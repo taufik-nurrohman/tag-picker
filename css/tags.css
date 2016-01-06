@@ -1,0 +1,45 @@
+.tags {
+  display:inline-block;
+  background-color:white;
+  border:1px solid black;
+  font:normal normal normal 16px/18px Helmet,FreeSans,Sans-Serif;
+  color:black;
+  padding:4px 4px 0 0;
+  cursor:text;
+}
+
+.tags-input {
+  display:inline-block;
+  width:10em;
+  margin:0 0 4px;
+  padding:4px 6px;
+  background:none;
+  border:0;
+  outline:0;
+  font:inherit;
+  color:inherit;
+  text-align:left;
+  text-shadow:none;
+}
+
+.tags-output {
+  display:inline-block;
+  margin-left:4px;
+}
+
+.tags-output span {
+  display:inline-block;
+  background-color:red;
+  margin:0 4px 4px 0;
+  padding:4px 6px;
+  border-radius:2px;
+  cursor:default;
+}
+
+.tags-output a {
+  display:inline-block;
+  text-decoration:none;
+  color:white;
+  cursor:pointer;
+  margin-left:6px;
+}

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Demo</title>
+    <link href="css/tags.css" rel="stylesheet">
+  </head>
+  <body>
+    <form method="get" target="_blank">
+      <p><input name="title" type="text"></p>
+      <p><textarea name="content"></textarea></p>
+      <p><input name="tags" type="text" placeholder="foo, bar, baz"></p>
+      <p><button type="submit">Submit</button></p>
+    </form>
+    <script src="js/tags.js"></script>
+    <script>
+    var form = document.querySelector('form');
+    var foo = new Tags(form.tags, ', ');
+    foo.beautify();
+    </script>
+  </body>
+</html>
