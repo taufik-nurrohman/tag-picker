@@ -1,11 +1,15 @@
 Simplest Tags Input Beautifier
 ==============================
 
+> Better tags input interaction with JavaScript.
+
 What is this?
 
 **Demo:**
 
 ![Image]()
+
+&rarr; https://rawgit.com/tovic/tags-input-beautifier/master/index.html
 
 Got it?
 
@@ -63,10 +67,17 @@ Variable | Description
 config = {
     join: ', ', // Tags joiner of the output value
     max: 9999, // Maximum tags allowed
+    values: ['foo', 'bar'], // pre-defined tags data
     d_text: 'Duplicate %s Tag', // Alert text if duplicate tags found
-    r_text: 'Remove %s Tag', // Remove message in `x` button
+    x_text: 'Remove %s Tag', // Remove message in `x` button
     i_class: 'tags-input', // Classes to be added to the tags input element
     o_class: 'tags-output', // Custom classes for the tags output 
-    w_class: 'tags' // Custom classes for the tags input wrapper
+    w_class: 'tags', // Custom classes for the tags input wrapper
+    update: function() {} // Hook that will be triggered on every tags item update
 };
 ~~~
+
+Playground
+----------
+
+ * -
