@@ -7,7 +7,7 @@ What is this?
 
 **Demo:**
 
-![Image]()
+![Image](https://cloud.githubusercontent.com/assets/1669261/12162361/7b457e14-b533-11e5-990a-8805cac26bb3.gif)
 
 &rarr; https://rawgit.com/tovic/tags-input-beautifier/master/index.html
 
@@ -80,4 +80,4 @@ config = {
 Playground
 ----------
 
- * -
+ * http://codepen.io/tovic/pen/ZQewJq
