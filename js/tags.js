@@ -45,8 +45,8 @@ var Tags = function(input, config) {
     }
 
     base.input = input;
-    base.config = config;
     base.output = false;
+    base.config = config;
 
     // validate tag name
     base.sanitize = function(text) {
