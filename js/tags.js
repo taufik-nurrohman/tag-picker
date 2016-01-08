@@ -50,7 +50,7 @@ var Tags = function(input, config) {
 
     // validate tag name
     base.sanitize = function(text) {
-        return text.replace(/,|\s{2,}/g, "").toLowerCase();
+        return text.replace(/,|^\s+|\s+$|\s{2,}/g, "").toLowerCase();
     };
 
     // clear tag(s) input field
