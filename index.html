@@ -15,13 +15,14 @@
     <script src="js/tags.js"></script>
     <script>
     var form = document.querySelector('form');
-    var foo = (new Tags(form.tags, {
+    var foo = new Tags(form.tags, {
         join: ', ',
         values: form.tags.value.split(', '),
         update: function(tags) {
             console.log(tags); // check the added tags on every update event
         }
-    })).beautify();
+    });
+    foo.beautify();
     </script>
   </body>
 </html>

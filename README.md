@@ -77,6 +77,106 @@ config = {
 };
 ~~~
 
+Methods
+-------
+
+### Initiation
+
+~~~ .javascript
+var foo = new Tags( … );
+~~~
+
+### Run the Plugin
+
+~~~ .javascript
+foo.beautify();
+~~~
+
+### Get Tags Data
+
+~~~ .javascript
+console.log(foo.tags);
+~~~
+
+### Get Tags Input Element
+
+~~~ .javascript
+console.log(foo.input);
+~~~
+
+### Get Tags Output Element
+
+~~~ .javascript
+console.log(foo.output);
+~~~
+
+### Get Configuration Data
+
+~~~ .javascript
+console.log(foo.config);
+~~~
+
+### Clear Tags Input Value
+
+~~~ .javascript
+foo.clear();
+~~~
+
+### Clear Tags Output Preview
+
+~~~ .javascript
+foo.input.previousSibling.innerHTML = "";
+~~~
+
+### Refresh Tags Output
+
+~~~ .javascript
+foo.refresh();
+~~~
+
+### Clear Tags Output Value
+
+~~~ .javascript
+foo.input.previousSibling.innerHTML = "";
+foo.clear();
+foo.refresh();
+~~~
+
+### Validate Tag Name
+
+Create custom tag input sanitizer before plugin execution:
+
+~~~ .javascript
+foo.sanitize = function(text) {
+    text = text.replace(/^\s+|\s+$/g, ""); // trim white-space(s)
+    text = text.replace(/,/g, ""); // disallow `,` in tag name
+    text = text.toLowerCase(); // force lower-case letter(s)
+    return text;
+};
+
+foo.beautify();
+~~~
+
+### Add Tag Item Dynamically
+
+~~~ .javascript
+foo.add('new tag name');
+~~~
+
+### Check for Duplicate Tag Name
+
+~~~ .javascript
+if ('my new tag name' in foo.tags) {
+    alert('Duplicate `my new tag name` !!!')
+}
+~~~
+
+### Check for Tags Length
+
+~~~ .javascript
+console.log(Object.keys(foo.tags).length);
+~~~
+
 Playground
 ----------
 
