@@ -17,7 +17,7 @@
     var form = document.querySelector('form');
     var foo = new Tags(form.tags, {
         join: ', ',
-        values: true, // is qual to `foo.input.value.split(foo.config.join)`
+        values: true, // is equal to `foo.input.value.split(foo.config.join)`
         update: function(tags) {
             console.log(tags); // check the added tags on every update event
         }
