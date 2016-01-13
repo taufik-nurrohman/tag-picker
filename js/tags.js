@@ -8,8 +8,10 @@
  *   License: MIT
  *
  * -- USAGE: ---------------------------------------------
- * var foo = new Tags(document.querySelector('input'));
- * foo.beautify();
+ *
+ *   var foo = new Tags(document.querySelector('input'));
+ *   foo.beautify();
+ *
  * -------------------------------------------------------
  *
  */
@@ -55,7 +57,7 @@ var Tags = function(input, config) {
 
     // clear tag(s) input field
     base.clear = function() {
-        base.input.value = "";
+        input.value = "";
     };
 
     // create new tag item
@@ -67,7 +69,7 @@ var Tags = function(input, config) {
         a.title = config.x_text.replace(/%s/g, text);
         a.setAttribute('data-tag', text);
         a.href = '#tag:remove';
-        a.innerHTML = '&times';
+        a.innerHTML = '&times;';
         a.onclick = function() {
             delete base.tags[this.getAttribute('data-tag')];
             this.parentNode.parentNode.removeChild(this.parentNode);
@@ -89,19 +91,22 @@ var Tags = function(input, config) {
 
     // convert text input into "tags input"
     base.draw = function() {
-        var e = base.input,
+        var e = input,
             n = e.name,
             w = el('label');
         base.output = el('input');
         base.output.name = n;
         base.output.type = "hidden";
-        base.input.removeAttribute('name');
+        e.removeAttribute('name');
         e.className += ' ' + config.i_class;
         w.className = config.w_class;
         w.innerHTML = '<span class="' + config.o_class + '"></span>';
         e.parentNode.insertBefore(w, e);
         w.appendChild(e);
         w.appendChild(base.output);
+        if (config.values === true) {
+            config.values = input.value.split(config.join);
+        }
         for (var i in config.values) {
             base.add(base.sanitize(config.values[i]));
         }
