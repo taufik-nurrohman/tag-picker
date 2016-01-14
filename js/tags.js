@@ -18,6 +18,8 @@
 
 var Tags = function(input, config) {
 
+    config = config || {};
+
     var base = this,
         el = function(x) {
             return document.createElement(x);
@@ -25,7 +27,7 @@ var Tags = function(input, config) {
         d = {
             join: ', ',
             max: 9999,
-            values: [],
+            values: true,
             d_text: 'Duplicate \u201C%s\u201D Tag',
             x_text: 'Remove \u201C%s\u201D Tag',
             i_class: 'tags-input',
