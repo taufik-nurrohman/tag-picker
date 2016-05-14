@@ -110,7 +110,9 @@ var Tags = function(input, config) {
             config.values = input.value.split(config.join);
         }
         for (var i in config.values) {
-            base.add(base.sanitize(config.values[i]));
+            var s = base.sanitize(config.values[i]);
+            if (!s) continue;
+            base.add(s);
         }
     };
 
