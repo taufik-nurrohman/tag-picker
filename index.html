@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Demo</title>
-    <link href="css/tags.css" rel="stylesheet">
+    <link href="tags-input-beautifier.min.css" rel="stylesheet">
   </head>
   <body>
     <form method="get" target="_blank">
@@ -12,17 +12,16 @@
       <p><input name="tags" type="text" value="foo, bar" placeholder="foo, bar, baz"></p>
       <p><button type="submit">Submit</button></p>
     </form>
-    <script src="js/tags.js"></script>
+    <script src="tags-input-beautifier.min.js"></script>
     <script>
     var form = document.querySelector('form');
-    var foo = new Tags(form.tags, {
+    var foo = new TIB(form.tags, {
         join: ', ',
-        values: true, // is equal to `foo.input.value.split(foo.config.join)`
         update: function(tags) {
             console.log(tags); // check the added tags on every update event
         }
     });
-    foo.beautify();
+    foo.create();
     </script>
   </body>
 </html>

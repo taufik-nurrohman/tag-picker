@@ -9,7 +9,7 @@ What is this?
 
 ![Image](https://cloud.githubusercontent.com/assets/1669261/12162361/7b457e14-b533-11e5-990a-8805cac26bb3.gif)
 
-&rarr; https://rawgit.com/tovic/tags-input-beautifier/master/index.html
+&rarr; https://tovic.github.io/tags-input-beautifier
 
 Got it?
 
@@ -20,7 +20,7 @@ First, load the CSS file in the `<head>` area:
 
 ~~~ .html
   …
-  <link href="css/tags.min.css" rel="stylesheet">
+  <link href="tags-input-beautifier.min.css" rel="stylesheet">
 </head>
 ~~~
 
@@ -34,7 +34,7 @@ Then, load the JS file just before the `</body>` tag:
 
 ~~~ .html
   …
-  <script src="js/tags.min.js"></script>
+  <script src="tags-input-beautifier.min.js"></script>
 </body>
 ~~~
 
@@ -43,10 +43,10 @@ Then, run the plugin:
 
 ~~~ .html
   …
-  <script src="js/tags.min.js"></script>
+  <script src="tags-input-beautifier.min.js"></script>
   <script>
-  var foo = new Tags(document.querySelector('input[name="tags"]'));
-  foo.beautify();
+  var foo = new TIB(document.querySelector('input[name="tags"]'));
+  foo.create();
   </script>
 </body>
 ~~~
@@ -55,12 +55,12 @@ Options
 -------
 
 ~~~ .javascript
-var foo = new Tags(elem, config);
+var foo = new TIB(input, config);
 ~~~
 
 Variable | Description
 -------- | -----------
-`elem` | The text input element you want to beautify.
+`input` | The text input element you want to beautify.
 `config` | The configuration data. See below!
 
 ~~~ .javascript
@@ -68,11 +68,8 @@ config = {
     join: ', ', // Tags joiner of the output value
     max: 9999, // Maximum tags allowed
     values: ['foo', 'bar'], // pre-defined tags data
-    d_text: 'Duplicate %s Tag', // Alert text if duplicate tags found
-    x_text: 'Remove %s Tag', // Remove message in `x` button
-    i_class: 'tags-input', // Classes to be added to the tags input element
-    o_class: 'tags-output', // Custom classes for the tags output 
-    w_class: 'tags', // Custom classes for the tags input wrapper
+    classes: ['tags', 'tags-input', 'tags-output'], // HTML classes
+    text: ['Remove \u201C%s\u201D Tag', 'Duplicate \u201C%s\u201D Tag'],
     update: function() {} // Hook that will be triggered on every tags item update
 };
 ~~~
@@ -83,13 +80,13 @@ Methods
 ### Initiation
 
 ~~~ .javascript
-var foo = new Tags( … );
+var foo = new TIB( … );
 ~~~
 
 ### Run the Plugin
 
 ~~~ .javascript
-foo.beautify();
+foo.create();
 ~~~
 
 ### Get Tags Data
@@ -119,7 +116,7 @@ console.log(foo.config);
 ### Clear Tags Input Value
 
 ~~~ .javascript
-foo.clear();
+foo.reset();
 ~~~
 
 ### Clear Tags Output Preview
@@ -131,15 +128,14 @@ foo.input.previousSibling.innerHTML = "";
 ### Refresh Tags Output
 
 ~~~ .javascript
-foo.refresh();
+foo.update();
 ~~~
 
 ### Clear Tags Output Value
 
 ~~~ .javascript
 foo.input.previousSibling.innerHTML = "";
-foo.clear();
-foo.refresh();
+foo.reset().update();
 ~~~
 
 ### Validate Tag Name
@@ -147,20 +143,20 @@ foo.refresh();
 Create custom tag input sanitizer before plugin execution:
 
 ~~~ .javascript
-foo.sanitize = function(text) {
+foo.filter = function(text) {
     text = text.replace(/^\s+|\s+$/g, ""); // trim white-space(s)
     text = text.replace(/,/g, ""); // disallow `,` in tag name
     text = text.toLowerCase(); // force lower-case letter(s)
     return text;
 };
 
-foo.beautify();
+foo.create();
 ~~~
 
 ### Add Tag Item Dynamically
 
 ~~~ .javascript
-foo.add('new tag name');
+foo.set('new tag name');
 ~~~
 
 ### Check for Duplicate Tag Name

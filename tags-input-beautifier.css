@@ -1,18 +1,17 @@
 .tags {
   display:inline-block;
-  background-color:white;
-  border:1px solid black;
-  font:normal normal normal 16px/18px Helmet,FreeSans,Sans-Serif;
-  color:black;
-  padding:4px 4px 0 0;
+  background:#fff;
+  border:1px solid;
+  font:normal normal normal 16px/1.25 Helmet,FreeSans,sans-serif;
+  color:#000;
+  padding:.25em .25em 0 0;
   cursor:text;
 }
-
 .tags-input {
   display:inline-block;
   width:10em;
-  margin:0 0 4px;
-  padding:4px 6px;
+  margin:0 0 .25em;
+  padding:.25em .4375em;
   background:none;
   border:0;
   outline:0;
@@ -21,25 +20,24 @@
   text-align:left;
   text-shadow:none;
 }
-
 .tags-output {
   display:inline-block;
-  margin-left:4px;
+  margin-left:.25em;
 }
-
 .tags-output span {
   display:inline-block;
-  background-color:red;
-  margin:0 4px 4px 0;
-  padding:4px 6px;
-  border-radius:2px;
+  background:#f00;
+  color:inherit;
+  margin:0 .25em .25em 0;
+  padding:.25em .4375em;
+  border-radius:.125em;
   cursor:default;
 }
-
 .tags-output a {
   display:inline-block;
   text-decoration:none;
-  color:white;
+  color:#fff;
   cursor:pointer;
-  margin-left:6px;
+  margin-left:.4375em;
 }
+.tags-output a:before {content:'\00d7'}
