@@ -130,7 +130,7 @@
         function _create() {
             var e = input,
                 n = e.name,
-                w = el('label'),
+                w = el('span'),
                 classes = config.classes;
             output = el('input');
             output.name = n;
@@ -139,6 +139,9 @@
             e.className += ' ' + classes[1];
             w.className = classes[0];
             w.innerHTML = '<span class="' + classes[2] + '"></span>';
+            w.onclick = function() {
+                input.focus();
+            };
             e[parent].insertBefore(w, e);
             w[append](e);
             w[append](output);
