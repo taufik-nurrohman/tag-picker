@@ -1,17 +1,20 @@
 .tags {
-  display:inline-block;
+  display:block;
   background:#fff;
   border:1px solid;
-  font:normal normal normal 16px/1.25 Helmet,FreeSans,sans-serif;
+  font:normal normal normal 13px/1.25 Helmet,FreeSans,sans-serif;
   color:#000;
   padding:.25em .25em 0 0;
   cursor:text;
 }
-.tags-input {
+.tags-input,
+.tags-output {
   display:inline-block;
-  width:10em;
-  margin:0 0 .25em;
-  padding:.25em .4375em;
+  vertical-align:middle;
+  width:auto;
+  height:auto;
+  margin:0;
+  padding:0;
   background:none;
   border:0;
   outline:0;
@@ -20,10 +23,8 @@
   text-align:left;
   text-shadow:none;
 }
-.tags-output {
-  display:inline-block;
-  margin-left:.25em;
-}
+.tags-output {margin-left:.25em}
+.tags-input,
 .tags-output span {
   display:inline-block;
   background:#f00;
@@ -32,6 +33,13 @@
   padding:.25em .4375em;
   border-radius:.125em;
   cursor:default;
+}
+.tags-input {
+  min-width:10em;
+  background:none;
+  padding-right:0;
+  border-radius:0;
+  cursor:inherit;
 }
 .tags-output a {
   display:inline-block;

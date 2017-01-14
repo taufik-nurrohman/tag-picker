@@ -25,7 +25,9 @@
         get = 'getAttribute',
         reset = 'removeAttribute',
         append = 'appendChild',
-        remove = 'removeChild';
+        remove = 'removeChild',
+        cn = 'className',
+        tlc = 'toLowerCase';
 
     function is_set(x) {
         return typeof x !== "undefined";
@@ -38,7 +40,7 @@
     (function($) {
 
         // plugin version
-        $.version = '2.0.0';
+        $.version = '2.0.1';
 
         // collect all instance(s)
         $[instance] = {};
@@ -89,7 +91,7 @@
 
         // validate tag name
         $.filter = function(text) {
-            return text.replace(new RegExp('[' + config.join.replace(/\s/g, "") + ']|^\\s+|\\s+$|\\s{2,}', 'g'), "").toLowerCase();
+            return text.replace(new RegExp('[' + config.join.replace(/\s/g, "") + ']|^\\s+|\\s+$|\\s{2,}', 'g'), "")[tlc]();
         };
 
         // clear tag(s) input field
@@ -136,8 +138,8 @@
             output.name = n;
             output.type = 'hidden';
             e[reset]('name');
-            e.className += ' ' + classes[1];
-            w.className = classes[0];
+            e[cn] += ' ' + classes[1];
+            w[cn] = classes[0];
             w.innerHTML = '<span class="' + classes[2] + '"></span>';
             w.onclick = function() {
                 input.focus();
@@ -146,7 +148,7 @@
             w[append](e);
             w[append](output);
             if (config.values === true) {
-                config.values = input.value.split(config.join);
+                config.values = e.value.split(config.join);
             }
             for (i in config.values) {
                 var s = $.filter(config.values[i]);
@@ -173,15 +175,22 @@
         $.create = function() {
             _create();
             $.reset();
+            var p = el('div');
+			p.style.cssText = 'font:inherit;white-space:pre;width:auto;position:absolute;top:0;left:0;visibility:hidden;';
+            input[parent][append](p);
+            p[cn] = input[cn];
             input.onkeydown = function(e) {
-                var display = input.previousSibling,
+                var t = this,
+                    display = input.previousSibling,
                     d = display.lastChild,
                     k = e.keyCode,
-                    key = e.key || "",
-                    v = this.value,
+                    key = (e.key || "")[tlc](),
+                    v = t.value,
                     shift = e.shiftKey, d;
+                p.textContent = v;
+                t.style.width = p.offsetWidth + 'px';
                 // `backspace`
-                if (!$.filter(v) && (key === 'Backspace' || k === 8)) {
+                if (!v && (key === 'backspace' || k === 8)) {
                     if (d) {
                         var dd = d.children[0][get]('data-tag');
                         display[remove](d);
@@ -192,7 +201,7 @@
                 } else  if (key === ',' || (!shift && k === 188)) {
                     return add(v);
                 // `enter` key
-                } else if (key === 'Enter' || e.keyCode === 13) {
+                } else if (key === 'enter' || k === 13) {
                     return add(v), true;
                 }
                 return $;
