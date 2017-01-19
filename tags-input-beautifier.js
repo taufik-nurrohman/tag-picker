@@ -26,6 +26,8 @@
         reset = 'removeAttribute',
         append = 'appendChild',
         remove = 'removeChild',
+        html = 'innerHTML',
+        text = 'textContent',
         cn = 'className',
         tlc = 'toLowerCase';
 
@@ -40,7 +42,7 @@
     (function($) {
 
         // plugin version
-        $.version = '2.0.1';
+        $.version = '2.0.2';
 
         // collect all instance(s)
         $[instance] = {};
@@ -90,32 +92,32 @@
         $.config = config;
 
         // validate tag name
-        $.filter = function(text) {
-            return text.replace(new RegExp('[' + config.join.replace(/\s/g, "") + ']|^\\s+|\\s+$|\\s{2,}', 'g'), "")[tlc]();
+        $.filter = function(t) {
+            return t.replace(new RegExp('[' + config.join.replace(/\s/g, "") + ']|^\\s+|\\s+$|\\s{2,}', 'g'), "")[tlc]();
         };
 
         // clear tag(s) input field
         $.reset = function() {
-            return input.value = "", $;
+            return output[text] = "", $;
         };
 
         // set new tag item
-        $.set = function(text) {
+        $.set = function(t) {
             var d = input.previousSibling,
                 s = el('span'),
                 a = el('a');
-            s.innerHTML = text;
-            a.title = config.text[0].replace(/%s/g, text);
-            a[set]('data-tag', text);
+            s[html] = t;
+            a.title = config.text[0].replace(/%s/g, t);
+            a[set]('data-tag', t);
             a.href = 'javascript:;';
             a.onclick = function() {
                 delete $.tags[this[get]('data-tag')];
                 this[parent][parent][remove](this[parent]);
-                return $.update(), input.focus(), false;
+                return $.update(), output.focus(), false;
             };
             s[append](a);
             d[append](s);
-            $.tags[text] = 1;
+            $.tags[t] = 1;
             return $;
         };
 
@@ -130,25 +132,24 @@
 
         // convert text input into “tag” item
         function _create() {
-            var e = input,
-                n = e.name,
-                w = el('span'),
+            var w = el('span'),
                 classes = config.classes;
-            output = el('input');
-            output.name = n;
-            output.type = 'hidden';
-            e[reset]('name');
-            e[cn] += ' ' + classes[1];
+            output = el('span');
+            output[cn] = input[cn];
+            output[set]('contenteditable', 'true');
+            output[set]('spellcheck', 'false');
+            input.type = 'hidden';
+            input[cn] += ' ' + classes[1];
             w[cn] = classes[0];
-            w.innerHTML = '<span class="' + classes[2] + '"></span>';
+            w[html] = '<span class="' + classes[2] + '"></span>';
             w.onclick = function() {
-                input.focus();
+                output.focus();
             };
-            e[parent].insertBefore(w, e);
-            w[append](e);
+            input[parent].insertBefore(w, input);
+            w[append](input);
             w[append](output);
             if (config.values === true) {
-                config.values = e.value.split(config.join);
+                config.values = input.value.split(config.join);
             }
             for (i in config.values) {
                 var s = $.filter(config.values[i]);
@@ -175,20 +176,13 @@
         $.create = function() {
             _create();
             $.reset();
-            var p = el('div');
-			p.style.cssText = 'font:inherit;white-space:pre;width:auto;position:absolute;top:0;left:0;visibility:hidden;';
-            input[parent][append](p);
-            p[cn] = input[cn];
-            input.onkeydown = function(e) {
-                var t = this,
-                    display = input.previousSibling,
+            output.onkeydown = function(e) {
+                var display = input.previousSibling,
                     d = display.lastChild,
                     k = e.keyCode,
                     key = (e.key || "")[tlc](),
-                    v = t.value,
+                    v = this[text],
                     shift = e.shiftKey, d;
-                p.textContent = v;
-                t.style.width = p.offsetWidth + 'px';
                 // `backspace`
                 if (!v && (key === 'backspace' || k === 8)) {
                     if (d) {
@@ -206,8 +200,8 @@
                 }
                 return $;
             };
-            input.onblur = function() {
-                return add(this.value);
+            output.onblur = function() {
+                return add(this[text]);
             };
             return $.update();
         };
