@@ -43,3 +43,10 @@
   margin-left:.4375em;
 }
 .tags-output a:before {content:'\00D7'}
+
+/* fake placeholder */
+.tags-input + span:empty:after {
+  content:attr(data-placeholder);
+  opacity:.5;
+  cursor:text;
+}

@@ -132,22 +132,22 @@
 
         // convert text input into “tag” item
         function _create() {
-            var w = el('span'),
+            var wrap = el('span'),
                 classes = config.classes;
             output = el('span');
-            output[cn] = input[cn];
             output[set]('contenteditable', 'true');
             output[set]('spellcheck', 'false');
+            output[set]('data-placeholder', input.placeholder);
             input.type = 'hidden';
             input[cn] += ' ' + classes[1];
-            w[cn] = classes[0];
-            w[html] = '<span class="' + classes[2] + '"></span>';
-            w.onclick = function() {
+            wrap[cn] = classes[0];
+            wrap[html] = '<span class="' + classes[2] + '"></span>';
+            wrap.onclick = function() {
                 output.focus();
             };
-            input[parent].insertBefore(w, input);
-            w[append](input);
-            w[append](output);
+            input[parent].insertBefore(wrap, input);
+            wrap[append](input);
+            wrap[append](output);
             if (config.values === true) {
                 config.values = input.value.split(config.join);
             }
