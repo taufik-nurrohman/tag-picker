@@ -45,8 +45,10 @@
 .tags-output a:before {content:'\00D7'}
 
 /* fake placeholder */
-.tags-input + span:empty:after {
-  content:attr(data-placeholder);
+.tags-output:empty + .tags-input + span:empty:before {
+  content:attr(placeholder);
   opacity:.5;
+  display:block;
   cursor:text;
 }
+.tags-output:empty + .tags-input + span:empty:focus:before {display:none}

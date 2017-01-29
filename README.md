@@ -54,7 +54,7 @@ Then, run the plugin:
 Options
 -------
 
-~~~ .javascript
+~~~ .js
 var foo = new TIB(input, config);
 ~~~
 
@@ -63,13 +63,14 @@ Variable | Description
 `input` | The text input element you want to beautify.
 `config` | The configuration data. See below!
 
-~~~ .javascript
+~~~ .js
 config = {
     join: ', ', // Tags joiner of the output value
     max: 9999, // Maximum tags allowed
     values: ['foo', 'bar'], // pre-defined tags data
     classes: ['tags', 'tags-input', 'tags-output'], // HTML classes
     text: ['Remove \u201C%s\u201D Tag', 'Duplicate \u201C%s\u201D Tag'],
+    alert: true,
     update: function() {} // Hook that will be triggered on every tags item update
 };
 ~~~
@@ -79,70 +80,69 @@ Methods
 
 ### Initiation
 
-~~~ .javascript
+~~~ .js
 var foo = new TIB( … );
 ~~~
 
 ### Run the Plugin
 
-~~~ .javascript
+~~~ .js
 foo.create();
 ~~~
 
 ### Get Tags Data
 
-~~~ .javascript
+~~~ .js
 console.log(foo.tags);
 ~~~
 
 ### Get Tags Input Element
 
-~~~ .javascript
+~~~ .js
 console.log(foo.input);
 ~~~
 
 ### Get Tags Output Element
 
-~~~ .javascript
+~~~ .js
 console.log(foo.output);
 ~~~
 
 ### Get Configuration Data
 
-~~~ .javascript
+~~~ .js
 console.log(foo.config);
 ~~~
 
-### Clear Tags Input Value
+### Clear Tags Input Field
 
-~~~ .javascript
+~~~ .js
+foo.clear();
+~~~
+
+### Remove All Tags Input Value
+
+~~~ .js
 foo.reset();
 ~~~
 
-### Clear Tags Output Preview
+### Remove Tag Item Dynamically
 
-~~~ .javascript
-foo.input.previousSibling.innerHTML = "";
+~~~ .js
+foo.reset('bar');
 ~~~
 
-### Refresh Tags Output
+### Refresh Tags Value
 
-~~~ .javascript
+~~~ .js
 foo.update();
-~~~
-
-### Clear Tags Output Value
-
-~~~ .javascript
-foo.input.previousSibling.innerHTML = "";
-foo.reset().update();
 ~~~
 
 ### Validate Tag Name
 
 Create custom tag input sanitizer before plugin execution:
 
-~~~ .javascript
+~~~ .js
 foo.filter = function(text) {
     text = text.replace(/^\s+|\s+$/g, ""); // trim white-space(s)
     text = text.replace(/,/g, ""); // disallow `,` in tag name
@@ -155,25 +155,25 @@ foo.create();
 
 ### Add Tag Item Dynamically
 
-~~~ .javascript
-foo.set('new tag name');
+~~~ .js
+foo.set('bar');
 ~~~
 
 ### Check for Duplicate Tag Name
 
-~~~ .javascript
-if ('my new tag name' in foo.tags) {
-    alert('Duplicate `my new tag name` !!!')
+~~~ .js
+if ('bar' in foo.tags) {
+    alert('Duplicate `bar` !!!')
 }
 ~~~
 
 ### Check for Tags Length
 
-~~~ .javascript
+~~~ .js
 console.log(Object.keys(foo.tags).length);
 ~~~
 
 Playground
 ----------
 
- * http://codepen.io/tovic/pen/ZQewJq
+ - http://codepen.io/tovic/pen/ZQewJq

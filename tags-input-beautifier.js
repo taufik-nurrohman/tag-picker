@@ -1,6 +1,6 @@
 /*!
  * =======================================================
- *  SIMPLEST TAGS INPUT BEAUTIFIER
+ *  SIMPLEST TAGS INPUT BEAUTIFIER 2.0.4
  * =======================================================
  *
  *   Author: Taufik Nurrohman
@@ -21,6 +21,7 @@
     var instance = '__instance__',
         delay = setTimeout,
         parent = 'parentNode',
+        previous = 'previousSibling',
         set = 'setAttribute',
         get = 'getAttribute',
         reset = 'removeAttribute',
@@ -29,6 +30,7 @@
         html = 'innerHTML',
         text = 'textContent',
         cn = 'className',
+        nn = 'nodeName',
         tlc = 'toLowerCase';
 
     function is_set(x) {
@@ -42,7 +44,7 @@
     (function($) {
 
         // plugin version
-        $.version = '2.0.2';
+        $.version = '2.0.4';
 
         // collect all instance(s)
         $[instance] = {};
@@ -71,8 +73,9 @@
                 values: true,
                 classes: ['tags', 'tags-input', 'tags-output'],
                 text: ['Remove \u201C%s\u201D Tag', 'Duplicate \u201C%s\u201D Tag'],
+                alert: true,
                 update: function() {}
-            }, i, output;
+            }, i, j, output;
 
         TIB[instance][input.id || input.name || object_keys_length(TIB[instance])] = $;
 
@@ -97,13 +100,29 @@
         };
 
         // clear tag(s) input field
-        $.reset = function() {
+        $.clear = function() {
             return output[text] = "", $;
+        };
+  
+        // reset tag(s) input field and output
+        $.reset = function(t) {
+            input[previous][html] = "";
+            if (t) {
+                delete $.tags[t];
+                j = $.tags;
+                $.tags = {};
+                for (i in j) {
+                    $.set(i);
+                }
+            } else {
+                $.tags = {};
+            }
+            return $.clear().update();
         };
 
         // set new tag item
         $.set = function(t) {
-            var d = input.previousSibling,
+            var d = input[previous],
                 s = el('span'),
                 a = el('a');
             s[html] = t;
@@ -121,12 +140,10 @@
             return $;
         };
 
-        // update tag(s) value …
+        // update tag(s) value…
         $.update = function() {
             var v = Object.keys($.tags).join(config.join);
-            if (output) {
-                output.value = v;
-            }
+            input.value = v;
             return config.update($.tags), $;
         };
 
@@ -137,7 +154,7 @@
             output = el('span');
             output[set]('contenteditable', 'true');
             output[set]('spellcheck', 'false');
-            output[set]('data-placeholder', input.placeholder);
+            output[set]('placeholder', input.placeholder);
             input.type = 'hidden';
             input[cn] += ' ' + classes[1];
             wrap[cn] = classes[0];
@@ -159,15 +176,15 @@
 
         function add(value) {
             var v = $.filter(value);
-            $.reset();
+            $.clear();
             // empty tag name or reached the max tags, do nothing!
             if (!v || object_keys_length($.tags) === config.max) {
                 return false;
             }
             // duplicate tag name, alert!
             if (v in $.tags) {
-                alert(config.text[1].replace(/%s/g, v));
-                return $.reset(), false;
+                if (config.alert) alert(config.text[1].replace(/%s/g, v));
+                return $.clear(), false;
             }
             return $.set(v).update(), false;
         }
@@ -175,9 +192,9 @@
         // apply the beautifier
         $.create = function() {
             _create();
-            $.reset();
+            $.clear();
             output.onkeydown = function(e) {
-                var display = input.previousSibling,
+                var display = input[previous],
                     d = display.lastChild,
                     k = e.keyCode,
                     key = (e.key || "")[tlc](),
@@ -196,7 +213,16 @@
                     return add(v);
                 // `enter` key
                 } else if (key === 'enter' || k === 13) {
-                    return add(v), true;
+                    var form,
+                        p = input;
+                    // submit form on `enter` key in the `span[contenteditable]`
+                    while (p = p[parent]) {
+                        if (p[nn][tlc]() === 'form') {
+                            form = p;
+                            break;
+                        }
+                    }
+                    return add(v), (form && form.submit()), false;
                 }
                 return $;
             };
@@ -206,7 +232,7 @@
             return $.update();
         };
 
-        return ($.output = output), $;
+        return ($.output = input[previous]), $;
 
     });
 
