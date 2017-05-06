@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Demo</title>
+    <link href="tags-input-beautifier.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <p>Using <code>,</code> as tags separator (default):</p>
+    <p><input type="text" value="foo, bar, baz"></p>
+    <p>Using <code>;</code> as tags separator:</p>
+    <input type="text" value="foo; bar; baz">
+    <script src="tags-input-beautifier.min.js"></script>
+    <script>
+
+    var input = document.querySelectorAll('input');
+
+    var tags_0 = new TIB(input[0]),
+        tags_1 = new TIB(input[1], {
+            join: '; ',
+            escape: [';']
+        });
+
+    </script>
+  </body>
+</html>

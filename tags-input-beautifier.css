@@ -1,54 +1,66 @@
 .tags {
-  display:block;
-  background:#fff;
-  border:1px solid;
-  font:normal normal normal 13px/1.25 Helmet,FreeSans,sans-serif;
+  font:inherit;
+  font-weight:normal;
+  font-style:normal;
   color:#000;
-  padding:.25em .25em 0 0;
+  border:1px solid;
+  display:block;
+  line-height:1.25;
+  padding:.25em 0 0 .25em;
   cursor:text;
   overflow:hidden;
 }
-.tags-output,
-.tags-input + span {
+.tags span {
+  display:block;
   float:left;
-  min-height:1.25em;
-  margin:0 0 0 .25em;
-  padding:0;
-  background:none;
-  border:0;
-  outline:0;
-  font:inherit;
-  color:inherit;
-  text-align:left;
-  text-shadow:none;
+  position:relative;
 }
-.tags-output span,
-.tags-input + span {
-  float:left;
+.tags .tag,
+.tags-input {
   background:#f00;
-  color:inherit;
   margin:0 .25em .25em 0;
-  padding:.25em .4375em;
-  border-radius:.125em;
+  padding:.25em .5em;
+  min-height:1.25em;
   cursor:default;
 }
-.tags-input + span {
-  background:none;
-  border-radius:0;
+.tags .tag:before {content:attr(data-tag)}
+.tags:after,
+.tags-view:after {
+  content:"";
+  display:table;
+  clear:both;
 }
-.tags-output a {
-  text-decoration:none;
+.tags a {
+  display:inline-block;
+  margin:0 0 0 .5em;
   color:#fff;
+  text-decoration:none;
   cursor:pointer;
-  margin-left:.4375em;
 }
-.tags-output a:before {content:'\00D7'}
-
-/* fake placeholder */
-.tags-output:empty + .tags-input + span:empty:before {
-  content:attr(placeholder);
+.tags a:before {content:'\00D7'}
+.tags .tags-view {float:none}
+.tags .tags-input {
+  float:none;
+  background:none;
+  cursor:inherit;
+  min-width:1em;
+}
+.tags-input span {
+  float:none;
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  left:0;
+  z-index:4;
+  padding:inherit;
+}
+.tags-input span + span {
+  position:static;
+  padding:0;
   opacity:.5;
-  display:block;
-  cursor:text;
 }
-.tags-output:empty + .tags-input + span:empty:focus:before {display:none}
+.tags .tag + .tags-input {float:left}
+.tags .tag + .tags-input span + span {display:none}
+.tags-input span:focus + span {opacity:.4}
+.tags-output {display:none}

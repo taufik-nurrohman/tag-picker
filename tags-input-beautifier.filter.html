@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Demo</title>
+    <link href="tags-input-beautifier.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <p>Replace all characters with a <code>-</code> except <code>[a-z0-9-]</code> and convert all characters to their lower-case mode:</p>
+    <p><input type="text"></p>
+    <script src="tags-input-beautifier.min.js"></script>
+    <script>
+
+    var tags = new TIB(document.querySelector('input'));
+    tags.filter = function(text) {
+        return text.replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "").toLowerCase();
+    };
+
+    </script>
+  </body>
+</html>

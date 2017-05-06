@@ -45,8 +45,7 @@ Then, run the plugin:
   …
   <script src="tags-input-beautifier.min.js"></script>
   <script>
-  var foo = new TIB(document.querySelector('input[name="tags"]'));
-  foo.create();
+  var tags = new TIB(document.querySelector('input[name="tags"]'));
   </script>
 </body>
 ~~~
@@ -55,23 +54,23 @@ Options
 -------
 
 ~~~ .js
-var foo = new TIB(input, config);
+var tags = new TIB(target, config);
 ~~~
 
 Variable | Description
 -------- | -----------
-`input` | The text input element you want to beautify.
+`target` | The text input element you want to beautify.
 `config` | The configuration data. See below!
 
 ~~~ .js
 config = {
     join: ', ', // Tags joiner of the output value
     max: 9999, // Maximum tags allowed
-    values: ['foo', 'bar'], // pre-defined tags data
-    classes: ['tags', 'tags-input', 'tags-output'], // HTML classes
-    text: ['Remove \u201C%s\u201D Tag', 'Duplicate \u201C%s\u201D Tag'],
+    escape: [',', '\n'], // List of character(s) used to trigger the tag addition
     alert: true,
-    update: function() {} // Hook that will be triggered on every tags item update
+    text: ['Delete \u201C%s\u201D Tag', 'Duplicate \u201C%s\u201D Tag'],
+    classes: ['tags', 'tag', 'tags-input', 'tags-output', 'tags-view'], // HTML classes
+    update: function($) {} // Hook that will be triggered on every tags item update
 };
 ~~~
 
@@ -81,61 +80,55 @@ Methods
 ### Initiation
 
 ~~~ .js
-var foo = new TIB( … );
-~~~
-
-### Run the Plugin
-
-~~~ .js
-foo.create();
+var tags = new TIB( … );
 ~~~
 
 ### Get Tags Data
 
 ~~~ .js
-console.log(foo.tags);
+console.log(tags.tags);
 ~~~
 
-### Get Tags Input Element
+### Get Fake Tags Input Element
 
 ~~~ .js
-console.log(foo.input);
+console.log(tags.input);
 ~~~
 
-### Get Tags Output Element
+### Get Tags View HTML Element
 
 ~~~ .js
-console.log(foo.output);
+console.log(tags.view);
+~~~
+
+### Get Original Tags Input Element
+
+~~~ .js
+console.log(tags.output);
 ~~~
 
 ### Get Configuration Data
 
 ~~~ .js
-console.log(foo.config);
+console.log(tags.config);
 ~~~
 
-### Clear Tags Input Field
+### Remove All Tags
 
 ~~~ .js
-foo.clear();
+tags.reset();
 ~~~
 
-### Remove All Tags Input Value
+### Remove _bar_ Tag
 
 ~~~ .js
-foo.reset();
-~~~
-
-### Remove Tag Item Dynamically
-
-~~~ .js
-foo.reset('bar');
+tags.reset('bar');
 ~~~
 
 ### Refresh Tags Value
 
 ~~~ .js
-foo.update();
+tags.update();
 ~~~
 
 ### Validate Tag Name
@@ -143,26 +136,24 @@ foo.update();
 Create custom tag input sanitizer before plugin execution:
 
 ~~~ .js
-foo.filter = function(text) {
+tags.filter = function(text) {
     text = text.replace(/^\s+|\s+$/g, ""); // trim white-space(s)
     text = text.replace(/,/g, ""); // disallow `,` in tag name
     text = text.toLowerCase(); // force lower-case letter(s)
     return text;
 };
-
-foo.create();
 ~~~
 
-### Add Tag Item Dynamically
+### Add _bar_ Tag
 
 ~~~ .js
-foo.set('bar');
+tags.set('bar');
 ~~~
 
 ### Check for Duplicate Tag Name
 
 ~~~ .js
-if ('bar' in foo.tags) {
+if ('bar' in tags.tags) {
     alert('Duplicate `bar` !!!')
 }
 ~~~
@@ -170,7 +161,7 @@ if ('bar' in foo.tags) {
 ### Check for Tags Length
 
 ~~~ .js
-console.log(Object.keys(foo.tags).length);
+console.log(Object.keys(tags.tags).length);
 ~~~
 
 Playground

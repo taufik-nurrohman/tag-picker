@@ -1,6 +1,6 @@
 /*!
  * =======================================================
- *  SIMPLEST TAGS INPUT BEAUTIFIER 2.0.4
+ *  SIMPLEST TAGS INPUT BEAUTIFIER 2.1.0
  * =======================================================
  *
  *   Author: Taufik Nurrohman
@@ -9,42 +9,50 @@
  *
  * -- USAGE: ---------------------------------------------
  *
- *   var foo = new TIB(document.querySelector('input'));
- *   foo.create();
+ *   var tags = new TIB(document.querySelector('input'));
  *
  * -------------------------------------------------------
  *
  */
 
-(function(win, doc) {
+(function(win, doc, NS) {
 
     var instance = '__instance__',
         delay = setTimeout,
-        parent = 'parentNode',
-        previous = 'previousSibling',
-        set = 'setAttribute',
-        get = 'getAttribute',
-        reset = 'removeAttribute',
-        append = 'appendChild',
-        remove = 'removeChild',
         html = 'innerHTML',
         text = 'textContent',
-        cn = 'className',
-        nn = 'nodeName',
-        tlc = 'toLowerCase';
+        cla = 'className',
+        clas = 'classes',
+        tlc = 'toLowerCase',
+        re = 'replace',
+        first = 'firstChild',
+        parent = 'parentNode',
+        next = 'nextSibling',
+        previous = 'previousSibling',
+        append = 'appendChild',
+        prepend = 'insertBefore',
+        remove = 'removeChild',
+        set = 'setAttribute',
+        get = 'getAttribute',
+        stop = 'preventDefault',
+        ev = 'addEventListener';
 
-    function is_set(x) {
-        return typeof x !== "undefined";
+    function el(n) {
+        return doc.createElement(n);
+    }
+
+    function object_keys(o) {
+        return Object.keys(o);
     }
 
     function object_keys_length(o) {
-        return Object.keys(o).length;
+        return object_keys(o).length;
     }
 
     (function($) {
 
         // plugin version
-        $.version = '2.0.4';
+        $.version = '2.1.0';
 
         // collect all instance(s)
         $[instance] = {};
@@ -59,181 +67,191 @@
             }, t === 0 ? 0 : (t || 1)), $;
         };
 
-    })(win.TIB = function(input, config) {
-
-        config = config || {};
-
+    })(win[NS] = function(target, o) {
         var $ = this,
-            el = function(x) {
-                return doc.createElement(x);
-            },
-            d = {
+            hash = Date.now(),
+            placeholder = target.placeholder || "",
+            config = {
                 join: ', ',
                 max: 9999,
-                values: true,
-                classes: ['tags', 'tags-input', 'tags-output'],
-                text: ['Remove \u201C%s\u201D Tag', 'Duplicate \u201C%s\u201D Tag'],
+                escape: [',', '\n'],
                 alert: true,
+                text: ['Delete \u201C%s\u201D Tag', 'Duplicate \u201C%s\u201D Tag'],
+                classes: ['tags', 'tag', 'tags-input', 'tags-output', 'tags-view'],
                 update: function() {}
-            }, i, j, output;
-
-        TIB[instance][input.id || input.name || object_keys_length(TIB[instance])] = $;
-
+            },
+            wrap = el('span'),
+            input = el('span'),
+            id = 'data-tag', edit, i;
+        win[NS][instance][target.id || target.name || object_keys_length(win[NS][instance])] = $;
+        o = typeof o === "string" ? {join: o} : (o || {});
+        for (i in config) {
+            if (typeof o[i] !== "undefined") config[i] = o[i];
+        }
+        function on_focus() {
+            edit.focus();
+        }
+        function on_paste(e) {
+            var t = e ? this : edit, v;
+            delay(function() {
+                v = t[text].split(config.join);
+                for (i in v) {
+                    $.set(v[i], 1);
+                }
+            }, 1);
+        }
+        target[cla] = config[clas][3];
+        wrap[cla] = config[clas][0] + ' ' + config[clas][0] + '-' + hash;
+        wrap[ev]("click", on_focus, false);
+        wrap.id = target.id || config[clas][0] + '-' + hash;
+        wrap[html] = '<span class="' + config[clas][4] + '"></span>';
+        input[cla] = config[clas][2];
+        input[html] = '<span contenteditable spellcheck="false" style="white-space:pre;outline:none;"></span><span>' + placeholder + '</span>';
+        target[parent][prepend](wrap, target[next] || null);
+        wrap[first][append](input);
+        edit = input[first];
         $.tags = {};
-
-        if (typeof config === "string") {
-            config = {
-                join: config
-            };
-        }
-
-        for (i in d) {
-            if (!is_set(config[i])) config[i] = d[i];
-        }
-
-        $.input = input;
-        $.config = config;
-
-        // validate tag name
+        $.error = 0;
         $.filter = function(t) {
-            return t.replace(new RegExp('[' + config.join.replace(/\s/g, "") + ']|^\\s+|\\s+$|\\s{2,}', 'g'), "")[tlc]();
+            return (t + "")[re](new RegExp('[' + config.join[re](/\s/g, "") + ']|^\\s+|\\s+$|\\s{2,}', 'g'), "")[tlc]();
         };
-
-        // clear tag(s) input field
-        $.clear = function() {
-            return output[text] = "", $;
+        $.update = function(v, is_first) {
+            target.value = "";
+            while ((i = wrap[first][first]) && i[get](id)) {
+                wrap[first][remove](i);
+            }
+            v = v !== 0 ? v : object_keys($.tags);
+            for (i in v) {
+                $.set(v[i], 1, is_first);
+            }
+            return config.update($), $;
         };
-  
-        // reset tag(s) input field and output
         $.reset = function(t) {
-            input[previous][html] = "";
-            if (t) {
-                delete $.tags[t];
-                j = $.tags;
+            t = $.filter(t || "");
+            if (!t) {
                 $.tags = {};
-                for (i in j) {
-                    $.set(i);
+            } else {
+                delete $.tags[t];
+            }
+            return $.update(0, 1);
+        };
+        $.set = function(t, clear, is_first) {
+            t = $.filter(t);
+            // empty tag name or reached the max tags, do nothing!
+            if (t === "" || object_keys_length($.tags) === config.max) {
+                edit[html] = "";
+                return $;
+            }
+            var a = el('span'),
+                x = el('a');
+            a[cla] = config[clas][1];
+            a[set](id, t);
+            x.href = 'javascript:;';
+            x.title = config.text[0][re](/%s/g, t) || "";
+            x[ev]("click", function(e) {
+                var t = this,
+                    s = t[parent],
+                    n = t[parent][get](id);
+                s[parent][remove](s);
+                $.reset(n), on_focus();
+                e[stop]();
+            }, false);
+            a[append](x);
+            if ($.tags[t]) {
+                edit[html] = "";
+                if (!is_first) {
+                    if (config.alert) {
+                        $.error = 1;
+                        var text = config.text[1][re](/%s/g, t);
+                        if (typeof config.alert === "function") {
+                            config.alert(text, t, $);
+                        } else {
+                            alert(text);
+                        }
+                    }
+                } else {
+                    wrap[first][prepend](a, input);
                 }
             } else {
-                $.tags = {};
+                $.tags[t] = 1;
+                wrap[first][prepend](a, input);
             }
-            return $.clear().update();
+            target.value = object_keys($.tags).join(config.join);
+            if (clear) {
+                edit[html] = "";
+            }
+            return (!is_first && config.update($)), $;
         };
-
-        // set new tag item
-        $.set = function(t) {
-            var d = input[previous],
-                s = el('span'),
-                a = el('a');
-            s[html] = t;
-            a.title = config.text[0].replace(/%s/g, t);
-            a[set]('data-tag', t);
-            a.href = 'javascript:;';
-            a.onclick = function() {
-                delete $.tags[this[get]('data-tag')];
-                this[parent][parent][remove](this[parent]);
-                return $.update(), output.focus(), false;
-            };
-            s[append](a);
-            d[append](s);
-            $.tags[t] = 1;
-            return $;
-        };
-
-        // update tag(s) value…
-        $.update = function() {
-            var v = Object.keys($.tags).join(config.join);
-            input.value = v;
-            return config.update($.tags), $;
-        };
-
-        // convert text input into “tag” item
-        function _create() {
-            var wrap = el('span'),
-                classes = config.classes;
-            output = el('span');
-            output[set]('contenteditable', 'true');
-            output[set]('spellcheck', 'false');
-            output[set]('placeholder', input.placeholder);
-            input.type = 'hidden';
-            input[cn] += ' ' + classes[1];
-            wrap[cn] = classes[0];
-            wrap[html] = '<span class="' + classes[2] + '"></span>';
-            wrap.onclick = function() {
-                output.focus();
-            };
-            input[parent].insertBefore(wrap, input);
-            wrap[append](input);
-            wrap[append](output);
-            if (config.values === true) {
-                config.values = input.value.split(config.join);
-            }
-            for (i in config.values) {
-                var s = $.filter(config.values[i]);
-                s && $.set(s);
-            }
-        };
-
-        function add(value) {
-            var v = $.filter(value);
-            $.clear();
-            // empty tag name or reached the max tags, do nothing!
-            if (!v || object_keys_length($.tags) === config.max) {
-                return false;
-            }
-            // duplicate tag name, alert!
-            if (v in $.tags) {
-                if (config.alert) alert(config.text[1].replace(/%s/g, v));
-                return $.clear(), false;
-            }
-            return $.set(v).update(), false;
-        }
-
-        // apply the beautifier
-        $.create = function() {
-            _create();
-            $.clear();
-            output.onkeydown = function(e) {
-                var display = input[previous],
-                    d = display.lastChild,
+        (function() {
+            return edit[ev]("blur", function() {
+                $.error = 0;
+                $.set(this[text]);
+                this[html] = "";
+            }, false),
+            edit[ev]("paste", on_paste, false),
+            edit[ev]("keydown", function(e) {
+                $.error = 0;
+                var t = this,
                     k = e.keyCode,
-                    key = (e.key || "")[tlc](),
-                    v = this[text],
-                    shift = e.shiftKey, d;
-                // `backspace`
-                if (!v && (key === 'backspace' || k === 8)) {
-                    if (d) {
-                        var dd = d.children[0][get]('data-tag');
-                        display[remove](d);
-                        delete $.tags[dd];
-                    }
-                    return $.update(), false;
-                // `comma` key
-                } else  if (key === ',' || (!shift && k === 188)) {
-                    return add(v);
-                // `enter` key
-                } else if (key === 'enter' || k === 13) {
-                    var form,
-                        p = input;
-                    // submit form on `enter` key in the `span[contenteditable]`
+                    p = wrap,
+                    key = (e.key || String.fromCharCode(k))[tlc](),
+                    ctrl = e.ctrlKey,
+                    shift = e.shiftKey,
+                    data = input[previous] && input[previous][get](id),
+                    shadow = edit[next],
+                    is_tab = key === 'tab' || !shift && k === 9,
+                    is_enter = key === 'enter' || !shift && k === 13, form;
+                // submit form on `enter` key in the `span[contenteditable]`
+                if (ctrl && is_enter) {
                     while (p = p[parent]) {
-                        if (p[nn][tlc]() === 'form') {
+                        if (p.nodeName[tlc]() === 'form') {
                             form = p;
                             break;
                         }
                     }
-                    return add(v), (form && form.submit()), false;
+                    $.set(t[text], 1);
+                    $.error === 0 && form && form.submit();
+                // paste event with `control` + `v`
+                } else if (ctrl && (key === 'v' || !shift && k === 86)) {
+                    on_paste();
+                } else {
+                    var x = config.escape;
+                    for (i in x) {
+                        if (
+                            x[i] === '\t' && is_tab ||
+                            x[i] === '\n' && is_enter // preserved!
+                        ) {
+                            delay(function() {
+                                $.set(t[text], 1), on_focus();
+                            }, 1);
+                            e[stop]();
+                            return;
+                        }
+                    }
+                    delay(function() {
+                        var v = t[text], j;
+                        shadow[html] = v ? "" : placeholder;
+                        // `backspace`
+                        if (!v && (key === 'backspace' || !shift && k === 8)) {
+                            $.reset(data), on_focus();
+                        // else…
+                        } else {
+                            for (i = 0, j = x.length; i < j; ++i) {
+                                if (x[i] && v.indexOf(x[i]) !== -1) {
+                                    $.set(v.split(x[i]).join(""), 1);
+                                    break;
+                                }
+                            }
+                        }
+                    }, 1);
                 }
-                return $;
-            };
-            output.onblur = function() {
-                return add(this[text]);
-            };
-            return $.update();
-        };
-
-        return ($.output = input[previous]), $;
-
+            }, false), $;
+        })();
+        $.update(target.value.split(config.join), 1);
+        $.config = config;
+        $.input = input;
+        $.view = wrap;
+        $.target = $.output = target;
     });
 
-})(window, document);
+})(window, document, 'TIB');

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Demo</title>
+    <link href="tags-input-beautifier.min.css" rel="stylesheet">
+    <style>
+
+      .tags-input span:focus + span {display:none}
+
+    </style>
+  </head>
+  <body>
+    <input type="text" placeholder="Placeholder here&hellip;">
+    <script src="tags-input-beautifier.min.js"></script>
+    <script>
+
+    var tags = new TIB(document.querySelector('input'));
+
+    </script>
+  </body>
+</html>

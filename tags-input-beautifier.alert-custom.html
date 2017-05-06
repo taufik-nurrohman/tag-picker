@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Demo</title>
+    <link href="tags-input-beautifier.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <p>Add <em>foo</em> again to see the effect:</p>
+    <p><input type="text" value="foo, bar, baz"></p>
+    <script src="tags-input-beautifier.min.js"></script>
+    <script>
+
+    var tags = new TIB(document.querySelector('input'), {
+        alert: function(a, b, $) {
+            var head = document.head,
+                style = document.createElement('style');
+            style.innerHTML = '#' + $.view.id + ' .tag[data-tag="' + b + '"] {background:#0f0}';
+            head.appendChild(style);
+            setTimeout(function() {
+                head.removeChild(style);
+            }, 1000);
+        }
+    });
+
+    </script>
+  </body>
+</html>
