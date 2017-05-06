@@ -131,9 +131,9 @@ tags.reset('bar');
 tags.update();
 ~~~
 
-### Validate Tag Name
+### Sanitize Tag Name
 
-Create custom tag input sanitizer before plugin execution:
+Create custom tag input sanitizer:
 
 ~~~ .js
 tags.filter = function(text) {
