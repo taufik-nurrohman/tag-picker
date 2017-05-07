@@ -147,7 +147,7 @@
             a[cla] = config[clas][1];
             a[set](id, t);
             x.href = 'javascript:;';
-            x.title = config.text[0][re](/%s/g, t) || "";
+            x.title = (config.text[0] || "")[re](/%s/g, t);
             x[ev]("click", function(e) {
                 var t = this,
                     s = t[parent],
