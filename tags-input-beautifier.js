@@ -1,6 +1,6 @@
 /*!
  * =======================================================
- *  SIMPLEST TAGS INPUT BEAUTIFIER 2.1.2
+ *  SIMPLEST TAGS INPUT BEAUTIFIER 2.1.3
  * =======================================================
  *
  *   Author: Taufik Nurrohman
@@ -52,7 +52,7 @@
     (function($) {
 
         // plugin version
-        $.version = '2.1.2';
+        $.version = '2.1.3';
 
         // collect all instance(s)
         $[instance] = {};
@@ -76,13 +76,13 @@
                 max: 9999,
                 escape: [',', '\n'],
                 alert: true,
-                text: ['Delete \u201C%s\u201D Tag', 'Duplicate \u201C%s\u201D Tag'],
+                text: ['Delete \u201C%s\u201D', 'Duplicate \u201C%s\u201D'],
                 classes: ['tags', 'tag', 'tags-input', 'tags-output', 'tags-view'],
                 update: function() {}
             },
             wrap = el('span'),
             input = el('span'),
-            id = 'data-tag', edit, i;
+            id = 'data-tag', edit, i, j;
         win[NS][instance][target.id || target.name || object_keys_length(win[NS][instance])] = $;
         o = typeof o === "string" ? {join: o} : (o || {});
         for (i in config) {
@@ -96,7 +96,7 @@
             delay(function() {
                 v = t[text].split(config.join);
                 for (i in v) {
-                    $.set(v[i], 1);
+                    $.set(v[i]);
                 }
             }, 1);
         }
@@ -120,9 +120,19 @@
             while ((i = wrap[first][first]) && i[get](id)) {
                 wrap[first][remove](i);
             }
-            v = v !== 0 ? v : object_keys($.tags);
+            if (v === 0) {
+                v = object_keys($.tags);
+            } else {
+                for (i in v) {
+                    j = $.filter(v[i]);
+                    if (!j) continue;
+                    $.tags[j] = 1;
+                }
+                v = object_keys($.tags);
+            }
+            $.tags = {};
             for (i in v) {
-                $.set(v[i], 1, is_first);
+                $.set(v[i], is_first);
             }
             return config.update($), $;
         };
@@ -135,7 +145,7 @@
             }
             return $.update(0, 1);
         };
-        $.set = function(t, clear, is_first) {
+        $.set = function(t, is_first) {
             t = $.filter(t);
             // empty tag name or reached the max tags, do nothing!
             if (t === "" || object_keys_length($.tags) === config.max) {
@@ -157,8 +167,9 @@
                 e[stop]();
             }, false);
             a[append](x);
+            edit[html] = "";
+            edit[next][html] = placeholder;
             if ($.tags[t]) {
-                edit[html] = "";
                 if (!is_first) {
                     if (config.alert) {
                         $.error = 1;
@@ -177,16 +188,12 @@
                 wrap[first][prepend](a, input);
             }
             target.value = object_keys($.tags).join(config.join);
-            if (clear) {
-                edit[html] = "";
-            }
             return (!is_first && config.update($)), $;
         };
         (function() {
             return edit[ev]("blur", function() {
                 $.error = 0;
                 $.set(this[text]);
-                this[html] = "";
             }, false),
             edit[ev]("paste", on_paste, false),
             edit[ev]("keydown", function(e) {
@@ -204,14 +211,14 @@
                     is_space = key === ' ' || !shift && k === 32,
                     is_backspace = key === 'backspace' || !shift && k === 8, form;
                 // submit form on `enter` key in the `span[contenteditable]`
-                if (ctrl && is_enter) {
+                if (!ctrl && is_enter) {
                     while (p = p[parent]) {
                         if (p.nodeName[tlc]() === 'form') {
                             form = p;
                             break;
                         }
                     }
-                    $.set(t[text], 1);
+                    $.set(t[text]);
                     $.error === 0 && form && form.submit();
                 // paste event with `control` + `v`
                 } else if (ctrl && (key === 'v' || !shift && k === 86)) {
@@ -230,18 +237,18 @@
                             (z || y === ' ') && is_space
                         ) {
                             delay(function() {
-                                $.set(t[text], 1), on_focus();
+                                $.set(t[text]), on_focus();
                             }, 1);
                             e[stop]();
                             return;
                         }
                     }
                     delay(function() {
-                        var v = t[text], j;
+                        var v = t[text];
                         shadow[html] = v ? "" : placeholder;
                         for (i = 0, j = x.length; i < j; ++i) {
                             if (x[i] && v.indexOf(x[i]) !== -1) {
-                                $.set(v.split(x[i]).join(""), 1);
+                                $.set(v.split(x[i]).join(""));
                                 break;
                             }
                         }
