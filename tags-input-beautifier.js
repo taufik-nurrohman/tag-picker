@@ -103,7 +103,7 @@
         target[cla] = config[clas][3];
         wrap[cla] = config[clas][0] + ' ' + config[clas][0] + '-' + hash;
         wrap[ev]("click", on_focus, false);
-        wrap.id = target.id || config[clas][0] + '-' + hash;
+        wrap.id = config[clas][0] + '-' + (target.id || hash);
         wrap[html] = '<span class="' + config[clas][4] + '"></span>';
         input[cla] = config[clas][2];
         input[html] = '<span contenteditable spellcheck="false" style="white-space:nowrap;outline:none;"></span><span>' + placeholder + '</span>';
