@@ -1,6 +1,6 @@
 /*!
  * =======================================================
- *  SIMPLEST TAGS INPUT BEAUTIFIER 2.1.1
+ *  SIMPLEST TAGS INPUT BEAUTIFIER 2.1.2
  * =======================================================
  *
  *   Author: Taufik Nurrohman
@@ -52,7 +52,7 @@
     (function($) {
 
         // plugin version
-        $.version = '2.1.1';
+        $.version = '2.1.2';
 
         // collect all instance(s)
         $[instance] = {};
@@ -201,7 +201,8 @@
                     shadow = edit[next],
                     is_tab = key === 'tab' || !shift && k === 9,
                     is_enter = key === 'enter' || !shift && k === 13,
-                    is_space = key === ' ' || !shift && k === 32, form;
+                    is_space = key === ' ' || !shift && k === 32,
+                    is_backspace = key === 'backspace' || !shift && k === 8, form;
                 // submit form on `enter` key in the `span[contenteditable]`
                 if (ctrl && is_enter) {
                     while (p = p[parent]) {
@@ -215,6 +216,9 @@
                 // paste event with `control` + `v`
                 } else if (ctrl && (key === 'v' || !shift && k === 86)) {
                     on_paste();
+                // `backspace`
+                } else if (!t[text] && is_backspace) {
+                    $.reset(data), on_focus();
                 } else {
                     var x = config.escape, y, z;
                     for (i in x) {
@@ -235,16 +239,10 @@
                     delay(function() {
                         var v = t[text], j;
                         shadow[html] = v ? "" : placeholder;
-                        // `backspace`
-                        if (!v && (key === 'backspace' || !shift && k === 8)) {
-                            $.reset(data), on_focus();
-                        // else…
-                        } else {
-                            for (i = 0, j = x.length; i < j; ++i) {
-                                if (x[i] && v.indexOf(x[i]) !== -1) {
-                                    $.set(v.split(x[i]).join(""), 1);
-                                    break;
-                                }
+                        for (i = 0, j = x.length; i < j; ++i) {
+                            if (x[i] && v.indexOf(x[i]) !== -1) {
+                                $.set(v.split(x[i]).join(""), 1);
+                                break;
                             }
                         }
                     }, 1);
