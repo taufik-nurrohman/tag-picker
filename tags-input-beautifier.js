@@ -1,6 +1,6 @@
 /*!
  * =======================================================
- *  SIMPLEST TAGS INPUT BEAUTIFIER 2.1.0
+ *  SIMPLEST TAGS INPUT BEAUTIFIER 2.1.1
  * =======================================================
  *
  *   Author: Taufik Nurrohman
@@ -52,7 +52,7 @@
     (function($) {
 
         // plugin version
-        $.version = '2.1.0';
+        $.version = '2.1.1';
 
         // collect all instance(s)
         $[instance] = {};
@@ -106,14 +106,14 @@
         wrap.id = target.id || config[clas][0] + '-' + hash;
         wrap[html] = '<span class="' + config[clas][4] + '"></span>';
         input[cla] = config[clas][2];
-        input[html] = '<span contenteditable spellcheck="false" style="white-space:pre;outline:none;"></span><span>' + placeholder + '</span>';
+        input[html] = '<span contenteditable spellcheck="false" style="white-space:nowrap;outline:none;"></span><span>' + placeholder + '</span>';
         target[parent][prepend](wrap, target[next] || null);
         wrap[first][append](input);
         edit = input[first];
         $.tags = {};
         $.error = 0;
         $.filter = function(t) {
-            return (t + "")[re](new RegExp('[' + config.join[re](/\s/g, "") + ']|^\\s+|\\s+$|\\s{2,}', 'g'), "")[tlc]();
+            return (t + "")[re](new RegExp('[' + config.join[re](/\s/g, "") + ']|\\s{2,}|^\\s+|\\s+$', 'g'), "")[tlc]();
         };
         $.update = function(v, is_first) {
             target.value = "";
@@ -162,7 +162,7 @@
                 if (!is_first) {
                     if (config.alert) {
                         $.error = 1;
-                        var text = config.text[1][re](/%s/g, t);
+                        var text = (config.text[1] || t)[re](/%s/g, t);
                         if (typeof config.alert === "function") {
                             config.alert(text, t, $);
                         } else {
@@ -200,7 +200,8 @@
                     data = input[previous] && input[previous][get](id),
                     shadow = edit[next],
                     is_tab = key === 'tab' || !shift && k === 9,
-                    is_enter = key === 'enter' || !shift && k === 13, form;
+                    is_enter = key === 'enter' || !shift && k === 13,
+                    is_space = key === ' ' || !shift && k === 32, form;
                 // submit form on `enter` key in the `span[contenteditable]`
                 if (ctrl && is_enter) {
                     while (p = p[parent]) {
@@ -215,11 +216,14 @@
                 } else if (ctrl && (key === 'v' || !shift && k === 86)) {
                     on_paste();
                 } else {
-                    var x = config.escape;
+                    var x = config.escape, y, z;
                     for (i in x) {
+                        y = x[i];
+                        z = y === '\s';
                         if (
-                            x[i] === '\t' && is_tab ||
-                            x[i] === '\n' && is_enter // preserved!
+                            (z || y === '\t') && is_tab ||
+                            (z || y === '\n') && is_enter || // preserved!
+                            (z || y === ' ') && is_space
                         ) {
                             delay(function() {
                                 $.set(t[text], 1), on_focus();
