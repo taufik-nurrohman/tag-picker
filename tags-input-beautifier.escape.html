@@ -7,13 +7,15 @@
     <link href="tags-input-beautifier.min.css" rel="stylesheet">
   </head>
   <body>
-    <p>Disable <kbd>,</kbd>, <kbd>Space</kbd> and <kbd>Tab</kbd> key.</p>
-    <p><input type="text" value="foo, bar, baz"></p>
+    <form>
+      <p>Disable <kbd>,</kbd>, <kbd>Space</kbd>, <kbd>Tab</kbd> and <kbd>Enter</kbd> key.</p>
+      <p><input type="text" value="foo, bar, baz"></p>
+    </form>
     <script src="tags-input-beautifier.min.js"></script>
     <script>
 
     var tags = new TIB(document.querySelector('input'), {
-        escape: [',', ' ', '\t']
+        escape: [',', ' ', '\t', '\n']
     });
 
     </script>
