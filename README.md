@@ -51,12 +51,17 @@ Variable | Description
 config = {
     join: ', ', // Tags joiner of the output value
     max: 9999, // Maximum tags allowed
-    escape: [',', '\n'], // List of character(s) used to trigger the tag addition
+    escape: [','], // List of character(s) used to trigger the tag addition
+    pattern: false, // Custom pattern to filter the tag name [^1]
+    placeholder: false, // Custom tags input placeholder [^2]
     alert: true,
-    text: ['Delete \u201C%s\u201D', 'Duplicate \u201C%s\u201D'],
+    text: ['Delete \u201C%s%\u201D', 'Duplicate \u201C%s%\u201D', 'Please match the requested format: %s%'],
     classes: ['tags', 'tag', 'tags-input', 'tags-output', 'tags-view'], // HTML classes
     update: function($) {} // Hook that will be triggered on every tags item update
 };
+
+// [^1]: Or simply use `data-pattern` attribute of `target` element.
+// [^2]: Or simply use `data-placeholder` or `placeholder` attribute of `target` element.
 ~~~
 
 Methods

@@ -63,4 +63,8 @@
 .tags .tag + .tags-input {float:left}
 .tags .tag + .tags-input span + span {display:none}
 .tags-input span:focus + span {opacity:.4}
-.tags-output {display:none}
+.tags-output {
+  position:fixed;
+  top:-9999px;
+  left:-9999px;
+}

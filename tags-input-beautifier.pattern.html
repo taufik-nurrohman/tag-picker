@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Demo</title>
+    <link href="tags-input-beautifier.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <p>When <code>pattern</code> option is defined or the target element has a <code>data-pattern</code> attribute, the <code>filter</code> method will simply output <code>false</code> if the requested format does not match with the input.</p>
+    <form>
+      <input type="text" data-pattern="^[a-z\d]+([- ][a-z\d]+)*$" data-placeholder="foo, bar, baz">
+    </form>
+    <script src="tags-input-beautifier.min.js"></script>
+    <script>
+
+    var tags = new TIB(document.querySelector('input'));
+
+    </script>
+  </body>
+</html>

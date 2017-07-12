@@ -1,6 +1,6 @@
 {
   "name": "t-i-b",
-  "version": "2.1.4",
+  "version": "2.2.0",
   "description": "Better tags input interaction with JavaScript.",
   "main": "tags-input-beautifier.js",
   "scripts": {

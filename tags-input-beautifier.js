@@ -1,6 +1,6 @@
 /*!
  * =======================================================
- *  SIMPLEST TAGS INPUT BEAUTIFIER 2.1.4
+ *  SIMPLEST TAGS INPUT BEAUTIFIER 2.2.0
  * =======================================================
  *
  *   Author: Taufik Nurrohman
@@ -21,20 +21,25 @@
         delay = setTimeout,
         html = 'innerHTML',
         text = 'textContent',
-        cla = 'className',
-        clas = 'classes',
+        s = 'class',
+        cla = s + 'Name',
+        clas = s + 'es',
         tlc = 'toLowerCase',
         re = 'replace',
+        pttn = 'pattern',
+        plc = 'placeholder',
         pos = 'indexOf',
         first = 'firstChild',
         parent = 'parentNode',
-        next = 'nextSibling',
-        previous = 'previousSibling',
+        s = 'Sibling',
+        next = 'next' + s,
+        previous = 'previous' + s,
         append = 'appendChild',
         prepend = 'insertBefore',
         remove = 'removeChild',
-        set = 'setAttribute',
-        get = 'getAttribute',
+        s = 'Attribute',
+        set = 'set' + s,
+        get = 'get' + s,
         stop = 'preventDefault',
         ev = 'addEventListener';
 
@@ -53,7 +58,7 @@
     (function($) {
 
         // plugin version
-        $.version = '2.1.4';
+        $.version = '2.2.0';
 
         // collect all instance(s)
         $[instance] = {};
@@ -71,23 +76,27 @@
     })(win[NS] = function(target, o) {
         var $ = this,
             hash = Date.now(),
-            placeholder = target.placeholder || "",
+            placeholder = target[get]('data-' + plc) || target[plc] || "",
             config = {
                 join: ', ',
                 max: 9999,
-                escape: [',', '\n'],
+                escape: [','],
                 alert: true,
-                text: ['Delete \u201C%s\u201D', 'Duplicate \u201C%s\u201D'],
+                text: ['Delete \u201C%s%\u201D', 'Duplicate \u201C%s%\u201D', 'Please match the requested format: %s%'],
                 classes: ['tags', 'tag', 'tags-input', 'tags-output', 'tags-view'],
                 update: function() {}
             },
             wrap = el('span'),
             input = el('span'),
-            id = 'data-tag', edit, i, j;
+            id = 'data-tag', pt, edit, i, j;
         win[NS][instance][target.id || target.name || object_keys_length(win[NS][instance])] = $;
         o = typeof o === "string" ? {join: o} : (o || {});
         for (i in config) {
             if (typeof o[i] !== "undefined") config[i] = o[i];
+        }
+        pt = config[pttn] || target[get]('data-' + pttn);
+        if (config[plc]) {
+            placeholder = config[plc];
         }
         function on_focus() {
             edit.focus();
@@ -104,6 +113,7 @@
         target[cla] = config[clas][3];
         wrap[cla] = config[clas][0] + ' ' + config[clas][0] + '-' + hash;
         wrap[ev]("click", on_focus, false);
+        target[ev]("focus", on_focus, false);
         wrap.id = config[clas][0] + ':' + (target.id || hash);
         wrap[html] = '<span class="' + config[clas][4] + '"></span>';
         input[cla] = config[clas][2];
@@ -112,9 +122,16 @@
         wrap[first][append](input);
         edit = input[first];
         $.tags = {};
+        $.success = 1; // TODO
         $.error = 0;
         $.filter = function(t) {
-            return (t + "")[re](new RegExp('[' + config.join[re](/\s/g, "") + ']|\\s{2,}|^\\s+|\\s+$', 'g'), "")[tlc]();
+            if (!pt) {
+                return (t + "")[re](new RegExp('[' + config.join[re](/\s/g, "") + ']|[-\\s]{2,}|^\\s+|\\s+$', 'g'), "")[tlc]();
+            }
+            // When `pattern` option is defined or the target element has
+            // a `data-pattern` attribute, this method will simply output
+            // `false` if the requested pattern does not match with the input.
+            return !t || (new RegExp(pt)).test(t) ? t : false;
         };
         $.update = function(v, is_first) {
             target.value = "";
@@ -146,19 +163,44 @@
             }
             return $.update(0, 1);
         };
+        function _reset() {
+            edit[html] = "";
+            edit[next][html] = placeholder;
+        }
         $.set = function(t, is_first) {
+            var alt = config.alert,
+                text = config.text, s;
             t = $.filter(t);
-            // empty tag name or reached the max tags, do nothing!
-            if (t === "" || object_keys_length($.tags) === config.max) {
-                edit[html] = "";
+            // does not match with `pattern`
+            if (t === false) {
+                // do nothing!
+                _reset();
+                if (alt) {
+                    $.error = 1;
+                    s = (text[2] || t)[re](/%s%/g, pt);
+                    if (typeof alt === "function") {
+                        alt(s, t, $);
+                    } else {
+                        alert(s);
+                    }
+                }
                 return $;
+            }
+            if (
+                // empty tag name
+                t === "" ||
+                // or has reached the max tags
+                object_keys_length($.tags) === config.max
+            ) {
+                // do nothing!
+                return _reset(), $;
             }
             var a = el('span'),
                 x = el('a');
             a[cla] = config[clas][1];
             a[set](id, t);
             x.href = 'javascript:;';
-            x.title = (config.text[0] || "")[re](/%s/g, t);
+            x.title = (text[0] || "")[re](/%s%/g, t);
             x[ev]("click", function(e) {
                 var t = this,
                     s = t[parent],
@@ -167,18 +209,16 @@
                 $.reset(n), on_focus();
                 e[stop]();
             }, false);
-            a[append](x);
-            edit[html] = "";
-            edit[next][html] = placeholder;
+            a[append](x), _reset();
             if ($.tags[t]) {
                 if (!is_first) {
-                    if (config.alert) {
+                    if (alt) {
                         $.error = 1;
-                        var text = (config.text[1] || t)[re](/%s/g, t);
-                        if (typeof config.alert === "function") {
-                            config.alert(text, t, $);
+                        s = (text[1] || t)[re](/%s%/g, t);
+                        if (typeof alt === "function") {
+                            alt(s, t, $);
                         } else {
-                            alert(text);
+                            alert(s);
                         }
                     }
                 } else {
