@@ -1,6 +1,6 @@
 /*!
  * =======================================================
- *  SIMPLEST TAGS INPUT BEAUTIFIER 2.2.0
+ *  SIMPLEST TAGS INPUT BEAUTIFIER 2.2.1
  * =======================================================
  *
  *   Author: Taufik Nurrohman
@@ -58,7 +58,7 @@
     (function($) {
 
         // plugin version
-        $.version = '2.2.0';
+        $.version = '2.2.1';
 
         // collect all instance(s)
         $[instance] = {};
@@ -190,7 +190,7 @@
                 // empty tag name
                 t === "" ||
                 // or has reached the max tags
-                object_keys_length($.tags) === config.max
+                object_keys_length($.tags) >= config.max
             ) {
                 // do nothing!
                 return _reset(), $;

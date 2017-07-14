@@ -16,7 +16,7 @@
         alert: function(a, b, $) {
             var head = document.head,
                 style = document.createElement('style');
-            style.innerHTML = '#' + $.view.id + ' .' + $.config.classes[1] + '[data-tag="' + b + '"] {background:#0f0}';
+            style.innerHTML = '#' + $.view.id.replace(':', '\\:') + ' .' + $.config.classes[1] + '[data-tag="' + b + '"] {background:#0f0}';
             head.appendChild(style);
             setTimeout(function() {
                 head.removeChild(style);
