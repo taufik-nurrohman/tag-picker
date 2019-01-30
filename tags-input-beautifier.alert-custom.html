@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width">
     <title>Demo</title>
     <link href="tags-input-beautifier.min.css" rel="stylesheet">
+    <style>
+
+    .tags .tag.highlight {background:#0f0}
+
+    </style>
   </head>
   <body>
     <p>Add <em>foo</em> again to see the effect:</p>
@@ -13,13 +18,10 @@
     <script>
 
     var tags = new TIB(document.querySelector('input'), {
-        alert: function(a, b, $) {
-            var head = document.head,
-                style = document.createElement('style');
-            style.innerHTML = '#' + $.view.id.replace(':', '\\:') + ' .' + $.config.classes[1] + '[data-tag="' + b + '"] {background:#0f0}';
-            head.appendChild(style);
+        alert: function(message, tag) {console.log(tag)
+            tag.classList.add('highlight');
             setTimeout(function() {
-                head.removeChild(style);
+                tag.classList.remove('highlight');
             }, 1000);
         }
     });

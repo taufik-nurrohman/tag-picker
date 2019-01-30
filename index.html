@@ -40,8 +40,8 @@
     var form = document.querySelector('form');
     var tags = new TIB(form.tags, {
         join: ', ',
-        update: function($) {
-            console.log($.tags); // check the added tags on every update event
+        update: function(tags) {
+            console.log([this, tags]); // check the added tags on every update event
         }
     });
     </script>

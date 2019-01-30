@@ -9,12 +9,17 @@
   <body>
     <p>When <code>pattern</code> option is defined or the target element has a <code>data-pattern</code> attribute, the <code>filter</code> method will simply output <code>false</code> if the requested format does not match with the input.</p>
     <form>
-      <input type="text" data-pattern="^[a-z\d]+([- ][a-z\d]+)*$" data-placeholder="foo, bar, baz">
+      <p><input type="text" data-pattern="^[a-z\d]+([- ][a-z\d]+)*$" placeholder="foo, bar, baz"></p>
+      <p><input type="text" placeholder="foo, bar, baz"></p>
     </form>
     <script src="tags-input-beautifier.min.js"></script>
     <script>
 
-    var tags = new TIB(document.querySelector('input'));
+    var input = document.querySelectorAll('input'),
+        tags_1 = new TIB(input[0]),
+        tags_2 = new TIB(input[1], {
+            pattern: '^[a-z\\d]+([- ][a-z\\d]+)*$'
+        });
 
     </script>
   </body>
