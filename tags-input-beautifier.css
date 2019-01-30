@@ -57,7 +57,7 @@ span.tags .tags-input span + span {
   white-space:nowrap;
 }
 span.tags .tag + .tags-input span + span {display:none}
-span.tags-input span:focus + span {opacity:.4}
+span.tags .tags-input span:focus + span {opacity:.4}
 .tags-output {
   position:fixed;
   top:-9999px;
