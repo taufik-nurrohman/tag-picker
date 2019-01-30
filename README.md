@@ -39,12 +39,12 @@ Options
 -------
 
 ~~~ .js
-var tags = new TIB(target, config);
+var tags = new TIB(source, config);
 ~~~
 
 Variable | Description
 -------- | -----------
-`target` | The text input element you want to beautify.
+`source` | The text input element you want to beautify.
 `config` | The configuration data. See below!
 
 ~~~ .js
@@ -57,11 +57,11 @@ config = {
     alert: true,
     text: ['Delete \u201C%s%\u201D', 'Duplicate \u201C%s%\u201D', 'Please match the requested format: %s%'],
     classes: ['tags', 'tag', 'tags-input', 'tags-output', 'tags-view'], // HTML classes
-    update: function($) {} // Hook that will be triggered on every tags item update
+    update: function() {} // Hook that will be triggered on every tags item update
 };
 
-// [^1]: Or simply use `data-pattern` attribute of `target` element.
-// [^2]: Or simply use `data-placeholder` or `placeholder` attribute of `target` element.
+// [^1]: Or simply use `data-pattern` attribute of `source` element.
+// [^2]: Or simply use `data-placeholder` or `placeholder` attribute of `source` element.
 ~~~
 
 Methods
@@ -88,7 +88,7 @@ console.log(tags.input);
 ### Get Tags View HTML Element
 
 ~~~ .js
-console.log(tags.view);
+console.log(tags.self);
 ~~~
 
 ### Get Original Tags Input Element
@@ -149,12 +149,6 @@ tags.set('bar');
 ### Check for Duplicate Tag Name
 
 ~~~ .js
-if ('bar' in tags.tags) {
-    alert('Duplicate `bar` !!!')
-}
-~~~
-
-~~~ .js
 if (tags.tags['bar']) {
     alert('Duplicate `bar` !!!')
 }
@@ -164,32 +158,6 @@ if (tags.tags['bar']) {
 
 ~~~ .js
 console.log(Object.keys(tags.tags).length);
-~~~
-
-Markup
-------
-
-The initial HTML markup:
-
-~~~ .html
-<input type="text" value="foo, bar, baz" placeholder="Placeholder here…" id="id-1">
-~~~
-
-The generated HTML markup:
-
-~~~ .html
-<input class="tags-output" type="text" value="foo, bar, baz" placeholder="Placeholder here…" id="input-1">
-<span class="tags tags-id-1" id="tags-id-1">
-  <span class="tags-view">
-    <span class="tag" data-tag="foo"><a href="javascript:;" title="Delete “foo”"></a></span>
-    <span class="tag" data-tag="bar"><a href="javascript:;" title="Delete “bar”"></a></span>
-    <span class="tag" data-tag="baz"><a href="javascript:;" title="Delete “baz”"></a></span>
-    <span class="tags-input">
-      <span contenteditable spellcheck="false" style="white-space:nowrap;outline:none;"></span>
-      <span>Placeholder here…</span>
-    </span>
-  </span>
-</span>
 ~~~
 
 Playground
