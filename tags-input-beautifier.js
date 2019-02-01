@@ -1,6 +1,6 @@
 /*!
  * =======================================================
- *  SIMPLEST TAGS INPUT BEAUTIFIER 2.2.2
+ *  SIMPLEST TAGS INPUT BEAUTIFIER 2.2.3
  * =======================================================
  *
  *   Author: Taufik Nurrohman
@@ -42,7 +42,8 @@
         get = 'get' + s,
         stop = 'preventDefault',
         ev = 'addEventListener',
-        evr = 'removeEventListener';
+        evr = 'removeEventListener',
+        scrollLeft = 'scrollLeft';
 
     function el(n) {
         return doc.createElement(n);
@@ -59,7 +60,7 @@
     (function($) {
 
         // plugin version
-        $.version = '2.2.2';
+        $.version = '2.2.3';
 
         // collect all instance(s)
         $[instance] = {};
@@ -81,6 +82,7 @@
             config = {
                 join: ', ',
                 max: 9999,
+                step: 5, // scroll step(s)
                 escape: [','],
                 alert: true,
                 text: ['Delete \u201C%{tag}%\u201D', 'Duplicate \u201C%{tag}%\u201D', 'Please match the requested format: %{pattern}%'],
@@ -125,12 +127,14 @@
                 key = (e.key || String.fromCharCode(k))[tlc](),
                 ctrl = e.ctrlKey,
                 shift = e.shiftKey,
+                step = config.step,
                 data = input[previous] && input[previous][get](id),
                 shadow = edit[next],
                 is_tab = key === 'tab' || !shift && k === 9,
                 is_enter = key === 'enter' || !shift && k === 13,
                 is_space = key === ' ' || !shift && k === 32,
-                is_backspace = key === 'backspace' || !shift && k === 8, form;
+                is_backspace = key === 'backspace' || !shift && k === 8,
+                is_empty = t[text] === "", form;
             // submit form on `enter` key in the `span[contenteditable]`
             if (!ctrl && is_enter && x[pos]('\n') === -1) {
                 while (p = p[parent]) {
@@ -142,11 +146,15 @@
                 }
                 $.set(t[text]);
                 $.error === 0 && form && form.submit();
+            } else if (is_empty && !ctrl && (key === 'arrowleft' || !shift && k === 37)) {
+                wrap[scrollLeft] -= step; // scroll to left
+            } else if (is_empty && !ctrl && (key === 'arrowright' || !shift && k === 39)) {
+                wrap[scrollLeft] += step; // scroll to right
             // paste event with `control` + `v`
             } else if (ctrl && (key === 'v' || !shift && k === 86)) {
                 on_paste();
             // `backspace`
-            } else if (!t[text] && is_backspace) {
+            } else if (is_empty && is_backspace) {
                 $.reset(data), on_focus();
             } else {
                 var y, z;
@@ -178,7 +186,6 @@
             }
         }
         $.tags = {};
-        $.success = 1; // TODO
         $.error = 0;
         $.filter = function(t) {
             if (!pt) {
