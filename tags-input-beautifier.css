@@ -21,10 +21,10 @@ span.tags .tags-view {
 }
 span.tags .tag {
   display:table-cell;
+  white-space:nowrap;
   width:auto;
   background:#f00;
   padding:0 .5em;
-  height:1.75em;
   line-height:1.75em;
   cursor:default;
 }

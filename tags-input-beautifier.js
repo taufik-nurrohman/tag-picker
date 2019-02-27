@@ -1,6 +1,6 @@
 /*!
  * =======================================================
- *  SIMPLEST TAGS INPUT BEAUTIFIER 2.2.3
+ *  SIMPLEST TAGS INPUT BEAUTIFIER 2.2.4
  * =======================================================
  *
  *   Author: Taufik Nurrohman
@@ -60,7 +60,7 @@
     (function($) {
 
         // plugin version
-        $.version = '2.2.3';
+        $.version = '2.2.4';
 
         // collect all instance(s)
         $[instance] = {};
@@ -78,7 +78,7 @@
     })(win[NS] = function(source, o) {
         var $ = this,
             hash = Date.now(),
-            placeholder = source[get]('data-' + plc) || source[plc] || "",
+            placeholder = (source[get]('data-' + plc) || source[plc] || "") + '\u200B',
             config = {
                 join: ', ',
                 max: 9999,
@@ -100,7 +100,7 @@
         pt = config[pttn] || source[get]('data-' + pttn);
         update = config.update;
         if (config[plc]) {
-            placeholder = config[plc];
+            placeholder = config[plc] + '\u200B';
         }
         function on_focus() {
             edit.focus();
@@ -175,7 +175,7 @@
                 }
                 delay(function() {
                     var v = t[text];
-                    shadow[html] = v ? "" : placeholder;
+                    shadow[html] = v ? '\u200B' : placeholder;
                     for (i = 0, j = x.length; i < j; ++i) {
                         if (x[i] && v[pos](x[i]) !== -1) {
                             $.set(v.split(x[i]).join(""));
