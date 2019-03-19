@@ -1,6 +1,6 @@
 /*!
  * =======================================================
- *  SIMPLEST TAGS INPUT BEAUTIFIER 2.2.4
+ *  SIMPLEST TAGS INPUT BEAUTIFIER 2.2.5
  * =======================================================
  *
  *   Author: Taufik Nurrohman
@@ -60,7 +60,7 @@
     (function($) {
 
         // plugin version
-        $.version = '2.2.4';
+        $.version = '2.2.5';
 
         // collect all instance(s)
         $[instance] = {};
@@ -155,7 +155,7 @@
                 on_paste();
             // `backspace`
             } else if (is_empty && is_backspace) {
-                $.reset(data), on_focus();
+                $.reset(data), on_focus(), e[stop]();
             } else {
                 var y, z;
                 for (i in x) {
