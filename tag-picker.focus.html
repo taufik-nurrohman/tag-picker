@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Demo</title>
+    <link href="tag-picker.css" rel="stylesheet">
+    <style>
+
+    .tag-picker.focus {
+      background-color: #90c6fa;
+      border-color: #2982d6;
+    }
+
+    </style>
+  </head>
+  <body>
+    <p><input type="text" placeholder="Placeholder here&hellip;"></p>
+    <script src="tag-picker.js"></script>
+    <script>
+
+    var picker = new TP(document.querySelector('input'));
+
+    picker.hook('tags.blur', function() {
+        this.view.classList.remove('focus');
+    });
+
+    picker.hook('tags.focus', function() {
+        this.view.classList.add('focus');
+    });
+
+    </script>
+  </body>
+</html>

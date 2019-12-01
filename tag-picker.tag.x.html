@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Demo</title>
+    <link href="tag-picker.css" rel="stylesheet">
+    <style>
+
+    .tag-picker .tag a {
+      display: inline-block;
+      margin-left: .25em;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .tag-picker .tag a::before {
+      content: '\00d7';
+    }
+
+    </style>
+  </head>
+  <body>
+    <p><input type="text"></p>
+    <script src="tag-picker.js"></script>
+    <script>
+
+    var picker = new TP(document.querySelector('input'));
+
+    picker.hook('tag.set', function(name) {
+        var tag = this.view.querySelector('[title="' + name + '"]');
+        if (tag) {
+            var x = document.createElement('a');
+            x.href = 'javascript:;';
+            x.addEventListener('click', function() {
+                picker.let(this.parentNode.title);
+                picker.focus();
+            }, false);
+            tag.appendChild(x);
+        }
+    });
+
+    </script>
+  </body>
+</html>

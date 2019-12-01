@@ -4,17 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>Demo</title>
-    <link href="tags-input-beautifier.min.css" rel="stylesheet">
+    <link href="tag-picker.css" rel="stylesheet">
   </head>
   <body>
     <form>
       <p>Disable <kbd>,</kbd>, <kbd>Space</kbd>, <kbd>Tab</kbd> and <kbd>Enter</kbd> key.</p>
       <p><input type="text" value="foo, bar, baz"></p>
     </form>
-    <script src="tags-input-beautifier.min.js"></script>
+    <script src="tag-picker.js"></script>
     <script>
 
-    var tags = new TIB(document.querySelector('input'), {
+    var tags = new TP(document.querySelector('input'), {
         escape: [',', ' ', '\t', '\n']
     });
 

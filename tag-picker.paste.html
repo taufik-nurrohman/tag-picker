@@ -4,15 +4,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>Demo</title>
-    <link href="tags-input-beautifier.min.css" rel="stylesheet">
+    <link href="tag-picker.css" rel="stylesheet">
   </head>
   <body>
     <p>Copy this &rarr; <mark contenteditable spellcheck="false">foo, bar, baz</mark> then paste to the input below:</p>
     <p><input type="text"></p>
-    <script src="tags-input-beautifier.min.js"></script>
+    <script src="tag-picker.js"></script>
     <script>
 
-    var tags = new TIB(document.querySelector('input'));
+    var picker = new TP(document.querySelector('input'));
+
+    picker.hook('tag.set', function(name, i) {
+        console.log([name, i]);
+    });
 
     </script>
   </body>

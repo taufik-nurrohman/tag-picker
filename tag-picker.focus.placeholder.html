@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Demo</title>
+    <link href="tag-picker.css" rel="stylesheet">
+    <style>
+
+    .tag-picker .editor span:focus + span {
+      visibility: hidden;
+    }
+
+    </style>
+  </head>
+  <body>
+    <p><input type="text" placeholder="Placeholder here&hellip;"></p>
+    <script src="tag-picker.js"></script>
+    <script>
+
+    var picker = new TP(document.querySelector('input'));
+
+    </script>
+  </body>
+</html>

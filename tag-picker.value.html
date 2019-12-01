@@ -4,20 +4,20 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>Demo</title>
-    <link href="tags-input-beautifier.min.css" rel="stylesheet">
+    <link href="tag-picker.css" rel="stylesheet">
   </head>
   <body>
-    <p>Using <code>,</code> as tags separator (default):</p>
+    <p>Using <code>,</code> as tag separator (default):</p>
     <p><input type="text" value="foo, bar, baz"></p>
-    <p>Using <code>;</code> as tags separator:</p>
+    <p>Using <code>;</code> as tag separator:</p>
     <input type="text" value="foo; bar; baz">
-    <script src="tags-input-beautifier.min.js"></script>
+    <script src="tag-picker.js"></script>
     <script>
 
     var input = document.querySelectorAll('input');
 
-    var tags_0 = new TIB(input[0]),
-        tags_1 = new TIB(input[1], {
+    var picker_0 = new TP(input[0]),
+        picker_1 = new TP(input[1], {
             join: '; ',
             escape: [';']
         });

@@ -10,7 +10,7 @@ Demo
 
 ![Image](https://cloud.githubusercontent.com/assets/1669261/12162361/7b457e14-b533-11e5-990a-8805cac26bb3.gif)
 
-&rarr; https://tovic.github.io/tags-input-beautifier
+&rarr; https://tovic.github.io/tag-picker
 
 Got it?
 
@@ -23,13 +23,13 @@ Usage
   <head>
     <meta charset="utf-8">
     <title>Demo</title>
-    <link href="tags-input-beautifier.min.css" rel="stylesheet">
+    <link href="tags-picker.min.css" rel="stylesheet">
   </head>
   <body>
-    <input name="tags" type="text">
-    <script src="tags-input-beautifier.min.js"></script>
+    <p><input name="tags" type="text"></p>
+    <script src="tags-picker.js"></script>
     <script>
-    var tags = new TIB(document.querySelector('input[name="tags"]'));
+    var picker = new TP(document.querySelector('input[name="tags"]'));
     </script>
   </body>
 </html>
@@ -39,29 +39,21 @@ Options
 -------
 
 ~~~ .js
-var tags = new TIB(source, config);
+var picker = new TP(source, state);
 ~~~
 
 Variable | Description
 -------- | -----------
-`source` | The text input element you want to beautify.
-`config` | The configuration data. See below!
+`source` | The text input element you want to modify.
+`state` | The configuration data. See below!
 
 ~~~ .js
-config = {
-    join: ', ', // Tags joiner of the output value
-    max: 9999, // Maximum tags allowed
-    escape: [','], // List of character(s) used to trigger the tag addition
-    pattern: false, // Custom pattern to filter the tag name [^1]
-    placeholder: false, // Custom tags input placeholder [^2]
+state = {
     alert: true,
-    text: ['Delete \u201C%s%\u201D', 'Duplicate \u201C%s%\u201D', 'Please match the requested format: %s%'],
-    classes: ['tags', 'tag', 'tags-input', 'tags-output', 'tags-view'], // HTML classes
-    update: function() {} // Hook that will be triggered on every tags item update
+    escape: [','], // List of character(s) used to trigger the tag addition
+    join: ', ', // Tags joiner of the output value
+    max: 9999 // Maximum tags allowed
 };
-
-// [^1]: Or simply use `data-pattern` attribute of `source` element.
-// [^2]: Or simply use `data-placeholder` or `placeholder` attribute of `source` element.
 ~~~
 
 Methods
@@ -70,38 +62,44 @@ Methods
 ### Initiation
 
 ~~~ .js
-var tags = new TIB( … );
+var picker = new TP( … );
 ~~~
 
 ### Get Current Tags Data
 
 ~~~ .js
-console.log(tags.tags);
+console.log(picker.tags);
 ~~~
 
 ### Get Fake Tags Input Element
 
 ~~~ .js
-console.log(tags.input);
+console.log(picker.input);
 ~~~
 
 ### Get Tags View HTML Element
 
 ~~~ .js
-console.log(tags.self);
+console.log(picker.self);
+console.log(picker.view); // Alias
 ~~~
 
 ### Get Original Tags Input Element
 
 ~~~ .js
-console.log(tags.output);
+console.log(picker.source);
+console.log(picker.output); // Alias
 ~~~
 
 ### Get Configuration Data
 
 ~~~ .js
-console.log(tags.config);
+console.log(picker.state);
 ~~~
+
+_TODO: Version 3.x.x_
+
+<!-- TODO
 
 ### Remove All Tags
 
@@ -164,3 +162,5 @@ Playground
 ----------
 
  - http://codepen.io/tovic/pen/ZQewJq
+
+-->

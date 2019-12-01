@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Demo</title>
+    <link href="tag-picker.css" rel="stylesheet">
+    <style>
+
+    .tag-picker {
+      padding: 0 .25em;
+    }
+
+    .tag-picker .tags {
+      gap: 0;
+    }
+
+    .tag-picker .tags::before {
+      content: 'C:/server/www/';
+    }
+
+    .tag-picker .tag {
+      background: none;
+      padding: 0;
+    }
+
+    .tag-picker .tag:focus {
+      background: #ff0;
+    }
+
+    .tag-picker .tag::before {
+      color: #00f;
+    }
+
+    .tag-picker .tag::after {
+      content: '/'
+    }
+
+    .tag-picker .editor::before,
+    .tag-picker .editor::after {
+      display: none;
+    }
+
+    </style>
+  </head>
+  <body>
+    <p><input type="text"></p>
+    <p><strong>Thing that doesn&rsquo;t work:</strong> Duplicate directory name.</p>
+    <script src="tag-picker.js"></script>
+    <script>
+
+    var picker = new TP(document.querySelector('input'), {
+        join: '/',
+        escape: ['/', '\\', '\t', '\n']
+    });
+
+    </script>
+  </body>
+</html>

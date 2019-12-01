@@ -4,17 +4,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>Demo</title>
-    <link href="tags-input-beautifier.min.css" rel="stylesheet">
+    <link href="tag-picker.css" rel="stylesheet">
   </head>
   <body>
     <p>Replace all characters with a <code>-</code> except <code>[a-z0-9-]</code> and convert all characters to their lower-case mode:</p>
     <p><input type="text"></p>
-    <script src="tags-input-beautifier.min.js"></script>
+    <script src="tag-picker.js"></script>
     <script>
 
-    var tags = new TIB(document.querySelector('input'));
-    tags.filter = function(text) {
-        return text.replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "").toLowerCase();
+    var picker = new TP(document.querySelector('input'));
+
+    picker.f = function(text) {
+        return text.toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "");
     };
 
     </script>

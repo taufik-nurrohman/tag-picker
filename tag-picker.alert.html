@@ -4,17 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>Demo</title>
-    <link href="tags-input-beautifier.min.css" rel="stylesheet">
+    <link href="tag-picker.css" rel="stylesheet">
   </head>
   <body>
     <p>Add <em>foo</em> again to see the default effect:</p>
     <p><input type="text" value="foo, bar, baz"></p>
-    <script src="tags-input-beautifier.min.js"></script>
+    <script src="tag-picker.js"></script>
     <script>
 
-    var tags = new TIB(document.querySelector('input'), {
-        alert: true
-    });
+    var picker = new TP(document.querySelector('input'));
 
     </script>
   </body>

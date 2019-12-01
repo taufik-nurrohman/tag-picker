@@ -1,0 +1,68 @@
+.tag-picker,
+.tag-picker * {
+  box-sizing: border-box;
+}
+.tag-picker,
+.tag-picker .tags {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  min-height: calc(var(--gap) * 6);
+  line-height: calc(var(--gap) * 6);
+}
+.tag-picker {
+  --background-color: #f00;
+  --color: inherit;
+  --gap: .25em;
+  border: 1px solid;
+  padding: var(--gap);
+  cursor: text;
+}
+.tag-picker .tag {
+  background: var(--background-color);
+  color: var(--color);
+  text-decoration: none;
+  padding: 0 calc(var(--gap) * 2);
+  cursor: pointer;
+}
+.tag-picker .tag[title]::before {
+  content: attr(title);
+}
+.tag-picker .tag:focus {
+  --background-color: #c00;
+  outline: none;
+}
+.tag-picker .editor {
+  background: none;
+  color: inherit;
+  cursor: inherit;
+  position: relative;
+  flex: 1;
+}
+.tag-picker .editor span {
+  display: block;
+  height: 100%;
+  outline: none;
+  position: relative;
+  z-index: 1;
+}
+.tag-picker .editor span + span {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: inherit;
+  white-space: nowrap;
+  z-index: 0;
+  opacity: .5;
+}
+.tag-picker .tag + .editor span + span {
+  display: none; /* Hide the placeholder if we have at least one tag */
+}
+.tag-picker-source {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+}

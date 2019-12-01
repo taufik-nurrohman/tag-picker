@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Demo</title>
+    <link href="tag-picker.css" rel="stylesheet">
+    <style>
+
+    .tag-picker .tag.highlight {
+      background: #0f0;
+    }
+
+    </style>
+  </head>
+  <body>
+    <p>Add <em>foo</em> again to see the effect:</p>
+    <p><input type="text" value="foo, bar, baz"></p>
+    <script src="tag-picker.js"></script>
+    <script>
+
+    var picker = new TP(document.querySelector('input'), {
+        alert: function(name) {
+            var tag = this.view.querySelector('[title="' + name + '"]');
+            if (tag) {
+                tag.classList.add('highlight');
+                setTimeout(function() {
+                    tag.classList.remove('highlight');
+                }, 1000);
+            }
+        }
+    });
+
+    </script>
+  </body>
+</html>
