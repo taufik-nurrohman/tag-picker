@@ -9,30 +9,73 @@
 
 (function(win, doc, NS) {
 
-    var instance = '__instance__',
+    var Arrow = 'Arrow',
+        ArrowLeft = Arrow + 'Left',
+        ArrowRight = Arrow + 'Right',
+        Backspace = 'Backspace',
+        Delete = 'Delete',
+        Enter = 'Enter',
+        Tab = 'Tab',
+
+        appendChild = 'appendChild',
+        children = 'children',
+        classList = 'classList',
+        createElement = 'createElement',
+        forEach = 'forEach',
+        fromCharCode = 'fromCharCode',
+        indexOf = 'indexOf',
+        innerHTML = 'innerHTML',
+        insertBefore = 'insertBefore',
+        instance = '__instance__',
+        key = 'key',
+        keyCode = key + 'Code',
+        lastChild = 'lastChild',
+        nextSibling = 'nextSibling',
+        nodeName = 'nodeName',
+        parentNode = 'parentNode',
+        previousSibling = 'previousSibling',
+        removeAttribute = 'removeAttribute',
+        removeChild = 'removeChild',
+        replace = 'replace',
+        setAttribute = 'setAttribute',
+        textContent = 'textContent',
+        toLowerCase = 'toLowerCase',
+
         delay = setTimeout;
 
     function array_key(a, b) {
-        var i = b.indexOf(a);
+        var i = b[indexOf](a);
         return i < 0 ? null : i;
     }
 
     function el(name, content, attr) {
-        var e = is_string(name) ? doc.createElement(name) : name, k, v;
+        var e = is_string(name) ? doc[createElement](name) : name, k, v;
         if (content || "" === content) {
-            e.innerHTML = content;
+            e[innerHTML] = content;
         }
         if (attr) {
             for (k in attr) {
                 v = attr[k];
                 if (null === v || false === v) {
-                    e.removeAttribute(k);
+                    e[removeAttribute](k);
                 } else {
-                    e.setAttribute(k, v);
+                    e[setAttribute](k, v);
                 }
             }
         }
         return e;
+    }
+
+    function class_get(a, name) {
+        return a[classList].contains(name);
+    }
+
+    function class_let(a, name) {
+        return a[classList].remove(name);
+    }
+
+    function class_set(a, name) {
+        return a[classList].add(name);
     }
 
     function extend(a, b) {
@@ -40,7 +83,7 @@
     }
 
     function in_array(a, b) {
-        return b.indexOf(a) >= 0;
+        return b[indexOf](a) >= 0;
     }
 
     function is_function(x) {
@@ -109,6 +152,11 @@
             },
             i, j, k, v;
 
+        // Already instantiated, skip!
+        if (source[NS]) {
+            return $;
+        }
+
         // Return new instance if `TP` was called without the `new` operator
         if (!($ instanceof $$)) {
             return new $$(source, o);
@@ -116,6 +164,9 @@
 
         // Store tag picker instance to `TP.__instance__`
         $$[instance][source.id || source.name || object_length($$[instance])] = $;
+
+        // Mark current DOM as active tag picker to prevent duplicate instance
+        source[NS] = 1;
 
         if (is_string(o)) {
             o = {
@@ -131,11 +182,15 @@
             tags = el('span', "", {
                 'class': 'tags'
             }),
-            editor = el('span', '<span contenteditable spellcheck="false" style="white-space:pre;"></span><span></span>', {
+            editor = el('span', "", {
                 'class': 'editor tag'
             }),
-            editor_input = editor.children[0],
-            editor_placeholder = editor.children[1];
+            editor_input = el('span', "", {
+                'contenteditable': 'true',
+                'spellcheck': 'false',
+                'style': 'white-space:pre;'
+            }),
+            editor_placeholder = el('span');
 
         function hook_get(name, id) {
             if (!is_set(name)) {
@@ -183,83 +238,82 @@
             return $;
         }
 
-        function hook(name, fn, id) {
-            if (!is_set(name)) {
-                return hooks;
-            }
-            if (!is_set(fn) || null === fn || false === fn) {
-                return hook_let(name, fn, id);
-            }
-            return hook_set(name, fn, id);
-        }
-
         // Default filter for the tag name
         $.f = function(v) {
-            return v.toLowerCase().replace(/[^ a-z0-9-]/g, "");
+            return v[toLowerCase]()[replace](/[^ a-z0-9-]/g, "");
         };
 
         function n(v) {
-            return $.f(v).replace(new RegExp('[' + state.escape.join("").replace(/\\/g, '\\\\') + ']+$'), "").trim();
+            return $.f(v)[replace](new RegExp('[' + state.escape.join("")[replace](/\\/g, '\\\\') + ']+$'), "").trim();
         }
 
         function event_blur_input() {
-            var v = n(editor_input.textContent);
+            var v = n(editor_input[textContent]);
             if (v) {
-                tag_set(v);
-                tag_set_node(v);
+                if (!tag_get(v)) {
+                    tag_set_node(v);
+                    tag_set(v);
+                }
                 input_set("");
             }
-            hook_fire('tags.blur', [v, $.tags.length]);
+            class_let(view, 'focus');
+            hook_fire('blur', [v, $.tags.length]);
         }
 
         function event_click_input() {
-            hook_fire('tags.click', [$.tags]);
+            hook_fire('click', [$.tags]);
         }
 
         function event_focus_input() {
-            hook_fire('tags.focus', [$.tags]);
+            class_set(view, 'focus');
+            hook_fire('focus', [$.tags]);
         }
 
         function event_keydown_input(e) {
             var escape = state.escape,
-                key = e.key.toLowerCase(),
-                last = editor.previousSibling,
+                t = this,
+                k = e[keyCode], // Old browser(s)
+                kk = (e[key] || String[fromCharCode](k)), // Modern browser(s)
+                last = editor[previousSibling],
                 length = $.tags.length,
-                max = state.max, name, last;
-            key = ({
-                'enter': '\n',
-                'tab': '\t'
-            })[key] || key;
-            // Submit the closest `<form>` element with `enter` key
-            if ('\n' === key && !in_array(key, escape)) {
-                var parent = this.parentNode;
-                while (parent && parent.nodeName && 'form' !== parent.nodeName.toLowerCase()) {
-                    parent = parent.parentNode;
+                max = state.max, name;
+            // Set preferred key name
+            if (Enter === kk) {
+                kk = '\n';
+            } else if (Tab === kk) {
+                kk = '\t';
+            }
+            // Submit the closest `<form>` element with `Enter` key
+            if (('\n' === kk || 13 === k) && !in_array(kk, escape)) {
+                var form = t[parentNode];
+                while (form && form[nodeName] && 'form' !== form[nodeName][toLowerCase]()) {
+                    form = form[parentNode];
                 }
-                parent && parent.submit();
+                event_blur_input(); // Force to add the tag name found in the tag editor
+                form && form.submit();
                 event_stop(e);
-            // Skip `tab` key
-            } else if ('\t' === key) {
+            // Skip `Tab` key
+            } else if ('\t' === kk || 9 === k) {
                 // :)
             } else {
-                var vv = n(editor_input.textContent); // Last value before timer
+                var vv = n(editor_input[textContent]); // Last value before delay
                 delay(function() {
-                    var text = editor_input.textContent,
+                    var text = editor_input[textContent],
                         v = n(text);
                     // Escape character only, delete!
                     if (in_array(text, escape)) {
                         input_set("");
                     } else if ("" === v) {
-                        if ("" === vv && 'backspace' === key) {
+                        if ("" === vv && (Backspace === kk || 8 === k)) {
                             name = $.tags[length - 1];
                             tag_let_node(name);
                             tag_let(name);
-                            hook_fire('tag.let', [name, length - 1]);
-                        } else if ('arrowleft' === key) {
+                            hook_fire('let.tag', [name, length - 1]);
+                        } else if (ArrowLeft === kk || 37 === k) {
                             // Focus to the last tag
                             last && last.focus();
                         }
-                    } else if (in_array(key, escape)) {
+                    } else if (in_array(kk, escape)) {
                         name = v;
                         input_set(v = "");
                         if ("" === name || length >= max) {
@@ -269,35 +323,53 @@
                         } else {
                             tag_set_node(name);
                             tag_set(name);
-                            hook_fire('tag.set', [name, length]);
+                            hook_fire('set.tag', [name, length]);
                         }
                         event_stop(e);
                     }
-                    editor_placeholder.innerHTML = v ? "" : placeholder;
+                    editor_placeholder[innerHTML] = v ? "" : placeholder;
                 }, 0);
             }
         }
 
+        function tags_set(values) {
+            // Remove …
+            var prev;
+            if (view[parentNode]) {
+                while (prev = editor[previousSibling]) {
+                    tag_let_node(prev.title);
+                }
+            }
+            $.tags = [];
+            source.value = "";
+            // … then add tag(s)
+            values = values ? values.split(state.join) : [],
+            j = state.max, i, v;
+            for (i = 0; i < j; ++i) {
+                if (!values[i]) {
+                    break;
+                }
+                if ("" !== (v = n(values[i]))) {
+                    if (tag_get(v)) {
+                        continue;
+                    }
+                    tag_set_node(v);
+                    tag_set(v);
+                    hook_fire('set.tag', [v, i]);
+                }
+            }
+            return $;
+        }
+
         function event_paste_input() {
             delay(function() {
-                var any = editor_input.textContent.split(state.join),
-                    j = state.max, v;
-                for (var i = 0; i < j; ++i) {
-                    if (!any[i]) {
-                        break;
-                    }
-                    if ("" !== (v = n(any[i]))) {
-                        tag_set(v);
-                        tag_set_node(v);
-                        hook_fire('tag.set', [v, i]);
-                    }
-                }
+                tags_set(editor_input[textContent]);
                 input_set("");
             }, 0);
         }
 
         function event_click_view(e) {
-            if (view === e.target) {
+            if (e && view === e.target) {
                 editor_input.focus();
                 event_click_input();
             }
@@ -307,56 +379,48 @@
             editor_input.focus();
         }
 
-        function event_stop(e) {
-            e.preventDefault();
-        }
-
         function event_click_tag() {
             var name = this.title;
-            hook_fire('tag.click', [name, array_key(name, $.tags)]);
+            hook_fire('click.tag', [name, array_key(name, $.tags)]);
         }
 
         function event_focus_tag() {
             var name = this.title;
-            hook_fire('tag.focus', [name, array_key(name, $.tags)]);
+            hook_fire('focus.tag', [name, array_key(name, $.tags)]);
         }
 
         function event_keydown_tag(e) {
             var t = this,
-                key = e.key.toLowerCase(),
-                prev = t.previousSibling,
-                next = t.nextSibling;
+                k = e[keyCode], // Old browser(s)
+                kk = (e[key] || String[fromCharCode](k)), // Modern browser(s)
+                prev = t[previousSibling],
+                next = t[nextSibling];
             // Focus to the previous tag
-            if ('arrowleft' === key) {
+            if (ArrowLeft === kk || 37 === k) {
                 prev && prev.focus();
             // Focus to the next tag or to the tag input
-            } else if ('arrowright' === key) {
+            } else if (ArrowRight === kk || 39 === k) {
                 next && next !== editor ? next.focus() : input_set("", 1);
-            // Remove tag with `backspace` or `delete` key
-            } else if ('backspace' === key || 'delete' === key) {
+            // Remove tag with `Backspace` or `Delete` key
+            } else if (
+                Backspace === kk || Delete === kk ||
+                8 === k || 46 === k
+            ) {
                 var name = t.title,
                     index = array_key(name, $.tags);
                 tag_let_node(name);
                 tag_let(name);
                 // Focus to the previous tag or to the tag input after remove
-                if ('backspace' === key) {
+                if (Backspace === kk || 8 === k) {
                     prev ? prev.focus() : input_set("", 1);
                 // Focus to the next tag or to the tag input after remove
-                } else /* if ('delete' === key) */ {
+                } else /* if (Delete === kk) */ {
                     next && next !== editor ? next.focus() : input_set("", 1);
                 }
-                hook_fire('tag.let', [name, index]);
+                hook_fire('let.tag', [name, index]);
             }
             event_stop(e);
         }
-
-        event_set(editor_input, 'blur', event_blur_input);
-        event_set(editor_input, 'click', event_click_input);
-        event_set(editor_input, 'focus', event_focus_input);
-        event_set(editor_input, 'keydown', event_keydown_input);
-        event_set(editor_input, 'paste', event_paste_input);
-        event_set(source, 'focus', event_focus_source);
-        event_set(view, 'click', event_click_view);
 
         function alert_set(v) {
             var a = state.alert;
@@ -364,15 +428,15 @@
                 alert($$.i('Duplicate tag name: %s', [v]));
             } else if (is_function(a)) {
                 a.apply($, [v]);
-            // Function name as string stored in the global `window` object
-            } else if (is_string(a) && win[a]) {
-                win[a].apply($, [v]);
+            // Function name as string stored in the `TP` object
+            } else if (is_string(a) && $$[a]) {
+                $$[a].apply($, [v]);
             }
         }
 
         function input_set(v, focus) {
-            editor_input.textContent = v;
-            editor_placeholder.textContent = v ? "" : placeholder;
+            editor_input[textContent] = v;
+            editor_placeholder[textContent] = v ? "" : placeholder;
             focus && editor_input.focus();
         } input_set("");
 
@@ -384,15 +448,19 @@
             el.addEventListener(name, fn, false);
         }
 
-        function tag_get(name) {
+        function event_stop(e) {
+            e.preventDefault();
+        }
+
+        function tag_get(name, hook) {
             var index = array_key(name, $.tags);
-            hook_fire('tag.get', [name, index]);
+            hook && hook_fire('get.tag', [name, index]);
             return is_number(index) ? name : null;
         }
 
         function tag_let(name) {
             var index = array_key(name, $.tags);
-            if (index >= 0) {
+            if (is_number(index) && index >= 0) {
                 $.tags.splice(index, 1);
                 source.value = $.tags.join(state.join);
                 return true;
@@ -403,51 +471,62 @@
         function tag_set(name, index) {
             if (is_number(index)) {
                 index = index < 0 ? 0 : index;
-                $.tags = $.tags.splice(0, index).concat(name).concat($.tags.splice(index));
+                $.tags = $.tags.splice(0, index).concat([name]).concat($.tags.splice(index - 1));
             } else {
                 $.tags.push(name);
             }
+            // Update value
             source.value = $.tags.join(state.join);
         }
 
         function tag_set_node(name, index) {
             var tag = el('span', "", {
                 'class': 'tag',
-                'draggable': true,
-                'tabindex': 1,
+                'tabindex': '1',
                 'title': name
             });
             event_set(tag, 'click', event_click_tag);
             event_set(tag, 'focus', event_focus_tag);
             event_set(tag, 'keydown', event_keydown_tag);
-            if (is_number(index)) {
-                tags.insertBefore(tag, tags.children[index]);
-            } else {
-                tags.insertBefore(tag, editor);
+            if (tags[parentNode]) {
+                if (is_number(index) && $.tags[index]) {
+                    tags[insertBefore](tag, tags[children][index]);
+                } else {
+                    tags[insertBefore](tag, editor);
+                }
             }
         }
 
         function tag_let_node(name) {
             var index = array_key(name, $.tags), tag;
-            if (index >= 0 && (tag = tags.children[index])) {
+            if (is_number(index) && index >= 0 && (tag = tags.children[index])) {
                 event_let(tag, 'click', event_click_tag);
                 event_let(tag, 'focus', event_focus_tag);
                 event_let(tag, 'keydown', event_keydown_tag);
-                tags.removeChild(tag);
+                tags[removeChild](tag);
                 return true;
             }
             return false;
         }
 
-        source.classList.add(state['class'] + '-source');
-        source.parentNode.insertBefore(view, source);
-        view.appendChild(tags);
-        tags.appendChild(editor);
+        class_set(source, state['class'] + '-source');
+        source[parentNode][insertBefore](view, source);
+        view[appendChild](tags);
+        tags[appendChild](editor);
+        editor[appendChild](editor_input);
+        editor[appendChild](editor_placeholder);
+
+        event_set(editor_input, 'blur', event_blur_input);
+        event_set(editor_input, 'click', event_click_input);
+        event_set(editor_input, 'focus', event_focus_input);
+        event_set(editor_input, 'keydown', event_keydown_input);
+        event_set(editor_input, 'paste', event_paste_input);
+        event_set(source, 'focus', event_focus_source);
+        event_set(view, 'click', event_click_view);
 
         $.tags = [];
 
-        editor_input.textContent = source.value;
-        event_paste_input(); // Fill value(s)
+        tags_set(source.value); // Fill value(s)
 
         $.input = editor_input;
         $.self = $.view = view;
@@ -464,25 +543,49 @@
             event_click_view();
         };
 
+        $.eject = function() {
+            if (!source[NS]) {
+                return $; // Already ejected
+            }
+            delete source[NS];
+            event_let(editor_input, 'blur', event_blur_input);
+            event_let(editor_input, 'click', event_click_input);
+            event_let(editor_input, 'focus', event_focus_input);
+            event_let(editor_input, 'keydown', event_keydown_input);
+            event_let(editor_input, 'paste', event_paste_input);
+            event_let(source, 'focus', event_focus_source);
+            event_let(view, 'click', event_click_view);
+            $.tags[forEach](tag_let_node);
+            view[parentNode][removeChild](view);
+            class_let(source, state['class'] + '-source');
+            return hook_fire('eject');
+        };
+
+        $.fire = function(name, lot, id) {
+            return hook_fire(name, lot, id);
+        };
+
         $.focus = function() {
             editor_input.focus();
             event_focus_input();
         };
 
         $.get = function(name) {
-            return tag_get(name);
+            return tag_get(name, 1);
         };
-
-        $.hook = hook;
-        $.hook.get = hook_get;
-        $.hook.let = hook_let;
-        $.hook.set = hook_set;
-        $.hook.fire = hook_fire;
 
         $.let = function(name) {
             tag_let_node(name);
             tag_let(name);
             return $;
+        };
+
+        $.on = function(name, fn, id) {
+            return hook_set(name, fn, id);
+        };
+
+        $.off = function(name, id) {
+            return hook_let(name, id);
         };
 
         $.set = function(name, index, guard) {
@@ -495,37 +598,9 @@
             return $;
         };
 
-        function is_mounted() {
-            return !!view.parentNode;
-        }
-
-        $.create = function(o) {
-            if (is_mounted()) {
-                return $; // Already created
-            }
-            return new $$($.source, o);
+        $.value = function(values) {
+            return tags_set(values);
         };
-
-        $.destroy = function() {
-            if (!is_mounted()) {
-                return $; // Already destroyed
-            }
-            event_let(editor_input, 'blur', event_blur_input);
-            event_let(editor_input, 'click', event_click_input);
-            event_let(editor_input, 'focus', event_focus_input);
-            event_let(editor_input, 'keydown', event_keydown_input);
-            event_let(editor_input, 'paste', event_paste_input);
-            event_let(source, 'focus', event_focus_source);
-            event_let(view, 'click', event_click_view);
-            $.tags.forEach(function(v) {
-                tag_let_node(v);
-            });
-            view.parentNode.removeChild(view);
-            source.classList.remove(state['class'] + '-source');
-            return hook_fire('tags.let');
-        };
-
-        return hook_fire('tags.set');
 
     });
 

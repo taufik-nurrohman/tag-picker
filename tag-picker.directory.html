@@ -4,15 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <title>Demo</title>
-    <link href="tag-picker.css" rel="stylesheet">
+    <link href="tag-picker.min.css" rel="stylesheet">
     <style>
 
     .tag-picker {
       padding: 0 .25em;
-    }
-
-    .tag-picker .tags {
-      gap: 0;
     }
 
     .tag-picker .tags::before {
@@ -21,6 +17,7 @@
 
     .tag-picker .tag {
       background: none;
+      margin: 0;
       padding: 0;
     }
 
@@ -46,7 +43,7 @@
   <body>
     <p><input type="text"></p>
     <p><strong>Thing that doesn&rsquo;t work:</strong> Duplicate directory name.</p>
-    <script src="tag-picker.js"></script>
+    <script src="tag-picker.min.js"></script>
     <script>
 
     var picker = new TP(document.querySelector('input'), {

@@ -8,11 +8,9 @@ What is this?
 Demo
 ----
 
-![Image](https://cloud.githubusercontent.com/assets/1669261/12162361/7b457e14-b533-11e5-990a-8805cac26bb3.gif)
+![Image](https://user-images.githubusercontent.com/1669261/69968635-633f9d80-154d-11ea-8632-1694fd52a985.gif)
 
 &rarr; https://tovic.github.io/tag-picker
-
-Got it?
 
 Usage
 -----
@@ -23,11 +21,11 @@ Usage
   <head>
     <meta charset="utf-8">
     <title>Demo</title>
-    <link href="tags-picker.min.css" rel="stylesheet">
+    <link href="tag-picker.min.css" rel="stylesheet">
   </head>
   <body>
     <p><input name="tags" type="text"></p>
-    <script src="tags-picker.js"></script>
+    <script src="tag-picker.min.js"></script>
     <script>
     var picker = new TP(document.querySelector('input[name="tags"]'));
     </script>
@@ -71,20 +69,20 @@ var picker = new TP( … );
 console.log(picker.tags);
 ~~~
 
-### Get Fake Tags Input Element
+### Get Tag Editor Element
 
 ~~~ .js
 console.log(picker.input);
 ~~~
 
-### Get Tags View HTML Element
+### Get Tags View Element
 
 ~~~ .js
 console.log(picker.self);
 console.log(picker.view); // Alias
 ~~~
 
-### Get Original Tags Input Element
+### Get Original Input Element
 
 ~~~ .js
 console.log(picker.source);
@@ -97,70 +95,128 @@ console.log(picker.output); // Alias
 console.log(picker.state);
 ~~~
 
-_TODO: Version 3.x.x_
-
-<!-- TODO
-
-### Remove All Tags
+### Add Tags
 
 ~~~ .js
-tags.reset();
-~~~
-
-### Remove _bar_ Tag
-
-~~~ .js
-tags.reset('bar');
-~~~
-
-### Refresh Tags Value
-
-~~~ .js
-tags.update();
-~~~
-
-Merge new values to the current values:
-
-~~~ .js
-tags.update(['foo', 'bar', 'baz']);
-~~~
-
-### Sanitize Tag Name
-
-Create custom tag input sanitizer:
-
-~~~ .js
-tags.filter = function(text) {
-    text = text.replace(/^\s+|\s+$/g, ""); // trim white-space(s)
-    text = text.replace(/,/g, ""); // disallow `,` in tag name
-    text = text.toLowerCase(); // force lower-case letter(s)
-    return text;
-};
+picker.value('foo, bar, baz');
 ~~~
 
 ### Add _bar_ Tag
 
 ~~~ .js
-tags.set('bar');
+picker.set('bar');
 ~~~
 
-### Check for Duplicate Tag Name
+### Remove _bar_ Tag
 
 ~~~ .js
-if (tags.tags['bar']) {
-    alert('Duplicate `bar` !!!')
-}
+tags.let('bar');
 ~~~
 
-### Check for Tags Length
+### Remove All Tags
 
 ~~~ .js
-console.log(Object.keys(tags.tags).length);
+picker.value("");
 ~~~
 
-Playground
-----------
+### Tag Name Filter
 
- - http://codepen.io/tovic/pen/ZQewJq
+Create custom tag name filter:
 
--->
+~~~ .js
+picker.f = function(text) {
+    // Force lower-case letter(s) and trim white-space(s)
+    return text.toLowerCase().trim();
+};
+~~~
+
+### Get _bar_ Tag
+
+~~~ .js
+console.log(picker.get('bar'));
+~~~
+
+### Get All Tags
+
+~~~ .js
+console.log(picker.tags);
+~~~
+
+### Check if _bar_ Tag Exists
+
+~~~ .js
+if (null !== picker.get('bar')) { … }
+~~~
+
+~~~ .js
+if (picker.tags.indexOf('bar') >= 0) { … }
+~~~
+
+
+### Count All Tags
+
+~~~ .js
+console.log(picker.tags.length);
+~~~
+
+### Destroy UI
+
+~~~ .js
+picker.eject();
+~~~
+
+Hooks
+-----
+
+Name | Description
+---- | -----------
+`blur` | 
+`click` | 
+`eject` | 
+`focus` | 
+`blur.tag` | 
+`click.tag` | 
+`focus.tag` | 
+`get.tag` | 
+`let.tag` | 
+`set.tag` | 
+
+### Add Hook
+
+~~~ .js
+picker.on('set.tag', function(name, index) {
+    alert('name: ' + name + ', index: ' + index);
+});
+~~~
+
+### Add Hook with ID
+
+~~~ .js
+picker.on('set.tag', function(name, index) {
+    alert('name: ' + name + ', index: ' + index);
+}, 'hook-id');
+~~~
+
+### Remove Hooks
+
+~~~ .js
+picker.off('set.tag');
+~~~
+
+### Remove Hook by ID
+
+~~~ .js
+picker.off('set.tag', 'hook-id');
+~~~
+
+### Trigger Hooks
+
+~~~ .js
+picker.fire('set.tag', ['foo', 0]);
+~~~
+
+### Trigger Hook by ID
+
+~~~ .js
+picker.fire('set.tag', ['foo', 0], 'hook-id');
+~~~

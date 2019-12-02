@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Demo</title>
+    <link href="tag-picker.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <table border="1" style="width: 100%;">
+      <caption>Tag picker in fluid table layout.</caption>
+      <tbody>
+        <tr>
+          <th>Tags</th>
+          <td><input type="text"></td>
+        </tr>
+      </tbody>
+    </table>
+    <table border="1" style="width: 100%; table-layout: fixed;">
+      <caption>Tag picker in fixed table layout.</caption>
+      <tbody>
+        <tr>
+          <th>Tags</th>
+          <td><input type="text"></td>
+        </tr>
+      </tbody>
+    </table>
+    <script src="tag-picker.min.js"></script>
+    <script>
+
+    var input = document.querySelectorAll('input'),
+        picker_0 = new TP(input[0]),
+        picker_1 = new TP(input[1]);
+
+    </script>
+  </body>
+</html>
