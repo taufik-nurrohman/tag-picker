@@ -1,5 +1,5 @@
-Simplest Tags Input Beautifier
-==============================
+Tag Picker
+==========
 
 > Better tags input interaction with JavaScript.
 

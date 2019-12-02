@@ -1,1 +1,23 @@
-{}
+{
+  "name": "t-p",
+  "description": "Better tags input interaction with JavaScript.",
+  "version": "3.0.0",
+  "main": "tag-picker.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tovic/tag-picker.git"
+  },
+  "keywords": [
+    "tag",
+    "picker"
+  ],
+  "author": "Taufik Nurrohman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tovic/tag-picker/issues"
+  },
+  "homepage": "https://github.com/tovic/tag-picker#readme"
+}
