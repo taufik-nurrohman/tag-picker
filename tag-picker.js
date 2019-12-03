@@ -333,8 +333,19 @@
                 delay(function() {
                     var text = editorInput[textContent],
                         v = n(text);
+                    // Last try for buggy key detection on mobile device(s)
+                    // Check for the last typed key in the tag editor
+                    if (inArray(text.slice(-1), escape)) {
+                        if (lengthTags < max) {
+                            // Add the tag name found in the tag editor
+                            onInput(1);
+                        } else {
+                            inputSet("");
+                            alertSet('Maximum tags allowed is %d', [max]);
+                        }
+                        preventDefault(e);
                     // Escape character only, delete!
-                    if ("" === v && !isCtrl && !isShift) {
+                    } else if ("" === v && !isCtrl && !isShift) {
                         if ("" === vv && (Backspace === kk || 8 === k)) {
                             name = $.tags[lengthTags - 1];
                             classLet(view, 'focus.tag');

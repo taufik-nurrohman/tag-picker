@@ -21,7 +21,6 @@
   background: #f00;
   color: inherit;
   text-decoration: none;
-  height: 1.5em; /* Same with `min-height` of container */
   margin: .125em;
   padding: 0 .5em;
   cursor: pointer;
