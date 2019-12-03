@@ -1,6 +1,6 @@
 /*!
  * ==========================================================
- *  TAG PICKER PLUGIN 3.0.1
+ *  TAG PICKER PLUGIN 3.0.2
  * ==========================================================
  * Author: Taufik Nurrohman <https://github.com/tovic>
  * License: MIT
@@ -119,7 +119,7 @@
 
     (function($$) {
 
-        $$.version = '3.0.1';
+        $$.version = '3.0.2';
 
         // Collect all instance(s)
         $$[instance] = {};
@@ -149,16 +149,6 @@
             });
             return text;
         };
-
-        if (isSet(module) && module.exports) {
-            module.exports = $$;
-        }
-
-        if (isFunction(define) && define.amd) {
-            define('tag-picker', [], function() { 
-                return $$; 
-            });
-        }
 
     })(win[NS] = function(source, o) {
 
@@ -714,4 +704,4 @@
 
     });
 
-})(window || {}, document, 'TP');
+})(window, document, 'TP');
