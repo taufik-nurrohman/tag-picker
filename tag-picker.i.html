@@ -7,16 +7,20 @@
     <link href="tag-picker.min.css" rel="stylesheet">
   </head>
   <body>
-    <p>Maximum tags allowed: <code>3</code>.</p>
     <form method="get">
-      <p><input name="tags" type="text"></p>
-      <p><button type="submit">Submit</button></p>
+      <p><input name="tags" type="text" value="foo, bar"></p>
     </form>
     <script src="tag-picker.min.js"></script>
     <script>
 
+    TP.I['Maximum tags allowed is %d'] = 'Jumlah maksimal label yang diperbolehkan adalah %d.';
+    TP.I['Minimum tags allowed is %d'] = 'Jumlah minimal label yang diperbolehkan adalah %d.';
+    TP.I['Remove tag %s'] = 'Hapus label \u201C%s\u201D';
+    TP.I['Tag %s already exists'] = 'Label \u201C%s\u201D sudah ada.';
+
     var picker = new TP(document.querySelector('input'), {
-        max: 3
+        max: 5,
+        min: 1
     });
 
     </script>

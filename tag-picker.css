@@ -1,6 +1,8 @@
 .tag-picker,
 .tag-picker * {
   box-sizing: border-box;
+  font: inherit;
+  color: inherit;
 }
 .tag-picker,
 .tag-picker .tags {
@@ -23,13 +25,22 @@
   margin: .125em;
   padding: 0 .5em;
   cursor: pointer;
+  outline: none;
 }
 .tag-picker .tag[title]::before {
   content: attr(title);
 }
+.tag-picker .tag[title] a {
+  margin-left: .5em;
+  text-decoration: none;
+  color: #fff;
+  outline: none;
+}
+.tag-picker .tag[title] a::before {
+  content: '\00d7'; /* The “×” button */
+}
 .tag-picker .tag:focus {
   background: #c00;
-  outline: none;
 }
 .tag-picker .editor {
   background: none;

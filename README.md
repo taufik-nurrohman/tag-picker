@@ -162,7 +162,7 @@ console.log(picker.tags.length);
 ### Destroy UI
 
 ~~~ .js
-picker.eject();
+picker.pop();
 ~~~
 
 Hooks
@@ -170,16 +170,17 @@ Hooks
 
 Name | Description
 ---- | -----------
-`blur` | 
-`click` | 
-`eject` | 
-`focus` | 
-`blur.tag` | 
-`click.tag` | 
-`focus.tag` | 
-`get.tag` | 
-`let.tag` | 
-`set.tag` | 
+`blur` | Will be triggered after release focus on the tag editor.
+`change` | Will be triggered on every time the tags data is updated.
+`click` | Will be triggered after click on the tag editor.
+`focus` | Will be triggered after focus on the tag editor.
+`pop` | Will be triggered after `picker.pop()`.
+`blur.tag` | Will be triggered after release focus on a tag item.
+`click.tag` | Will be triggered after click on a tag item.
+`focus.tag` | Will be triggered after focus on a tag item.
+`get.tag` | Will be triggered after `picker.get('foo')`.
+`let.tag` | Will be triggered after `picker.let('foo')`.
+`set.tag` | Will be triggered after `picker.set('foo')`.
 
 ### Add Hook
 
@@ -219,4 +220,13 @@ picker.fire('set.tag', ['foo', 0]);
 
 ~~~ .js
 picker.fire('set.tag', ['foo', 0], 'hook-id');
+~~~
+
+Translations
+------------
+
+Translation data are stored in the `TP.I` as object:
+
+~~~ .js
+console.log(TP.I);
 ~~~

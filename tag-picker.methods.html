@@ -9,19 +9,19 @@
   <body>
     <p><input type="text" value="foo, bar, baz"></p>
     <p>
-      <button onclick="picker = picker.source.TP ? picker.eject() : new TP(picker.source);">Create or Destroy UI</button>
+      <button onclick="console.log(picker = picker.source.TP ? picker.pop() : new TP(picker.source));">Create or Destroy UI</button>
     </p>
     <p>
-      <button onclick="picker.click();"><code>click</code></button>
-      <button onclick="picker.focus();"><code>focus</code></button>
+      <button onclick="console.log(picker.click());"><code>click</code></button>
+      <button onclick="console.log(picker.focus());"><code>focus</code></button>
       <button onmouseover="picker.blur();" disabled><code>blur</code> (on hover)</button>
     </p>
     <p>
-      <button onclick="picker.set('hello');">Append <code>hello</code> Tag</button>
-      <button onclick="picker.set('hi', 1);">Insert <code>hi</code> Tag after the First Tag</button>
-      <button onclick="picker.set('boo', null, true);">Add <code>boo</code> Tag and Check for Duplicate</button>
-      <button onclick="picker.value('');">Reset Values</button>
-      <button onclick="picker.value('foo, bar, baz, qux');">Set Values</button>
+      <button onclick="console.log(picker.set('hello'));">Append <code>hello</code> Tag</button>
+      <button onclick="console.log(picker.set('hi', 1));">Insert <code>hi</code> Tag after the First Tag</button>
+      <button onclick="console.log(picker.set('boo', null, true));">Add <code>boo</code> Tag with Guard</button>
+      <button onclick="console.log(picker.value(''));">Reset Values</button>
+      <button onclick="console.log(picker.value('foo, bar, baz, qux'));">Set Values</button>
       <button onclick="alert(picker.source.value);">Get Values</button>
     </p>
     <script src="tag-picker.min.js"></script>

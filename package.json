@@ -1,7 +1,7 @@
 {
-  "name": "t-p",
+  "name": "@taufik-nurrohman/tag-picker",
   "description": "Better tags input interaction with JavaScript.",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "main": "tag-picker.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

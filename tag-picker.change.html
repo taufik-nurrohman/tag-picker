@@ -5,20 +5,18 @@
     <meta name="viewport" content="width=device-width">
     <title>Demo</title>
     <link href="tag-picker.min.css" rel="stylesheet">
-    <style>
-
-    .tag-picker.focus .editor span + span {
-      visibility: hidden;
-    }
-
-    </style>
   </head>
   <body>
-    <p><input type="text" placeholder="Placeholder here&hellip;"></p>
+    <p>Copy this &rarr; <mark contenteditable spellcheck="false">foo, bar, baz</mark> then paste to the input below:</p>
+    <p><input type="text" value="foo, bar"></p>
     <script src="tag-picker.min.js"></script>
     <script>
 
     var picker = new TP(document.querySelector('input'));
+
+    picker.on('change', function(name, i) {
+        console.log([name, i, this.tags]);
+    });
 
     </script>
   </body>
