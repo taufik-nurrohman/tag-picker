@@ -10,7 +10,7 @@ Demo
 
 ![Image](https://user-images.githubusercontent.com/1669261/69968635-633f9d80-154d-11ea-8632-1694fd52a985.gif)
 
-&rarr; https://tovic.github.io/tag-picker
+&rarr; https://taufik-nurrohman.github.io/tag-picker
 
 Usage
 -----
