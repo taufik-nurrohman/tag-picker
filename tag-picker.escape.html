@@ -15,7 +15,18 @@
     <script>
 
     var tags = new TP(document.querySelector('input'), {
-        escape: [',', ' ', '\t', '\n']
+        escape: [
+            // Modern browser(s)
+            ',',
+            ' ',
+            '\t',
+            '\n',
+            // Old browser(s)
+            188,
+            32,
+            9,
+            13
+        ]
     });
 
     </script>

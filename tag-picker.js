@@ -25,7 +25,6 @@
         ctrlKey = 'ctrlKey',
         firstChild = 'firstChild',
         forEach = 'forEach',
-        fromCharCode = 'fromCharCode',
         indexOf = 'indexOf',
         innerHTML = 'innerHTML',
         insertBefore = 'insertBefore',
@@ -161,7 +160,7 @@
             defaults = {
                 'alert': true,
                 'class': 'tag-picker',
-                'escape': [','],
+                'escape': [',', 188],
                 'join': ', ',
                 'max': 9999,
                 'min': 0,
@@ -301,7 +300,7 @@
             var escape = state.escape,
                 t = this,
                 k = e[keyCode], // Old browser(s)
-                kk = (e[key] || String[fromCharCode](k)), // Modern browser(s)
+                kk = e[key], // Modern browser(s)
                 isCtrl = e[ctrlKey],
                 isShift = e[shiftKey],
                 lastTag = editor[previousSibling],
@@ -310,12 +309,12 @@
                 vv = n(editorInput[textContent]), // Last value before delay
                 name;
             // Set preferred key name
-            if (Enter === kk) {
+            if (Enter === kk || 13 === k) {
                 kk = '\n';
-            } else if (Tab === kk) {
+            } else if (Tab === kk || 9 === k) {
                 kk = '\t';
             }
-            if (inArray(kk, escape)) {
+            if (inArray(kk, escape) || inArray(k, escape)) {
                 if (lengthTags < max) {
                     // Add the tag name found in the tag editor
                     onInput(1);
@@ -325,10 +324,10 @@
                 }
                 preventDefault(e);
             // Submit the closest `<form>` element with `Enter` key
-            } else if ('\n' === kk || 13 === k) {
+            } else if ('\n' === kk) {
                 onSubmitForm(), preventDefault(e);
             // Skip `Tab` key
-            } else if (!isShift && ('\t' === kk || 9 === k)) {
+            } else if (!isShift && '\t' === kk) {
                 // :)
             } else {
                 delay(function() {
@@ -446,7 +445,7 @@
         function onKeyDownTag(e) {
             var t = this,
                 k = e[keyCode], // Old browser(s)
-                kk = (e[key] || String[fromCharCode](k)), // Modern browser(s)
+                kk = e[key], // Modern browser(s)
                 isCtrl = e[ctrlKey],
                 isShift = e[shiftKey],
                 previousTag = t[previousSibling],
