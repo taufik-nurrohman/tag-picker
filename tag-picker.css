@@ -23,6 +23,7 @@
   text-decoration: none;
   margin: .125em;
   padding: 0 .5em;
+  height: 1.5em; /* Same with `min-height` of container */
   cursor: pointer;
   outline: none;
 }
