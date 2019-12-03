@@ -150,6 +150,16 @@
             return text;
         };
 
+        if (isSet(module) && module.exports) {
+            module.exports = $$;
+        }
+
+        if (isFunction(define) && define.amd) {
+            define('tag-picker', [], function() { 
+                return $$; 
+            });
+        }
+
     })(win[NS] = function(source, o) {
 
         if (!source) return;
@@ -704,4 +714,4 @@
 
     });
 
-})(window, document, 'TP');
+})(window || {}, document, 'TP');
