@@ -20,7 +20,6 @@ Usage
 <html dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Demo</title>
     <link href="tag-picker.min.css" rel="stylesheet">
   </head>
   <body>

@@ -126,10 +126,11 @@
 
         // Apply to all instance(s)
         $$.each = function(fn, t) {
+            var i, j;
             return delay(function() {
-                var ins = $$[instance], i;
-                for (i in ins) {
-                    fn.call(ins[i], i, ins);
+                j =  = $$[instance];
+                for (i in j) {
+                    fn.call(j[i], i);
                 }
             }, 0 === t ? 0 : (t || 1)), $$;
         };
@@ -149,6 +150,8 @@
             });
             return text;
         };
+
+        $$._ = $$.prototype;
 
     })(win[NS] = function(source, o) {
 
@@ -299,7 +302,7 @@
         function onKeyDownInput(e) {
             var escape = state.escape,
                 t = this,
-                k = e[keyCode], // Old browser(s)
+                k = e[keyCode], // Legacy browser(s)
                 kk = e[key], // Modern browser(s)
                 isCtrl = e[ctrlKey],
                 isShift = e[shiftKey],
@@ -455,7 +458,7 @@
 
         function onKeyDownTag(e) {
             var t = this,
-                k = e[keyCode], // Old browser(s)
+                k = e[keyCode], // Legacy browser(s)
                 kk = e[key], // Modern browser(s)
                 isCtrl = e[ctrlKey],
                 isShift = e[shiftKey],
