@@ -128,7 +128,7 @@
         $$.each = function(fn, t) {
             var i, j;
             return delay(function() {
-                j =  = $$[instance];
+                j = $$[instance];
                 for (i in j) {
                     fn.call(j[i], i);
                 }
@@ -328,7 +328,7 @@
                 preventDefault(e);
             // Submit the closest `<form>` element with `Enter` key
             } else if ('\n' === kk) {
-                onSubmitForm(), preventDefault(e);
+                onSubmitForm() && form && form.submit(), preventDefault(e);
             // Skip `Tab` key
             } else if (!isShift && '\t' === kk) {
                 // :)
@@ -404,9 +404,10 @@
                 inputSet("", 1);
                 alertSet('Minimum tags allowed is %d', [min]);
                 preventDefault(e);
-            } else {
-                // Do normal `submit` event
+                return false;
             }
+            // Do normal `submit` event
+            return true;
         }
 
         function onPasteInput() {
