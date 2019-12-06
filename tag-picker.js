@@ -1,6 +1,6 @@
 /*!
  * ==========================================================
- *  TAG PICKER PLUGIN 3.0.3
+ *  TAG PICKER PLUGIN 3.0.4
  * ==========================================================
  * Author: Taufik Nurrohman <https://github.com/tovic>
  * License: MIT
@@ -119,7 +119,7 @@
 
     (function($$) {
 
-        $$.version = '3.0.3';
+        $$.version = '3.0.4';
 
         // Collect all instance(s)
         $$[instance] = {};
@@ -566,6 +566,7 @@
             if (state.x) {
                 var x = nodeSet('a', 0, {
                     'href': "",
+                    'tabindex': '-1',
                     'title': $$.i('Remove tag %s', [name])
                 });
                 on(x, 'click', onClickTagX);
