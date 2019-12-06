@@ -9,12 +9,15 @@
   <body>
     <p><input type="text" value="foo, bar, baz"></p>
     <p>
-      <button onclick="console.log(picker = picker.source.TP ? picker.pop() : new TP(picker.source));">Create or Destroy UI</button>
+      <label>
+        <input checked onchange="console.log(picker = this.checked ? new TP(picker.source) : picker.pop());" type="checkbox">
+        <span>Enable Tag Picker</span>
+      </label>
     </p>
     <p>
       <button onclick="console.log(picker.click());"><code>click</code></button>
       <button onclick="console.log(picker.focus());"><code>focus</code></button>
-      <button onmouseover="picker.blur();" disabled><code>blur</code> (on hover)</button>
+      <button onmouseover="console.log(picker.blur());" disabled><code>blur</code> (on hover)</button>
     </p>
     <p>
       <button onclick="console.log(picker.set('hello'));">Append <code>hello</code> Tag</button>

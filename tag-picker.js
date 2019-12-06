@@ -20,7 +20,6 @@
         appendChild = 'appendChild',
         children = 'children',
         classList = 'classList',
-        concat = 'concat',
         createElement = 'createElement',
         ctrlKey = 'ctrlKey',
         firstChild = 'firstChild',
@@ -145,9 +144,9 @@
         };
 
         $$.i = function(text, args) {
-            text = win[NS].I[text] || text;
+            text = $$.I[text] || text;
             args && args[forEach](function(v) {
-                text = text.replace('%' + (isNumber(v) ? 'd' : 's'), v);
+                text = text[replace]('%' + (isNumber(v) ? 'd' : 's'), v);
             });
             return text;
         };
@@ -368,7 +367,7 @@
                         }
                     }
                     editorInputPlaceholder[innerHTML] = v ? "" : placeholder;
-                }, 1);
+                }, 0);
             }
         }
 
@@ -418,7 +417,7 @@
             delay(function() {
                 tagsSet(editorInput[textContent]);
                 inputSet("");
-            }, 1);
+            }, 0);
         }
 
         function onClickView(e) {
@@ -492,7 +491,7 @@
                 if (Backspace === kk || 8 === k) {
                     previousTag ? previousTag.focus() : inputSet("", 1);
                 // Focus to the next tag or to the tag input after remove
-                } else /* if (Delete === kk) */ {
+                } else /* if (Delete === kk || 46 === k) */ {
                     nextTag && nextTag !== editor ? nextTag.focus() : inputSet("", 1);
                 }
                 hookFire('change', [name, index]);
@@ -550,7 +549,7 @@
         function tagSet(name, index) {
             if (isNumber(index)) {
                 index = index < 0 ? 0 : index;
-                $.tags = $.tags.splice(0, index)[concat]([name])[concat]($.tags.splice(index - 1));
+                $.tags.splice(index, 0, name);
             } else {
                 $.tags.push(name);
             }
