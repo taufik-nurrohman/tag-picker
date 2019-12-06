@@ -1,6 +1,6 @@
 /*!
  * ==========================================================
- *  TAG PICKER PLUGIN 3.0.2
+ *  TAG PICKER PLUGIN 3.0.3
  * ==========================================================
  * Author: Taufik Nurrohman <https://github.com/tovic>
  * License: MIT
@@ -25,6 +25,7 @@
         ctrlKey = 'ctrlKey',
         firstChild = 'firstChild',
         forEach = 'forEach',
+        getAttribute = 'getAttribute',
         indexOf = 'indexOf',
         innerHTML = 'innerHTML',
         insertBefore = 'insertBefore',
@@ -119,7 +120,7 @@
 
     (function($$) {
 
-        $$.version = '3.0.2';
+        $$.version = '3.0.3';
 
         // Collect all instance(s)
         $$[instance] = {};
@@ -160,6 +161,7 @@
         var $ = this,
             $$ = win[NS],
             placeholder = source.placeholder || "",
+            tabindex = source[getAttribute]('tabindex'),
             defaults = {
                 'alert': true,
                 'class': 'tag-picker',
@@ -195,16 +197,16 @@
 
         var hooks = {},
             state = extend(defaults, o),
-            view = nodeSet('span', "", {
+            view = nodeSet('span', 0, {
                 'class': state['class']
             }),
-            tags = nodeSet('span', "", {
+            tags = nodeSet('span', 0, {
                 'class': 'tags'
             }),
-            editor = nodeSet('span', "", {
+            editor = nodeSet('span', 0, {
                 'class': 'editor tag'
             }),
-            editorInput = nodeSet('span', "", {
+            editorInput = nodeSet('span', 0, {
                 'contenteditable': 'true',
                 'spellcheck': 'false',
                 'style': 'white-space:pre;'
@@ -305,16 +307,18 @@
                 k = e[keyCode], // Legacy browser(s)
                 kk = e[key], // Modern browser(s)
                 isCtrl = e[ctrlKey],
+                isEnter = Enter === kk || 13 === k,
                 isShift = e[shiftKey],
+                isTab = Tab === kk || 9 === k,
                 lastTag = editor[previousSibling],
                 lengthTags = $.tags.length,
                 max = state.max,
                 vv = n(editorInput[textContent]), // Last value before delay
                 name;
             // Set preferred key name
-            if (Enter === kk || 13 === k) {
+            if (isEnter) {
                 kk = '\n';
-            } else if (Tab === kk || 9 === k) {
+            } else if (isTab) {
                 kk = '\t';
             }
             if (inArray(kk, escape) || inArray(k, escape)) {
@@ -327,10 +331,10 @@
                 }
                 preventDefault(e);
             // Submit the closest `<form>` element with `Enter` key
-            } else if ('\n' === kk) {
+            } else if (isEnter) {
                 onSubmitForm() && form && form.submit(), preventDefault(e);
             // Skip `Tab` key
-            } else if (!isShift && '\t' === kk) {
+            } else if (!isShift && isTab) {
                 // :)
             } else {
                 delay(function() {
@@ -462,38 +466,39 @@
                 k = e[keyCode], // Legacy browser(s)
                 kk = e[key], // Modern browser(s)
                 isCtrl = e[ctrlKey],
+                isEnter = Enter === kk || 13 === k,
                 isShift = e[shiftKey],
+                isTab = Tab === kk || 9 === k,
                 previousTag = t[previousSibling],
                 nextTag = t[nextSibling];
-            if (!isCtrl && !isShift) {
-                // Focus to the previous tag
-                if (ArrowLeft === kk || 37 === k) {
-                    previousTag && previousTag.focus();
-                // Focus to the next tag or to the tag input
-                } else if (ArrowRight === kk || 39 === k) {
+            // Focus to the previous tag
+            if ((isShift && isTab) || ArrowLeft === kk || 37 === k) {
+                previousTag && (previousTag.focus(), preventDefault(e));
+            // Focus to the next tag or to the tag input
+            } else if (isTab || ArrowRight === kk || 39 === k) {
+                nextTag && nextTag !== editor ? nextTag.focus() : inputSet("", 1);
+                preventDefault(e);
+            // Remove tag with `Backspace` or `Delete` key
+            } else if (
+                Backspace === kk || Delete === kk ||
+                8 === k || 46 === k
+            ) {
+                var name = t.title,
+                    index = arrayKey(name, $.tags);
+                classLet(view, 'focus.tag');
+                tagLetNode(name);
+                tagLet(name);
+                // Focus to the previous tag or to the tag input after remove
+                if (Backspace === kk || 8 === k) {
+                    previousTag ? previousTag.focus() : inputSet("", 1);
+                // Focus to the next tag or to the tag input after remove
+                } else /* if (Delete === kk) */ {
                     nextTag && nextTag !== editor ? nextTag.focus() : inputSet("", 1);
-                // Remove tag with `Backspace` or `Delete` key
-                } else if (
-                    Backspace === kk || Delete === kk ||
-                    8 === k || 46 === k
-                ) {
-                    var name = t.title,
-                        index = arrayKey(name, $.tags);
-                    classLet(view, 'focus.tag');
-                    tagLetNode(name);
-                    tagLet(name);
-                    // Focus to the previous tag or to the tag input after remove
-                    if (Backspace === kk || 8 === k) {
-                        previousTag ? previousTag.focus() : inputSet("", 1);
-                    // Focus to the next tag or to the tag input after remove
-                    } else /* if (Delete === kk) */ {
-                        nextTag && nextTag !== editor ? nextTag.focus() : inputSet("", 1);
-                    }
-                    hookFire('change', [name, index]);
-                    hookFire('let.tag', [name, index]);
                 }
+                hookFire('change', [name, index]);
+                hookFire('let.tag', [name, index]);
+                preventDefault(e);
             }
-            preventDefault(e);
         }
 
         function alertSet(key, v) {
@@ -554,13 +559,13 @@
         }
 
         function tagSetNode(name, index) {
-            var tag = nodeSet('span', "", {
+            var tag = nodeSet('span', 0, {
                 'class': 'tag',
-                'tabindex': '1',
+                'tabindex': '0',
                 'title': name
             });
             if (state.x) {
-                var x = nodeSet('a', "", {
+                var x = nodeSet('a', 0, {
                     'href': "",
                     'title': $$.i('Remove tag %s', [name])
                 });
@@ -603,6 +608,10 @@
         tags[appendChild](editor);
         editor[appendChild](editorInput);
         editor[appendChild](editorInputPlaceholder);
+
+        nodeSet(source, 0, {
+            'tabindex': '-1'
+        });
 
         // Capture the closest `<form>` element
         form = source[parentNode];
@@ -684,6 +693,9 @@
             form && off(form, 'submit', onSubmitForm);
             $.tags[forEach](tagLetNode);
             classLet(source, state['class'] + '-source');
+            nodeSet(source, 0, {
+                'tabindex': tabindex
+            });
             return nodeLet(view), hookFire('pop');
         };
 
