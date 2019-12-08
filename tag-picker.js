@@ -1,10 +1,10 @@
 /*!
- * ==========================================================
- *  TAG PICKER PLUGIN 3.0.4
- * ==========================================================
- * Author: Taufik Nurrohman <https://github.com/tovic>
+ * ==============================================================
+ *  TAG PICKER 3.0.4
+ * ==============================================================
+ * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
- * ----------------------------------------------------------
+ * --------------------------------------------------------------
  */
 
 (function(win, doc, NS) {
@@ -657,7 +657,7 @@
         };
 
         $.get = function(name) {
-            return tagGet(name, 1), $;
+            return tagGet(name, 1);
         };
 
         $.let = function(name, guard) {
