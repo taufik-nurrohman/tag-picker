@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Tag Picker</title>
+    <link href="tag-picker.min.css" rel="stylesheet">
+    <style>
+
+    .tag-picker-source[readonly] + .tag-picker {
+      background-color: #eee;
+      border-color: #999;
+    }
+
+    </style>
+  </head>
+  <body>
+    <form method="get" target="_blank">
+      <p><input name="tags" readonly type="text" value="foo, bar"></p>
+      <p>
+        <label>
+          <input checked onchange="picker.source.readOnly = this.checked; picker.pop(); picker = new TP(picker.source);" type="checkbox">
+          <span>Read-Only</span>
+        </label>
+      </p>
+      <p><button type="submit">Submit</button></p>
+    </form>
+    <script src="tag-picker.min.js"></script>
+    <script>
+
+    var picker = new TP(document.querySelector('input'));
+
+    </script>
+  </body>
+</html>

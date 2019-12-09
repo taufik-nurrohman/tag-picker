@@ -22,8 +22,8 @@
         text-decoration: underline;
       ">click here to focus!</label></p>
       <p>Test add and remove methods: 
-        <a href="javascript:void(picker.set('wow', null, true));">+wow</a>
-        <a href="javascript:void(picker.let('wow'));">-wow</a>
+        <a href="javascript:void(picker.set('wow', null, true).focus());">+wow</a>
+        <a href="javascript:void(picker.let('wow').focus());">-wow</a>
       </p>
       <p><button type="submit">Submit</button></p>
     </form>
@@ -201,7 +201,7 @@ picker.fire('set.tag', ['foo', 0], 'hook-id'); // With context</code></pre>
     <p>To call the translation string, use <code>TP.i</code>:</p>
     <pre><code>TP.I['Hi %s!'] = 'Hai %s!';
 
-alert(TP.i('Hi!', ['Taufik Nurrohman']));</code></pre>
+alert(TP.i('Hi %s!', ['Taufik Nurrohman']));</code></pre>
     <h2>Examples</h2>
     <ul>
       <li><a href="tag-picker.html" target="_blank">No Idea?</a></li>
@@ -209,6 +209,8 @@ alert(TP.i('Hi!', ['Taufik Nurrohman']));</code></pre>
       <li><a href="tag-picker.placeholder.html" target="_blank">Set Placeholder</a></li>
       <li><a href="tag-picker.focus.html" target="_blank">Focus State</a></li>
       <li><a href="tag-picker.focus.placeholder.html" target="_blank">Hide Placeholder on Focus</a></li>
+      <li><a href="tag-picker.disabled.html" target="_blank">Disabled Input</a></li>
+      <li><a href="tag-picker.read-only.html" target="_blank">Read-Only Input</a></li>
       <li><a href="tag-picker.min.html" target="_blank">Limit Minimum Tags</a></li>
       <li><a href="tag-picker.max.html" target="_blank">Limit Maximum Tags</a></li>
       <li><a href="tag-picker.x.html" target="_blank">Enable &ldquo;Remove&rdquo; Button</a></li>
@@ -223,7 +225,7 @@ alert(TP.i('Hi!', ['Taufik Nurrohman']));</code></pre>
     </ul>
     <script src="tag-picker.js"></script>
     <script>
-    var picker = new TP(document.querySelector('form').tags, ', ');
+    var picker = new TP(document.querySelector('form').tags);
     </script>
   </body>
 </html>

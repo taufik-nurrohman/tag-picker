@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Tag Picker</title>
+    <link href="tag-picker.min.css" rel="stylesheet">
+    <style>
+
+    .tag-picker-source[disabled] + .tag-picker {
+      background-color: #eee;
+      border-color: #999;
+    }
+
+    .tag-picker-source[disabled] + .tag-picker .tag[title] {
+      background-color: #aaa;
+    }
+
+    </style>
+  </head>
+  <body>
+    <form method="get" target="_blank">
+      <p><input name="tags" disabled type="text" value="foo, bar"></p>
+      <p>
+        <label>
+          <input onchange="picker.source.disabled = !this.checked; picker.pop(); picker = new TP(picker.source);" type="checkbox">
+          <span>Enable</span>
+        </label>
+      </p>
+      <p><button type="submit">Submit</button></p>
+    </form>
+    <script src="tag-picker.min.js"></script>
+    <script>
+
+    var picker = new TP(document.querySelector('input'));
+
+    </script>
+  </body>
+</html>

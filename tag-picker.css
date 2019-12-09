@@ -19,7 +19,7 @@
 }
 .tag-picker .tag {
   background: #f00;
-  color: inherit;
+  color: #000;
   text-decoration: none;
   margin: .125em;
   padding: 0 .5em;
@@ -74,4 +74,9 @@
   position: fixed;
   top: -9999px;
   left: -9999px;
+}
+.tag-picker-source[disabled] + .tag-picker,
+.tag-picker-source[disabled] + .tag-picker *,
+.tag-picker-source[readonly] + .tag-picker .tag[title] a {
+  cursor: not-allowed;
 }
