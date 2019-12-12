@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  TAG PICKER 3.0.6
+ *  TAG PICKER 3.0.7
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -122,7 +122,7 @@
 
     (function($$) {
 
-        $$.version = '3.0.6';
+        $$.version = '3.0.7';
 
         // Collect all instance(s)
         $$[__instance__] = {};
@@ -277,8 +277,7 @@
             var name = n(editorInput[textContent]), index;
             if (name) {
                 if (!tagGet(name)) {
-                    tagSetNode(name);
-                    tagSet(name);
+                    tagSetNode(name), tagSet(name);
                     index = $.tags.length;
                     hookFire('change', [name, index]);
                     hookFire('set.tag', [name, index]);
@@ -330,9 +329,9 @@
             if (isTab) {
                 // :)
             } else if (source[disabled] || source[readOnly]) {
-                // Allow form submit with `readonly` input
+                // Submit the closest `<form>` element with `Enter` key
                 if (isEnter && source[readOnly]) {
-                    onSubmitForm() && form && form.submit();
+                    trySubmit();
                 }
                 preventDefault(e);
             } else if (inArray(kk, escape) || inArray(k, escape)) {
@@ -346,7 +345,7 @@
                 preventDefault(e);
             // Submit the closest `<form>` element with `Enter` key
             } else if (isEnter) {
-                (onSubmitForm() && form && form.submit()), preventDefault(e);
+                trySubmit(), preventDefault(e);
             } else {
                 delay(function() {
                     var text = editorInput[textContent],
@@ -367,8 +366,7 @@
                         if ("" === vv && (Backspace === kk || 8 === k)) {
                             name = $.tags[lengthTags - 1];
                             classLet(view, 'focus.tag');
-                            tagLetNode(name);
-                            tagLet(name);
+                            tagLetNode(name), tagLet(name);
                             if (lastTag) {
                                 hookFire('change', [name, lengthTags - 1]);
                                 hookFire('let.tag', [name, lengthTags - 1]);
@@ -404,8 +402,7 @@
                     if (tagGet(v)) {
                         continue;
                     }
-                    tagSetNode(v);
-                    tagSet(v);
+                    tagSetNode(v), tagSet(v);
                     hookFire('change', [v, i]);
                     hookFire('set.tag', [v, i]);
                 }
@@ -472,9 +469,7 @@
         function onClickTagX(e) {
             if (!source[disabled] && !source[readOnly]) {
                 var name = this[parentNode].title;
-                tagLetNode(name);
-                tagLet(name);
-                inputSet("", 1);
+                tagLetNode(name), tagLet(name), inputSet("", 1);
             }
             preventDefault(e);
         }
@@ -485,15 +480,16 @@
                 kk = e[key], // Modern browser(s)
                 isCtrl = e[ctrlKey],
                 isEnter = Enter === kk || 13 === k,
+                isReadOnly = source[readOnly],
                 isShift = e[shiftKey],
                 isTab = Tab === kk || 9 === k,
                 previousTag = t[previousSibling],
                 nextTag = t[nextSibling];
             // Focus to the previous tag
-            if ((isShift && isTab) || ArrowLeft === kk || 37 === k) {
+            if (!isReadOnly && (ArrowLeft === kk || 37 === k)) {
                 previousTag && (previousTag.focus(), preventDefault(e));
             // Focus to the next tag or to the tag input
-            } else if (isTab || ArrowRight === kk || 39 === k) {
+            } else if (!isReadOnly && (ArrowRight === kk || 39 === k)) {
                 nextTag && nextTag !== editor ? nextTag.focus() : inputSet("", 1);
                 preventDefault(e);
             // Remove tag with `Backspace` or `Delete` key
@@ -501,12 +497,11 @@
                 Backspace === kk || Delete === kk ||
                 8 === k || 46 === k
             ) {
-                if (!source[readOnly]) {
+                if (!isReadOnly) {
                     var name = t.title,
                         index = arrayKey(name, $.tags);
                     classLet(view, 'focus.tag');
-                    tagLetNode(name);
-                    tagLet(name);
+                    tagLetNode(name), tagLet(name);
                     // Focus to the previous tag or to the tag input after remove
                     if (Backspace === kk || 8 === k) {
                         previousTag ? previousTag.focus() : inputSet("", 1);
@@ -618,9 +613,12 @@
                     off(x, 'click', onClickTagX);
                     nodeLet(x);
                 }
-                return nodeLet(tag), true;
+                nodeLet(tag);
             }
-            return false;
+        }
+
+        function trySubmit() {
+            onSubmitForm() && form && form.submit();
         }
 
         classSet(source, state['class'] + '-source');
@@ -730,8 +728,7 @@
                 if (!tagGet(name)) {
                     var max = state.max;
                     if ($.tags.length < max) {
-                        tagSetNode(name, index);
-                        tagSet(name, index);
+                        tagSetNode(name, index), tagSet(name, index);
                     } else if (guard) {
                         alertSet('Maximum tags allowed is %d', [max]);
                     }

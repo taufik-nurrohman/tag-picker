@@ -80,48 +80,56 @@
       <li><var>key</var> &rarr; Refers to the tag picker target&rsquo;s <code>id</code> or <code>name</code> attribute value, or its current order.</li>
     </ul>
     <h2>Methods and Properties</h2>
-    <h3><code>picker.state</code></h3>
+    <h3>TP.version</h3>
+    <p>Return the tag picker version.</p>
+    <h3>TP._</h3>
+    <p>Return the tag picker prototypes.</p>
+    <h3>TP.I</h3>
+    <p>Return the tag picker translation data.</p>
+    <h3>TP.i(string, args = [])</h3>
+    <p>Print the translation string.</p>
+    <h3>picker.state</h3>
     <p>Return the tag picker states.</p>
-    <h3><code>picker.source</code></h3>
+    <h3>picker.source</h3>
     <p>Return the <code>&lt;input&gt;</code> element.</p>
-    <h3><code>picker.self</code></h3>
+    <h3>picker.self</h3>
     <p>Return the tag picker element.</p>
-    <h3><code>picker.input</code></h3>
+    <h3>picker.input</h3>
     <p>Return the content-editable element.</p>
-    <h3><code>picker.output</code></h3>
+    <h3>picker.output</h3>
     <p>Alias for <code>picker.source</code> property.</p>
-    <h3><code>picker.tags</code></h3>
+    <h3>picker.tags</h3>
     <p>Return the tags data as array.</p>
     <pre><code>console.log(picker.tags);</code></pre>
-    <h3><code>picker.f</code></h3>
+    <h3>picker.f</h3>
     <p>Set custom tag name filter.</p>
     <pre><code>picker.f = function(name) {
     // Force lower-case letter(s) and trim white-space(s)
     return name.toLowerCase().trim();
 };</code></pre>
-    <h3><code>picker.set(name, index, guard = false)</code></h3>
+    <h3>picker.set(name, index, guard = false)</h3>
     <p>Add a new tag.</p>
     <pre><code>picker.set('foo'); // Append a `foo` tag
 picker.set('foo', 1); // Insert a `foo` tag exactly at index `1`
 picker.set('foo', null, true); // Insert a `foo` tag and enable alert message</code></pre>
-    <h3><code>picker.value(tags)</code></h3>
+    <h3>picker.value(tags)</h3>
     <p>Add multiple tags at once.</p>
     <pre><code>picker.value('foo, bar, baz'); // Add `foo`, `bar` and `baz`
 picker.value(""); // Remove all tags</code></pre>
-    <h3><code>picker.get(name)</code></h3>
+    <h3>picker.get(name)</h3>
     <p>Check the existence of a tag.</p>
     <pre><code>if (null !== picker.get('foo')) { &hellip; }</code></pre>
-    <h3><code>picker.let(name, guard = false)</code></h3>
+    <h3>picker.let(name, guard = false)</h3>
     <p>Remove a tag.</p>
     <pre><code>picker.let('foo'); // Remove `foo` tag
 picker.let('foo', true); // Remove `foo` tag and enable alert message</code></pre>
-    <h3><code>picker.blur()</code></h3>
+    <h3>picker.blur()</h3>
     <p>Blur from the content-editable element.</p>
-    <h3><code>picker.focus()</code></h3>
+    <h3>picker.focus()</h3>
     <p>Focus to the content-editable element.</p>
-    <h3><code>picker.click()</code></h3>
+    <h3>picker.click()</h3>
     <p>Click the content-editable element.</p>
-    <h3><code>picker.pop()</code></h3>
+    <h3>picker.pop()</h3>
     <p>Convert the tag picker element back to its original <code>&lt;input&gt;</code> element.</p>
     <h2>Hooks</h2>
     <table border="1">
@@ -178,7 +186,7 @@ picker.let('foo', true); // Remove `foo` tag and enable alert message</code></pr
         </tr>
       </tbody>
     </table>
-    <h3><code>picker.on(name, fn, id)</code></h3>
+    <h3>picker.on(name, fn, id)</h3>
     <p>Add a new hook.</p>
     <pre><code>picker.on('set.tag', function(name, index) {
     alert('name: ' + name + ', index: ' + index);
@@ -187,18 +195,18 @@ picker.let('foo', true); // Remove `foo` tag and enable alert message</code></pr
 picker.on('set.tag', function(name, index) {
     alert('name: ' + name + ', index: ' + index);
 }, 'hook-id'); // With context</code></pre>
-    <h3><code>picker.off(name, id)</code></h3>
+    <h3>picker.off(name, id)</h3>
     <p>Remove a hook.</p>
     <pre><code>picker.off('set.tag');
 picker.off('set.tag', 'hook-id'); // With context</code></pre>
-    <h3><code>picker.fire(name, lot, id)</code></h3>
+    <h3>picker.fire(name, lot, id)</h3>
     <p>Trigger hooks.</p>
     <pre><code>picker.fire('set.tag', ['foo', 0]);
 picker.fire('set.tag', ['foo', 0], 'hook-id'); // With context</code></pre>
     <h2>Translations</h2>
     <p>Translation data are stored in the <code>TP.I</code> as object:</p>
     <pre><code>console.log(TP.I);</code></pre>
-    <p>To call the translation string, use <code>TP.i</code>:</p>
+    <p>To print the translation string, use <code>TP.i</code>:</p>
     <pre><code>TP.I['Hi %s!'] = 'Hai %s!';
 
 alert(TP.i('Hi %s!', ['Taufik Nurrohman']));</code></pre>
