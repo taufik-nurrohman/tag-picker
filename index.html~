@@ -21,7 +21,7 @@
         cursor: pointer;
         text-decoration: underline;
       ">click here to focus!</label></p>
-      <p>Test add and remove methods:
+      <p>Test add and remove methods: 
         <a href="javascript:void(picker.set('wow', null, true).focus());">+wow</a>
         <a href="javascript:void(picker.let('wow').focus());">-wow</a>
       </p>
