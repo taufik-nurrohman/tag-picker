@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  TAG PICKER 3.0.7
+ *  TAG PICKER 3.0.8
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -66,14 +66,6 @@
         return a[classList].add(name);
     }
 
-    function count(x) {
-        return Object.keys(x).length;
-    }
-
-    function extend(a, b) {
-        return Object.assign(a, b);
-    }
-
     function inArray(a, b) {
         return b[indexOf](a) >= 0;
     }
@@ -87,7 +79,7 @@
     }
 
     function isSet(x) {
-        return 'undefined' !== typeof x;
+        return 'undefined' !== typeof x || null === x;
     }
 
     function isString(x) {
@@ -122,7 +114,7 @@
 
     (function($$) {
 
-        $$.version = '3.0.7';
+        $$.version = '3.0.8';
 
         // Collect all instance(s)
         $$[__instance__] = {};
@@ -164,7 +156,8 @@
             $$ = win[NS],
             placeholder = source.placeholder || "",
             tabindex = source[getAttribute]('tabindex'),
-            defaults = {
+            hooks = {},
+            state = Object.assign({
                 'alert': true,
                 'class': 'tag-picker',
                 'escape': [',', 188],
@@ -172,7 +165,9 @@
                 'max': 9999,
                 'min': 0,
                 'x': false
-            },
+            }, isString(o) ? {
+                'join': o
+            } : (o || {})),
             i, j, k, v;
 
         // Already instantiated, skip!
@@ -182,24 +177,16 @@
 
         // Return new instance if `TP` was called without the `new` operator
         if (!($ instanceof $$)) {
-            return new $$(source, o);
+            return new $$(source, state);
         }
 
         // Store tag picker instance to `TP.__instance__`
-        $$[__instance__][source.id || source.name || count($$[__instance__])] = $;
+        $$[__instance__][source.id || source.name || Object.keys($$[__instance__]).length] = $;
 
         // Mark current DOM as active tag picker to prevent duplicate instance
         source[NS] = 1;
 
-        if (isString(o)) {
-            o = {
-                'join': o
-            };
-        }
-
-        var hooks = {},
-            state = extend(defaults, o),
-            view = nodeSet('span', 0, {
+        var view = nodeSet('span', 0, {
                 'class': state['class']
             }),
             tags = nodeSet('span', 0, {
@@ -213,50 +200,42 @@
                 'spellcheck': 'false',
                 'style': 'white-space:pre;'
             }),
-            editorInputPlaceholder = nodeSet('span'), form;        
+            editorInputPlaceholder = nodeSet('span'), form;
 
-        function hookGet(name, id) {
+        function hookLet(name, fn) {
             if (!isSet(name)) {
-                return hooks;
+                return (hooks = {}), $;
             }
-            if (!isSet(id)) {
-                return hooks[name] || {};
+            if (isSet(hooks[name])) {
+                if (isSet(fn)) {
+                    for (var i = 0, j = hooks[name].length; i < j; ++i) {
+                        if (fn === hooks[name][i]) {
+                            hooks[name].splice(i, 1);
+                        }
+                    }
+                } else {
+                    delete hooks[name];
+                }
             }
-            return hooks[name][id] || null;
+            return $;
         }
 
-        function hookSet(name, fn, id) {
+        function hookSet(name, fn) {
             if (!isSet(hooks[name])) {
-                hooks[name] = {};
+                hooks[name] = [];
             }
-            if (!isSet(id)) {
-                id = count(hooks[name]);
+            if (isSet(fn)) {
+                hooks[name].push(fn);
             }
-            return hooks[name][id] = fn, $;
+            return $;
         }
 
-        function hookLet(name, id) {
-            if (!isSet(name)) {
-                return hooks = {}, $;
-            }
-            if (!isSet(id)) {
-                return hooks[name] = {}, $;
-            }
-            return delete hooks[name][id], $;
-        }
-
-        function hookFire(name, lot, id) {
+        function hookFire(name, lot) {
             if (!isSet(hooks[name])) {
                 return $;
             }
-            if (!isSet(id)) {
-                for (var i in hooks[name]) {
-                    hooks[name][i].apply($, lot);
-                }
-            } else {
-                if (isSet(hooks[name][id])) {
-                    hooks[name][id].apply($, lot);
-                }
+            for (var i = 0, j = hooks[name].length; i < j; ++i) {
+                hooks[name][i].apply($, lot);
             }
             return $;
         }
@@ -652,6 +631,7 @@
 
         tagsSet(source.value); // Fill value(s)
 
+        $.hooks = hooks;
         $.input = editorInput;
         $.self = $.view = view;
         $.source = $.output = source;
@@ -665,9 +645,7 @@
             return view.click(), onClickView(), $;
         };
 
-        $.fire = function(name, lot, id) {
-            return hookFire(name, lot, id);
-        };
+        $.fire = hookFire;
 
         $.focus = function() {
             if (!source[disabled]) {
@@ -694,13 +672,8 @@
             return $;
         };
 
-        $.on = function(name, fn, id) {
-            return hookSet(name, fn, id);
-        };
-
-        $.off = function(name, id) {
-            return hookLet(name, id);
-        };
+        $.on = hookSet;
+        $.off = hookLet;
 
         $.pop = function() {
             if (!source[NS]) {

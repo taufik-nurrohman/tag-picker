@@ -20,16 +20,16 @@
     <script>
 
     var picker = new TP(document.querySelector('input'), {
-        alert: function(name) {
-            var tag = this.view.querySelector('[title="' + name + '"]');
-            if (tag) {
-                tag.classList.add('highlight');
-                setTimeout(function() {
-                    tag.classList.remove('highlight');
-                }, 1000);
+            alert: function(name) {
+                var tag = this.view.querySelector('[title="' + name + '"]');
+                if (tag) {
+                    tag.classList.add('highlight');
+                    setTimeout(function() {
+                        tag.classList.remove('highlight');
+                    }, 1000);
+                }
             }
-        }
-    });
+        });
 
     </script>
   </body>

@@ -186,23 +186,23 @@ picker.let('foo', true); // Remove `foo` tag and enable alert message</code></pr
         </tr>
       </tbody>
     </table>
-    <h3>picker.on(name, fn, id)</h3>
+    <h3>picker.on(name, fn)</h3>
     <p>Add a new hook.</p>
     <pre><code>picker.on('set.tag', function(name, index) {
     alert('name: ' + name + ', index: ' + index);
-});
-
-picker.on('set.tag', function(name, index) {
+});</code></pre>
+    <pre><code>function onSetTag(name, index) {
     alert('name: ' + name + ', index: ' + index);
-}, 'hook-id'); // With context</code></pre>
-    <h3>picker.off(name, id)</h3>
+}
+
+picker.on('set.tag', onSetTag); // With context</code></pre>
+    <h3>picker.off(name, fn)</h3>
     <p>Remove a hook.</p>
-    <pre><code>picker.off('set.tag');
-picker.off('set.tag', 'hook-id'); // With context</code></pre>
-    <h3>picker.fire(name, lot, id)</h3>
+    <pre><code>picker.off('set.tag');</code></pre>
+    <pre><code>picker.off('set.tag', onSetTag); // With context</code></pre>
+    <h3>picker.fire(name, lot)</h3>
     <p>Trigger hooks.</p>
-    <pre><code>picker.fire('set.tag', ['foo', 0]);
-picker.fire('set.tag', ['foo', 0], 'hook-id'); // With context</code></pre>
+    <pre><code>picker.fire('set.tag', ['foo', 0]);</code></pre>
     <h2>Translations</h2>
     <p>Translation data are stored in the <code>TP.I</code> as object:</p>
     <pre><code>console.log(TP.I);</code></pre>
