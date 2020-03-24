@@ -2,6 +2,7 @@
 <html dir="ltr">
   <head>
     <meta charset="utf-8">
+    <meta content="#000" name="color-scheme">
     <meta content="width=device-width" name="viewport">
     <meta content="Tag Picker is a simple JavaScript widget that aims to provide better user interaction experience in adding and removing tags." name="description">
     <title>Tag Picker</title>
@@ -25,8 +26,7 @@
     }
     pre code {
       display: block;
-      background: #000;
-      color: #fff;
+      background: #eee;
       padding: 1em;
     }
     table {
@@ -43,7 +43,7 @@
     ">Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
       <h1>Tag Picker v3.0.8-dev</h1>
-      <p>Tag Picker is a simple JavaScript widget that aims to provide better user interaction experience in adding and removing tags.</p>
+      <p>Tag Picker is a simple JavaScript widget that aims to provide better experience for users in adding and removing comma-separated list of words.</p>
       <hr>
     </header>
     <main>
@@ -62,11 +62,11 @@
       </form>
       <h2>Features</h2>
       <ul>
-        <li>Light-weight library. No dependencies. Tag Picker uses plain JavaScript language.</li>
-        <li>Simple <abbr title="Application Programming Interface">API</abbr>. Easy to learn.</li>
+        <li>Light-weight, no dependencies. It uses plain JavaScript language.</li>
+        <li>Simple <abbr title="Application Programming Interface">API</abbr>. Easy to master.</li>
         <li>Care about accessibility. Interacts very well using the keyboard keys. Free from the focus traps.</li>
       </ul>
-      <h2>Start</h2>
+      <h2>Usage</h2>
       <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html dir="ltr"&gt;
   &lt;head&gt;
@@ -77,13 +77,13 @@
     &lt;p&gt;&lt;input type="text"&gt;&lt;/p&gt;
     &lt;script src="<a href="tag-picker.min.js" target="_blank">tag-picker.min.js</a>"&gt;&lt;/script&gt;
     &lt;script&gt;
-    var picker = new TP(document.querySelector('input'));
+    const picker = new TP(document.querySelector('input'));
     &lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
-      <h2>Configure</h2>
-      <pre><code>var picker = new TP(<var>source</var>, <var>join</var> = ', ');</code></pre>
-      <pre><code>var picker = new TP(<var>source</var>, <var>state</var> = {
+      <h2>Settings</h2>
+      <pre><code>const picker = new TP(<var>source</var>, <var>join</var> = ', ');</code></pre>
+      <pre><code>const picker = new TP(<var>source</var>, <var>state</var> = {
         alert: true,
         escape: [','],
         join: ', ',
@@ -116,13 +116,13 @@
       <h3>TP.version</h3>
       <p>Return the tag picker version.</p>
       <h3>TP._</h3>
-      <p>Return the tag picker prototypes.</p>
+      <p>Return the tag picker prototypes if any.</p>
       <h3>TP.I</h3>
       <p>Return the tag picker translation data.</p>
       <h3>TP.i(string, args = [])</h3>
       <p>Print the translation string.</p>
       <h3>picker.state</h3>
-      <p>Return the tag picker states.</p>
+      <p>Return the modified tag picker states.</p>
       <h3>picker.source</h3>
       <p>Return the <code>&lt;input&gt;</code> element.</p>
       <h3>picker.self</h3>
@@ -134,7 +134,7 @@
       <h3>picker.tags</h3>
       <p>Return the tags data as array.</p>
       <pre><code>console.log(picker.tags);</code></pre>
-      <h3>picker.f</h3>
+      <h3>picker.f(name)</h3>
       <p>Set custom tag name filter.</p>
       <pre><code>picker.f = function(name) {
     // Force lower-case letter(s) and trim white-space(s)
