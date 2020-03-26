@@ -1,0 +1,48 @@
+Change Log
+==========
+
+v3.0.7
+------
+
+ - Updated hook system and added more examples.
+
+v3.0.6
+------
+
+ - Consider `disabled` and `readonly` attribute to control the tag picker behaviour.
+
+v3.0.5
+------
+
+ - None.
+
+v3.0.4
+------
+
+ - Fixed tab-index of the “×” button.
+
+v3.0.3
+------
+
+ - Better tabbing behaviour.
+
+v3.0.2
+------
+
+ - Removed experimental JavaScript module pattern.
+
+v3.0.1
+------
+
+ - Small bug fixes and improvements.
+
+v3.0.0
+------
+
+ - Changed project name from `tags-input-beautifier` to `tag-picker`.
+ - The “×” button is removed. You can now trigger focus on a tag item and delete it using `Backspace` or `Delete` key. You can also navigate between tag items using `ArrowLeft` and `ArrowRight` key.
+
+v2.2.5
+------
+
+ - None.
