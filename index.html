@@ -42,12 +42,12 @@
       padding: .75em 1em;
     ">Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
-      <h1>Tag Picker v3.0.8-dev</h1>
+      <h1>Tag Picker v3.0.8</h1>
       <p>Tag Picker is a simple JavaScript widget that aims to provide better experience for users in adding and removing comma-separated list of words.</p>
       <hr>
     </header>
     <main>
-      <p>A tags is a comma-separated list of words. It has support for hooks, so you can listen to events that occur at each interaction to provide additional features. Each tag item can also be selected using the arrow keys and a mouse click to perform actions on the selected tag, for example, to delete the tag.</p>
+      <p>Tags are comma-separated list of words. This widget has support for hooks, so you can listen to events that occur at each interaction to provide additional features. Each tag item can also be selected using the arrow keys and a mouse click to perform actions on the selected tag, for example, to delete the tag.</p>
       <form method="get" target="_blank">
         <p><input name="tags" type="text" value="foo, bar" id="tags" placeholder="foo, bar, baz"></p>
         <p>Test connection with <code>&lt;label&gt;</code> element: <label for="tags" style="
@@ -55,14 +55,14 @@
           text-decoration: underline;
         ">click here to focus!</label></p>
         <p>Test add and remove methods:
-          <a href="javascript:void(picker.set('wow', null, true).focus());">+wow</a>
-          <a href="javascript:void(picker.let('wow').focus());">-wow</a>
+          <a href="javascript:void(picker.set('wow', null, true).focus());">add &ldquo;wow&rdquo;</a>
+          <a href="javascript:void(picker.let('wow').focus());">remove &ldquo;wow&rdquo;</a>
         </p>
         <p><button type="submit">Submit</button></p>
       </form>
       <h2>Features</h2>
       <ul>
-        <li>Light-weight, no dependencies. It uses plain JavaScript language.</li>
+        <li>Light-weight, no dependencies. It uses vanilla JavaScript.</li>
         <li>Simple <abbr title="Application Programming Interface">API</abbr>. Easy to master.</li>
         <li>Care about accessibility. Interacts very well using the keyboard keys. Free from the focus traps.</li>
       </ul>
@@ -81,6 +81,28 @@
     &lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
+      <h2>Examples</h2>
+      <ul>
+        <li><a href="tag-picker.html" target="_blank">No Idea?</a></li>
+        <li><a href="tag-picker.value.html" target="_blank">Set Pre-Defined Value</a></li>
+        <li><a href="tag-picker.placeholder.html" target="_blank">Set Placeholder</a></li>
+        <li><a href="tag-picker.focus.html" target="_blank">Focus State</a></li>
+        <li><a href="tag-picker.focus.placeholder.html" target="_blank">Hide Placeholder on Focus</a></li>
+        <li><a href="tag-picker.disabled.html" target="_blank">Disabled Input</a></li>
+        <li><a href="tag-picker.read-only.html" target="_blank">Read-Only Input</a></li>
+        <li><a href="tag-picker.min.html" target="_blank">Limit Minimum Tags</a></li>
+        <li><a href="tag-picker.max.html" target="_blank">Limit Maximum Tags</a></li>
+        <li><a href="tag-picker.x.html" target="_blank">Enable &ldquo;Remove&rdquo; Button</a></li>
+        <li><a href="tag-picker.paste.html" target="_blank">Paste Event</a></li>
+        <li><a href="tag-picker.alert.html" target="_blank">Default Alert</a></li>
+        <li><a href="tag-picker.alert.false.html" target="_blank">No Alert</a></li>
+        <li><a href="tag-picker.alert.function.html" target="_blank">Custom Alert</a></li>
+        <li><a href="tag-picker.escape.html" target="_blank">Disable Characters with <code>picker.state.escape</code></a></li>
+        <li><a href="tag-picker.f.html" target="_blank">Filter Characters with <code>picker.f()</code> Method</a></li>
+        <li><a href="tag-picker.i.html" target="_blank">Translations</a></li>
+        <li><a href="tag-picker.directory.html" target="_blank">Directory (Experiment)</a></li>
+        <li><a href="tag-picker.element.html" target="_blank">Native HTML5 Custom <code>&lt;tag-picker&gt;</code> Element</a></li>
+      </ul>
       <h2>Settings</h2>
       <pre><code>const picker = new TP(<var>source</var>, <var>join</var> = ', ');</code></pre>
       <pre><code>const picker = new TP(<var>source</var>, <var>state</var> = {
@@ -243,59 +265,14 @@ picker.on('set.tag', onSet); // With context</code></pre>
       <pre><code>TP.I['Hi %s!'] = 'Hai %s!';
 
 alert(TP.i('Hi %s!', ['Taufik Nurrohman']));</code></pre>
-      <h2>Examples</h2>
-      <ul>
-        <li><a href="tag-picker.html" target="_blank">No Idea?</a></li>
-        <li><a href="tag-picker.value.html" target="_blank">Set Pre-Defined Value</a></li>
-        <li><a href="tag-picker.placeholder.html" target="_blank">Set Placeholder</a></li>
-        <li><a href="tag-picker.focus.html" target="_blank">Focus State</a></li>
-        <li><a href="tag-picker.focus.placeholder.html" target="_blank">Hide Placeholder on Focus</a></li>
-        <li><a href="tag-picker.disabled.html" target="_blank">Disabled Input</a></li>
-        <li><a href="tag-picker.read-only.html" target="_blank">Read-Only Input</a></li>
-        <li><a href="tag-picker.min.html" target="_blank">Limit Minimum Tags</a></li>
-        <li><a href="tag-picker.max.html" target="_blank">Limit Maximum Tags</a></li>
-        <li><a href="tag-picker.x.html" target="_blank">Enable &ldquo;Remove&rdquo; Button</a></li>
-        <li><a href="tag-picker.paste.html" target="_blank">Paste Event</a></li>
-        <li><a href="tag-picker.alert.html" target="_blank">Default Alert</a></li>
-        <li><a href="tag-picker.alert.false.html" target="_blank">No Alert</a></li>
-        <li><a href="tag-picker.alert.function.html" target="_blank">Custom Alert</a></li>
-        <li><a href="tag-picker.escape.html" target="_blank">Disable Characters with <code>picker.state.escape</code></a></li>
-        <li><a href="tag-picker.f.html" target="_blank">Filter Characters with <code>picker.f</code></a></li>
-        <li><a href="tag-picker.i.html" target="_blank">Translations</a></li>
-        <li><a href="tag-picker.directory.html" target="_blank">Directory (Experiment)</a></li>
-      </ul>
-      <h2>Support</h2>
-      <p>Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project, huh? It&rsquo;s a good idea to share a little financial support with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.</p>
+      <h2>License</h2>
+      <p>Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to share a little financial support with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.</p>
       <p>Thank you! ❤️</p>
       <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
         <input name="cmd" value="_s-xclick" type="hidden">
         <input name="hosted_button_id" value="TNVGH7NQ7E4EU" type="hidden">
         <p><button type="submit" class="button">Donate</button></p>
       </form>
-      <hr>
-      <pre>The MIT License (MIT)
-
-Copyright (c) 2020 Taufik Nurrohman
-
-&lt;https://github.com/taufik-nurrohman/tag-picker&gt;
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.</pre>
     </main>
     <footer>
       <hr>
