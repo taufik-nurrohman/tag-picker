@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="#000" name="color-scheme">
     <meta content="width=device-width" name="viewport">
-    <meta content="Tag Picker is a simple JavaScript widget that aims to provide better user interaction experience in adding and removing tags." name="description">
+    <meta content="Tag Picker is a simple JavaScript application that aims to provide better user interaction experience in adding and removing tags." name="description">
     <title>Tag Picker</title>
     <link href="favicon.ico" rel="icon">
     <link href="tag-picker.css" rel="stylesheet">
@@ -42,12 +42,12 @@
       padding: .75em 1em;
     ">Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
-      <h1>Tag Picker v3.0.7</h1>
-      <p>Tag Picker is a simple JavaScript widget that aims to provide better experience for users in adding and removing comma-separated list of words.</p>
+      <h1>Tag Picker v3.0.8</h1>
+      <p>Tag Picker is a simple JavaScript application that aims to provide better experience for users in adding and removing comma-separated list of words.</p>
       <hr>
     </header>
     <main>
-      <p>Tags are comma-separated list of words. This widget has support for hooks, so you can listen to events that occur at each interaction to provide additional features. Each tag item can also be selected using the arrow keys and a mouse click to perform actions on the selected tag, for example, to delete the tag.</p>
+      <p>Tags are comma-separated list of words. This application has support for hooks, so you can listen to events that occur at each interaction to provide additional features. Each tag item can also be selected using the arrow keys and a mouse click to perform actions on the selected tag, for example, to delete the tag.</p>
       <form method="get" target="_blank">
         <p><input name="tags" type="text" value="foo, bar" id="tags" placeholder="foo, bar, baz"></p>
         <p>Test connection with <code>&lt;label&gt;</code> element: <label for="tags" style="
@@ -55,7 +55,7 @@
           text-decoration: underline;
         ">click here to focus!</label></p>
         <p>Test add and remove methods:
-          <a href="javascript:void(picker.set('wow', null, true).focus());">add &ldquo;wow&rdquo;</a>
+          <a href="javascript:void(picker.set('wow').focus());">add &ldquo;wow&rdquo;</a>
           <a href="javascript:void(picker.let('wow').focus());">remove &ldquo;wow&rdquo;</a>
         </p>
         <p><button type="submit">Submit</button></p>
@@ -94,19 +94,16 @@
         <li><a href="tag-picker.max.html" target="_blank">Limit Maximum Tags</a></li>
         <li><a href="tag-picker.x.html" target="_blank">Enable &ldquo;Remove&rdquo; Button</a></li>
         <li><a href="tag-picker.paste.html" target="_blank">Paste Event</a></li>
-        <li><a href="tag-picker.alert.html" target="_blank">Default Alert</a></li>
-        <li><a href="tag-picker.alert.false.html" target="_blank">No Alert</a></li>
-        <li><a href="tag-picker.alert.function.html" target="_blank">Custom Alert</a></li>
+        <li><a href="tag-picker.alert.html" target="_blank">Warn for Duplicate Tags with Alert Message</a></li>
+        <li><a href="tag-picker.mark.html" target="_blank">Warn for Duplicate Tags with Flash Highlight</a></li>
         <li><a href="tag-picker.escape.html" target="_blank">Disable Characters with <code>picker.state.escape</code></a></li>
         <li><a href="tag-picker.f.html" target="_blank">Filter Characters with <code>picker.f()</code> Method</a></li>
-        <li><a href="tag-picker.i.html" target="_blank">Translations</a></li>
         <li><a href="tag-picker.directory.html" target="_blank">Directory (Experiment)</a></li>
         <li><a href="tag-picker.element.html" target="_blank">Native HTML5 Custom <code>&lt;tag-picker&gt;</code> Element</a></li>
       </ul>
       <h2>Settings</h2>
       <pre><code>const picker = new TP(<var>source</var>, <var>join</var> = ', ');</code></pre>
       <pre><code>const picker = new TP(<var>source</var>, <var>state</var> = {
-        alert: true,
         escape: [','],
         join: ', ',
         max: 9999,
@@ -117,67 +114,73 @@
         <li><var>source</var> &rarr; The text input element.</li>
         <li><var>join</var> &rarr; Tags joiner for the output value.</li>
         <li><var>state</var> &rarr; The configuration data.</li>
-        <li><var>state.alert</var> &rarr; Set to <code>false</code> to disable alert message.</li>
         <li><var>state.escape</var> &rarr; List of characters used to trigger the tag addition.</li>
         <li><var>state.join</var> &rarr; Tags joiner for the output value.</li>
         <li><var>state.max</var> &rarr; Maximum tags allowed.</li>
         <li><var>state.min</var> &rarr; Minimum tags allowed.</li>
         <li><var>state.x</var> &rarr; Set to <code>true</code> to show the &ldquo;remove&rdquo; button.</li>
       </ul>
-      <h2>Instance</h2>
-      <p>All tag picker instances will be stored in <code>TP.__instance__</code>. To iterate the instances is possible with <code>TP.each()</code>:</p>
-      <pre><code>TP.each(function(key) {
-    console.log(key);
-    console.log(this.source);
-});</code></pre>
-      <ul>
-        <li><var>this</var> &rarr; Refers to the tag picker instance.</li>
-        <li><var>key</var> &rarr; Refers to the tag picker target&rsquo;s <code>id</code> or <code>name</code> attribute value, or its current order.</li>
-      </ul>
       <h2>Methods and Properties</h2>
       <h3>TP.version</h3>
       <p>Return the tag picker version.</p>
+      <pre><code>let version = TP.version,
+    major = version.split('.')[0];
+
+if (+major &lt; 3) { &hellip; }</code></pre>
+      <h3>TP.instances</h3>
+      <p>Return the tag picker instances.</p>
+      <pre><code>for (let key in TP.instances) {
+    console.log(key);
+    console.log(TP.instances[key]);
+}</code></pre>
       <h3>TP._</h3>
-      <p>Return the tag picker prototypes if any.</p>
-      <h3>TP.I</h3>
-      <p>Return the tag picker translation data.</p>
-      <h3>TP.i(string, args = [])</h3>
-      <p>Print the translation string.</p>
+      <p>Alias of <code>TP.prototype</code> used to formalize the prototype creation.</p>
+      <pre><code>// Create `addTag()` and `removeTag()` method
+TP._.addTag = function(name) {
+    return this.set(name);
+};
+
+TP._.removeTag = function(name) {
+    return this.let(name);
+};</code></pre>
       <h3>picker.state</h3>
       <p>Return the modified tag picker states.</p>
       <h3>picker.source</h3>
       <p>Return the <code>&lt;input&gt;</code> element.</p>
+      <pre><code>console.log(picker.source);</code></pre>
       <h3>picker.self</h3>
       <p>Return the tag picker element.</p>
+      <pre><code>picker.self.style.borderWidth = '4px';</code></pre>
       <h3>picker.input</h3>
       <p>Return the content-editable element.</p>
+      <pre><code>picker.input.addEventListener('paste', function() {
+    // Handle `paste` event here
+}, false);</code></pre>
       <h3>picker.output</h3>
       <p>Alias for <code>picker.source</code> property.</p>
       <h3>picker.tags</h3>
       <p>Return the tags data as array.</p>
       <pre><code>console.log(picker.tags);</code></pre>
-      <h3>picker.f(name)</h3>
+      <h3>picker.f(tag)</h3>
       <p>Set custom tag name filter.</p>
-      <pre><code>picker.f = function(name) {
+      <pre><code>picker.f = function(tag) {
     // Force lower-case letter(s) and trim white-space(s)
-    return name.toLowerCase().trim();
+    return tag.toLowerCase().trim();
 };</code></pre>
-      <h3>picker.set(name, index, guard = false)</h3>
+      <h3>picker.set(tag, index)</h3>
       <p>Add a new tag.</p>
       <pre><code>picker.set('foo'); // Append a `foo` tag
-picker.set('foo', 1); // Insert a `foo` tag exactly at index `1`
-picker.set('foo', null, true); // Insert a `foo` tag and enable alert message</code></pre>
+picker.set('foo', 1); // Insert a `foo` tag exactly at index `1`</code></pre>
       <h3>picker.value(tags)</h3>
       <p>Add multiple tags at once.</p>
       <pre><code>picker.value('foo, bar, baz'); // Add `foo`, `bar` and `baz`
 picker.value(""); // Remove all tags</code></pre>
-      <h3>picker.get(name)</h3>
+      <h3>picker.get(tag)</h3>
       <p>Check the existence of a tag.</p>
       <pre><code>if (null !== picker.get('foo')) { &hellip; }</code></pre>
-      <h3>picker.let(name, guard = false)</h3>
+      <h3>picker.let(tag)</h3>
       <p>Remove a tag.</p>
-      <pre><code>picker.let('foo'); // Remove `foo` tag
-picker.let('foo', true); // Remove `foo` tag and enable alert message</code></pre>
+      <pre><code>picker.let('foo'); // Remove `foo` tag</code></pre>
       <h3>picker.blur()</h3>
       <p>Blur from the content-editable element.</p>
       <h3>picker.focus()</h3>
@@ -200,6 +203,10 @@ picker.let('foo', true); // Remove `foo` tag and enable alert message</code></pr
             <td>Will be triggered after release focus on the tag editor.</td>
           </tr>
           <tr>
+            <td><code>blur.tag</code></td>
+            <td>Will be triggered after release focus on a tag item.</td>
+          </tr>
+          <tr>
             <td><code>change</code></td>
             <td>Will be triggered on every time the tags data is updated.</td>
           </tr>
@@ -208,20 +215,12 @@ picker.let('foo', true); // Remove `foo` tag and enable alert message</code></pr
             <td>Will be triggered after click on the tag editor.</td>
           </tr>
           <tr>
-            <td><code>focus</code></td>
-            <td>Will be triggered after focus on the tag editor.</td>
-          </tr>
-          <tr>
-            <td><code>pop</code></td>
-            <td>Will be triggered after <code>picker.pop()</code>.</td>
-          </tr>
-          <tr>
-            <td><code>blur.tag</code></td>
-            <td>Will be triggered after release focus on a tag item.</td>
-          </tr>
-          <tr>
             <td><code>click.tag</code></td>
             <td>Will be triggered after click on a tag item.</td>
+          </tr>
+          <tr>
+            <td><code>focus</code></td>
+            <td>Will be triggered after focus on the tag editor.</td>
           </tr>
           <tr>
             <td><code>focus.tag</code></td>
@@ -232,8 +231,24 @@ picker.let('foo', true); // Remove `foo` tag and enable alert message</code></pr
             <td>Will be triggered after <code>picker.get('foo')</code>.</td>
           </tr>
           <tr>
+            <td><code>has.tag</code></td>
+            <td>Will be triggered if the tag you want to add already exists.</td>
+          </tr>
+          <tr>
             <td><code>let.tag</code></td>
             <td>Will be triggered after <code>picker.let('foo')</code>.</td>
+          </tr>
+          <tr>
+            <td><code>min.tags</code></td>
+            <td>Will be triggered if number of tags you want to submit is less than the <code>picker.state.min</code> value.</td>
+          </tr>
+          <tr>
+            <td><code>max.tags</code></td>
+            <td>Will be triggered if number of tags you want to submit is greater than the <code>picker.state.max</code> value.</td>
+          </tr>
+          <tr>
+            <td><code>pop</code></td>
+            <td>Will be triggered after <code>picker.pop()</code>.</td>
           </tr>
           <tr>
             <td><code>set.tag</code></td>
@@ -241,6 +256,9 @@ picker.let('foo', true); // Remove `foo` tag and enable alert message</code></pr
           </tr>
         </tbody>
       </table>
+      <h3>picker.hooks</h3>
+      <p>Return the added hooks.</p>
+      <pre><code>console.log(picker.hooks);</code></pre>
       <h3>picker.on(name, fn)</h3>
       <p>Add a new hook.</p>
       <pre><code>picker.on('set.tag', function(name, index) {
@@ -258,13 +276,6 @@ picker.on('set.tag', onSet); // With context</code></pre>
       <h3>picker.fire(name, lot)</h3>
       <p>Trigger hooks.</p>
       <pre><code>picker.fire('set.tag', ['foo', 0]);</code></pre>
-      <h2>Translations</h2>
-      <p>Translation data are stored in the <code>TP.I</code> as object:</p>
-      <pre><code>console.log(TP.I);</code></pre>
-      <p>To print the translation string, use <code>TP.i</code>:</p>
-      <pre><code>TP.I['Hi %s!'] = 'Hai %s!';
-
-alert(TP.i('Hi %s!', ['Taufik Nurrohman']));</code></pre>
       <h2>License</h2>
       <p>Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to share a little financial support with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.</p>
       <p>Thank you! ❤️</p>
@@ -281,6 +292,9 @@ alert(TP.i('Hi %s!', ['Taufik Nurrohman']));</code></pre>
     <script src="tag-picker.js"></script>
     <script>
     var picker = new TP(document.querySelector('form').tags);
+    picker.on('has.tag', function(tag) {
+        alert('Tag “' + tag + '” already exists.');
+    });
     </script>
   </body>
 </html>

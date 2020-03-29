@@ -1,13 +1,13 @@
 /*!
  * ==============================================================
- *  TAG PICKER 3.0.7
+ *  TAG PICKER 3.0.8
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
  * --------------------------------------------------------------
  */
 
-(function(win, doc, NS) {
+(function(win, doc, name) {
 
     var Arrow = 'Arrow',
         ArrowLeft = Arrow + 'Left',
@@ -16,8 +16,6 @@
         Delete = 'Delete',
         Enter = 'Enter',
         Tab = 'Tab',
-
-        __instance__ = '__instance__',
 
         appendChild = 'appendChild',
         children = 'children',
@@ -31,6 +29,7 @@
         indexOf = 'indexOf',
         innerHTML = 'innerHTML',
         insertBefore = 'insertBefore',
+        instances = 'instances',
         key = 'key',
         keyCode = key + 'Code',
         lastChild = 'lastChild',
@@ -114,51 +113,23 @@
 
     (function($$) {
 
-        $$.version = '3.0.7';
+        $$.version = '3.0.8';
 
         // Collect all instance(s)
-        $$[__instance__] = {};
-
-        // Apply to all instance(s)
-        $$.each = function(fn, t) {
-            var i, j;
-            return delay(function() {
-                j = $$[__instance__];
-                for (i in j) {
-                    fn.call(j[i], i);
-                }
-            }, 0 === t ? 0 : (t || 1)), $$;
-        };
-
-        // Language library
-        $$.I = {
-            'Maximum tags allowed is %d': 'Maximum tags allowed is %d.',
-            'Minimum tags allowed is %d': 'Minimum tags allowed is %d.',
-            'Remove tag %s': 'Remove tag \u201C%s\u201D',
-            'Tag %s already exists': 'Tag \u201C%s\u201D already exists.'
-        };
-
-        $$.i = function(text, args) {
-            text = $$.I[text] || text;
-            args && args[forEach](function(v) {
-                text = text[replace]('%' + (isNumber(v) ? 'd' : 's'), v);
-            });
-            return text;
-        };
+        $$[instances] = {};
 
         $$._ = $$.prototype;
 
-    })(win[NS] = function(source, o) {
+    })(win[name] = function(source, o) {
 
         if (!source) return;
 
         var $ = this,
-            $$ = win[NS],
+            $$ = win[name],
             placeholder = source.placeholder || "",
             tabindex = source[getAttribute]('tabindex'),
             hooks = {},
             state = Object.assign({
-                'alert': true,
                 'class': 'tag-picker',
                 'escape': [',', 188],
                 'join': ', ',
@@ -171,7 +142,7 @@
             i, j, k, v;
 
         // Already instantiated, skip!
-        if (source[NS]) {
+        if (source[name]) {
             return $;
         }
 
@@ -180,11 +151,11 @@
             return new $$(source, state);
         }
 
-        // Store tag picker instance to `TP.__instance__`
-        $$[__instance__][source.id || source.name || Object.keys($$[__instance__]).length] = $;
+        // Store tag picker instance to `TP.instances`
+        $$[instances][source.id || source.name || Object.keys($$[instances]).length] = $;
 
         // Mark current DOM as active tag picker to prevent duplicate instance
-        source[NS] = 1;
+        source[name] = 1;
 
         var view = nodeSet('span', 0, {
                 'class': state['class']
@@ -249,26 +220,27 @@
             return $.f(v)[replace](new RegExp('(' + state.escape.join('|')[replace](/\\/g, '\\\\') + ')+'), "").trim();
         }
 
-        function onInput(guard) {
+        function onInput() {
             if (source[disabled] || source[readOnly]) {
                 return inputSet("");
             }
-            var name = n(editorInput[textContent]), index;
-            if (name) {
-                if (!tagGet(name)) {
-                    tagSetNode(name), tagSet(name);
-                    index = $.tags.length;
-                    hookFire('change', [name, index]);
-                    hookFire('set.tag', [name, index]);
-                } else if (guard) {
-                    alertSet('Tag %s already exists', [name]);
+            var tag = n(editorInput[textContent]),
+                tags = $.tags, index;
+            if (tag) {
+                if (!tagGet(tag)) {
+                    tagSetNode(tag), tagSet(tag);
+                    index = tags.length;
+                    hookFire('change', [tag, index]);
+                    hookFire('set.tag', [tag, index]);
+                } else {
+                    hookFire('has.tag', [tag, arrayKey(tag, tags)]);
                 }
                 inputSet("");
             }
         }
 
         function onBlurInput() {
-            onInput(1);
+            onInput();
             classLet(view, 'focus');
             classLet(view, 'focus.input');
             hookFire('blur', [v, $.tags.length]);
@@ -297,7 +269,7 @@
                 lengthTags = $.tags.length,
                 max = state.max,
                 vv = n(editorInput[textContent]), // Last value before delay
-                name;
+                tag;
             // Set preferred key name
             if (isEnter) {
                 kk = '\n';
@@ -316,10 +288,10 @@
             } else if (inArray(kk, escape) || inArray(k, escape)) {
                 if (lengthTags < max) {
                     // Add the tag name found in the tag editor
-                    onInput(1);
+                    onInput();
                 } else {
                     inputSet("");
-                    alertSet('Maximum tags allowed is %d', [max]);
+                    hookFire('max.tags', [max]);
                 }
                 preventDefault(e);
             // Submit the closest `<form>` element with `Enter` key
@@ -334,21 +306,21 @@
                     if (inArray(text.slice(-1), escape)) {
                         if (lengthTags < max) {
                             // Add the tag name found in the tag editor
-                            onInput(1);
+                            onInput();
                         } else {
                             inputSet("");
-                            alertSet('Maximum tags allowed is %d', [max]);
+                            hookFire('max.tags', [max]);
                         }
                         preventDefault(e);
                     // Escape character only, delete!
                     } else if ("" === v && !isCtrl && !isShift) {
                         if ("" === vv && (Backspace === kk || 8 === k)) {
-                            name = $.tags[lengthTags - 1];
+                            tag = $.tags[lengthTags - 1];
                             classLet(view, 'focus.tag');
-                            tagLetNode(name), tagLet(name);
+                            tagLetNode(tag), tagLet(tag);
                             if (lastTag) {
-                                hookFire('change', [name, lengthTags - 1]);
-                                hookFire('let.tag', [name, lengthTags - 1]);
+                                hookFire('change', [tag, lengthTags - 1]);
+                                hookFire('let.tag', [tag, lengthTags - 1]);
                             }
                         } else if (ArrowLeft === kk || 37 === k) {
                             // Focus to the last tag
@@ -396,7 +368,7 @@
             onInput(); // Force to add the tag name found in the tag editor
             if (min > 0 && $.tags.length < min) {
                 inputSet("", 1);
-                alertSet('Minimum tags allowed is %d', [min]);
+                hookFire('min.tags', [min]);
                 preventDefault(e);
                 return;
             }
@@ -426,29 +398,32 @@
 
         function onBlurTag() {
             var t = this,
-                name = t.title;
+                tag = t.title,
+                tags = $.tags;
             classLet(view, 'focus');
             classLet(view, 'focus.tag');
-            hookFire('blur.tag', [name, arrayKey(name, $.tags)]);
+            hookFire('blur.tag', [tag, arrayKey(tag, tags)]);
         }
 
         function onClickTag() {
-            var name = this.title;
-            hookFire('click.tag', [name, arrayKey(name, $.tags)]);
+            var tag = this.title,
+                tags = $.tags;
+            hookFire('click.tag', [tag, arrayKey(tag, tags)]);
         }
 
         function onFocusTag() {
             var t = this,
-                name = t.title;
+                tag = t.title,
+                tags = $.tags;
             classSet(view, 'focus');
             classSet(view, 'focus.tag');
-            hookFire('focus.tag', [name, arrayKey(name, $.tags)]);
+            hookFire('focus.tag', [tag, arrayKey(tag, tags)]);
         }
 
         function onClickTagX(e) {
             if (!source[disabled] && !source[readOnly]) {
-                var name = this[parentNode].title;
-                tagLetNode(name), tagLet(name), inputSet("", 1);
+                var tag = this[parentNode].title;
+                tagLetNode(tag), tagLet(tag), inputSet("", 1);
             }
             preventDefault(e);
         }
@@ -477,10 +452,10 @@
                 8 === k || 46 === k
             ) {
                 if (!isReadOnly) {
-                    var name = t.title,
-                        index = arrayKey(name, $.tags);
+                    var tag = t.title,
+                        index = arrayKey(tag, $.tags);
                     classLet(view, 'focus.tag');
-                    tagLetNode(name), tagLet(name);
+                    tagLetNode(tag), tagLet(tag);
                     // Focus to the previous tag or to the tag input after remove
                     if (Backspace === kk || 8 === k) {
                         previousTag ? previousTag.focus() : inputSet("", 1);
@@ -488,22 +463,10 @@
                     } else /* if (Delete === kk || 46 === k) */ {
                         nextTag && nextTag !== editor ? nextTag.focus() : inputSet("", 1);
                     }
-                    hookFire('change', [name, index]);
-                    hookFire('let.tag', [name, index]);
+                    hookFire('change', [tag, index]);
+                    hookFire('let.tag', [tag, index]);
                 }
                 preventDefault(e);
-            }
-        }
-
-        function alertSet(key, v) {
-            var a = state.alert, k;
-            if (true === a && (k = $$.i(key, v))) {
-                alert(k);
-            } else if (isFunction(a)) {
-                a.apply($, v);
-            // Function name as string stored in the `TP` object
-            } else if (isString(a) && $$[a]) {
-                $$[a].apply($, v);
             }
         }
 
@@ -525,14 +488,14 @@
             e && e.preventDefault();
         }
 
-        function tagGet(name, hook) {
-            var index = arrayKey(name, $.tags);
-            hook && hookFire('get.tag', [name, index]);
-            return isNumber(index) ? name : null;
+        function tagGet(tag, hook) {
+            var index = arrayKey(tag, $.tags);
+            hook && hookFire('get.tag', [tag, index]);
+            return isNumber(index) ? tag : null;
         }
 
-        function tagLet(name) {
-            var index = arrayKey(name, $.tags);
+        function tagLet(tag) {
+            var index = arrayKey(tag, $.tags);
             if (isNumber(index) && index >= 0) {
                 $.tags.splice(index, 1);
                 source.value = $.tags.join(state.join);
@@ -541,58 +504,57 @@
             return false;
         }
 
-        function tagSet(name, index) {
+        function tagSet(tag, index) {
             if (isNumber(index)) {
                 index = index < 0 ? 0 : index;
-                $.tags.splice(index, 0, name);
+                $.tags.splice(index, 0, tag);
             } else {
-                $.tags.push(name);
+                $.tags.push(tag);
             }
             // Update value
             source.value = $.tags.join(state.join);
         }
 
-        function tagSetNode(name, index) {
-            var tag = nodeSet('span', 0, {
+        function tagSetNode(tag, index) {
+            var node = nodeSet('span', 0, {
                 'class': 'tag',
                 'tabindex': source[disabled] ? false : '0',
-                'title': name
+                'title': tag
             });
             if (state.x) {
                 var x = nodeSet('a', 0, {
                     'href': "",
-                    'tabindex': '-1',
-                    'title': $$.i('Remove tag %s', [name])
+                    'tabindex': '-1'
                 });
                 on(x, 'click', onClickTagX);
-                tag[appendChild](x);
+                node[appendChild](x);
             }
-            on(tag, 'blur', onBlurTag);
-            on(tag, 'click', onClickTag);
-            on(tag, 'focus', onFocusTag);
-            on(tag, 'keydown', onKeyDownTag);
+            on(node, 'blur', onBlurTag);
+            on(node, 'click', onClickTag);
+            on(node, 'focus', onFocusTag);
+            on(node, 'keydown', onKeyDownTag);
             if (tags[parentNode]) {
                 if (isNumber(index) && $.tags[index]) {
-                    tags[insertBefore](tag, tags[children][index]);
+                    tags[insertBefore](node, tags[children][index]);
                 } else {
-                    tags[insertBefore](tag, editor);
+                    tags[insertBefore](node, editor);
                 }
             }
         }
 
-        function tagLetNode(name) {
-            var index = arrayKey(name, $.tags), tag;
-            if (isNumber(index) && index >= 0 && (tag = tags.children[index])) {
-                off(tag, 'blur', onBlurTag);
-                off(tag, 'click', onClickTag);
-                off(tag, 'focus', onFocusTag);
-                off(tag, 'keydown', onKeyDownTag);
+        function tagLetNode(tag) {
+            var index = arrayKey(tag, $.tags), node;
+            if (isNumber(index) && index >= 0 && (node = tags.children[index])) {
+                off(node, 'blur', onBlurTag);
+                off(node, 'click', onClickTag);
+                off(node, 'focus', onFocusTag);
+                off(node, 'keydown', onKeyDownTag);
                 if (state.x) {
-                    var x = tag[firstChild];
+                    var x = node[firstChild];
                     off(x, 'click', onClickTagX);
                     nodeLet(x);
                 }
-                nodeLet(tag);
+                nodeLet(node);
             }
         }
 
@@ -655,19 +617,19 @@
             return $;
         };
 
-        $.get = function(name) {
-            return source[disabled] ? null : tagGet(name, 1);
+        $.get = function(tag) {
+            return source[disabled] ? null : tagGet(tag, 1);
         };
 
-        $.let = function(name, guard) {
+        $.let = function(tag) {
             if (!source[disabled] && !source[readOnly]) {
                 var min = state.min;
                 onInput();
-                if (guard && min > 0 && $.tags.length < min) {
-                    alertSet('Minimum tags allowed is %d', [min]);
+                if (min > 0 && $.tags.length < min) {
+                    hookFire('min.tags', [min]);
                     return $;
                 }
-                tagLetNode(name), tagLet(name);
+                tagLetNode(tag), tagLet(tag);
             }
             return $;
         };
@@ -676,10 +638,10 @@
         $.off = hookLet;
 
         $.pop = function() {
-            if (!source[NS]) {
+            if (!source[name]) {
                 return $; // Already ejected
             }
-            delete source[NS];
+            delete source[name];
             off(editorInput, 'blur', onBlurInput);
             off(editorInput, 'click', onClickInput);
             off(editorInput, 'focus', onFocusInput);
@@ -693,20 +655,21 @@
             nodeSet(source, 0, {
                 'tabindex': tabindex
             });
-            return nodeLet(view), hookFire('pop');
+            return nodeLet(view), hookFire('pop', [$.tags]);
         };
 
-        $.set = function(name, index, guard) {
+        $.set = function(tag, index) {
             if (!source[disabled] && !source[readOnly]) {
-                if (!tagGet(name)) {
-                    var max = state.max;
-                    if ($.tags.length < max) {
-                        tagSetNode(name, index), tagSet(name, index);
-                    } else if (guard) {
-                        alertSet('Maximum tags allowed is %d', [max]);
+                var max = state.max,
+                    tags = $.tags;
+                if (!tagGet(tag)) {
+                    if (tags.length < max) {
+                        tagSetNode(tag, index), tagSet(tag, index);
+                    } else {
+                        hookFire('max.tags', [max]);
                     }
-                } else if (guard) {
-                    alertSet('Tag %s already exists', [name]);
+                } else {
+                    hookFire('has.tag', [tag, arrayKey(tag, tags)]);
                 }
             }
             return $;
@@ -718,4 +681,4 @@
 
     });
 
-})(window, document, 'TP');
+})(this, this.document, 'TP');

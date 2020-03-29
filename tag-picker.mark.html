@@ -19,17 +19,17 @@
     <script src="tag-picker.min.js"></script>
     <script>
 
-    var picker = new TP(document.querySelector('input'), {
-            alert: function(name) {
-                var tag = this.view.querySelector('[title="' + name + '"]');
-                if (tag) {
-                    tag.classList.add('highlight');
-                    setTimeout(function() {
-                        tag.classList.remove('highlight');
-                    }, 1000);
-                }
-            }
-        });
+    var picker = new TP(document.querySelector('input'));
+
+    picker.on('has.tag', function(tag, index) {
+        var node = this.view.querySelector('[title="' + tag + '"]');
+        if (node) {
+            node.classList.add('highlight');
+            setTimeout(function() {
+                node.classList.remove('highlight');
+            }, 2000);
+        }
+    });
 
     </script>
   </body>

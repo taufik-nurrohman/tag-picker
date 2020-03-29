@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+v3.0.8
+------
+
+ - Removed `TP.each()` method.
+ - Renamed `TP.__instance__` to `TP.instances`.
+ - Added `has.tag`, `max.tags` and `min.tags` hooks.
+ - Removed translation feature. Use the new hooks instead.
+ - Removed `state.alert` option. Use the new hooks to create alert message feature.
+
 v3.0.7
 ------
 

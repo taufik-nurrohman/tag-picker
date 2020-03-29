@@ -17,12 +17,11 @@
     <p>
       <button onclick="console.log(picker.click());"><code>click</code></button>
       <button onclick="console.log(picker.focus());"><code>focus</code></button>
-      <button onmouseover="console.log(picker.blur());" disabled><code>blur</code> (on hover)</button>
+      <button onmouseover="console.log(picker.blur());" onmouseout="console.log(picker.focus());" disabled><code>blur</code> (on enter), <code>focus</code> (on exit)</button>
     </p>
     <p>
       <button onclick="console.log(picker.set('hello'));">Append <code>hello</code> Tag</button>
       <button onclick="console.log(picker.set('hi', 1));">Insert <code>hi</code> Tag after the First Tag</button>
-      <button onclick="console.log(picker.set('boo', null, true));">Add <code>boo</code> Tag with Guard</button>
       <button onclick="console.log(picker.value(''));">Reset Values</button>
       <button onclick="console.log(picker.value('foo, bar, baz, qux'));">Set Values</button>
       <button onclick="alert(picker.source.value);">Get Values</button>
