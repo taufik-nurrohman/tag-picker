@@ -2,7 +2,7 @@
 <html dir="ltr">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta content="width=device-width" name="viewport">
     <title>Tag Picker</title>
     <link href="tag-picker.min.css" rel="stylesheet">
     <style>
@@ -20,7 +20,7 @@
   </head>
   <body>
     <form method="get" target="_blank">
-      <p><input name="tags" disabled type="text" value="foo, bar"></p>
+      <p><input disabled name="tags" type="text" value="foo, bar"></p>
       <p>
         <label>
           <input onchange="picker.source.disabled = !this.checked; picker.pop(); picker = new TP(picker.source);" type="checkbox">

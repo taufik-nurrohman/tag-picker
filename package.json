@@ -1,7 +1,7 @@
 {
   "name": "@taufik-nurrohman/tag-picker",
   "description": "Better tags input interaction with JavaScript.",
-  "version": "3.0.8",
+  "version": "3.0.9",
   "main": "tag-picker.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -19,5 +19,5 @@
   "bugs": {
     "url": "https://github.com/taufik-nurrohman/tag-picker/issues"
   },
-  "homepage": "https://github.com/taufik-nurrohman/tag-picker#readme"
+  "homepage": "https://taufik-nurrohman.github.io/tag-picker"
 }

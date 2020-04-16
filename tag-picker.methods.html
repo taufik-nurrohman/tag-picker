@@ -2,7 +2,7 @@
 <html dir="ltr">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta content="width=device-width" name="viewport">
     <title>Tag Picker</title>
     <link href="tag-picker.min.css" rel="stylesheet">
   </head>
@@ -17,7 +17,7 @@
     <p>
       <button onclick="console.log(picker.click());"><code>click</code></button>
       <button onclick="console.log(picker.focus());"><code>focus</code></button>
-      <button onmouseover="console.log(picker.blur());" onmouseout="console.log(picker.focus());" disabled><code>blur</code> (on enter), <code>focus</code> (on exit)</button>
+      <button disabled onmouseout="console.log(picker.focus());" onmouseover="console.log(picker.blur());"><code>blur</code> (on enter), <code>focus</code> (on exit)</button>
     </p>
     <p>
       <button onclick="console.log(picker.set('hello'));">Append <code>hello</code> Tag</button>

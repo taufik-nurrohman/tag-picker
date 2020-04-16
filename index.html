@@ -64,14 +64,9 @@
     </style>
   </head>
   <body>
-    <p style="
-      background: #ffa;
-      border: 1px dashed;
-      margin-top: 0;
-      padding: .75em 1em;
-    ">Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
+    <p>Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
-      <h1>Tag Picker v3.0.8</h1>
+      <h1>Tag Picker v3.0.9</h1>
       <p>Tag Picker is a simple JavaScript application that aims to provide better experience for users in adding and removing comma-separated list of words.</p>
       <hr>
     </header>
@@ -106,7 +101,7 @@
     &lt;p&gt;&lt;input type="text"&gt;&lt;/p&gt;
     &lt;script src="<a href="tag-picker.min.js" target="_blank">tag-picker.min.js</a>"&gt;&lt;/script&gt;
     &lt;script&gt;
-    const picker = new TP(document.querySelector('input'));
+    let picker = new TP(document.querySelector('input'));
     &lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
@@ -131,8 +126,8 @@
         <li><a href="tag-picker.element.html" target="_blank">Native HTML5 Custom <code>&lt;tag-picker&gt;</code> Element</a></li>
       </ul>
       <h2>Settings</h2>
-      <pre><code>const picker = new TP(<var>source</var>, <var>join</var> = ', ');</code></pre>
-      <pre><code>const picker = new TP(<var>source</var>, <var>state</var> = {
+      <pre><code>let picker = new TP(<var>source</var>, <var>join</var> = ', ');</code></pre>
+      <pre><code>let picker = new TP(<var>source</var>, <var>state</var> = {
         escape: [','],
         join: ', ',
         max: 9999,
@@ -156,6 +151,13 @@
     major = version.split('.')[0];
 
 if (+major &lt; 3) { &hellip; }</code></pre>
+      <h3>TP.state</h3>
+      <p>This property stores the initial values of <code>picker.state</code>.</p>
+      <pre><code>let picker = new TP(source, {
+        foo: ['bar', 'baz', 'qux']
+    });
+
+console.log([TP.state, picker.state]);</code></pre>
       <h3>TP.instances</h3>
       <p>Return the tag picker instances.</p>
       <pre><code>for (let key in TP.instances) {

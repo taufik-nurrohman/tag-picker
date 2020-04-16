@@ -15,6 +15,10 @@ Demo
 Release Notes
 -------------
 
+### 3.0.9
+
+ - Added `TP.state` property to set initial state globally.
+
 ### 3.0.8
 
  - Removed `TP.each()` method.
