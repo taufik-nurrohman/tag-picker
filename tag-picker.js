@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  TAG PICKER 3.0.8
+ *  TAG PICKER 3.0.9
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -113,7 +113,16 @@
 
     (function($$) {
 
-        $$.version = '3.0.8';
+        $$.version = '3.0.9';
+
+        $$.state = {
+            'class': 'tag-picker',
+            'escape': [',', 188],
+            'join': ', ',
+            'max': 9999,
+            'min': 0,
+            'x': false
+        };
 
         // Collect all instance(s)
         $$[instances] = {};
@@ -129,14 +138,7 @@
             placeholder = source.placeholder || "",
             tabindex = source[getAttribute]('tabindex'),
             hooks = {},
-            state = Object.assign({
-                'class': 'tag-picker',
-                'escape': [',', 188],
-                'join': ', ',
-                'max': 9999,
-                'min': 0,
-                'x': false
-            }, isString(o) ? {
+            state = Object.assign({}, $$.state, isString(o) ? {
                 'join': o
             } : (o || {})),
             i, j, k, v;
@@ -574,10 +576,7 @@
         });
 
         // Capture the closest `<form>` element
-        form = source[parentNode];
-        while (form && form[nodeName] && 'form' !== form[nodeName][toLowerCase]()) {
-            form = form[parentNode];
-        }
+        form = source.form;
 
         on(editorInput, 'blur', onBlurInput);
         on(editorInput, 'click', onClickInput);
