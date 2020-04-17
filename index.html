@@ -5,7 +5,7 @@
     <meta content="#000" name="theme-color">
     <meta content="width=device-width" name="viewport">
     <meta content="Tag Picker is a simple JavaScript application that aims to provide better user interaction experience in adding and removing tags." name="description">
-    <title>Tag Picker</title>
+    <title>Tag Picker &middot; A simple JavaScript application that aims to provide better user interaction experience in adding and removing tags.</title>
     <link href="favicon.ico" rel="icon">
     <link href="tag-picker.css" rel="stylesheet">
     <style>
@@ -311,9 +311,9 @@ picker.on('set.tag', onSet); // With context</code></pre>
       <p>Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to share a little financial support with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.</p>
       <p>Thank you! ❤️</p>
       <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-        <input name="cmd" value="_s-xclick" type="hidden">
-        <input name="hosted_button_id" value="TNVGH7NQ7E4EU" type="hidden">
-        <p><button type="submit" class="button">Donate</button></p>
+        <input name="cmd" type="hidden" value="_s-xclick">
+        <input name="hosted_button_id" type="hidden" value="TNVGH7NQ7E4EU">
+        <p><button type="submit">Donate</button></p>
       </form>
     </main>
     <footer>
@@ -322,7 +322,7 @@ picker.on('set.tag', onSet); // With context</code></pre>
     </footer>
     <script src="tag-picker.js"></script>
     <script>
-    var picker = new TP(document.querySelector('form').tags);
+    var picker = new TP(document.forms[0].tags);
     picker.on('has.tag', function(tag) {
         alert('Tag “' + tag + '” already exists.');
     });
