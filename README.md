@@ -15,6 +15,10 @@ Demo
 Release Notes
 -------------
 
+### 3.0.10
+
+ - Added ability to clear the hook storage object if it’s empty.
+
 ### 3.0.9
 
  - Added `TP.state` property to set initial state globally.
