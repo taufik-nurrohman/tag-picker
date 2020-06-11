@@ -15,6 +15,10 @@ Demo
 Release Notes
 -------------
 
+### 3.1.11
+
+ - Fixed common issue with ES6 module which does not reference the `this` scope to `window` object by default.
+
 ### 3.0.10
 
  - Added ability to clear the hook storage object if it’s empty.
