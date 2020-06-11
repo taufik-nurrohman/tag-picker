@@ -684,4 +684,4 @@
 
     });
 
-})(this, this.document, 'TP');
+})(window, document, 'TP');
