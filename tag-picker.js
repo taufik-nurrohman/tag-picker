@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  TAG PICKER 3.0.11
+ *  TAG PICKER 3.0.12
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -113,7 +113,7 @@
 
     (function($$) {
 
-        $$.version = '3.0.11';
+        $$.version = '3.0.12';
 
         $$.state = {
             'class': 'tag-picker',
@@ -428,8 +428,12 @@
 
         function onClickTagX(e) {
             if (!source[disabled] && !source[readOnly]) {
-                var tag = this[parentNode].title;
+                var tag = this[parentNode].title,
+                    index = arrayKey(tag, $.tags);
                 tagLetNode(tag), tagLet(tag), inputSet("", 1);
+                hookFire('change', [tag, index]);
+                hookFire('click.tag', [tag, index]);
+                hookFire('let.tag', [tag, index]);
             }
             preventDefault(e);
         }
