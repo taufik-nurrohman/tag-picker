@@ -15,11 +15,11 @@ Demo
 Release Notes
 -------------
 
-### 3.1.12
+### 3.0.12
 
  - Fixed for missing `change`, `click.tag` and `let.tag` hook on remove button click events (#16)
 
-### 3.1.11
+### 3.0.11
 
  - Fixed common issue with ES6 module which does not reference the `this` scope to `window` object by default.
 
