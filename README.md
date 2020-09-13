@@ -15,6 +15,10 @@ Demo
 Release Notes
 -------------
 
+### 3.0.13
+
+ - Updated donation target.
+
 ### 3.0.12
 
  - Fixed for missing `change`, `click.tag` and `let.tag` hook on remove button click events (#16)
