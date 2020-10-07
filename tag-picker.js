@@ -78,7 +78,7 @@
     }
 
     function isSet(x) {
-        return 'undefined' !== typeof x || null === x;
+        return 'undefined' !== typeof x && null !== x;
     }
 
     function isString(x) {
