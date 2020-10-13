@@ -1,6 +1,6 @@
 /*!
  * ==============================================================
- *  TAG PICKER 3.0.13
+ *  TAG PICKER 3.0.14
  * ==============================================================
  * Author: Taufik Nurrohman <https://github.com/taufik-nurrohman>
  * License: MIT
@@ -113,7 +113,7 @@
 
     (function($$) {
 
-        $$.version = '3.0.13';
+        $$.version = '3.0.14';
 
         $$.state = {
             'class': 'tag-picker',
@@ -126,8 +126,6 @@
 
         // Collect all instance(s)
         $$[instances] = {};
-
-        $$._ = $$.prototype;
 
     })(win[name] = function(source, o) {
 

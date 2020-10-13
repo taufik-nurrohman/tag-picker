@@ -66,7 +66,7 @@
   <body>
     <p>Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
-      <h1>Tag Picker v3.0.13</h1>
+      <h1>Tag Picker v3.0.14</h1>
       <p>Tag Picker is a simple JavaScript application that aims to provide better experience for users in adding and removing comma-separated list of words.</p>
       <hr>
     </header>
@@ -164,16 +164,6 @@ console.log([TP.state, picker.state]);</code></pre>
     console.log(key);
     console.log(TP.instances[key]);
 }</code></pre>
-      <h3>TP._</h3>
-      <p>Alias of <code>TP.prototype</code> used to formalize the prototype creation.</p>
-      <pre><code>// Create `addTag()` and `removeTag()` method
-TP._.addTag = function(name) {
-    return this.set(name);
-};
-
-TP._.removeTag = function(name) {
-    return this.let(name);
-};</code></pre>
       <h3>picker.state</h3>
       <p>Return the modified tag picker states.</p>
       <h3>picker.source</h3>
@@ -310,11 +300,6 @@ picker.on('set.tag', onSet); // With context</code></pre>
       <h2>License</h2>
       <p>Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to <a href="https://paypal.me/tatautaufik" target="_blank">share a little financial support</a> with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.</p>
       <p>Thank you! ❤️</p>
-      <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-        <input name="cmd" type="hidden" value="_s-xclick">
-        <input name="hosted_button_id" type="hidden" value="TNVGH7NQ7E4EU">
-        <p><button type="submit">Donate</button></p>
-      </form>
     </main>
     <footer>
       <hr>

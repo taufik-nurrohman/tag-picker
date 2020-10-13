@@ -15,6 +15,10 @@ Demo
 Release Notes
 -------------
 
+### 3.0.14
+
+ - Removed `TP._` method.
+
 ### 3.0.13
 
  - Updated donation target.
