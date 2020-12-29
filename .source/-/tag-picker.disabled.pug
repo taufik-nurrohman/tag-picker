@@ -1,0 +1,40 @@
+extends _index.pug
+
+block state
+  - const title = 'Tag Picker'
+  - const scripts = ['index.min.js']
+  - const styles = ['index.min.css']
+
+block script
+  script
+    | let picker = new TP(document.querySelector('input'));
+    |
+    | picker.on('change', function(tag, index) {
+    |     console.log([tag, index, this.tags]);
+    | });
+
+block style
+  style
+    | .tag-picker-source[disabled] + .tag-picker {
+    |   background-color: #eee;
+    |   border-color: #999;
+    | }
+    | .tag-picker-source[disabled] + .tag-picker .tag[title] {
+    |   background-color: #aaa;
+    | }
+
+block content
+  main
+    form(method="get" target="_blank")
+      p: input(disabled name='tags' type='text' value='foo, bar')
+      p
+        label
+          input(onchange='picker.source.disabled = !this.checked; picker.pop(); picker = new TP(picker.source);' type='checkbox')
+          |
+          |
+          span Enable
+      p
+        button(type='submit') Submit
+        |
+        |
+        button(onclick='picker.set(\'baz\')' type='button') Add &ldquo;baz&rdquo; Tag

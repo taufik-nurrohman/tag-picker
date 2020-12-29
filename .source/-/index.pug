@@ -1,0 +1,302 @@
+extends _index.pug
+
+block state
+  - const title = 'Tag Picker ' + version
+  - const theme = '#000'
+  - const scripts = ['index.min.js']
+  - const styles = ['index.min.css']
+
+block script
+  script
+    | const picker = new TP(document.forms[0].tags);
+    | picker.on('has.tag', tag => {
+    |     alert('Tag “' + tag + '” already exists.');
+    | });
+block style
+  style
+    | * {
+    |   box-sizing: border-box;
+    | }
+    | :root {
+    |   background: #fff;
+    |   color: #000;
+    |   border-top: 4px solid;
+    |   font: normal normal 16px/1.25 serif;
+    | }
+    | a {
+    |   color: #009;
+    |   text-decoration: none;
+    | }
+    | a, code {
+    |   word-wrap: break-word;
+    | }
+    | code {
+    |   font-family: monospace;
+    |   font-size: 80%;
+    | }
+    | footer, header, main, nav {
+    |   max-width: 700px;
+    |   margin: 0 auto;
+    | }
+    | hr {
+    |   border: 0;
+    |   color: inherit;
+    |   border-top: 1px dashed;
+    |   height: 0;
+    | }
+    | pre {
+    |   white-space: pre-wrap;
+    |   word-wrap: break-word;
+    | }
+    | pre code {
+    |   display: block;
+    |   background: #eee;
+    |   padding: 1em;
+    | }
+    | table {
+    |   width: 100%;
+    | }
+    | td, th {
+    |   text-align: left;
+    |   vertical-align: top;
+    | }
+    | body > p:first-child {
+    |   background: #ffa;
+    |   border: 1px dashed;
+    |   margin-top: 0;
+    |   padding: .75em 1em;
+    | }
+
+block content
+  p Do you like this project? Please support my #[a(href='https://github.com/mecha-cms') Mecha CMS] project too. Thank you!
+  header
+    h1= title
+    p Tag Picker is a simple JavaScript application that aims to provide better experience for users in adding and removing comma-separated list of words.
+    hr
+  main
+    p Tags are comma-separated list of words. This application has support for hooks, so you can listen to events that occur at each interaction to provide additional features. Each tag item can also be selected using the arrow keys and a mouse click to perform actions on the selected tag, for example, to delete the tag.
+    form(method='get' target='_blank')
+      p: input(id='tags' name='tags' placeholder='foo, bar, baz' type='text' value='foo, bar')
+      p Test connection with #[code &lt;label&gt;] element: #[label(for='tags' style='cursor: pointer; text-decoration: underline;') click here to focus!]
+      p Test add and remove methods: #[a(href='javascript:void(picker.set(\'wow\').focus());') add &ldquo;wow&rdquo;] #[a(href='javascript:void(picker.let(\'wow\').focus());') remove &ldquo;wow&rdquo;]
+      p: button(type='submit') Submit
+    h2 Features
+    ul
+      li Light-weight, no dependencies. It uses vanilla JavaScript.
+      li Simple #[abbr(title='Application Programming Interface') API]. Easy to master.
+      li Care about accessibility. Interacts very well using the keyboard keys. Free from the focus traps.
+    h2 Usage
+    h3 Browser
+    p With the basic knowledge of accessing the DOM and manipulating it using JavaScript, you can use this application like a pro.
+    pre: code
+      | &lt;!DOCTYPE html&gt;
+      | &lt;html dir="ltr"&gt;
+      |   &lt;head&gt;
+      |     &lt;meta charset="utf-8"&gt;
+      |     &lt;link href="#[a(href='index.min.css' target='_blank') index.min.css]" rel="stylesheet"&gt;
+      |   &lt;/head&gt;
+      |   &lt;body&gt;
+      |     &lt;p&gt;&lt;input type="text"&gt;&lt;/p&gt;
+      |     &lt;script src="#[a(href='index.min.js' target='_blank') index.min.js]"&gt;&lt;/script&gt;
+      |     &lt;script&gt;
+      |     const picker = new TP(document.querySelector('input'));
+      |     &lt;/script&gt;
+      |   &lt;/body&gt;
+      | &lt;/html&gt;
+    h3 CommonJS
+    pre: code
+      | const TP = require('@taufik-nurrohman/tag-picker');
+      |
+      | const picker = new TP(document.querySelector('input'));
+    h3 ECMAScript
+    p Functions and methods in this application are mostly native JavaScript and are intended for use by the browser. Node.js doesn&rsquo;t know about the DOM, so this kind of practice will probably be used more often to build new browser packages than to be used directly in the Node.js server.
+    pre: code
+      | import TP from '@taufik-nurrohman/tag-picker';
+      |
+      | const picker = new TP(document.querySelector('input'));
+    h2 Examples
+    ul
+      li: a(href='tag-picker.html' target='_blank') No Idea?
+      li: a(href='tag-picker.value.html' target='_blank') Set Pre-Defined Value
+      li: a(href='tag-picker.placeholder.html' target='_blank') Set Placeholder
+      li: a(href='tag-picker.focus.html' target='_blank') Focus State
+      li: a(href='tag-picker.focus.placeholder.html' target='_blank') Hide Placeholder on Focus
+      li: a(href='tag-picker.disabled.html' target='_blank') Disabled Input
+      li: a(href='tag-picker.read-only.html' target='_blank') Read-Only Input
+      li: a(href='tag-picker.min.html' target='_blank') Limit Minimum Tags
+      li: a(href='tag-picker.max.html' target='_blank') Limit Maximum Tags
+      li: a(href='tag-picker.x.html' target='_blank') Enable &ldquo;Remove&rdquo; Button
+      li: a(href='tag-picker.paste.html' target='_blank') Paste Event
+      li: a(href='tag-picker.alert.html' target='_blank') Warn for Duplicate Tags with Alert Message
+      li: a(href='tag-picker.mark.html' target='_blank') Warn for Duplicate Tags with Flash Highlight
+      li: a(href='tag-picker.escape.html' target='_blank') Disable Characters with #[code picker.state.escape]
+      li: a(href='tag-picker.f.html' target='_blank') Filter Characters with #[code picker.f()] Method
+      li #[a(href='tag-picker.directory.html' target='_blank') Directory] (Experiment)
+      li: a(href='tag-picker.element.html' target='_blank') Native HTML5 Custom #[code &lt;tag-picker&gt;] Element
+    h2 Settings
+    pre: code const picker = new TP(#[var source], #[var join] = ', ');
+    pre: code
+      | const picker = new TP(#[var source], #[var state] = {
+      |     escape: [','],
+      |     join: ', ',
+      |     max: 9999,
+      |     min: 0,
+      |     x: false
+      | });
+    ul
+      li #[var source] &rarr; The text input element.
+      li #[var join] &rarr; Tags joiner for the output value.
+      li #[var state] &rarr; The configuration data.
+      li #[var state.escape] &rarr; List of characters used to trigger the tag addition.
+      li #[var state.join] &rarr; Tags joiner for the output value.
+      li #[var state.max] &rarr; Maximum tags allowed.
+      li #[var state.min] &rarr; Minimum tags allowed.
+      li #[var state.x] &rarr; Set to #[code true] to show the &ldquo;remove&rdquo; button.
+    h2 Methods and Properties
+    h3 TP.instances
+    p Return the application instances.
+    pre: code
+      | for (let key in TP.instances) {
+      |     console.log(key);
+      |     console.log(TP.instances[key]);
+      | }
+    h3 TP.state
+    p This property stores the initial values of #[code picker.state].
+    pre: code
+      | const picker = new TP({
+      |     foo: ['bar', 'baz', 'qux']
+      | });
+      |
+      | console.log([TP.state, picker.state]);
+    h3 TP.version
+    p Return the application version.
+    pre: code
+      | let version = TP.version,
+      |     major = version.split('.')[0];
+      |
+      | if (+major &lt; 3) { &hellip; }
+    h3 picker.blur()
+    p Blur from the content-editable element.
+    h3 picker.click()
+    p Click the content-editable element.
+    h3 picker.f(tag)
+    p Set custom tag name filter.
+    pre: code
+      | // Force lower-case letter(s) and trim white-space(s)
+      | picker.f = tag =&gt; (tag || "").toLowerCase().trim();
+    h3 picker.focus()
+    p Focus to the content-editable element.
+    h3 picker.get(tag)
+    p Check the existence of a tag.
+    pre: code if (null !== picker.get('foo')) { &hellip; }
+    h3 picker.input
+    p Return the content-editable element.
+    pre: code
+      | picker.input.addEventListener('paste', () =&gt; {
+      |     // Handle `paste` event here
+      | });
+    h3 picker.let(tag)
+    p Remove a tag.
+    pre: code picker.let('foo'); // Remove `foo` tag
+    h3 picker.output
+    p Alias for #[code picker.source] property.
+    h3 picker.pop()
+    p Convert the tag picker element back to its original #[code &lt;input&gt;] element.
+    h3 picker.self
+    p Return the tag picker element.
+    pre: code picker.self.style.borderWidth = '4px';
+    h3 picker.set(tag, index)
+    p Add a new tag.
+    pre: code
+      | picker.set('foo'); // Append a `foo` tag
+      | picker.set('foo', 1); // Insert a `foo` tag exactly at index `1`
+    h3 picker.source
+    p Return the #[code &lt;input&gt;] element.
+    pre: code console.log(picker.source);
+    h3 picker.state
+    p Return the modified tag picker states.
+    h3 picker.tags
+    p Return the tags data as array.
+    pre: code console.log(picker.tags);
+    h3 picker.value(tags)
+    p Add multiple tags at once.
+    pre: code
+      | picker.value('foo, bar, baz'); // Add `foo`, `bar` and `baz`
+      | picker.value(""); // Remove all tag(s)
+    h2 Hooks
+    table(border='1')
+      thead
+        tr
+          th Name
+          th Description
+      tbody
+        tr
+          td: code blur
+          td Will be triggered after release focus on the tag editor.
+        tr
+          td: code blur.tag
+          td Will be triggered after release focus on a tag item.
+        tr
+          td: code change
+          td Will be triggered on every time the tags data is updated.
+        tr
+          td: code click
+          td Will be triggered after click on the tag editor.
+        tr
+          td: code click.tag
+          td Will be triggered after click on a tag item.
+        tr
+          td: code focus
+          td Will be triggered after focus on the tag editor.
+        tr
+          td: code focus.tag
+          td Will be triggered after focus on a tag item.
+        tr
+          td: code get.tag
+          td Will be triggered after #[code picker.get('foo')].
+        tr
+          td: code has.tag
+          td Will be triggered if the tag you want to add already exists.
+        tr
+          td: code let.tag
+          td Will be triggered after #[code picker.let('foo')].
+        tr
+          td: code max.tags
+          td Will be triggered if number of tags you want to submit is greater than the #[code picker.state.max] value.
+        tr
+          td: code min.tags
+          td Will be triggered if number of tags you want to submit is less than the #[code picker.state.min] value.
+        tr
+          td: code pop
+          td Will be triggered after #[code picker.pop()].
+        tr
+          td: code set.tag
+          td Will be triggered after #[code picker.set('foo')].
+    h3 picker.fire(event, data)
+    p Trigger a hook.
+    pre: code picker.fire('change', [picker.tags]);
+    h3 picker.hooks
+    p Return the added hooks.
+    pre: code console.log(picker.hooks);
+    h3 picker.off(event, then)
+    p Remove a hook.
+    pre: code picker.off('change');
+    pre: code picker.off('change', onChange); // With context
+    h3 picker.on(event, then)
+    p Add a new hook.
+    pre: code
+      | picker.on('change', tags =&gt; {
+      |     console.log(tags);
+      | });
+    pre: code
+      | function onChange(tags) {
+      |     console.log(tags);
+      | }
+      |
+      | picker.on('change', onChange); // With context
+    h2 License
+    p Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to #[a(href='https://paypal.me/tatautaufik' target='_blank') share a little financial support] with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.
+    p Thank you! ❤️
+  footer
+    hr
+    p &copy; 2020 #[a(href='/') Taufik Nurrohman]

@@ -1,0 +1,19 @@
+extends _index.pug
+
+block state
+  - const title = 'Tag Picker'
+  - const scripts = ['index.min.js']
+  - const styles = ['index.min.css']
+
+block script
+  script
+    | const picker = new TP(document.querySelector('input'), {
+    |     min: 3
+    | });
+
+block content
+  main
+    p Minimum tags allowed: #[code 3].
+    form(method='get')
+      p: input(name='tags' type='text')
+      p: button(type='submit') Submit

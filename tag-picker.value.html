@@ -1,27 +1,7 @@
-<!DOCTYPE html>
-<html dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width" name="viewport">
-    <title>Tag Picker</title>
-    <link href="tag-picker.min.css" rel="stylesheet">
-  </head>
-  <body>
-    <p>Using <code>,</code> as tag separator (default):</p>
-    <p><input type="text" value="foo, bar, baz"></p>
-    <p>Using <code>;</code> as tag separator:</p>
-    <input type="text" value="foo; bar; baz">
-    <script src="tag-picker.min.js"></script>
-    <script>
+<!DOCTYPE html><html dir="ltr"><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><meta content="Better tags input interaction with JavaScript." name="description"><title>Tag Picker</title><link href="index.min.css" rel="stylesheet"></head><body><main><p>Using <code>,</code> as tag separator (default):</p><p><input type="text" value="foo, bar, baz"></p><p>Using <code>;</code> as tag separator:</p><p><input type="text" value="foo; bar; baz"></p></main><script src="index.min.js"></script><script>const sources = document.querySelectorAll('input');
 
-    var input = document.querySelectorAll('input');
-
-    var picker_0 = new TP(input[0]),
-        picker_1 = new TP(input[1], {
-            join: '; ',
-            escape: [';', 59]
-        });
-
-    </script>
-  </body>
-</html>
+const picker_0 = new TP(sources[0]);
+const picker_1 = new TP(sources[1], {
+    join: '; ',
+    escape: [';', 59]
+});</script></body></html>

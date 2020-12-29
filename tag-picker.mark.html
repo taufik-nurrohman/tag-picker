@@ -1,36 +1,13 @@
-<!DOCTYPE html>
-<html dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <meta content="width=device-width" name="viewport">
-    <title>Tag Picker</title>
-    <link href="tag-picker.min.css" rel="stylesheet">
-    <style>
+<!DOCTYPE html><html dir="ltr"><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><meta content="Better tags input interaction with JavaScript." name="description"><title>Tag Picker</title><link href="index.min.css" rel="stylesheet"><style>.tag-picker .tag.highlight {
+  background: #0f0;
+}</style></head><body><main><p>Add <em>foo</em> again to see the effect:</p><p><input type="text" value="foo, bar, baz"></p></main><script src="index.min.js"></script><script>const picker = new TP(document.querySelector('input'));
 
-    .tag-picker .tag.highlight {
-      background: #0f0;
+picker.on('has.tag', function(tag, index) {
+    const node = this.view.querySelector('[title="' + tag + '"]');
+    if (node) {
+        node.classList.add('highlight');
+        setTimeout(() => {
+            node.classList.remove('highlight');
+        }, 2000);
     }
-
-    </style>
-  </head>
-  <body>
-    <p>Add <em>foo</em> again to see the effect:</p>
-    <p><input type="text" value="foo, bar, baz"></p>
-    <script src="tag-picker.min.js"></script>
-    <script>
-
-    var picker = new TP(document.querySelector('input'));
-
-    picker.on('has.tag', function(tag, index) {
-        var node = this.view.querySelector('[title="' + tag + '"]');
-        if (node) {
-            node.classList.add('highlight');
-            setTimeout(function() {
-                node.classList.remove('highlight');
-            }, 2000);
-        }
-    });
-
-    </script>
-  </body>
-</html>
+});</script></body></html>

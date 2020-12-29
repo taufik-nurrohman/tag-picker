@@ -1,0 +1,23 @@
+extends _index.pug
+
+block state
+  - const title = 'Tag Picker'
+  - const scripts = ['index.min.js']
+  - const styles = ['index.min.css']
+
+block script
+  script
+    | const picker = new TP(document.querySelector('input'));
+
+block style
+  style
+    | .tag-picker.focus {
+    |   background: #ff0;
+    | }
+    | .tag-picker.focus\.tag {
+    |   background: #0f0;
+    | }
+
+block content
+  main
+    p: input(placeholder!='Placeholder here&hellip;' type='text')

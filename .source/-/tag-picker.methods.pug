@@ -1,0 +1,42 @@
+extends _index.pug
+
+block state
+  - const title = 'Tag Picker'
+  - const scripts = ['index.min.js']
+  - const styles = ['index.min.css']
+
+block script
+  script
+    | const picker = new TP(document.querySelector('input'));
+
+block content
+  main
+    p: input(type='text' value='foo, bar, baz')
+    p
+      label
+        input(checked onchange='console.log(picker = this.checked ? new TP(picker.source) : picker.pop());' type='checkbox')
+        |
+        |
+        span Tag Picker
+    p
+      button(onclick='console.log(picker.click());'): code click
+      |
+      |
+      button(onclick='console.log(picker.focus());'): code focus
+      |
+      |
+      button(disabled onmouseout='console.log(picker.focus());' onmouseover='console.log(picker.blur());') #[code blur] (on enter), #[code focus] (on exit)
+    p
+      button(onclick='console.log(picker.set(\'hello\'));') Append #[code hello] Tag
+      |
+      |
+      button(onclick='console.log(picker.set(\'hi\', 1));') Insert #[code hi] Tag after the First Tag
+      |
+      |
+      button(onclick='console.log(picker.value(\'\'));') Reset Values
+      |
+      |
+      button(onclick='console.log(picker.value(\'foo, bar, baz, qux\'));') Set Values
+      |
+      |
+      button(onclick='alert(picker.source.value);') Get Values

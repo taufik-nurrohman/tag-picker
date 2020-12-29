@@ -1,0 +1,23 @@
+extends _index.pug
+
+block state
+  - const title = 'Tag Picker'
+  - const scripts = ['index.min.js']
+  - const styles = ['index.min.css']
+
+block script
+  script
+    | const sources = document.querySelectorAll('input');
+    |
+    | const picker_0 = new TP(sources[0]);
+    | const picker_1 = new TP(sources[1], {
+    |     join: '; ',
+    |     escape: [';', 59]
+    | });
+
+block content
+  main
+    p Using #[code ,] as tag separator (default):
+    p: input(type='text' value='foo, bar, baz')
+    p Using #[code ;] as tag separator:
+    p: input(type='text' value='foo; bar; baz')
