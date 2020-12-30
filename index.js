@@ -924,7 +924,7 @@
       'min': 0,
       'x': false
     };
-    TP.version = '3.1.0';
+    TP.version = '3.1.1';
 
     return TP;
 
