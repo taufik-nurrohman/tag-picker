@@ -24,6 +24,10 @@ Contribute
 Release Notes
 -------------
 
+### 3.1.1
+
+ - Maintenance.
+
 ### 3.1.0
 
  - Prioritized maintainability over file size. Say hello to Node.js and ES6! :wave:
