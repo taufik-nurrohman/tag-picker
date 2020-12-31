@@ -119,144 +119,209 @@
     return _wrapNativeSuper(Class);
   }
 
-  const isArray = x => Array.isArray(x);
-  const isDefined = x => 'undefined' !== typeof x;
-  const isInstance = (x, of) => x && isSet(of) && x instanceof of;
-  const isNull = x => null === x;
-  const isNumeric = x => /^-?(?:\d*.)?\d+$/.test(x + "");
-  const isObject = (x, isPlain = true) => {
-      if ('object' !== typeof x) {
-          return false;
-      }
-      return isPlain ? isInstance(x, Object) : true;
-  };
-  const isSet = x => isDefined(x) && !isNull(x);
-  const isString = x => 'string' === typeof x;
-
-  const fromValue = x => {
-      if (isArray(x)) {
-          return x.map(v => fromValue(x));
-      }
-      if (isObject(x)) {
-          for (let k in x) {
-              x[k] = fromValue(x[k]);
-          }
-          return x;
-      }
-      if (false === x) {
-          return 'false';
-      }
-      if (null === x) {
-          return 'null';
-      }
-      if (true === x) {
-          return 'true';
-      }
-      return "" + x;
+  var isArray = function isArray(x) {
+    return Array.isArray(x);
   };
 
-  const toNumber = (x, base = 10) => parseInt(x, base);
-  const toValue = x => {
-      if (isArray(x)) {
-          return x.map(v => toValue(v));
+  var isDefined = function isDefined(x) {
+    return 'undefined' !== typeof x;
+  };
+
+  var isInstance = function isInstance(x, of) {
+    return x && isSet(of) && x instanceof of;
+  };
+
+  var isNull = function isNull(x) {
+    return null === x;
+  };
+
+  var isNumeric = function isNumeric(x) {
+    return /^-?(?:\d*.)?\d+$/.test(x + "");
+  };
+
+  var isObject = function isObject(x, isPlain) {
+    if (isPlain === void 0) {
+      isPlain = true;
+    }
+
+    if ('object' !== typeof x) {
+      return false;
+    }
+
+    return isPlain ? isInstance(x, Object) : true;
+  };
+
+  var isSet = function isSet(x) {
+    return isDefined(x) && !isNull(x);
+  };
+
+  var isString = function isString(x) {
+    return 'string' === typeof x;
+  };
+
+  var fromValue = function fromValue(x) {
+    if (isArray(x)) {
+      return x.map(function (v) {
+        return fromValue(x);
+      });
+    }
+
+    if (isObject(x)) {
+      for (var k in x) {
+        x[k] = fromValue(x[k]);
       }
-      if (isNumeric(x)) {
-          return toNumber(x);
+
+      return x;
+    }
+
+    if (false === x) {
+      return 'false';
+    }
+
+    if (null === x) {
+      return 'null';
+    }
+
+    if (true === x) {
+      return 'true';
+    }
+
+    return "" + x;
+  };
+
+  var toNumber = function toNumber(x, base) {
+    if (base === void 0) {
+      base = 10;
+    }
+
+    return parseInt(x, base);
+  };
+
+  var toValue = function toValue(x) {
+    if (isArray(x)) {
+      return x.map(function (v) {
+        return toValue(v);
+      });
+    }
+
+    if (isNumeric(x)) {
+      return toNumber(x);
+    }
+
+    if (isObject(x)) {
+      for (var k in x) {
+        x[k] = toValue(x[k]);
       }
-      if (isObject(x)) {
-          for (let k in x) {
-              x[k] = toValue(x[k]);
-          }
-          return x;
+
+      return x;
+    }
+
+    return {
+      'false': false,
+      'null': null,
+      'true': true
+    }[x] || x;
+  };
+
+  var D = document;
+  var W = window;
+
+  var getAttribute = function getAttribute(node, attribute, parseValue) {
+    if (parseValue === void 0) {
+      parseValue = true;
+    }
+
+    if (!hasAttribute(node, attribute)) {
+      return null;
+    }
+
+    var value = node.getAttribute(attribute);
+    return parseValue ? toValue(value) : value;
+  };
+
+  var getParent = function getParent(node) {
+    return node.parentNode || null;
+  };
+
+  var hasAttribute = function hasAttribute(node, attribute) {
+    return node.hasAttribute(attribute);
+  };
+
+  var hasState = function hasState(node, state) {
+    return state in node;
+  };
+
+  var letAttribute = function letAttribute(node, attribute) {
+    return node.removeAttribute(attribute), node;
+  };
+
+  var setAttribute = function setAttribute(node, attribute, value) {
+    if (true === value) {
+      value = attribute;
+    }
+
+    return node.setAttribute(attribute, fromValue(value)), node;
+  };
+
+  var setAttributes = function setAttributes(node, attributes) {
+    var value;
+
+    for (var attribute in attributes) {
+      value = attributes[attribute];
+
+      if (value || "" === value || 0 === value) {
+        setAttribute(node, attribute, value);
+      } else {
+        letAttribute(node, attribute);
       }
-      return ({
-          'false': false,
-          'null': null,
-          'true': true
-      })[x] || x;
+    }
+
+    return node;
   };
 
-  const D = document;
-  const W = window;
+  var setElement = function setElement(node, content, attributes) {
+    node = isString(node) ? D.createElement(node) : node;
 
-  const getAttribute = (node, attribute, parseValue = true) => {
-      if (!hasAttribute(node, attribute)) {
-          return null;
-      }
-      let value = node.getAttribute(attribute);
-      return parseValue ? toValue(value) : value;
+    if (isObject(content)) {
+      attributes = content;
+      content = false;
+    }
+
+    if (isString(content)) {
+      setHTML(node, content);
+    }
+
+    if (isObject(attributes)) {
+      setAttributes(node, attributes);
+    }
+
+    return node;
   };
 
-  const getParent = node => {
-      return node.parentNode || null;
-  };
+  var setHTML = function setHTML(node, content, trim) {
+    if (trim === void 0) {
+      trim = true;
+    }
 
-  const hasAttribute = (node, attribute) => {
-      return node.hasAttribute(attribute);
-  };
-
-  const hasState = (node, state) => {
-      return state in node;
-  };
-
-  const letAttribute = (node, attribute) => {
-      return node.removeAttribute(attribute), node;
-  };
-
-  const setAttribute = (node, attribute, value) => {
-      if (true === value) {
-          value = attribute;
-      }
-      return node.setAttribute(attribute, fromValue(value)), node;
-  };
-
-  const setAttributes = (node, attributes) => {
-      let value;
-      for (let attribute in attributes) {
-          value = attributes[attribute];
-          if (value || "" === value || 0 === value) {
-              setAttribute(node, attribute, value);
-          } else {
-              letAttribute(node, attribute);
-          }
-      }
+    if (null === content) {
       return node;
+    }
+
+    var state = 'innerHTML';
+    return hasState(node, state) && (node[state] = trim ? content.trim() : content), node;
   };
 
-  const setElement = (node, content, attributes) => {
-      node = isString(node) ? D.createElement(node) : node;
-      if (isObject(content)) {
-          attributes = content;
-          content = false;
-      }
-      if (isString(content)) {
-          setHTML(node, content);
-      }
-      if (isObject(attributes)) {
-          setAttributes(node, attributes);
-      }
-      return node;
-  };
-
-  const setHTML = (node, content, trim = true) => {
-      if (null === content) {
-          return node;
-      }
-      let state = 'innerHTML';
-      return hasState(node, state) && (node[state] = trim ? content.trim() : content), node;
-  };
-
-  const setPrev = (current, node) => {
-      return getParent(current).insertBefore(node, current), node;
+  var setPrev = function setPrev(current, node) {
+    return getParent(current).insertBefore(node, current), node;
   };
 
   var HTMLTagPickerElement = /*#__PURE__*/function (_HTMLElement) {
     _inheritsLoose(HTMLTagPickerElement, _HTMLElement);
 
     function HTMLTagPickerElement() {
-      var _this;
+      var _this; // Always call `super()` first in constructor
 
-      // Always call `super()` first in constructor
+
       _this = _HTMLElement.call(this) || this; // Create a shadow root
 
       _this.attachShadow({
@@ -287,5 +352,4 @@
 
 
   W.customElements.define('tag-picker', HTMLTagPickerElement);
-
-}());
+})();

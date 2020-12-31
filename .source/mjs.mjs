@@ -2,7 +2,7 @@ import * as file from '@taufik-nurrohman/file';
 import * as folder from '@taufik-nurrohman/folder';
 
 import {rollup} from 'rollup';
-import {babel} from '@rollup/plugin-babel';
+import {babel, getBabelOutputPlugin} from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 
 import {minify} from 'terser';
@@ -19,31 +19,20 @@ function factory(from, to, name, format, options = {}) {
         plugins: [
             babel({
                 babelHelpers: 'bundled',
-                exclude: 'node_modules/**',
                 plugins: [
-                    [
-                        '@babel/plugin-proposal-class-properties',
-                        {
-                            loose: true
-                        }
-                    ],
-                    [
-                        '@babel/plugin-proposal-private-methods',
-                        {
-                            loose: true
-                        }
-                    ]
+                    '@babel/plugin-proposal-class-properties',
+                    '@babel/plugin-proposal-private-methods'
                 ],
                 presets: [
-                    [
-                        '@babel/preset-env',
-                        {
-                            loose: true,
-                            modules: false,
-                            targets: '>0.25%'
-                        }
-                    ]
+                    ['@babel/preset-env', {
+                        loose: true,
+                        modules: false,
+                        targets: '>0.25%'
+                    }]
                 ]
+            }),
+            getBabelOutputPlugin({
+                allowAllFormats: true
             }),
             resolve()
         ]
