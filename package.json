@@ -15,7 +15,7 @@
     "@taufik-nurrohman/file": "^0.0.6",
     "@taufik-nurrohman/folder": "^0.0.4",
     "@taufik-nurrohman/from": "^0.0.4",
-    "@taufik-nurrohman/hook": "^0.0.3",
+    "@taufik-nurrohman/hook": "^0.0.4",
     "@taufik-nurrohman/pattern": "^0.1.0",
     "@taufik-nurrohman/to": "^0.0.8",
     "clean-css": "^4.2.3",
@@ -55,5 +55,5 @@
     "html": "node .source/pug.mjs",
     "js": "node .source/mjs.mjs"
   },
-  "version": "3.1.2"
+  "version": "3.1.3"
 }
