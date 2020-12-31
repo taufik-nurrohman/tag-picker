@@ -387,10 +387,6 @@
     node.addEventListener(name, then, options);
   };
 
-  function _readOnlyError(name) {
-    throw new TypeError("\"" + name + "\" is read-only");
-  }
-
   function fire(name, data) {
     var $ = this;
 
@@ -410,7 +406,7 @@
     var $ = this;
 
     if (!isSet(name)) {
-      return hooks = (_readOnlyError("hooks"), {}), $;
+      return hooks = {}, $;
     }
 
     if (isSet(hooks[name])) {
@@ -1044,6 +1040,6 @@
     'min': 0,
     'x': false
   };
-  TP.version = '3.1.2';
+  TP.version = '3.1.3';
   return TP;
 });
