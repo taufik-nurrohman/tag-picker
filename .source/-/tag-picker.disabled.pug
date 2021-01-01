@@ -30,11 +30,9 @@ block content
       p
         label
           input(onchange='picker.source.disabled = !this.checked; picker.pop(); picker = new TP(picker.source);' type='checkbox')
-          |
-          |
+          = ' '
           span Enable
       p
         button(type='submit') Submit
-        |
-        |
+        = ' '
         button(onclick='picker.set(\'baz\')' type='button') Add &ldquo;baz&rdquo; Tag

@@ -458,6 +458,10 @@
     return new RegExp(pattern, isSet(opt) ? opt : 'g');
   };
 
+  var toCaseLower$1 = function toCaseLower(x) {
+    return x.toLowerCase();
+  };
+
   var delay = W.setTimeout,
       name = 'TP';
 
@@ -936,7 +940,7 @@
     }, onClickView(), $; // Default filter for the tag name
 
     $.f = function (text) {
-      return toCaseLower(text || "").replace(/[^ a-z\d-]/g, "");
+      return toCaseLower$1(text || "").replace(/[^ a-z\d-]/g, "");
     };
 
     $.fire = fire$1;
@@ -1040,6 +1044,6 @@
     'min': 0,
     'x': false
   };
-  TP.version = '3.1.3';
+  TP.version = '3.1.4';
   return TP;
 });

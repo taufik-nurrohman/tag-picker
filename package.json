@@ -12,12 +12,12 @@
     "@rollup/plugin-node-resolve": "^11.0.1",
     "@taufik-nurrohman/document": "^0.1.3",
     "@taufik-nurrohman/event": "^0.1.1",
-    "@taufik-nurrohman/file": "^0.0.6",
-    "@taufik-nurrohman/folder": "^0.0.4",
-    "@taufik-nurrohman/from": "^0.0.4",
+    "@taufik-nurrohman/file": "^0.0.7",
+    "@taufik-nurrohman/folder": "^0.0.5",
+    "@taufik-nurrohman/from": "^0.0.5",
     "@taufik-nurrohman/hook": "^0.0.4",
-    "@taufik-nurrohman/pattern": "^0.1.0",
-    "@taufik-nurrohman/to": "^0.0.8",
+    "@taufik-nurrohman/pattern": "^0.1.3",
+    "@taufik-nurrohman/to": "^0.0.13",
     "clean-css": "^4.2.3",
     "node-sass": "^5.0.0",
     "pug": "^3.0.0",
@@ -55,5 +55,6 @@
     "html": "node .source/pug.mjs",
     "js": "node .source/mjs.mjs"
   },
-  "version": "3.1.3"
+  "type": "module",
+  "version": "3.1.4"
 }

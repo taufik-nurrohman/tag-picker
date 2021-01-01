@@ -7,7 +7,7 @@ html(dir='ltr')
     meta(content='width=device-width' name='viewport')
     if description
       meta(content=description name='description')
-    title= title
+    title!= title
     if styles
       each style in styles
         link(href=style rel='stylesheet')
