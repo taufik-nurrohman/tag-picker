@@ -28,26 +28,15 @@
 
 import {W, getAttribute, getChildFirst, getChildren, getNext, getParent, getParentForm, getPrev, getText, hasParent, letClass, letClasses, letElement, setClass, setChildLast, setClasses, setElement, setNext, setPrev, setText} from '@taufik-nurrohman/document';
 import {eventPreventDefault, off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
+import {fromStates} from '@taufik-nurrohman/from';
+import {hasValue} from '@taufik-nurrohman/has';
 import {fire as fireHook, hooks, off as offHook, on as onHook} from '@taufik-nurrohman/hook';
 import {isInstance, isNumber, isSet, isString} from '@taufik-nurrohman/is';
 import {toPattern} from '@taufik-nurrohman/pattern';
-import {toCaseLower} from '@taufik-nurrohman/to';
+import {toArrayKey, toCaseLower, toCount, toObjectCount} from '@taufik-nurrohman/to';
 
 let delay = W.setTimeout,
     name = 'TP';
-
-function getCount(ofArray) {
-    return ofArray.length;
-}
-
-function getKey(fromValue, ofArray) {
-    let index = ofArray.indexOf(fromValue);
-    return index < 0 ? null : index;
-}
-
-function inArray(theValue, theArray) {
-    return theArray.indexOf(theValue) >= 0;
-}
 
 const KEY_ARROW_LEFT = ['ArrowLeft', 37];
 const KEY_ARROW_RIGHT = ['ArrowRight', 39];
@@ -67,7 +56,7 @@ function TP(source, state = {}) {
         return $;
     }
 
-    // Return new instance if `F3H` was called without the `new` operator
+    // Return new instance if `TP` was called without the `new` operator
     if (!isInstance($, TP)) {
         return new TP(source, state);
     }
@@ -77,7 +66,7 @@ function TP(source, state = {}) {
         thePlaceholder = getAttribute(source, 'placeholder'),
         theTabIndex = getAttribute(source, 'tabindex');
 
-    $.state = state = Object.assign({}, TP.state, isString(state) ? {
+    $.state = state = fromStates(TP.state, isString(state) ? {
         join: state
     } : (state || {}));
 
@@ -88,7 +77,7 @@ function TP(source, state = {}) {
         on = onHook.bind($);
 
     // Store current instance to `TP.instances`
-    TP.instances[source.id || source.name || getCount(Object.keys(TP.instances))] = $;
+    TP.instances[source.id || source.name || toObjectCount(TP.instances)] = $;
 
     // Mark current DOM as active tag picker to prevent duplicate instance
     source[name] = 1;
@@ -123,11 +112,11 @@ function TP(source, state = {}) {
         if (tag) {
             if (!getTag(tag)) {
                 setTagElement(tag), setTag(tag);
-                index = getCount(tags);
+                index = toCount(tags);
                 fire('change', [tag, index]);
                 fire('set.tag', [tag, index]);
             } else {
-                fire('has.tag', [tag, getKey(tag, tags)]);
+                fire('has.tag', [tag, toArrayKey(tag, tags)]);
             }
             setInput("");
         }
@@ -136,7 +125,7 @@ function TP(source, state = {}) {
     function onBlurInput() {
         onInput();
         letClasses(view, ['focus', 'focus.input']);
-        fire('blur', [$.tags, getCount($.tags)]);
+        fire('blur', [$.tags, toCount($.tags)]);
     }
 
     function onClickInput() {
@@ -160,7 +149,7 @@ function TP(source, state = {}) {
             t = this,
             tag,
             theTagLast = getPrev(editor),
-            theTagsLength = getCount($.tags),
+            theTagsLength = toCount($.tags),
             theTagsMax = state.max,
             theValueLast = n(getText(editorInput)); // Last value before delay
         // Set preferred key name
@@ -178,7 +167,7 @@ function TP(source, state = {}) {
                 doSubmitTry();
             }
             eventPreventDefault(e);
-        } else if (inArray(key, escape) || inArray(keyCode, escape)) {
+        } else if (hasValue(key, escape) || hasValue(keyCode, escape)) {
             if (theTagsLength < theTagsMax) {
                 // Add the tag name found in the tag editor
                 onInput();
@@ -196,7 +185,7 @@ function TP(source, state = {}) {
                     value = n(text);
                 // Last try for buggy key detection on mobile device(s)
                 // Check for the last typed key in the tag editor
-                if (inArray(text.slice(-1), escape)) {
+                if (hasValue(text.slice(-1), escape)) {
                     if (theTagsLength < theTagsMax) {
                         // Add the tag name found in the tag editor
                         onInput();
@@ -267,7 +256,7 @@ function TP(source, state = {}) {
         }
         let theTagsMin = state.min;
         onInput(); // Force to add the tag name found in the tag editor
-        if (theTagsMin > 0 && getCount($.tags) < theTagsMin) {
+        if (theTagsMin > 0 && toCount($.tags) < theTagsMin) {
             setInput("", 1);
             fire('min.tags', [theTagsMin]);
             eventPreventDefault(e);
@@ -301,14 +290,14 @@ function TP(source, state = {}) {
             tag = t.title,
             tags = $.tags;
         letClasses(view, ['focus', 'focus.tag']);
-        fire('blur.tag', [tag, getKey(tag, tags)]);
+        fire('blur.tag', [tag, toArrayKey(tag, tags)]);
     }
 
     function onClickTag() {
         let t = this,
             tag = t.title,
             tags = $.tags;
-        fire('click.tag', [tag, getKey(tag, tags)]);
+        fire('click.tag', [tag, toArrayKey(tag, tags)]);
     }
 
     function onFocusTag() {
@@ -316,7 +305,7 @@ function TP(source, state = {}) {
             tag = t.title,
             tags = $.tags;
         setClasses(view, ['focus', 'focus.tag']);
-        fire('focus.tag', [tag, getKey(tag, tags)]);
+        fire('focus.tag', [tag, toArrayKey(tag, tags)]);
     }
 
     function onClickTagX(e) {
@@ -324,7 +313,7 @@ function TP(source, state = {}) {
             let t = this,
                 tag = getParent(t).title,
                 tags = $.tags,
-                index = getKey(tag, tags);
+                index = toArrayKey(tag, tags);
             letTagElement(tag), letTag(tag), setInput("", 1);
             fire('change', [tag, index]);
             fire('click.tag', [tag, index]);
@@ -371,7 +360,7 @@ function TP(source, state = {}) {
                 if (!sourceIsReadOnly()) {
                     let tag = t.title,
                         tags = $.tags,
-                        index = getKey(tag, tags);
+                        index = toArrayKey(tag, tags);
                     letClass(view, 'focus.tag');
                     letTagElement(tag), letTag(tag);
                     // Focus to the previous tag or to the tag input after remove
@@ -403,14 +392,14 @@ function TP(source, state = {}) {
 
     function getTag(tag, fireHook) {
         let tags = $.tags,
-            index = getKey(tag, tags);
+            index = toArrayKey(tag, tags);
         fireHook && fire('get.tag', [tag, index]);
         return isNumber(index) ? tag : null;
     }
 
     function letTag(tag) {
         let tags = $.tags,
-            index = getKey(tag, tags);
+            index = toArrayKey(tag, tags);
         if (isNumber(index) && index >= 0) {
             source.value = tags.join(state.join);
             return $.tags.splice(index, 1), true;
@@ -458,7 +447,7 @@ function TP(source, state = {}) {
     }
 
     function letTagElement(tag) {
-        let index = getKey(tag, $.tags), element;
+        let index = toArrayKey(tag, $.tags), element;
         if (isNumber(index) && index >= 0 && (element = getChildren(tags, index))) {
             offEvent('blur', element, onBlurTag);
             offEvent('click', element, onClickTag);
@@ -526,7 +515,7 @@ function TP(source, state = {}) {
         if (!sourceIsDisabled() && !sourceIsReadOnly()) {
             let theTagsMin = state.min;
             onInput();
-            if (theTagsMin > 0 && getCount($.tags) < theTagsMin) {
+            if (theTagsMin > 0 && toCount($.tags) < theTagsMin) {
                 fire('min.tags', [theTagsMin]);
                 return $;
             }
@@ -567,13 +556,13 @@ function TP(source, state = {}) {
             let tags = $.tags,
                 theTagsMax = state.max;
             if (!getTag(tag)) {
-                if (getCount(tags) < theTagsMax) {
+                if (toCount(tags) < theTagsMax) {
                     setTagElement(tag, index), setTag(tag, index);
                 } else {
                     fire('max.tags', [theTagsMax]);
                 }
             } else {
-                fire('has.tag', [tag, getKey(tag, tags)]);
+                fire('has.tag', [tag, toArrayKey(tag, tags)]);
             }
         }
         return $;
@@ -603,6 +592,6 @@ TP.state = {
     'x': false
 };
 
-TP.version = '3.1.4';
+TP.version = '3.1.5';
 
 export default TP;
