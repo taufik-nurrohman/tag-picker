@@ -136,15 +136,6 @@ block content
       li #[a(href='test/path.html' target='_blank') Directory] (Experiment)
       li: a(href='index/element.html' target='_blank') Native HTML5 Custom #[code &lt;tag-picker&gt;] Element
     h2 Settings
-    pre: code const picker = new TP(#[var source], #[var join] = ', ');
-    pre: code
-      | const picker = new TP(#[var source], #[var state] = {
-      |     escape: [','],
-      |     join: ', ',
-      |     max: 9999,
-      |     min: 0,
-      |     x: false
-      | });
     table(border='1')
       thead
         tr
@@ -175,6 +166,15 @@ block content
         tr
           td: code state.x
           td Set to #[code true] to show the &ldquo;remove&rdquo; button.
+    pre: code const picker = new TP(#[var source], #[var join] = ', ');
+    pre: code
+      | const picker = new TP(#[var source], #[var state] = {
+      |     escape: [','],
+      |     join: ', ',
+      |     max: 9999,
+      |     min: 0,
+      |     x: false
+      | });
     h2 Methods and Properties
     h3 TP.instances
     p Return the application instances.
