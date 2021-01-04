@@ -24,6 +24,11 @@ Contribute
 Release Notes
 -------------
 
+### 3.1.7
+
+ - Included CSS and SCSS files to the NPM package.
+ - Included custom HTML5 `<tag-picker>` element script to the NPM package.
+
 ### 3.1.6
 
  - Added custom setter and getter for the HTML5 `<tag-picker>` element so that it will look like native HTML5 elements.

@@ -26,4 +26,6 @@ function factory(from, to, options = {}) {
     });
 }
 
+file.copy('.source/-/index.scss', '.');
+
 factory('.source/-/index.scss', 'index.css');
