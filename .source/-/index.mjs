@@ -64,11 +64,11 @@ function TP(source, state = {}) {
         }),
         editorInputPlaceholder = setElement('span'),
         form = getParentForm(source), // Capture the closest `<form>` element
+        self = setElement('span', {
+            'class': state['class']
+        }),
         tags = setElement('span', {
             'class': 'tags'
-        }),
-        view = setElement('span', {
-            'class': state['class']
         });
 
     function n(text) {
@@ -96,7 +96,7 @@ function TP(source, state = {}) {
 
     function onBlurInput() {
         onInput();
-        letClasses(view, ['focus', 'focus.input']);
+        letClasses(self, ['focus', 'focus.input']);
         fire('blur', [$.tags, toCount($.tags)]);
     }
 
@@ -105,8 +105,8 @@ function TP(source, state = {}) {
     }
 
     function onFocusInput() {
-        setClass(view, 'focus');
-        setClass(view, 'focus.input');
+        setClass(self, 'focus');
+        setClass(self, 'focus.input');
         fire('focus', [$.tags]);
     }
 
@@ -175,7 +175,7 @@ function TP(source, state = {}) {
                             KEY_DELETE_LEFT[0] === keyCode
                         )
                     ) {
-                        letClass(view, 'focus.tag');
+                        letClass(self, 'focus.tag');
                         tag = $.tags[theTagsLength - 1];
                         letTagElement(tag), letTag(tag);
                         if (theTagLast) {
@@ -197,7 +197,7 @@ function TP(source, state = {}) {
 
     function setTags(values) {
         // Remove …
-        if (hasParent(view)) {
+        if (hasParent(self)) {
             let prev;
             while (prev = getPrev(editor)) {
                 letTagElement(prev.title);
@@ -247,8 +247,8 @@ function TP(source, state = {}) {
         }, 0);
     }
 
-    function onClickView(e) {
-        if (e && view === e.target) {
+    function onClickSelf(e) {
+        if (e && self === e.target) {
             editorInput.focus(), onClickInput();
         }
     }
@@ -261,7 +261,7 @@ function TP(source, state = {}) {
         let t = this,
             tag = t.title,
             tags = $.tags;
-        letClasses(view, ['focus', 'focus.tag']);
+        letClasses(self, ['focus', 'focus.tag']);
         fire('blur.tag', [tag, toArrayKey(tag, tags)]);
     }
 
@@ -276,7 +276,7 @@ function TP(source, state = {}) {
         let t = this,
             tag = t.title,
             tags = $.tags;
-        setClasses(view, ['focus', 'focus.tag']);
+        setClasses(self, ['focus', 'focus.tag']);
         fire('focus.tag', [tag, toArrayKey(tag, tags)]);
     }
 
@@ -333,7 +333,7 @@ function TP(source, state = {}) {
                     let tag = t.title,
                         tags = $.tags,
                         index = toArrayKey(tag, tags);
-                    letClass(view, 'focus.tag');
+                    letClass(self, 'focus.tag');
                     letTagElement(tag), letTag(tag);
                     // Focus to the previous tag or to the tag input after remove
                     if (
@@ -440,12 +440,12 @@ function TP(source, state = {}) {
         onSubmitForm() && form && form.submit();
     }
 
-    setChildLast(view, tags);
+    setChildLast(self, tags);
     setChildLast(tags, editor);
     setChildLast(editor, editorInput);
     setChildLast(editor, editorInputPlaceholder);
     setClass(source, state['class'] + '-source');
-    setNext(source, view);
+    setNext(source, self);
 
     setElement(source, {
         'tabindex': '-1'
@@ -453,7 +453,7 @@ function TP(source, state = {}) {
 
     onEvent('blur', editorInput, onBlurInput);
     onEvent('click', editorInput, onClickInput);
-    onEvent('click', view, onClickView);
+    onEvent('click', self, onClickSelf);
     onEvent('focus', editorInput, onFocusInput);
     onEvent('focus', source, onFocusSource);
     onEvent('keydown', editorInput, onKeyDownInput);
@@ -463,7 +463,7 @@ function TP(source, state = {}) {
 
     $.blur = () => (!sourceIsDisabled() && (editorInput.blur(), onBlurInput())), $;
 
-    $.click = () => view.click(), onClickView(), $;
+    $.click = () => self.click(), onClickSelf(), $;
 
     // Default filter for the tag name
     $.f = text => toCaseLower(text || "").replace(/[^ a-z\d-]/g, "");
@@ -508,7 +508,7 @@ function TP(source, state = {}) {
         letClass(source, state['class'] + '-source');
         offEvent('blur', editorInput, onBlurInput);
         offEvent('click', editorInput, onClickInput);
-        offEvent('click', view, onClickView);
+        offEvent('click', self, onClickSelf);
         offEvent('focus', editorInput, onFocusInput);
         offEvent('focus', source, onFocusSource);
         offEvent('keydown', editorInput, onKeyDownInput);
@@ -518,10 +518,10 @@ function TP(source, state = {}) {
         setElement(source, {
             'tabindex': theTabIndex
         });
-        return letElement(view), fire('pop', [tags]);
+        return letElement(self), fire('pop', [tags]);
     };
 
-    $.self = $.view = view;
+    $.self = self;
 
     $.set = (tag, index) => {
         if (!sourceIsDisabled() && !sourceIsReadOnly()) {

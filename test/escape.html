@@ -1,0 +1,8 @@
+<!DOCTYPE html><html dir="ltr"><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><meta content="Better tags input interaction with JavaScript." name="description"><title>Tag Picker</title><link href="../index.min.css" rel="stylesheet"></head><body><main><form><p>Disable <kbd>,</kbd>, <kbd>Space</kbd>, <kbd>Tab</kbd> and <kbd>Enter</kbd> key.</p><p><input type="text" value="foo, bar, baz"></p></form></main><script src="../index.min.js"></script><script>const picker = new TP(document.querySelector('input'), {
+    escape: [
+        // Modern browser(s)
+        ',', ' ', '\n', '\t',
+        // Legacy browser(s)
+        188, 32, 13, 9
+    ]
+});</script></body></html>

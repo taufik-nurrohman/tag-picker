@@ -1,0 +1,18 @@
+extends ../_index.pug
+
+block state
+  - const title = 'Tag Picker'
+  - const scripts = ['../index.min.js']
+  - const styles = ['../index.min.css']
+
+block script
+  script
+    | const picker = new TP(document.querySelector('input'));
+    |
+    | picker.on('change', function(tag, index) {
+    |     console.log([tag, index, this.tags]);
+    | });
+
+block content
+  main
+    p: input(type='text' value='foo, bar')

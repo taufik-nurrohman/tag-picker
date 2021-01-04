@@ -64,4 +64,4 @@ function factory(from, to, name, format, options = {}) {
 }
 
 factory('.source/-/index.mjs', 'index.js', 'TP', 'umd');
-factory('.source/-/tag-picker/element.mjs', 'tag-picker/element.js', null, 'iife');
+factory('.source/-/index/element.mjs', 'index/element.js', null, 'iife');

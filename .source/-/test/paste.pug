@@ -1,0 +1,19 @@
+extends ../_index.pug
+
+block state
+  - const title = 'Tag Picker'
+  - const scripts = ['../index.min.js']
+  - const styles = ['../index.min.css']
+
+block script
+  script
+    | const picker = new TP(document.querySelector('input'));
+    |
+    | picker.on('set.tag', (name, i) => {
+    |     console.log([name, i]);
+    | });
+
+block content
+  main
+    p Copy this &rarr; #[mark(contenteditable spellcheck='false') foo, bar, baz] then paste to the input below:
+    p: input(type='text')

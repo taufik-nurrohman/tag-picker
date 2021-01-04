@@ -1,0 +1,44 @@
+extends ../_index.pug
+
+block state
+  - const title = 'Tag Picker'
+  - const scripts = ['../index.min.js']
+  - const styles = ['../index.min.css']
+
+block script
+  script
+    | const picker = new TP(document.querySelector('input'), {
+    |     escape: ['/', '\\', '\t', '\n'],
+    |     join: '/'
+    | });
+
+block style
+  style
+    | .tag-picker {
+    |   padding: 0 .25em;
+    | }
+    | .tag-picker .tags::before {
+    |   content: 'C:/server/www/';
+    | }
+    | .tag-picker .tag {
+    |   background: none;
+    |   margin: 0;
+    |   padding: 0;
+    | }
+    | .tag-picker .tag:focus {
+    |   background: #ff0;
+    | }
+    | .tag-picker .tag::before {
+    |   color: #00f;
+    | }
+    | .tag-picker .tag::after {
+    |   content: '/'
+    | }
+    | .tag-picker .editor::before,
+    | .tag-picker .editor::after {
+    |   display: none;
+    | }
+
+block content
+  main
+    p: input(type='text' value='foo/bar')

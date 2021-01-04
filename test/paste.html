@@ -1,0 +1,5 @@
+<!DOCTYPE html><html dir="ltr"><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><meta content="Better tags input interaction with JavaScript." name="description"><title>Tag Picker</title><link href="../index.min.css" rel="stylesheet"></head><body><main><p>Copy this &rarr; <mark contenteditable spellcheck="false">foo, bar, baz</mark> then paste to the input below:</p><p><input type="text"></p></main><script src="../index.min.js"></script><script>const picker = new TP(document.querySelector('input'));
+
+picker.on('set.tag', (name, i) => {
+    console.log([name, i]);
+});</script></body></html>

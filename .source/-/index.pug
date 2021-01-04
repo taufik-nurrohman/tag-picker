@@ -94,11 +94,11 @@ block content
       | &lt;html dir="ltr"&gt;
       |   &lt;head&gt;
       |     &lt;meta charset="utf-8"&gt;
-      |     &lt;link href="#[a(href='index.min.css' target='_blank') index.min.css]" rel="stylesheet"&gt;
+      |     &lt;link href="#[a(href='index.min.css' target='_blank') ./index.min.css]" rel="stylesheet"&gt;
       |   &lt;/head&gt;
       |   &lt;body&gt;
       |     &lt;p&gt;&lt;input type="text"&gt;&lt;/p&gt;
-      |     &lt;script src="#[a(href='index.min.js' target='_blank') index.min.js]"&gt;&lt;/script&gt;
+      |     &lt;script src="#[a(href='index.min.js' target='_blank') ./index.min.js]"&gt;&lt;/script&gt;
       |     &lt;script&gt;
       |     const picker = new TP(document.querySelector('input'));
       |     &lt;/script&gt;
@@ -118,23 +118,23 @@ block content
       | const picker = new TP(document.querySelector('input'));
     h2 Examples
     ul
-      li: a(href='tag-picker.html' target='_blank') No Idea?
-      li: a(href='tag-picker.value.html' target='_blank') Set Pre-Defined Value
-      li: a(href='tag-picker.placeholder.html' target='_blank') Set Placeholder
-      li: a(href='tag-picker.focus.html' target='_blank') Focus State
-      li: a(href='tag-picker.focus.placeholder.html' target='_blank') Hide Placeholder on Focus
-      li: a(href='tag-picker.disabled.html' target='_blank') Disabled Input
-      li: a(href='tag-picker.read-only.html' target='_blank') Read-Only Input
-      li: a(href='tag-picker.min.html' target='_blank') Limit Minimum Tags
-      li: a(href='tag-picker.max.html' target='_blank') Limit Maximum Tags
-      li: a(href='tag-picker.x.html' target='_blank') Enable &ldquo;Remove&rdquo; Button
-      li: a(href='tag-picker.paste.html' target='_blank') Paste Event
-      li: a(href='tag-picker.alert.html' target='_blank') Warn for Duplicate Tags with Alert Message
-      li: a(href='tag-picker.mark.html' target='_blank') Warn for Duplicate Tags with Flash Highlight
-      li: a(href='tag-picker.escape.html' target='_blank') Disable Characters with #[code picker.state.escape]
-      li: a(href='tag-picker.f.html' target='_blank') Filter Characters with #[code picker.f()] Method
-      li #[a(href='tag-picker.directory.html' target='_blank') Directory] (Experiment)
-      li: a(href='tag-picker.element.html' target='_blank') Native HTML5 Custom #[code &lt;tag-picker&gt;] Element
+      li: a(href='test.html' target='_blank') No Idea?
+      li: a(href='test/value.html' target='_blank') Set Pre-Defined Value
+      li: a(href='test/placeholder.html' target='_blank') Set Placeholder
+      li: a(href='test/focus.html' target='_blank') Focus State
+      li: a(href='test/focus.placeholder.html' target='_blank') Hide Placeholder on Focus
+      li: a(href='test/disabled.html' target='_blank') Disabled Input
+      li: a(href='test/readonly.html' target='_blank') Read-Only Input
+      li: a(href='test/min.html' target='_blank') Limit Minimum Tags
+      li: a(href='test/max.html' target='_blank') Limit Maximum Tags
+      li: a(href='test/x.html' target='_blank') Enable &ldquo;Remove&rdquo; Button
+      li: a(href='test/paste.html' target='_blank') Paste Event
+      li: a(href='test/alert.html' target='_blank') Warn for Duplicate Tags with Alert Message
+      li: a(href='test/mark.html' target='_blank') Warn for Duplicate Tags with Flash Highlight
+      li: a(href='test/escape.html' target='_blank') Disable Characters with #[code picker.state.escape]
+      li: a(href='test/f.html' target='_blank') Filter Characters with #[code picker.f()] Method
+      li #[a(href='test/path.html' target='_blank') Directory] (Experiment)
+      li: a(href='index/element.html' target='_blank') Native HTML5 Custom #[code &lt;tag-picker&gt;] Element
     h2 Settings
     pre: code const picker = new TP(#[var source], #[var join] = ', ');
     pre: code
@@ -145,15 +145,36 @@ block content
       |     min: 0,
       |     x: false
       | });
-    ul
-      li #[var source] &rarr; The text input element.
-      li #[var join] &rarr; Tags joiner for the output value.
-      li #[var state] &rarr; The configuration data.
-      li #[var state.escape] &rarr; List of characters used to trigger the tag addition.
-      li #[var state.join] &rarr; Tags joiner for the output value.
-      li #[var state.max] &rarr; Maximum tags allowed.
-      li #[var state.min] &rarr; Minimum tags allowed.
-      li #[var state.x] &rarr; Set to #[code true] to show the &ldquo;remove&rdquo; button.
+    table(border='1')
+      thead
+        tr
+          th Name
+          th Description
+      tbody
+        tr
+          td: code source
+          td The text input element.
+        tr
+          td: code join
+          td Tags joiner for the output value.
+        tr
+          td: code state
+          td The configuration data.
+        tr
+          td: code state.escape
+          td List of characters used to trigger the tag addition.
+        tr
+          td: code state.join
+          td Tags joiner for the output value.
+        tr
+          td: code state.max
+          td Maximum tags allowed.
+        tr
+          td: code state.min
+          td Minimum tags allowed.
+        tr
+          td: code state.x
+          td Set to #[code true] to show the &ldquo;remove&rdquo; button.
     h2 Methods and Properties
     h3 TP.instances
     p Return the application instances.

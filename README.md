@@ -24,6 +24,12 @@ Contribute
 Release Notes
 -------------
 
+### 3.1.6
+
+ - Added custom setter and getter for the HTML5 `<tag-picker>` element so that it will look like native HTML5 elements.
+ - Removed `picker.view` property.
+ - Restructured the test files.
+
 ### 3.1.1, 3.1.2, 3.1.3, 3.1.4, 3.1.5
 
  - Maintenance.
