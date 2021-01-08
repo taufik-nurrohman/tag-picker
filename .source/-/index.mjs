@@ -2,7 +2,7 @@ import {W, getAttribute, getChildFirst, getChildren, getNext, getParent, getPare
 import {eventPreventDefault, off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
 import {fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
-import {fire as fireHook, hooks, off as offHook, on as onHook} from '@taufik-nurrohman/hook';
+import {fire as fireHook, hooks as theHooks, off as offHook, on as onHook} from '@taufik-nurrohman/hook';
 import {isInstance, isNumber, isSet, isString} from '@taufik-nurrohman/is';
 import {toPattern} from '@taufik-nurrohman/pattern';
 import {toArrayKey, toCaseLower, toCount, toObjectCount} from '@taufik-nurrohman/to';
@@ -121,7 +121,7 @@ function TP(source, state = {}) {
             t = this,
             tag,
             theTagLast = getPrev(editor),
-            theTagsLength = toCount($.tags),
+            theTagsCount = toCount($.tags),
             theTagsMax = state.max,
             theValueLast = n(getText(editorInput)); // Last value before delay
         // Set preferred key name
@@ -140,7 +140,7 @@ function TP(source, state = {}) {
             }
             eventPreventDefault(e);
         } else if (hasValue(key, escape) || hasValue(keyCode, escape)) {
-            if (theTagsLength < theTagsMax) {
+            if (theTagsCount < theTagsMax) {
                 // Add the tag name found in the tag editor
                 onInput();
             } else {
@@ -158,7 +158,7 @@ function TP(source, state = {}) {
                 // Last try for buggy key detection on mobile device(s)
                 // Check for the last typed key in the tag editor
                 if (hasValue(text.slice(-1), escape)) {
-                    if (theTagsLength < theTagsMax) {
+                    if (theTagsCount < theTagsMax) {
                         // Add the tag name found in the tag editor
                         onInput();
                     } else {
@@ -176,11 +176,11 @@ function TP(source, state = {}) {
                         )
                     ) {
                         letClass(self, 'focus.tag');
-                        tag = $.tags[theTagsLength - 1];
+                        tag = $.tags[theTagsCount - 1];
                         letTagElement(tag), letTag(tag);
                         if (theTagLast) {
-                            fire('change', [tag, theTagsLength - 1]);
-                            fire('let.tag', [tag, theTagsLength - 1]);
+                            fire('change', [tag, theTagsCount - 1]);
+                            fire('let.tag', [tag, theTagsCount - 1]);
                         }
                     } else if (
                         KEY_ARROW_LEFT[0] === key ||
@@ -362,10 +362,10 @@ function TP(source, state = {}) {
         fireFocus && editorInput.focus();
     } setInput("");
 
-    function getTag(tag, fireHook) {
+    function getTag(tag, fireHooks) {
         let tags = $.tags,
             index = toArrayKey(tag, tags);
-        fireHook && fire('get.tag', [tag, index]);
+        fireHooks && fire('get.tag', [tag, index]);
         return isNumber(index) ? tag : null;
     }
 
@@ -480,7 +480,7 @@ function TP(source, state = {}) {
 
     $.get = tag => sourceIsDisabled() ? null : getTag(tag, 1);
 
-    $.hooks = hooks;
+    $.hooks = theHooks;
     $.input = editorInput;
 
     $.let = tag => {

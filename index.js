@@ -610,7 +610,7 @@
           keyIsTab = KEY_TAB[0] === key || KEY_TAB[1] === keyCode,
           tag,
           theTagLast = getPrev(editor),
-          theTagsLength = toCount($.tags),
+          theTagsCount = toCount($.tags),
           theTagsMax = state.max,
           theValueLast = n(getText(editorInput)); // Last value before delay
       // Set preferred key name
@@ -630,7 +630,7 @@
 
         eventPreventDefault(e);
       } else if (hasValue(key, escape) || hasValue(keyCode, escape)) {
-        if (theTagsLength < theTagsMax) {
+        if (theTagsCount < theTagsMax) {
           // Add the tag name found in the tag editor
           onInput();
         } else {
@@ -648,7 +648,7 @@
           // Check for the last typed key in the tag editor
 
           if (hasValue(text.slice(-1), escape)) {
-            if (theTagsLength < theTagsMax) {
+            if (theTagsCount < theTagsMax) {
               // Add the tag name found in the tag editor
               onInput();
             } else {
@@ -660,12 +660,12 @@
           } else if ("" === value && !keyIsCtrl && !keyIsShift) {
             if ("" === theValueLast && (KEY_DELETE_LEFT[0] === key || KEY_DELETE_LEFT[0] === keyCode)) {
               letClass(self, 'focus.tag');
-              tag = $.tags[theTagsLength - 1];
+              tag = $.tags[theTagsCount - 1];
               letTagElement(tag), letTag(tag);
 
               if (theTagLast) {
-                fire$1('change', [tag, theTagsLength - 1]);
-                fire$1('let.tag', [tag, theTagsLength - 1]);
+                fire$1('change', [tag, theTagsCount - 1]);
+                fire$1('let.tag', [tag, theTagsCount - 1]);
               }
             } else if (KEY_ARROW_LEFT[0] === key || KEY_ARROW_LEFT[1] === keyCode) {
               // Focus to the last tag
@@ -841,10 +841,10 @@
 
     setInput("");
 
-    function getTag(tag, fireHook) {
+    function getTag(tag, fireHooks) {
       var tags = $.tags,
           index = toArrayKey(tag, tags);
-      fireHook && fire$1('get.tag', [tag, index]);
+      fireHooks && fire$1('get.tag', [tag, index]);
       return isNumber(index) ? tag : null;
     }
 
@@ -1059,6 +1059,6 @@
     'min': 0,
     'x': false
   };
-  TP.version = '3.1.7';
+  TP.version = '3.1.8';
   return TP;
 });

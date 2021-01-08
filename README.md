@@ -24,6 +24,10 @@ Contribute
 Release Notes
 -------------
 
+### 3.1.8
+
+ - Updated.
+
 ### 3.1.7
 
  - Included CSS and SCSS files to the NPM package.
