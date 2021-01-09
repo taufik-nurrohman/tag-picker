@@ -2,7 +2,7 @@ import {W, getAttribute, getChildFirst, getChildren, getNext, getParent, getPare
 import {eventPreventDefault, off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
 import {fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
-import {fire as fireHook, hooks as theHooks, off as offHook, on as onHook} from '@taufik-nurrohman/hook';
+import {context as contextHook} from '@taufik-nurrohman/hook';
 import {isInstance, isNumber, isSet, isString} from '@taufik-nurrohman/is';
 import {toPattern} from '@taufik-nurrohman/pattern';
 import {toArrayKey, toCaseLower, toCount, toObjectCount} from '@taufik-nurrohman/to';
@@ -25,7 +25,7 @@ function TP(source, state = {}) {
 
     // Already instantiated, skip!
     if (source[name]) {
-        return $;
+        return;
     }
 
     // Return new instance if `TP` was called without the `new` operator
@@ -38,15 +38,13 @@ function TP(source, state = {}) {
         thePlaceholder = getAttribute(source, 'placeholder'),
         theTabIndex = getAttribute(source, 'tabindex');
 
+    let {fire} = contextHook($);
+
     $.state = state = fromStates(TP.state, isString(state) ? {
         join: state
     } : (state || {}));
 
     $.source = source;
-
-    let fire = fireHook.bind($),
-        off = offHook.bind($),
-        on = onHook.bind($);
 
     // Store current instance to `TP.instances`
     TP.instances[source.id || source.name || toObjectCount(TP.instances)] = $;
@@ -468,8 +466,6 @@ function TP(source, state = {}) {
     // Default filter for the tag name
     $.f = text => toCaseLower(text || "").replace(/[^ a-z\d-]/g, "");
 
-    $.fire = fire;
-
     $.focus = () => {
         if (!sourceIsDisabled()) {
             editorInput.focus();
@@ -480,7 +476,6 @@ function TP(source, state = {}) {
 
     $.get = tag => sourceIsDisabled() ? null : getTag(tag, 1);
 
-    $.hooks = theHooks;
     $.input = editorInput;
 
     $.let = tag => {
@@ -495,9 +490,6 @@ function TP(source, state = {}) {
         }
         return $;
     };
-
-    $.off = off;
-    $.on = on;
 
     $.pop = () => {
         if (!source[name]) {

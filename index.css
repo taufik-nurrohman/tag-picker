@@ -45,6 +45,7 @@
 
 .tag-picker .tag[title] a::before {
   content: '\00d7';
+  font-family: sans-serif;
 }
 
 .tag-picker .tag[title]::before {

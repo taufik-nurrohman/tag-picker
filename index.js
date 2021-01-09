@@ -399,62 +399,70 @@
     return -1 !== data.indexOf(x);
   };
 
-  function fire(name, data) {
-    var $ = this;
+  function context($) {
+    var hooks = {};
 
-    if (!isSet(hooks[name])) {
+    function fire(name, data) {
+      if (!isSet(hooks[name])) {
+        return $;
+      }
+
+      hooks[name].forEach(function (then) {
+        return then.apply($, data);
+      });
       return $;
     }
 
-    hooks[name].forEach(function (then) {
-      return then.apply($, data);
-    });
-    return $;
-  }
+    function off(name, then) {
+      if (!isSet(name)) {
+        return hooks = {}, $;
+      }
 
-  var hooks = {};
+      if (isSet(hooks[name])) {
+        if (isSet(then)) {
+          for (var i = 0, _j = hooks[name].length; i < _j; ++i) {
+            if (then === hooks[name][i]) {
+              hooks[name].splice(i, 1);
+              break;
+            }
+          } // Clean-up empty hook(s)
 
-  function off$1(name, then) {
-    var $ = this;
 
-    if (!isSet(name)) {
-      return hooks = {}, $;
-    }
-
-    if (isSet(hooks[name])) {
-      if (isSet(then)) {
-        for (var i = 0, _j = hooks[name].length; i < _j; ++i) {
-          if (then === hooks[name][i]) {
-            hooks[name].splice(i, 1);
-            break;
+          if (0 === j) {
+            delete hooks[name];
           }
-        } // Clean-up empty hook(s)
-
-
-        if (0 === j) {
+        } else {
           delete hooks[name];
         }
-      } else {
-        delete hooks[name];
       }
+
+      return $;
     }
 
+    function on(name, then) {
+      if (!isSet(hooks[name])) {
+        hooks[name] = [];
+      }
+
+      if (isSet(then)) {
+        hooks[name].push(then);
+      }
+
+      return $;
+    }
+
+    $.hooks = hooks;
+    $.fire = fire;
+    $.off = off;
+    $.on = on;
     return $;
   }
 
-  function on$1(name, then) {
-    var $ = this;
-
-    if (!isSet(hooks[name])) {
-      hooks[name] = [];
-    }
-
-    if (isSet(then)) {
-      hooks[name].push(then);
-    }
-
-    return $;
-  }
+  var $ = context({});
+  var fire = $.fire;
+  var off$1 = $.off;
+  var on$1 = $.on;
+  var hooks = $.hooks;
 
   var isPattern = function isPattern(pattern) {
     return isInstance(pattern, RegExp);
@@ -509,7 +517,7 @@
     var $ = this; // Already instantiated, skip!
 
     if (source[name]) {
-      return $;
+      return;
     } // Return new instance if `TP` was called without the `new` operator
 
 
@@ -526,13 +534,13 @@
         thePlaceholder = getAttribute(source, 'placeholder'),
         theTabIndex = getAttribute(source, 'tabindex');
 
+    var _contextHook = context($),
+        fire = _contextHook.fire;
+
     $.state = state = fromStates(TP.state, isString(state) ? {
       join: state
     } : state || {});
-    $.source = source;
-    var fire$1 = fire.bind($),
-        off$2 = off$1.bind($),
-        on$2 = on$1.bind($); // Store current instance to `TP.instances`
+    $.source = source; // Store current instance to `TP.instances`
 
     TP.instances[source.id || source.name || toObjectCount(TP.instances)] = $; // Mark current DOM as active tag picker to prevent duplicate instance
 
@@ -572,10 +580,10 @@
         if (!getTag(tag)) {
           setTagElement(tag), setTag(tag);
           index = toCount(tags);
-          fire$1('change', [tag, index]);
-          fire$1('set.tag', [tag, index]);
+          fire('change', [tag, index]);
+          fire('set.tag', [tag, index]);
         } else {
-          fire$1('has.tag', [tag, toArrayKey(tag, tags)]);
+          fire('has.tag', [tag, toArrayKey(tag, tags)]);
         }
 
         setInput("");
@@ -585,17 +593,17 @@
     function onBlurInput() {
       onInput();
       letClasses(self, ['focus', 'focus.input']);
-      fire$1('blur', [$.tags, toCount($.tags)]);
+      fire('blur', [$.tags, toCount($.tags)]);
     }
 
     function onClickInput() {
-      fire$1('click', [$.tags]);
+      fire('click', [$.tags]);
     }
 
     function onFocusInput() {
       setClass(self, 'focus');
       setClass(self, 'focus.input');
-      fire$1('focus', [$.tags]);
+      fire('focus', [$.tags]);
     }
 
     function onKeyDownInput(e) {
@@ -635,7 +643,7 @@
           onInput();
         } else {
           setInput("");
-          fire$1('max.tags', [theTagsMax]);
+          fire('max.tags', [theTagsMax]);
         }
 
         eventPreventDefault(e); // Submit the closest `<form>` element with `Enter` key
@@ -653,7 +661,7 @@
               onInput();
             } else {
               setInput("");
-              fire$1('max.tags', [theTagsMax]);
+              fire('max.tags', [theTagsMax]);
             }
 
             eventPreventDefault(e); // Escape character only, delete!
@@ -664,8 +672,8 @@
               letTagElement(tag), letTag(tag);
 
               if (theTagLast) {
-                fire$1('change', [tag, theTagsCount - 1]);
-                fire$1('let.tag', [tag, theTagsCount - 1]);
+                fire('change', [tag, theTagsCount - 1]);
+                fire('let.tag', [tag, theTagsCount - 1]);
               }
             } else if (KEY_ARROW_LEFT[0] === key || KEY_ARROW_LEFT[1] === keyCode) {
               // Focus to the last tag
@@ -704,8 +712,8 @@
           }
 
           setTagElement(value), setTag(value);
-          fire$1('change', [value, i]);
-          fire$1('set.tag', [value, i]);
+          fire('change', [value, i]);
+          fire('set.tag', [value, i]);
         }
       }
     }
@@ -720,7 +728,7 @@
 
       if (theTagsMin > 0 && toCount($.tags) < theTagsMin) {
         setInput("", 1);
-        fire$1('min.tags', [theTagsMin]);
+        fire('min.tags', [theTagsMin]);
         eventPreventDefault(e);
         return;
       } // Do normal `submit` event
@@ -754,14 +762,14 @@
           tag = t.title,
           tags = $.tags;
       letClasses(self, ['focus', 'focus.tag']);
-      fire$1('blur.tag', [tag, toArrayKey(tag, tags)]);
+      fire('blur.tag', [tag, toArrayKey(tag, tags)]);
     }
 
     function onClickTag() {
       var t = this,
           tag = t.title,
           tags = $.tags;
-      fire$1('click.tag', [tag, toArrayKey(tag, tags)]);
+      fire('click.tag', [tag, toArrayKey(tag, tags)]);
     }
 
     function onFocusTag() {
@@ -769,7 +777,7 @@
           tag = t.title,
           tags = $.tags;
       setClasses(self, ['focus', 'focus.tag']);
-      fire$1('focus.tag', [tag, toArrayKey(tag, tags)]);
+      fire('focus.tag', [tag, toArrayKey(tag, tags)]);
     }
 
     function onClickTagX(e) {
@@ -779,9 +787,9 @@
             _tags = $.tags,
             index = toArrayKey(tag, _tags);
         letTagElement(tag), letTag(tag), setInput("", 1);
-        fire$1('change', [tag, index]);
-        fire$1('click.tag', [tag, index]);
-        fire$1('let.tag', [tag, index]);
+        fire('change', [tag, index]);
+        fire('click.tag', [tag, index]);
+        fire('let.tag', [tag, index]);
       }
 
       eventPreventDefault(e);
@@ -824,8 +832,8 @@
                 theTagNext && theTagNext !== editor ? theTagNext.focus() : setInput("", 1);
               }
 
-            fire$1('change', [tag, index]);
-            fire$1('let.tag', [tag, index]);
+            fire('change', [tag, index]);
+            fire('let.tag', [tag, index]);
           }
 
           eventPreventDefault(e);
@@ -844,7 +852,7 @@
     function getTag(tag, fireHooks) {
       var tags = $.tags,
           index = toArrayKey(tag, tags);
-      fireHooks && fire$1('get.tag', [tag, index]);
+      fireHooks && fire('get.tag', [tag, index]);
       return isNumber(index) ? tag : null;
     }
 
@@ -958,8 +966,6 @@
       return toCaseLower$1(text || "").replace(/[^ a-z\d-]/g, "");
     };
 
-    $.fire = fire$1;
-
     $.focus = function () {
       if (!sourceIsDisabled()) {
         editorInput.focus();
@@ -973,7 +979,6 @@
       return sourceIsDisabled() ? null : getTag(tag, 1);
     };
 
-    $.hooks = hooks;
     $.input = editorInput;
 
     $.let = function (tag) {
@@ -982,7 +987,7 @@
         onInput();
 
         if (theTagsMin > 0 && toCount($.tags) < theTagsMin) {
-          fire$1('min.tags', [theTagsMin]);
+          fire('min.tags', [theTagsMin]);
           return $;
         }
 
@@ -991,9 +996,6 @@
 
       return $;
     };
-
-    $.off = off$2;
-    $.on = on$2;
 
     $.pop = function () {
       if (!source[name]) {
@@ -1015,7 +1017,7 @@
       setElement(source, {
         'tabindex': theTabIndex
       });
-      return letElement(self), fire$1('pop', [tags]);
+      return letElement(self), fire('pop', [tags]);
     };
 
     $.self = self;
@@ -1029,10 +1031,10 @@
           if (toCount(_tags3) < theTagsMax) {
             setTagElement(tag, index), setTag(tag, index);
           } else {
-            fire$1('max.tags', [theTagsMax]);
+            fire('max.tags', [theTagsMax]);
           }
         } else {
-          fire$1('has.tag', [tag, toArrayKey(tag, _tags3)]);
+          fire('has.tag', [tag, toArrayKey(tag, _tags3)]);
         }
       }
 
@@ -1059,6 +1061,6 @@
     'min': 0,
     'x': false
   };
-  TP.version = '3.1.8';
+  TP.version = '3.1.9';
   return TP;
 });

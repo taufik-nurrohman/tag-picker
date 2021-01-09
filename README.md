@@ -24,9 +24,9 @@ Contribute
 Release Notes
 -------------
 
-### 3.1.8
+### 3.1.8, 3.1.9
 
- - Updated.
+ - Maintenance.
 
 ### 3.1.7
 

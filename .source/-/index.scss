@@ -47,6 +47,7 @@ $height: 1.5em;
         outline: none;
         &::before {
           content: '\00d7'; // The “×” button
+          font-family: sans-serif;
         }
       }
       &::before {
