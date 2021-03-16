@@ -106,15 +106,15 @@ function TP(source, state = {}) {
             return setInput("");
         }
         let tag = n(getText(editorInput)),
-            tags = $.tags, index;
+            index;
         if (tag) {
             if (!getTag(tag)) {
                 setTagElement(tag), setTag(tag);
-                index = toCount(tags);
+                index = toCount($.tags);
                 fire('change', [tag, index]);
                 fire('set.tag', [tag, index]);
             } else {
-                fire('has.tag', [tag, toArrayKey(tag, tags)]);
+                fire('has.tag', [tag, toArrayKey(tag, $.tags)]);
             }
             setInput("");
         }
@@ -285,33 +285,29 @@ function TP(source, state = {}) {
 
     function onBlurTag() {
         let t = this,
-            tag = t.title,
-            tags = $.tags;
+            tag = t.title;
         letClasses(self, ['focus', 'focus.tag']);
-        fire('blur.tag', [tag, toArrayKey(tag, tags)]);
+        fire('blur.tag', [tag, toArrayKey(tag, $.tags)]);
     }
 
     function onClickTag() {
         let t = this,
-            tag = t.title,
-            tags = $.tags;
-        fire('click.tag', [tag, toArrayKey(tag, tags)]);
+            tag = t.title;
+        fire('click.tag', [tag, toArrayKey(tag, $.tags)]);
     }
 
     function onFocusTag() {
         let t = this,
-            tag = t.title,
-            tags = $.tags;
+            tag = t.title;
         setClasses(self, ['focus', 'focus.tag']);
-        fire('focus.tag', [tag, toArrayKey(tag, tags)]);
+        fire('focus.tag', [tag, toArrayKey(tag, $.tags)]);
     }
 
     function onClickTagX(e) {
         if (!sourceIsDisabled() && !sourceIsReadOnly()) {
             let t = this,
                 tag = getParent(t).title,
-                tags = $.tags,
-                index = toArrayKey(tag, tags);
+                index = toArrayKey(tag, $.tags);
             letTagElement(tag), letTag(tag), setInput("", 1);
             fire('change', [tag, index]);
             fire('click.tag', [tag, index]);
@@ -357,8 +353,7 @@ function TP(source, state = {}) {
             ) {
                 if (!sourceIsReadOnly()) {
                     let tag = t.title,
-                        tags = $.tags,
-                        index = toArrayKey(tag, tags);
+                        index = toArrayKey(tag, $.tags);
                     letClass(self, 'focus.tag');
                     letTagElement(tag), letTag(tag);
                     // Focus to the previous tag or to the tag input after remove
@@ -389,18 +384,17 @@ function TP(source, state = {}) {
     } setInput("");
 
     function getTag(tag, fireHooks) {
-        let tags = $.tags,
-            index = toArrayKey(tag, tags);
+        let index = toArrayKey(tag, $.tags);
         fireHooks && fire('get.tag', [tag, index]);
         return isNumber(index) ? tag : null;
     }
 
     function letTag(tag) {
-        let tags = $.tags,
-            index = toArrayKey(tag, tags);
+        let index = toArrayKey(tag, $.tags);
         if (isNumber(index) && index >= 0) {
-            source.value = tags.join(state.join);
-            return $.tags.splice(index, 1), true;
+            $.tags.splice(index, 1);
+            source.value = $.tags.join(state.join);
+            return true;
         }
         return false;
     }
@@ -584,6 +578,6 @@ TP.state = {
     'x': false
 };
 
-TP.version = '3.1.9';
+TP.version = '3.1.10';
 
 export default TP;

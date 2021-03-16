@@ -24,8 +24,9 @@ Contribute
 Release Notes
 -------------
 
-### 3.1.8, 3.1.9
+### 3.1.10
 
+ - Fixed a bug that caused the original input value not updated due to the cached `$.tags` value on a variable.
  - Maintenance.
 
 ### 3.1.7
@@ -39,7 +40,7 @@ Release Notes
  - Removed `picker.view` property.
  - Restructured the test files.
 
-### 3.1.1, 3.1.2, 3.1.3, 3.1.4, 3.1.5
+### 3.1.5
 
  - Maintenance.
 

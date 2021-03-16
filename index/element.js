@@ -48,7 +48,8 @@
   function _inheritsLoose(subClass, superClass) {
     subClass.prototype = Object.create(superClass.prototype);
     subClass.prototype.constructor = subClass;
-    subClass.__proto__ = superClass;
+
+    _setPrototypeOf(subClass, superClass);
   }
 
   function _getPrototypeOf(o) {
@@ -73,7 +74,7 @@
     if (typeof Proxy === "function") return true;
 
     try {
-      Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
       return true;
     } catch (e) {
       return false;
@@ -210,7 +211,7 @@
       base = 10;
     }
 
-    return parseInt(x, base);
+    return base ? parseInt(x, base) : parseFloat(x);
   };
 
   var toValue = function toValue(x) {
@@ -232,11 +233,19 @@
       return x;
     }
 
-    return {
-      'false': false,
-      'null': null,
-      'true': true
-    }[x] || x;
+    if ('false' === x) {
+      return false;
+    }
+
+    if ('null' === x) {
+      return null;
+    }
+
+    if ('true' === x) {
+      return true;
+    }
+
+    return x;
   };
 
   var D = document;

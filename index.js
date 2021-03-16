@@ -75,6 +75,14 @@
     return 'string' === typeof x;
   };
 
+  var fromStates = function fromStates() {
+    for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
+      lot[_key] = arguments[_key];
+    }
+
+    return Object.assign.apply(Object, [{}].concat(lot));
+  };
+
   var fromValue = function fromValue(x) {
     if (isArray(x)) {
       return x.map(function (v) {
@@ -105,8 +113,17 @@
     return "" + x;
   };
 
+  var toArrayKey = function toArrayKey(x, data) {
+    var i = data.indexOf(x);
+    return -1 !== i ? i : null;
+  };
+
   var toCaseLower = function toCaseLower(x) {
     return x.toLowerCase();
+  };
+
+  var toCount = function toCount(x) {
+    return x.length;
   };
 
   var toNumber = function toNumber(x, base) {
@@ -114,7 +131,15 @@
       base = 10;
     }
 
-    return parseInt(x, base);
+    return base ? parseInt(x, base) : parseFloat(x);
+  };
+
+  var toObjectCount = function toObjectCount(x) {
+    return toCount(toObjectKeys(x));
+  };
+
+  var toObjectKeys = function toObjectKeys(x) {
+    return Object.keys(x);
   };
 
   var toValue = function toValue(x) {
@@ -136,11 +161,19 @@
       return x;
     }
 
-    return {
-      'false': false,
-      'null': null,
-      'true': true
-    }[x] || x;
+    if ('false' === x) {
+      return false;
+    }
+
+    if ('null' === x) {
+      return null;
+    }
+
+    if ('true' === x) {
+      return true;
+    }
+
+    return x;
   };
 
   var D = document;
@@ -387,14 +420,6 @@
     node.addEventListener(name, then, options);
   };
 
-  var fromStates = function fromStates() {
-    for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
-      lot[_key] = arguments[_key];
-    }
-
-    return Object.assign.apply(Object, [{}].concat(lot));
-  };
-
   var hasValue = function hasValue(x, data) {
     return -1 !== data.indexOf(x);
   };
@@ -459,10 +484,10 @@
   }
 
   var $ = context({});
-  var fire = $.fire;
-  var off$1 = $.off;
-  var on$1 = $.on;
-  var hooks = $.hooks;
+  $.fire;
+  $.off;
+  $.on;
+  $.hooks;
 
   var isPattern = function isPattern(pattern) {
     return isInstance(pattern, RegExp);
@@ -476,27 +501,6 @@
 
     pattern = pattern.replace(/\//g, '\\/');
     return new RegExp(pattern, isSet(opt) ? opt : 'g');
-  };
-
-  var toArrayKey = function toArrayKey(x, data) {
-    var i = data.indexOf(x);
-    return -1 !== i ? i : null;
-  };
-
-  var toCaseLower$1 = function toCaseLower(x) {
-    return x.toLowerCase();
-  };
-
-  var toCount = function toCount(x) {
-    return x.length;
-  };
-
-  var toObjectCount = function toObjectCount(x) {
-    return toCount(toObjectKeys(x));
-  };
-
-  var toObjectKeys = function toObjectKeys(x) {
-    return Object.keys(x);
   };
 
   var delay = W.setTimeout,
@@ -573,17 +577,16 @@
       }
 
       var tag = n(getText(editorInput)),
-          tags = $.tags,
           index;
 
       if (tag) {
         if (!getTag(tag)) {
           setTagElement(tag), setTag(tag);
-          index = toCount(tags);
+          index = toCount($.tags);
           fire('change', [tag, index]);
           fire('set.tag', [tag, index]);
         } else {
-          fire('has.tag', [tag, toArrayKey(tag, tags)]);
+          fire('has.tag', [tag, toArrayKey(tag, $.tags)]);
         }
 
         setInput("");
@@ -759,33 +762,29 @@
 
     function onBlurTag() {
       var t = this,
-          tag = t.title,
-          tags = $.tags;
+          tag = t.title;
       letClasses(self, ['focus', 'focus.tag']);
-      fire('blur.tag', [tag, toArrayKey(tag, tags)]);
+      fire('blur.tag', [tag, toArrayKey(tag, $.tags)]);
     }
 
     function onClickTag() {
       var t = this,
-          tag = t.title,
-          tags = $.tags;
-      fire('click.tag', [tag, toArrayKey(tag, tags)]);
+          tag = t.title;
+      fire('click.tag', [tag, toArrayKey(tag, $.tags)]);
     }
 
     function onFocusTag() {
       var t = this,
-          tag = t.title,
-          tags = $.tags;
+          tag = t.title;
       setClasses(self, ['focus', 'focus.tag']);
-      fire('focus.tag', [tag, toArrayKey(tag, tags)]);
+      fire('focus.tag', [tag, toArrayKey(tag, $.tags)]);
     }
 
     function onClickTagX(e) {
       if (!sourceIsDisabled() && !sourceIsReadOnly()) {
         var t = this,
             tag = getParent(t).title,
-            _tags = $.tags,
-            index = toArrayKey(tag, _tags);
+            index = toArrayKey(tag, $.tags);
         letTagElement(tag), letTag(tag), setInput("", 1);
         fire('change', [tag, index]);
         fire('click.tag', [tag, index]);
@@ -816,8 +815,7 @@
         } else if (KEY_DELETE_LEFT[0] === key || KEY_DELETE_LEFT[1] === keyCode || KEY_DELETE_RIGHT[0] === key || KEY_DELETE_RIGHT[1] === keyCode) {
           if (!sourceIsReadOnly()) {
             var tag = t.title,
-                _tags2 = $.tags,
-                index = toArrayKey(tag, _tags2);
+                index = toArrayKey(tag, $.tags);
             letClass(self, 'focus.tag');
             letTagElement(tag), letTag(tag); // Focus to the previous tag or to the tag input after remove
 
@@ -850,19 +848,18 @@
     setInput("");
 
     function getTag(tag, fireHooks) {
-      var tags = $.tags,
-          index = toArrayKey(tag, tags);
+      var index = toArrayKey(tag, $.tags);
       fireHooks && fire('get.tag', [tag, index]);
       return isNumber(index) ? tag : null;
     }
 
     function letTag(tag) {
-      var tags = $.tags,
-          index = toArrayKey(tag, tags);
+      var index = toArrayKey(tag, $.tags);
 
       if (isNumber(index) && index >= 0) {
-        source.value = tags.join(state.join);
-        return $.tags.splice(index, 1), true;
+        $.tags.splice(index, 1);
+        source.value = $.tags.join(state.join);
+        return true;
       }
 
       return false;
@@ -963,7 +960,7 @@
     }, onClickSelf(), $; // Default filter for the tag name
 
     $.f = function (text) {
-      return toCaseLower$1(text || "").replace(/[^ a-z\d-]/g, "");
+      return toCaseLower(text || "").replace(/[^ a-z\d-]/g, "");
     };
 
     $.focus = function () {
@@ -1024,17 +1021,17 @@
 
     $.set = function (tag, index) {
       if (!sourceIsDisabled() && !sourceIsReadOnly()) {
-        var _tags3 = $.tags,
+        var _tags = $.tags,
             theTagsMax = state.max;
 
         if (!getTag(tag)) {
-          if (toCount(_tags3) < theTagsMax) {
+          if (toCount(_tags) < theTagsMax) {
             setTagElement(tag, index), setTag(tag, index);
           } else {
             fire('max.tags', [theTagsMax]);
           }
         } else {
-          fire('has.tag', [tag, toArrayKey(tag, _tags3)]);
+          fire('has.tag', [tag, toArrayKey(tag, _tags)]);
         }
       }
 
@@ -1061,6 +1058,6 @@
     'min': 0,
     'x': false
   };
-  TP.version = '3.1.9';
+  TP.version = '3.1.10';
   return TP;
 });
