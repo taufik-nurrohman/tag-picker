@@ -30,7 +30,7 @@ import {W, getAttribute, getChildFirst, getChildren, getNext, getParent, getPare
 import {eventPreventDefault, off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
 import {fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
-import {context as contextHook} from '@taufik-nurrohman/hook';
+import {hook} from '@taufik-nurrohman/hook';
 import {isInstance, isNumber, isSet, isString} from '@taufik-nurrohman/is';
 import {toPattern} from '@taufik-nurrohman/pattern';
 import {toArrayKey, toCaseLower, toCount, toObjectCount} from '@taufik-nurrohman/to';
@@ -66,7 +66,7 @@ function TP(source, state = {}) {
         thePlaceholder = getAttribute(source, 'placeholder'),
         theTabIndex = getAttribute(source, 'tabindex');
 
-    let {fire} = contextHook($);
+    let {fire} = hook($);
 
     $.state = state = fromStates(TP.state, isString(state) ? {
         join: state
@@ -578,6 +578,6 @@ TP.state = {
     'x': false
 };
 
-TP.version = '3.1.10';
+TP.version = '3.1.11';
 
 export default TP;

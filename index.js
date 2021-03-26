@@ -424,7 +424,7 @@
     return -1 !== data.indexOf(x);
   };
 
-  function context($) {
+  function hook($) {
     var hooks = {};
 
     function fire(name, data) {
@@ -483,12 +483,6 @@
     return $;
   }
 
-  var $ = context({});
-  $.fire;
-  $.off;
-  $.on;
-  $.hooks;
-
   var isPattern = function isPattern(pattern) {
     return isInstance(pattern, RegExp);
   };
@@ -538,8 +532,8 @@
         thePlaceholder = getAttribute(source, 'placeholder'),
         theTabIndex = getAttribute(source, 'tabindex');
 
-    var _contextHook = context($),
-        fire = _contextHook.fire;
+    var _hook = hook($),
+        fire = _hook.fire;
 
     $.state = state = fromStates(TP.state, isString(state) ? {
       join: state
@@ -1058,6 +1052,6 @@
     'min': 0,
     'x': false
   };
-  TP.version = '3.1.10';
+  TP.version = '3.1.11';
   return TP;
 });
