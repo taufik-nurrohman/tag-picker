@@ -1052,6 +1052,6 @@
     'min': 0,
     'x': false
   };
-  TP.version = '3.1.11';
+  TP.version = '3.1.12';
   return TP;
 });
