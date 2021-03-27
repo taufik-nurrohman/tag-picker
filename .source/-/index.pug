@@ -322,4 +322,7 @@ block content
     p Thank you! ❤️
   footer
     hr
-    p &copy; 2020 #[a(href='/') Taufik Nurrohman]
+    p
+      != '&copy; ' + (new Date).getFullYear()
+      != ' '
+      a(href='/') Taufik Nurrohman
