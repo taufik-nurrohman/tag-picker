@@ -2,7 +2,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright © 2020 Taufik Nurrohman
+ * Copyright © 2021 Taufik Nurrohman
  *
  * <https://github.com/taufik-nurrohman/tag-picker>
  *
@@ -26,14 +26,57 @@
  *
  */
 
-import {W, getAttribute, getChildFirst, getChildren, getNext, getParent, getParentForm, getPrev, getText, hasParent, letClass, letClasses, letElement, setClass, setChildLast, setClasses, setElement, setNext, setPrev, setText} from '@taufik-nurrohman/document';
-import {eventPreventDefault, off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
-import {fromStates} from '@taufik-nurrohman/from';
-import {hasValue} from '@taufik-nurrohman/has';
-import {hook} from '@taufik-nurrohman/hook';
-import {isInstance, isNumber, isSet, isString} from '@taufik-nurrohman/is';
-import {toPattern} from '@taufik-nurrohman/pattern';
-import {toArrayKey, toCaseLower, toCount, toObjectCount} from '@taufik-nurrohman/to';
+import {
+    W,
+    getAttribute,
+    getChildFirst,
+    getChildren,
+    getNext,
+    getParent,
+    getParentForm,
+    getPrev,
+    getText,
+    hasParent,
+    letClass,
+    letClasses,
+    letElement,
+    setClass,
+    setChildLast,
+    setClasses,
+    setElement,
+    setNext,
+    setPrev,
+    setText
+} from '@taufik-nurrohman/document';
+import {
+    eventPreventDefault,
+    off as offEvent,
+    on as onEvent
+} from '@taufik-nurrohman/event';
+import {
+    fromStates
+} from '@taufik-nurrohman/from';
+import {
+    hasValue
+} from '@taufik-nurrohman/has';
+import {
+    hook
+} from '@taufik-nurrohman/hook';
+import {
+    isInstance,
+    isNumber,
+    isSet,
+    isString
+} from '@taufik-nurrohman/is';
+import {
+    toPattern
+} from '@taufik-nurrohman/pattern';
+import {
+    toArrayKey,
+    toCaseLower,
+    toCount,
+    toObjectCount
+} from '@taufik-nurrohman/to';
 
 let delay = W.setTimeout,
     name = 'TP';
@@ -66,7 +109,9 @@ function TP(source, state = {}) {
         thePlaceholder = getAttribute(source, 'placeholder'),
         theTabIndex = getAttribute(source, 'tabindex');
 
-    let {fire} = hook($);
+    let {
+        fire
+    } = hook($);
 
     $.state = state = fromStates(TP.state, isString(state) ? {
         join: state
@@ -174,7 +219,7 @@ function TP(source, state = {}) {
                 fire('max.tags', [theTagsMax]);
             }
             eventPreventDefault(e);
-        // Submit the closest `<form>` element with `Enter` key
+            // Submit the closest `<form>` element with `Enter` key
         } else if (keyIsEnter) {
             doSubmitTry(), eventPreventDefault(e);
         } else {
@@ -192,7 +237,7 @@ function TP(source, state = {}) {
                         fire('max.tags', [theTagsMax]);
                     }
                     eventPreventDefault(e);
-                // Escape character only, delete!
+                    // Escape character only, delete!
                 } else if ("" === value && !keyIsCtrl && !keyIsShift) {
                     if (
                         "" === theValueLast &&
@@ -335,7 +380,7 @@ function TP(source, state = {}) {
                 )
             ) {
                 theTagPrev && (theTagPrev.focus(), eventPreventDefault(e));
-            // Focus to the next tag or to the tag input
+                // Focus to the next tag or to the tag input
             } else if (
                 !sourceIsReadOnly() && (
                     KEY_ARROW_RIGHT[0] === key ||
@@ -344,7 +389,7 @@ function TP(source, state = {}) {
             ) {
                 theTagNext && theTagNext !== editor ? theTagNext.focus() : setInput("", 1);
                 eventPreventDefault(e);
-            // Remove tag with `Backspace` or `Delete` key
+                // Remove tag with `Backspace` or `Delete` key
             } else if (
                 KEY_DELETE_LEFT[0] === key ||
                 KEY_DELETE_LEFT[1] === keyCode ||
@@ -362,11 +407,13 @@ function TP(source, state = {}) {
                         KEY_DELETE_LEFT[1] === keyCode
                     ) {
                         theTagPrev ? theTagPrev.focus() : setInput("", 1);
-                    // Focus to the next tag or to the tag input after remove
-                    } else /* if (
-                        KEY_DELETE_RIGHT[0] === key ||
-                        KEY_DELETE_RIGHT[1] === keyCode
-                    ) */ {
+                        // Focus to the next tag or to the tag input after remove
+                    } else
+                    /* if (
+                                           KEY_DELETE_RIGHT[0] === key ||
+                                           KEY_DELETE_RIGHT[1] === keyCode
+                                       ) */
+                    {
                         theTagNext && theTagNext !== editor ? theTagNext.focus() : setInput("", 1);
                     }
                     fire('change', [tag, index]);
@@ -381,7 +428,8 @@ function TP(source, state = {}) {
         setText(editorInput, value);
         setText(editorInputPlaceholder, value ? "" : thePlaceholder);
         fireFocus && editorInput.focus();
-    } setInput("");
+    }
+    setInput("");
 
     function getTag(tag, fireHooks) {
         let index = toArrayKey(tag, $.tags);
@@ -439,7 +487,8 @@ function TP(source, state = {}) {
     }
 
     function letTagElement(tag) {
-        let index = toArrayKey(tag, $.tags), element;
+        let index = toArrayKey(tag, $.tags),
+            element;
         if (isNumber(index) && index >= 0 && (element = getChildren(tags, index))) {
             offEvent('blur', element, onBlurTag);
             offEvent('click', element, onClickTag);

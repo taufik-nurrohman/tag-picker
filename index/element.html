@@ -1,14 +1,47 @@
-<!DOCTYPE html><html dir="ltr"><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><meta content="Better tags input interaction with JavaScript." name="description"><title>Tag Picker</title><link href="../index.min.css" rel="stylesheet"><style>.tag-picker-source[readonly] + .tag-picker {
-  background-color: #eee;
-  border-color: #999;
-}
-.tag-picker-source[disabled] + .tag-picker {
-  background-color: #eee;
-  border-color: #999;
-}
-.tag-picker-source[disabled] + .tag-picker .tag[title] {
-  background-color: #aaa;
-}</style></head><body><main><p>Test native HTML5 custom element. View the page source!</p><p><tag-picker name="tag-1" value="foo, bar, baz"></tag-picker></p><p><button onclick="alert(picker.value);" type="button">Check Values</button> <button onclick="picker.disabled = !picker.disabled;" type="button">Toggle Disabled State</button> <button onclick="picker.readOnly = !picker.readOnly;" type="button">Toggle Read-Only State</button> <button onclick="picker.value = 'foo, bar, baz, qux';" type="button">Set Values</button></p><p><tag-picker disabled name="tag-2" value="foo, bar"></tag-picker></p><p><tag-picker name="tag-3" readonly value="foo, bar"></tag-picker></p><p><tag-picker name="tag-4" placeholder="foo, bar, baz"></tag-picker></p><h2>Usage</h2><pre><code>&lt;!DOCTYPE html&gt;
+<!DOCTYPE html>
+<html dir="ltr">
+
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker-source[readonly]+.tag-picker {
+        background-color: #eee;
+        border-color: #999;
+      }
+
+      .tag-picker-source[disabled]+.tag-picker {
+        background-color: #eee;
+        border-color: #999;
+      }
+
+      .tag-picker-source[disabled]+.tag-picker .tag[title] {
+        background-color: #aaa;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main>
+      <p>Test native HTML5 custom element. View the page source!</p>
+      <p>
+        <tag-picker name="tag-1" value="foo, bar, baz"></tag-picker>
+      </p>
+      <p><button onclick="alert(picker.value);" type="button">Check Values</button> <button onclick="picker.disabled = !picker.disabled;" type="button">Toggle Disabled State</button> <button onclick="picker.readOnly = !picker.readOnly;" type="button">Toggle Read-Only State</button> <button onclick="picker.value = 'foo, bar, baz, qux';" type="button">Set Values</button></p>
+      <p>
+        <tag-picker disabled name="tag-2" value="foo, bar"></tag-picker>
+      </p>
+      <p>
+        <tag-picker name="tag-3" readonly value="foo, bar"></tag-picker>
+      </p>
+      <p>
+        <tag-picker name="tag-4" placeholder="foo, bar, baz"></tag-picker>
+      </p>
+      <h2>Usage</h2>
+      <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html dir="ltr"&gt;
   &lt;head&gt;
     &lt;meta charset="utf-8"&gt;
@@ -31,4 +64,13 @@
     console.log(picker.value);
     &lt;/script&gt;
   &lt;/body&gt;
-&lt;/html&gt;</code></pre></main><script src="../index.min.js"></script><script src="element.min.js"></script><script>const picker = document.querySelector('tag-picker');</script></body></html>
+&lt;/html&gt;</code></pre>
+    </main>
+    <script src="../index.min.js"></script>
+    <script src="element.min.js"></script>
+    <script>
+      const picker = document.querySelector('tag-picker');
+    </script>
+  </body>
+
+</html>

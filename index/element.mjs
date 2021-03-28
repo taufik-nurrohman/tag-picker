@@ -2,7 +2,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright © 2020 Taufik Nurrohman
+ * Copyright © 2021 Taufik Nurrohman
  *
  * <https://github.com/taufik-nurrohman/tag-picker>
  *
@@ -26,7 +26,16 @@
  *
  */
 
-import {D, W, getAttribute, getState, hasAttribute, setElement, setPrev, setStates} from '@taufik-nurrohman/document';
+import {
+    D,
+    W,
+    getAttribute,
+    getState,
+    hasAttribute,
+    setElement,
+    setPrev,
+    setStates
+} from '@taufik-nurrohman/document';
 
 class HTMLTagPickerElement extends HTMLElement {
     constructor() {

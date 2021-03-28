@@ -7,6 +7,19 @@ import resolve from '@rollup/plugin-node-resolve';
 
 import {minify} from 'terser';
 
+import beautify from 'js-beautify';
+
+let license = file.getContent('.github/src/LICENSE').trim(),
+    state = JSON.parse(file.getContent('package.json'));
+
+state.year = (new Date).getFullYear();
+
+file.setContent('LICENSE', file.parseContent(license, state));
+
+license = license.replace(/\n/g, '\n * ');
+license = license.replace(/\n \* \n/g, '\n *\n');
+license = '/*!\n *\n * ' + license + '\n *\n */';
+
 function factory(from, to, name, format, options = {}) {
     const c = Object.assign({
         input: from,
@@ -37,18 +50,19 @@ function factory(from, to, name, format, options = {}) {
             resolve()
         ]
     }, options);
-    let license = '/*!\n *\n * ' + file.getContent('LICENSE').trim().replace(/\n/g, '\n * ').replace(/\n \* \n/g, '\n *\n') + '\n *\n */';
     (async () => {
         const generator = await rollup(c);
-        const state = JSON.parse(file.getContent('package.json'));
         await generator.write(c.output);
         await generator.close();
         state.rollup = c;
         delete state.scripts;
         // Generate browser module…
         let content = file.getContent(c.output.file);
-        content = license + '\n\n' + file.parseContent(content, state);
-        file.setContent(c.output.file, content);
+        content = file.parseContent(license + '\n\n' + content, state);
+        file.setContent(c.output.file, beautify.js(content, {
+            indent_char: ' ',
+            indent_size: 4
+        }));
         minify(content, {
             compress: {
                 unsafe: true
@@ -58,10 +72,13 @@ function factory(from, to, name, format, options = {}) {
         });
         // Generate Node.js module…
         content = file.getContent(from);
-        content = license + '\n\n' + file.parseContent(content, state);
-        file.setContent(to.replace(/\.js$/, '.mjs'), content);
+        content = file.parseContent(license + '\n\n' + content, state);
+        file.setContent(to.replace(/\.js$/, '.mjs'), beautify.js(content, {
+            indent_char: ' ',
+            indent_size: 4
+        }));
     })();
 }
 
-factory('.source/-/index.mjs', 'index.js', 'TP', 'umd');
-factory('.source/-/index/element.mjs', 'index/element.js', null, 'iife');
+factory('.github/src/-/index.mjs', 'index.js', 'TP', 'umd');
+factory('.github/src/-/index/element.mjs', 'index/element.js', null, 'iife');

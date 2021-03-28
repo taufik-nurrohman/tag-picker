@@ -1,1 +1,25 @@
-<!DOCTYPE html><html dir="ltr"><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><meta content="Better tags input interaction with JavaScript." name="description"><title>Tag Picker</title><link href="../index.min.css" rel="stylesheet"></head><body><main><p><input type="text" value="foo, bar, baz"></p><p><label><input checked onchange="console.log(picker = this.checked ? new TP(picker.source) : picker.pop());" type="checkbox"> <span>Tag Picker</span></label></p><p><button onclick="console.log(picker.click());"><code>click</code></button> <button onclick="console.log(picker.focus());"><code>focus</code></button> <button disabled onmouseout="console.log(picker.focus());" onmouseover="console.log(picker.blur());"><code>blur</code> (on enter), <code>focus</code> (on exit)</button></p><p><button onclick="console.log(picker.set('hello'));">Append <code>hello</code> Tag</button> <button onclick="console.log(picker.set('hi', 1));">Insert <code>hi</code> Tag after the First Tag</button> <button onclick="console.log(picker.value(''));">Reset Values</button> <button onclick="console.log(picker.value('foo, bar, baz, qux'));">Set Values</button> <button onclick="alert(picker.source.value);">Get Values</button></p></main><script src="../index.min.js"></script><script>let picker = new TP(document.querySelector('input'));</script></body></html>
+<!DOCTYPE html>
+<html dir="ltr">
+
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <main>
+      <p><input type="text" value="foo, bar, baz"></p>
+      <p><label><input checked onchange="console.log(picker = this.checked ? new TP(picker.source) : picker.pop());" type="checkbox"> <span>Tag Picker</span></label></p>
+      <p><button onclick="console.log(picker.click());"><code>click</code></button> <button onclick="console.log(picker.focus());"><code>focus</code></button> <button disabled onmouseout="console.log(picker.focus());" onmouseover="console.log(picker.blur());"><code>blur</code> (on enter), <code>focus</code> (on exit)</button></p>
+      <p><button onclick="console.log(picker.set('hello'));">Append <code>hello</code> Tag</button> <button onclick="console.log(picker.set('hi', 1));">Insert <code>hi</code> Tag after the First Tag</button> <button onclick="console.log(picker.value(''));">Reset Values</button> <button onclick="console.log(picker.value('foo, bar, baz, qux'));">Set Values</button> <button onclick="alert(picker.source.value);">Get Values</button></p>
+    </main>
+    <script src="../index.min.js"></script>
+    <script>
+      let picker = new TP(document.querySelector('input'));
+    </script>
+  </body>
+
+</html>

@@ -4,6 +4,8 @@ import * as folder from '@taufik-nurrohman/folder';
 import cleancss from 'clean-css';
 import sass from 'node-sass';
 
+import beautify from 'js-beautify';
+
 const minifier = new cleancss({
     level: 2
 });
@@ -16,7 +18,10 @@ function factory(from, to, options = {}) {
         if (error) {
             throw error;
         }
-        file.setContent(to, result.css);
+        file.setContent(to, beautify.css(result.css.toString(), {
+            indent_char: ' ',
+            indent_size: 2
+        }));
         minifier.minify(result.css, (error, result) => {
             if (error) {
                 throw error;
@@ -26,6 +31,6 @@ function factory(from, to, options = {}) {
     });
 }
 
-file.copy('.source/-/index.scss', '.');
+file.copy('.github/src/-/index.scss', '.');
 
-factory('.source/-/index.scss', 'index.css');
+factory('.github/src/-/index.scss', 'index.css');

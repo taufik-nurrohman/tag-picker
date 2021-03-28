@@ -1,11 +1,40 @@
-<!DOCTYPE html><html dir="ltr"><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><meta content="Better tags input interaction with JavaScript." name="description"><title>Tag Picker</title><link href="../index.min.css" rel="stylesheet"><style>.tag-picker-source[disabled] + .tag-picker {
-  background-color: #eee;
-  border-color: #999;
-}
-.tag-picker-source[disabled] + .tag-picker .tag[title] {
-  background-color: #aaa;
-}</style></head><body><main><form method="get" target="_blank"><p><input disabled name="tags" type="text" value="foo, bar"></p><p><label><input onchange="picker.source.disabled = !this.checked; picker.pop(); picker = new TP(picker.source);" type="checkbox"> <span>Enable</span></label></p><p><button type="submit">Submit</button> <button onclick="picker.set('baz')" type="button">Add &ldquo;baz&rdquo; Tag</button></p></form></main><script src="../index.min.js"></script><script>let picker = new TP(document.querySelector('input'));
+<!DOCTYPE html>
+<html dir="ltr">
 
-picker.on('change', function(tag, index) {
-    console.log([tag, index, this.tags]);
-});</script></body></html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker-source[disabled]+.tag-picker {
+        background-color: #eee;
+        border-color: #999;
+      }
+
+      .tag-picker-source[disabled]+.tag-picker .tag[title] {
+        background-color: #aaa;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main>
+      <form method="get" target="_blank">
+        <p><input disabled name="tags" type="text" value="foo, bar"></p>
+        <p><label><input onchange="picker.source.disabled = !this.checked; picker.pop(); picker = new TP(picker.source);" type="checkbox"> <span>Enable</span></label></p>
+        <p><button type="submit">Submit</button> <button onclick="picker.set('baz')" type="button">Add &ldquo;baz&rdquo; Tag</button></p>
+      </form>
+    </main>
+    <script src="../index.min.js"></script>
+    <script>
+      let picker = new TP(document.querySelector('input'));
+
+      picker.on('change', function(tag, index) {
+        console.log([tag, index, this.tags]);
+      });
+    </script>
+  </body>
+
+</html>
