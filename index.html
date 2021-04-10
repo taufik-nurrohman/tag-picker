@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html dir="ltr">
-
   <head>
     <meta charset="utf-8">
     <meta content="#000" name="theme-color">
@@ -12,29 +11,24 @@
       * {
         box-sizing: border-box;
       }
-
       :root {
         background: #fff;
         color: #000;
         border-top: 4px solid;
         font: normal normal 16px/1.25 serif;
       }
-
       a {
         color: #009;
         text-decoration: none;
       }
-
       a,
       code {
         word-wrap: break-word;
       }
-
       code {
         font-family: monospace;
         font-size: 80%;
       }
-
       footer,
       header,
       main,
@@ -42,36 +36,30 @@
         max-width: 700px;
         margin: 0 auto;
       }
-
       hr {
         border: 0;
         color: inherit;
         border-top: 1px dashed;
         height: 0;
       }
-
       pre {
         white-space: pre-wrap;
         word-wrap: break-word;
       }
-
       pre code {
         display: block;
         background: #eee;
         padding: 1em;
       }
-
       table {
         width: 100%;
       }
-
       td,
       th {
         text-align: left;
         vertical-align: top;
       }
-
-      body>p:first-child {
+      body > p:first-child {
         background: #ffa;
         border: 1px dashed;
         margin-top: 0;
@@ -79,7 +67,6 @@
       }
     </style>
   </head>
-
   <body>
     <p>Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
@@ -362,9 +349,8 @@ picker.on('change', onChange); // With context</code></pre>
     <script>
       const picker = new TP(document.forms[0].tags);
       picker.on('has.tag', tag => {
-        alert('Tag “' + tag + '” already exists.');
+          alert('Tag “' + tag + '” already exists.');
       });
     </script>
   </body>
-
 </html>

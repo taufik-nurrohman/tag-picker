@@ -52,7 +52,7 @@
   content: attr(title);
 }
 
-.tag-picker .tag+.editor span+span {
+.tag-picker .tag + .editor span + span {
   display: none;
 }
 
@@ -72,7 +72,7 @@
   z-index: 1;
 }
 
-.tag-picker .editor span+span {
+.tag-picker .editor span + span {
   position: absolute;
   top: 0;
   right: 0;
@@ -90,11 +90,11 @@
   left: -9999px;
 }
 
-.tag-picker-source[disabled]+.tag-picker,
-.tag-picker-source[disabled]+.tag-picker * {
+.tag-picker-source[disabled] + .tag-picker,
+.tag-picker-source[disabled] + .tag-picker * {
   cursor: not-allowed;
 }
 
-.tag-picker-source[readonly]+.tag-picker .tag[title] a {
+.tag-picker-source[readonly] + .tag-picker .tag[title] a {
   cursor: not-allowed;
 }

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html dir="ltr">
-
   <head>
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
@@ -8,7 +7,6 @@
     <title>Tag Picker</title>
     <link href="../index.min.css" rel="stylesheet">
   </head>
-
   <body>
     <main>
       <p><input type="text" value="foo, bar"></p>
@@ -18,9 +16,8 @@
       const picker = new TP(document.querySelector('input'));
 
       picker.on('change', function(tag, index) {
-        console.log([tag, index, this.tags]);
+          console.log([tag, index, this.tags]);
       });
     </script>
   </body>
-
 </html>

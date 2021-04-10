@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html dir="ltr">
-
   <head>
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
@@ -13,7 +12,6 @@
       }
     </style>
   </head>
-
   <body>
     <main>
       <p>Add <em>foo</em> again to see the effect:</p>
@@ -24,15 +22,14 @@
       const picker = new TP(document.querySelector('input'));
 
       picker.on('has.tag', function(tag, index) {
-        const node = this.self.querySelector('[title="' + tag + '"]');
-        if (node) {
-          node.classList.add('highlight');
-          setTimeout(() => {
-            node.classList.remove('highlight');
-          }, 2000);
-        }
+          const node = this.self.querySelector('[title="' + tag + '"]');
+          if (node) {
+              node.classList.add('highlight');
+              setTimeout(() => {
+                  node.classList.remove('highlight');
+              }, 2000);
+          }
       });
     </script>
   </body>
-
 </html>

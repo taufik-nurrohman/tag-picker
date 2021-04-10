@@ -15,8 +15,8 @@ Contribute
  - **Please do not make pull requests by editing the files that are in the root of the project. They are generated automatically by the build tool.**
  - Install [Git](https://en.wikipedia.org/wiki/Git) and [Node.js](https://en.wikipedia.org/wiki/Node.js)
  - Run `git clone https://github.com/taufik-nurrohman/tag-picker.git`
- - Run `cd tag-picker && npm install`
- - Edit the files in the `.github/src/-` folder.
+ - Run `cd tag-picker && npm install --save-dev`
+ - Edit the files in the `.github/source` folder.
  - Run `npm run pack` to generate the production ready files.
 
 ---
@@ -24,7 +24,7 @@ Contribute
 Release Notes
 -------------
 
-### 3.1.12
+### 3.1.13
 
  - Fixed a bug that caused the original input value not updated due to the cached `$.tags` value on a variable.
  - Maintenance.

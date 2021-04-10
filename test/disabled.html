@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html dir="ltr">
-
   <head>
     <meta charset="utf-8">
     <meta content="width=device-width" name="viewport">
@@ -8,17 +7,15 @@
     <title>Tag Picker</title>
     <link href="../index.min.css" rel="stylesheet">
     <style>
-      .tag-picker-source[disabled]+.tag-picker {
+      .tag-picker-source[disabled] + .tag-picker {
         background-color: #eee;
         border-color: #999;
       }
-
-      .tag-picker-source[disabled]+.tag-picker .tag[title] {
+      .tag-picker-source[disabled] + .tag-picker .tag[title] {
         background-color: #aaa;
       }
     </style>
   </head>
-
   <body>
     <main>
       <form method="get" target="_blank">
@@ -32,9 +29,8 @@
       let picker = new TP(document.querySelector('input'));
 
       picker.on('change', function(tag, index) {
-        console.log([tag, index, this.tags]);
+          console.log([tag, index, this.tags]);
       });
     </script>
   </body>
-
 </html>

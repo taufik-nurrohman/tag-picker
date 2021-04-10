@@ -1,5 +1,5 @@
 import {W, getAttribute, getChildFirst, getChildren, getNext, getParent, getParentForm, getPrev, getText, hasParent, letClass, letClasses, letElement, setClass, setChildLast, setClasses, setElement, setNext, setPrev, setText} from '@taufik-nurrohman/document';
-import {eventPreventDefault, off as offEvent, on as onEvent} from '@taufik-nurrohman/event';
+import {offEvent, offEventDefault, onEvent} from '@taufik-nurrohman/event';
 import {fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
@@ -8,7 +8,7 @@ import {toPattern} from '@taufik-nurrohman/pattern';
 import {toArrayKey, toCaseLower, toCount, toObjectCount} from '@taufik-nurrohman/to';
 
 let delay = W.setTimeout,
-    name = '%(rollup.output.name)';
+    name = '%(js.name)';
 
 const KEY_ARROW_LEFT = ['ArrowLeft', 37];
 const KEY_ARROW_RIGHT = ['ArrowRight', 39];
@@ -136,7 +136,7 @@ function TP(source, state = {}) {
             if (keyIsEnter && sourceIsReadOnly()) {
                 doSubmitTry();
             }
-            eventPreventDefault(e);
+            offEventDefault(e);
         } else if (hasValue(key, escape) || hasValue(keyCode, escape)) {
             if (theTagsCount < theTagsMax) {
                 // Add the tag name found in the tag editor
@@ -145,10 +145,10 @@ function TP(source, state = {}) {
                 setInput("");
                 fire('max.tags', [theTagsMax]);
             }
-            eventPreventDefault(e);
+            offEventDefault(e);
         // Submit the closest `<form>` element with `Enter` key
         } else if (keyIsEnter) {
-            doSubmitTry(), eventPreventDefault(e);
+            doSubmitTry(), offEventDefault(e);
         } else {
             delay(() => {
                 let text = getText(editorInput) || "",
@@ -163,7 +163,7 @@ function TP(source, state = {}) {
                         setInput("");
                         fire('max.tags', [theTagsMax]);
                     }
-                    eventPreventDefault(e);
+                    offEventDefault(e);
                 // Escape character only, delete!
                 } else if ("" === value && !keyIsCtrl && !keyIsShift) {
                     if (
@@ -229,7 +229,7 @@ function TP(source, state = {}) {
         if (theTagsMin > 0 && toCount($.tags) < theTagsMin) {
             setInput("", 1);
             fire('min.tags', [theTagsMin]);
-            eventPreventDefault(e);
+            offEventDefault(e);
             return;
         }
         // Do normal `submit` event
@@ -285,7 +285,7 @@ function TP(source, state = {}) {
             fire('click.tag', [tag, index]);
             fire('let.tag', [tag, index]);
         }
-        eventPreventDefault(e);
+        offEventDefault(e);
     }
 
     function onKeyDownTag(e) {
@@ -306,7 +306,7 @@ function TP(source, state = {}) {
                     KEY_ARROW_LEFT[1] === keyCode
                 )
             ) {
-                theTagPrev && (theTagPrev.focus(), eventPreventDefault(e));
+                theTagPrev && (theTagPrev.focus(), offEventDefault(e));
             // Focus to the next tag or to the tag input
             } else if (
                 !sourceIsReadOnly() && (
@@ -315,7 +315,7 @@ function TP(source, state = {}) {
                 )
             ) {
                 theTagNext && theTagNext !== editor ? theTagNext.focus() : setInput("", 1);
-                eventPreventDefault(e);
+                offEventDefault(e);
             // Remove tag with `Backspace` or `Delete` key
             } else if (
                 KEY_DELETE_LEFT[0] === key ||
@@ -344,7 +344,7 @@ function TP(source, state = {}) {
                     fire('change', [tag, index]);
                     fire('let.tag', [tag, index]);
                 }
-                eventPreventDefault(e);
+                offEventDefault(e);
             }
         }
     }
