@@ -28,6 +28,7 @@ Release Notes
 
  - Fixed a bug that caused the original input value not updated due to the cached `$.tags` value on a variable.
  - Maintenance.
+ - Removed custom element example.
 
 ### 3.1.7
 
