@@ -550,6 +550,6 @@ TP.state = {
     'x': false
 };
 
-TP.version = '3.1.14';
+TP.version = '3.1.15';
 
 export default TP;
