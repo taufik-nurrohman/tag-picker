@@ -24,7 +24,7 @@ Contribute
 Release Notes
 -------------
 
-### 3.1.13
+### 3.1.14
 
  - Fixed a bug that caused the original input value not updated due to the cached `$.tags` value on a variable.
  - Maintenance.
