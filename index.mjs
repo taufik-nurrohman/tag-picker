@@ -429,7 +429,9 @@ function TP(source, state = {}) {
     }
 
     function doSubmitTry() {
-        onSubmitForm() && form && form.submit();
+        onSubmitForm() && form && form.dispatchEvent(new Event('submit', {
+            cancelable: true
+        }));
     }
 
     setChildLast(self, tags);
@@ -550,6 +552,6 @@ TP.state = {
     'x': false
 };
 
-TP.version = '3.1.15';
+TP.version = '3.1.16';
 
 export default TP;

@@ -24,6 +24,10 @@ Contribute
 Release Notes
 -------------
 
+### 3.1.16
+
+ - Fixed form submit event via tag picker element not triggering custom event listeners.
+
 ### 3.1.15
 
  - Fixed a bug that caused the original input value not updated due to the cached `$.tags` value on a variable.
@@ -47,8 +51,8 @@ Release Notes
 
 ### 3.1.0
 
- - Prioritized maintainability over file size. Say hello to Node.js and ES6! :wave:
  - Output file for the browser is now using the [Universal Module Definition](https://github.com/umdjs/umd) format.
+ - Prioritized maintainability over file size. Say hello to Node.js and ES6! :wave:
 
 ### 3.0.14
 
@@ -76,11 +80,11 @@ Release Notes
 
 ### 3.0.8
 
- - Removed `TP.each()` method.
- - Renamed `TP.__instance__` to `TP.instances`.
  - Added `has.tag`, `max.tags` and `min.tags` hooks.
- - Removed translation feature. Use the new hooks!
+ - Removed `TP.each()` method.
  - Removed `state.alert` option. Use the new hooks to create your own alert messages!
+ - Removed translation feature. Use the new hooks!
+ - Renamed `TP.__instance__` to `TP.instances`.
 
 ### 3.0.7
 

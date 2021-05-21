@@ -429,7 +429,9 @@ function TP(source, state = {}) {
     }
 
     function doSubmitTry() {
-        onSubmitForm() && form && form.submit();
+        onSubmitForm() && form && form.dispatchEvent(new Event('submit', {
+            cancelable: true
+        }));
     }
 
     setChildLast(self, tags);

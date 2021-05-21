@@ -15,7 +15,7 @@
   },
   "description": "Better tags input interaction with JavaScript.",
   "devDependencies": {
-    "@taufik-nurrohman/factory": "^0.1.12"
+    "@taufik-nurrohman/factory": "^0.1.14"
   },
   "exports": {
     "import": "./index.mjs",
@@ -49,5 +49,5 @@
     "pack": "pack --clean=false --from=.github/source --js-format=umd --js-name=TP --js-top='%(js.license)' --mjs=true --scss=true --to=."
   },
   "type": "module",
-  "version": "3.1.15"
+  "version": "3.1.16"
 }

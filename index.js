@@ -762,7 +762,9 @@
         }
 
         function doSubmitTry() {
-            onSubmitForm() && form && form.submit();
+            onSubmitForm() && form && form.dispatchEvent(new Event('submit', {
+                cancelable: true
+            }));
         }
         setChildLast(self, tags);
         setChildLast(tags, editor);
@@ -859,6 +861,6 @@
         'min': 0,
         'x': false
     };
-    TP.version = '3.1.15';
+    TP.version = '3.1.16';
     return TP;
 });

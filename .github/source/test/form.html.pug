@@ -1,0 +1,28 @@
+extends ../_index.pug
+
+block state
+  - const title = 'Tag Picker'
+  - const scripts = ['../index.min.js']
+  - const styles = ['../index.min.css']
+
+block script
+  script
+    | const form = document.forms[0];
+    | const picker = new TP(form.test);
+    |
+    | form.addEventListener('submit', e => {
+    |     console.log(form.test.value);
+    |     form.js.checked && e.preventDefault();
+    | });
+
+block content
+  main
+    p Submitting a form by pressing the submit button vs. pressing the #[kbd Enter] key in tag picker element.
+    form(method='get' target='_blank')
+      p: input(name='test' type='text')
+      p
+        label
+          input(name='js' type='checkbox')
+          = ' '
+          span Test Default Prevention via JavaScript
+      p: button(type='submit') Submit
