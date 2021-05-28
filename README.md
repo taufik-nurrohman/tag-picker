@@ -24,9 +24,10 @@ Contribute
 Release Notes
 -------------
 
-### 3.1.16
+### 3.1.17
 
  - Fixed form submit event via tag picker element not triggering custom event listeners.
+ - Maintenance.
 
 ### 3.1.15
 

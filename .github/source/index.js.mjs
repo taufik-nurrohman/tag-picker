@@ -455,9 +455,9 @@ function TP(source, state = {}) {
 
     form && onEvent('submit', form, onSubmitForm);
 
-    $.blur = () => (!sourceIsDisabled() && (editorInput.blur(), onBlurInput())), $;
+    $.blur = () => ((!sourceIsDisabled() && (editorInput.blur(), onBlurInput())), $);
 
-    $.click = () => self.click(), onClickSelf(), $;
+    $.click = () => (self.click(), onClickSelf(), $);
 
     // Default filter for the tag name
     $.f = text => toCaseLower(text || "").replace(/[^ a-z\d-]/g, "");
@@ -535,7 +535,7 @@ function TP(source, state = {}) {
 
     setTags(source.value); // Fill value(s)
 
-    $.value = values => (!sourceIsDisabled() && !sourceIsReadOnly() && setTags(values)), $;
+    $.value = values => ((!sourceIsDisabled() && !sourceIsReadOnly() && setTags(values)), $);
 
     return $;
 

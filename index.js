@@ -2,9 +2,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright © 2021 Taufik Nurrohman
- *
- * <https://github.com/taufik-nurrohman/tag-picker>
+ * Copyright © 2021 Taufik Nurrohman <https://github.com/taufik-nurrohman>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the “Software”), to deal
@@ -783,8 +781,8 @@
         onEvent('keydown', editorInput, onKeyDownInput);
         onEvent('paste', editorInput, onPasteInput);
         form && onEvent('submit', form, onSubmitForm);
-        $.blur = () => !sourceIsDisabled() && (editorInput.blur(), onBlurInput()), $;
-        $.click = () => self.click(), onClickSelf(), $; // Default filter for the tag name
+        $.blur = () => (!sourceIsDisabled() && (editorInput.blur(), onBlurInput()), $);
+        $.click = () => (self.click(), onClickSelf(), $); // Default filter for the tag name
         $.f = text => toCaseLower(text || "").replace(/[^ a-z\d-]/g, "");
         $.focus = () => {
             if (!sourceIsDisabled()) {
@@ -849,7 +847,7 @@
         $.state = state;
         $.tags = [];
         setTags(source.value); // Fill value(s)
-        $.value = values => !sourceIsDisabled() && !sourceIsReadOnly() && setTags(values), $;
+        $.value = values => (!sourceIsDisabled() && !sourceIsReadOnly() && setTags(values), $);
         return $;
     }
     TP.instances = {};
@@ -861,6 +859,6 @@
         'min': 0,
         'x': false
     };
-    TP.version = '3.1.16';
+    TP.version = '3.1.17';
     return TP;
 });
