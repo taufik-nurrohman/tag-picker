@@ -859,6 +859,6 @@
         'min': 0,
         'x': false
     };
-    TP.version = '3.1.17';
+    TP.version = '3.1.18';
     return TP;
 });
