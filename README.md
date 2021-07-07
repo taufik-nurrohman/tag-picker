@@ -26,8 +26,8 @@ Release Notes
 
 ### 3.2.0
 
- - [x] Removed `picker.value()` method. Pass array of tags to the `picker.set()` method instead.
- - [x] Removed `x` option. The close button is now enabled by default for accessibility on mobile devices.
+ - Removed `picker.value()` method. Pass array of tags to the `picker.set()` method instead.
+ - Removed `x` option. The remove button is now enabled by default for accessibility on mobile devices.
 
 ### 3.1.18
 
