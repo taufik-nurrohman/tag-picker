@@ -13,19 +13,9 @@ block script
     |     console.log([tag, index, this.tags]);
     | });
 
-block style
-  style
-    | .tag-picker-source[disabled] + .tag-picker {
-    |   background-color: #eee;
-    |   border-color: #999;
-    | }
-    | .tag-picker-source[disabled] + .tag-picker .tag[title] {
-    |   background-color: #aaa;
-    | }
-
 block content
   main
-    form(method="get" target="_blank")
+    form(method='get' target='_blank')
       p: input(disabled name='tags' type='text' value='foo, bar')
       p
         label

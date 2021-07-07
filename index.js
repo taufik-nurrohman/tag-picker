@@ -718,15 +718,13 @@
                 'tabindex': sourceIsDisabled() ? false : '0',
                 'title': tag
             });
-            if (state.x) {
-                let x = setElement('a', {
-                    'href': "",
-                    'tabindex': '-1',
-                    'target': '_top'
-                });
-                onEvent('click', x, onClickTagX);
-                setChildLast(element, x);
-            }
+            let x = setElement('a', {
+                'href': "",
+                'tabindex': '-1',
+                'target': '_top'
+            });
+            onEvent('click', x, onClickTagX);
+            setChildLast(element, x);
             onEvent('blur', element, onBlurTag);
             onEvent('click', element, onClickTag);
             onEvent('focus', element, onFocusTag);
@@ -748,12 +746,10 @@
                 offEvent('click', element, onClickTag);
                 offEvent('focus', element, onFocusTag);
                 offEvent('keydown', element, onKeyDownTag);
-                if (state.x) {
-                    let x = getChildFirst(element);
-                    if (x) {
-                        offEvent('click', x, onClickTagX);
-                        letElement(x);
-                    }
+                let x = getChildFirst(element);
+                if (x) {
+                    offEvent('click', x, onClickTagX);
+                    letElement(x);
                 }
                 letElement(element);
             }
@@ -795,13 +791,17 @@
         $.input = editorInput;
         $.let = tag => {
             if (!sourceIsDisabled() && !sourceIsReadOnly()) {
-                let theTagsMin = state.min;
-                onInput();
-                if (theTagsMin > 0 && toCount($.tags) < theTagsMin) {
-                    fire('min.tags', [theTagsMin]);
-                    return $;
+                if (!tag) {
+                    setTags("");
+                } else {
+                    let theTagsMin = state.min;
+                    onInput();
+                    if (theTagsMin > 0 && toCount($.tags) < theTagsMin) {
+                        fire('min.tags', [theTagsMin]);
+                        return $;
+                    }
+                    letTagElement(tag), letTag(tag);
                 }
-                letTagElement(tag), letTag(tag);
             }
             return $;
         };
@@ -828,17 +828,24 @@
         };
         $.self = self;
         $.set = (tag, index) => {
+            if (!tag) {
+                return $;
+            }
             if (!sourceIsDisabled() && !sourceIsReadOnly()) {
-                let tags = $.tags,
-                    theTagsMax = state.max;
-                if (!getTag(tag)) {
-                    if (toCount(tags) < theTagsMax) {
-                        setTagElement(tag, index), setTag(tag, index);
-                    } else {
-                        fire('max.tags', [theTagsMax]);
-                    }
+                if (isArray(tag)) {
+                    setTags(tag.join(state.join));
                 } else {
-                    fire('has.tag', [tag, toArrayKey(tag, tags)]);
+                    let tags = $.tags,
+                        theTagsMax = state.max;
+                    if (!getTag(tag)) {
+                        if (toCount(tags) < theTagsMax) {
+                            setTagElement(tag, index), setTag(tag, index);
+                        } else {
+                            fire('max.tags', [theTagsMax]);
+                        }
+                    } else {
+                        fire('has.tag', [tag, toArrayKey(tag, tags)]);
+                    }
                 }
             }
             return $;
@@ -847,7 +854,6 @@
         $.state = state;
         $.tags = [];
         setTags(source.value); // Fill value(s)
-        $.value = values => (!sourceIsDisabled() && !sourceIsReadOnly() && setTags(values), $);
         return $;
     }
     TP.instances = {};
@@ -856,9 +862,8 @@
         'escape': [',', 188],
         'join': ', ',
         'max': 9999,
-        'min': 0,
-        'x': false
+        'min': 0
     };
-    TP.version = '3.1.18';
+    TP.version = '3.2.0';
     return TP;
 });

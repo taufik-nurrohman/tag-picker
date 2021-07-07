@@ -24,6 +24,11 @@ Contribute
 Release Notes
 -------------
 
+### 3.2.0
+
+ - [x] Removed `picker.value()` method. Pass array of tags to the `picker.set()` method instead.
+ - [x] Removed `x` option. The close button is now enabled by default for accessibility on mobile devices.
+
 ### 3.1.18
 
  - Fixed form submit event via tag picker element not triggering custom event listeners.

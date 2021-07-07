@@ -21,6 +21,10 @@
   line-height: 1.5em;
 }
 
+.tag-picker:focus-within {
+  border-color: #00f;
+}
+
 .tag-picker .tag {
   background: #f00;
   color: #000;
@@ -33,7 +37,7 @@
 }
 
 .tag-picker .tag:focus {
-  background: #cc0000;
+  background: #c00;
 }
 
 .tag-picker .tag[title] a {
@@ -90,9 +94,23 @@
   left: -9999px;
 }
 
+.tag-picker-source[disabled] + .tag-picker {
+  background: #eee;
+  border-color: #999;
+}
+
 .tag-picker-source[disabled] + .tag-picker,
 .tag-picker-source[disabled] + .tag-picker * {
   cursor: not-allowed;
+}
+
+.tag-picker-source[disabled] + .tag-picker .tag[title] {
+  background: #aaa;
+}
+
+.tag-picker-source[readonly] + .tag-picker {
+  background: #eee;
+  border-color: #999;
 }
 
 .tag-picker-source[readonly] + .tag-picker .tag[title] a {

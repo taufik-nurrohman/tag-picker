@@ -67,6 +67,11 @@ block style
     |   margin-top: 0;
     |   padding: .75em 1em;
     | }
+    |
+    | /* Add Bootstrap-like focus ring effect */
+    | .tag-picker.focus {
+    |   box-shadow: 0 0 0 3px rgba(0, 0, 255, .25);
+    | }
 
 block content
   p Do you like this project? Please support my #[a(href='https://github.com/mecha-cms') Mecha CMS] project too. Thank you!
@@ -127,7 +132,6 @@ block content
       li: a(href='test/readonly.html' target='_blank') Read-Only Input
       li: a(href='test/min.html' target='_blank') Limit Minimum Tags
       li: a(href='test/max.html' target='_blank') Limit Maximum Tags
-      li: a(href='test/x.html' target='_blank') Enable &ldquo;Remove&rdquo; Button
       li: a(href='test/form.html' target='_blank') Form Event
       li: a(href='test/paste.html' target='_blank') Paste Event
       li: a(href='tweak/alert.html' target='_blank') Warn for Duplicate Tags with Alert Message
@@ -163,17 +167,13 @@ block content
         tr
           td: code state.min
           td Minimum tags allowed.
-        tr
-          td: code state.x
-          td Set to #[code true] to show the &ldquo;remove&rdquo; button.
     pre: code const picker = new TP(#[var source], #[var join] = ', ');
     pre: code
       | const picker = new TP(#[var source], #[var state] = {
       |     escape: [','],
       |     join: ', ',
       |     max: 9999,
-      |     min: 0,
-      |     x: false
+      |     min: 0
       | });
     h2 Methods and Properties
     h3 TP.instances
@@ -220,7 +220,9 @@ block content
       | });
     h3 picker.let(tag)
     p Remove a tag.
-    pre: code picker.let('foo'); // Remove `foo` tag
+    pre: code
+      | picker.let('foo'); // Remove `foo` tag
+      | picker.let(); // Remove all tags
     h3 picker.output
     p Alias for #[code picker.source] property.
     h3 picker.pop()
@@ -233,6 +235,10 @@ block content
     pre: code
       | picker.set('foo'); // Append a `foo` tag
       | picker.set('foo', 1); // Insert a `foo` tag exactly at index `1`
+    h3 picker.set(tags)
+    p Add multiple tags at once.
+    pre: code
+      | picker.set(['foo', 'bar', 'baz']); // Add `foo`, `bar` and `baz`
     h3 picker.source
     p Return the #[code &lt;input&gt;] element.
     pre: code console.log(picker.source);
@@ -241,11 +247,6 @@ block content
     h3 picker.tags
     p Return the tags data as array.
     pre: code console.log(picker.tags);
-    h3 picker.value(tags)
-    p Add multiple tags at once.
-    pre: code
-      | picker.value('foo, bar, baz'); // Add `foo`, `bar` and `baz`
-      | picker.value(""); // Remove all tag(s)
     h2 Hooks
     table(border='1')
       thead

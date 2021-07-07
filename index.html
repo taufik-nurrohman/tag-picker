@@ -5,7 +5,7 @@
     <meta content="#000" name="theme-color">
     <meta content="width=device-width" name="viewport">
     <meta content="Better tags input interaction with JavaScript." name="description">
-    <title>Tag Picker 3.1.18</title>
+    <title>Tag Picker 3.2.0</title>
     <link href="index.min.css" rel="stylesheet">
     <style>
       * {
@@ -65,12 +65,17 @@
         margin-top: 0;
         padding: .75em 1em;
       }
+
+      /* Add Bootstrap-like focus ring effect */
+      .tag-picker.focus {
+        box-shadow: 0 0 0 3px rgba(0, 0, 255, .25);
+      }
     </style>
   </head>
   <body>
     <p>Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
-      <h1>Tag Picker 3.1.18</h1>
+      <h1>Tag Picker 3.2.0</h1>
       <p>Tag Picker is a simple JavaScript application that aims to provide better experience for users in adding and removing comma-separated list of words.</p>
       <hr>
     </header>
@@ -126,7 +131,6 @@ const picker = new TP(document.querySelector('input'));</code></pre>
         <li><a href="test/readonly.html" target="_blank">Read-Only Input</a></li>
         <li><a href="test/min.html" target="_blank">Limit Minimum Tags</a></li>
         <li><a href="test/max.html" target="_blank">Limit Maximum Tags</a></li>
-        <li><a href="test/x.html" target="_blank">Enable &ldquo;Remove&rdquo; Button</a></li>
         <li><a href="test/form.html" target="_blank">Form Event</a></li>
         <li><a href="test/paste.html" target="_blank">Paste Event</a></li>
         <li><a href="tweak/alert.html" target="_blank">Warn for Duplicate Tags with Alert Message</a></li>
@@ -172,10 +176,6 @@ const picker = new TP(document.querySelector('input'));</code></pre>
             <td><code>state.min</code></td>
             <td>Minimum tags allowed.</td>
           </tr>
-          <tr>
-            <td><code>state.x</code></td>
-            <td>Set to <code>true</code> to show the &ldquo;remove&rdquo; button.</td>
-          </tr>
         </tbody>
       </table>
       <pre><code>const picker = new TP(<var>source</var>, <var>join</var> = ', ');</code></pre>
@@ -183,8 +183,7 @@ const picker = new TP(document.querySelector('input'));</code></pre>
     escape: [','],
     join: ', ',
     max: 9999,
-    min: 0,
-    x: false
+    min: 0
 });</code></pre>
       <h2>Methods and Properties</h2>
       <h3>TP.instances</h3>
@@ -226,7 +225,8 @@ picker.f = tag =&gt; (tag || "").toLowerCase().trim();</code></pre>
 });</code></pre>
       <h3>picker.let(tag)</h3>
       <p>Remove a tag.</p>
-      <pre><code>picker.let('foo'); // Remove `foo` tag</code></pre>
+      <pre><code>picker.let('foo'); // Remove `foo` tag
+picker.let(); // Remove all tags</code></pre>
       <h3>picker.output</h3>
       <p>Alias for <code>picker.source</code> property.</p>
       <h3>picker.pop()</h3>
@@ -238,6 +238,9 @@ picker.f = tag =&gt; (tag || "").toLowerCase().trim();</code></pre>
       <p>Add a new tag.</p>
       <pre><code>picker.set('foo'); // Append a `foo` tag
 picker.set('foo', 1); // Insert a `foo` tag exactly at index `1`</code></pre>
+      <h3>picker.set(tags)</h3>
+      <p>Add multiple tags at once.</p>
+      <pre><code>picker.set(['foo', 'bar', 'baz']); // Add `foo`, `bar` and `baz`</code></pre>
       <h3>picker.source</h3>
       <p>Return the <code>&lt;input&gt;</code> element.</p>
       <pre><code>console.log(picker.source);</code></pre>
@@ -246,10 +249,6 @@ picker.set('foo', 1); // Insert a `foo` tag exactly at index `1`</code></pre>
       <h3>picker.tags</h3>
       <p>Return the tags data as array.</p>
       <pre><code>console.log(picker.tags);</code></pre>
-      <h3>picker.value(tags)</h3>
-      <p>Add multiple tags at once.</p>
-      <pre><code>picker.value('foo, bar, baz'); // Add `foo`, `bar` and `baz`
-picker.value(""); // Remove all tag(s)</code></pre>
       <h2>Hooks</h2>
       <table border="1">
         <thead>

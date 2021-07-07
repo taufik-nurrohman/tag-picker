@@ -1,10 +1,14 @@
-$color: #000;
+$color-back-lock: #eee;
 $color-back: #fff;
-
-$color-tag: #000;
+$color-border-focus: #00f;
+$color-border-lock: #999;
+$color-border: #000;
+$color-tag-back-focus: #c00;
+$color-tag-back-lock: #aaa;
 $color-tag-back: #f00;
-
 $color-tag-x: #fff;
+$color-tag: #000;
+$color: #000;
 
 $height: 1.5em;
 
@@ -24,9 +28,12 @@ $height: 1.5em;
     line-height: $height;
   }
   background: $color-back;
-  border: 1px solid $color;
+  border: 1px solid $color-border;
   padding: .125em;
   cursor: text;
+  &:focus-within {
+    border-color: $color-border-focus;
+  }
   .tag {
     background: $color-tag-back;
     color: $color-tag;
@@ -37,7 +44,7 @@ $height: 1.5em;
     cursor: pointer;
     outline: none;
     &:focus {
-      background: darken($color-tag-back, 10%);
+      background: $color-tag-back-focus;
     }
     &[title] {
       a {
@@ -100,6 +107,13 @@ $height: 1.5em;
       & * {
         cursor: not-allowed;
       }
+      .tag {
+        &[title] {
+          background: $color-tag-back-lock;
+        }
+      }
+      background: $color-back-lock;
+      border-color: $color-border-lock;
     }
   }
   &[readonly] {
@@ -111,6 +125,8 @@ $height: 1.5em;
           }
         }
       }
+      background: $color-back-lock;
+      border-color: $color-border-lock;
     }
   }
 }
