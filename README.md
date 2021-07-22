@@ -24,6 +24,11 @@ Contribute
 Release Notes
 -------------
 
+### 3.2.1
+
+ - Improved focus state.
+ - Improved keyboard interaction to make it possible to select all tags with <kbd>⌘</kbd> <kbd>a</kbd>.
+
 ### 3.2.0
 
  - Removed `picker.value()` method. Pass array of tags to the `picker.set()` method instead.

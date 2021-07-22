@@ -31,6 +31,8 @@ $height: 1.5em;
   border: 1px solid $color-border;
   padding: .125em;
   cursor: text;
+  outline: 0;
+  &:focus,
   &:focus-within {
     border-color: $color-border-focus;
   }
@@ -42,8 +44,9 @@ $height: 1.5em;
     padding: 0 .5em;
     height: $height; // Same with `min-height` of container
     cursor: pointer;
-    outline: none;
-    &:focus {
+    outline: 0;
+    &:focus,
+    &:focus-within {
       background: $color-tag-back-focus;
     }
     &[title] {
@@ -51,7 +54,7 @@ $height: 1.5em;
         margin-left: .5em;
         text-decoration: none;
         color: $color-tag-x;
-        outline: none;
+        outline: 0;
         &::before {
           content: '\00d7'; // The “×” button
           font-family: sans-serif;
@@ -69,29 +72,41 @@ $height: 1.5em;
         }
       }
     }
-  }
-  .editor {
-    background: none;
-    color: inherit;
-    cursor: inherit;
-    position: relative;
-    flex: 1;
-    span {
-      display: block;
-      height: 100%;
-      outline: none;
+    &.editor {
+      background: none;
+      color: inherit;
+      cursor: inherit;
       position: relative;
-      z-index: 1;
-      + span {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        padding: inherit;
-        white-space: nowrap;
-        z-index: 0;
-        opacity: .5;
+      flex: 1;
+      &:focus,
+      &:focus-within {
+        background: none;
+      }
+      span {
+        display: block;
+        height: 100%;
+        outline: 0;
+        position: relative;
+        z-index: 1;
+        + span {
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          padding: inherit;
+          white-space: nowrap;
+          z-index: 0;
+          opacity: .5;
+        }
+      }
+    }
+  }
+  &.focus\.tags {
+    .tag {
+      background: $color-tag-back-focus;
+      &.editor {
+        background: none;
       }
     }
   }

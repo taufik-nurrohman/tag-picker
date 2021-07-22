@@ -5,7 +5,7 @@
     <meta content="#000" name="theme-color">
     <meta content="width=device-width" name="viewport">
     <meta content="Better tags input interaction with JavaScript." name="description">
-    <title>Tag Picker 3.2.0</title>
+    <title>Tag Picker 3.2.1</title>
     <link href="index.min.css" rel="stylesheet">
     <style>
       * {
@@ -67,7 +67,8 @@
       }
 
       /* Add Bootstrap-like focus ring effect */
-      .tag-picker.focus {
+      .tag-picker:focus,
+      .tag-picker:focus-within {
         box-shadow: 0 0 0 3px rgba(0, 0, 255, .25);
       }
     </style>
@@ -75,7 +76,7 @@
   <body>
     <p>Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
-      <h1>Tag Picker 3.2.0</h1>
+      <h1>Tag Picker 3.2.1</h1>
       <p>Tag Picker is a simple JavaScript application that aims to provide better experience for users in adding and removing comma-separated list of words.</p>
       <hr>
     </header>
