@@ -197,6 +197,9 @@
     var hasAttribute = function hasAttribute(node, attribute) {
         return node.hasAttribute(attribute);
     };
+    var hasClass = function hasClass(node, value) {
+        return node.classList.contains(value);
+    };
     var hasParent = function hasParent(node) {
         return null !== getParent(node);
     };
@@ -318,11 +321,24 @@
     var offEventPropagation = function offEventPropagation(e) {
         return e && e.stopPropagation();
     };
+    var offEvents = function offEvents(names, node, then) {
+        names.forEach(function(name) {
+            return offEvent(name, node, then);
+        });
+    };
     var onEvent = function onEvent(name, node, then, options) {
         if (options === void 0) {
             options = false;
         }
         node.addEventListener(name, then, options);
+    };
+    var onEvents = function onEvents(names, node, then, options) {
+        if (options === void 0) {
+            options = false;
+        }
+        names.forEach(function(name) {
+            return onEvent(name, node, then, options);
+        });
     };
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
@@ -420,34 +436,139 @@
         $.source = source; // Store current instance to `TP.instances`
         TP.instances[source.id || source.name || toObjectCount(TP.instances)] = $; // Mark current DOM as active tag picker to prevent duplicate instance
         source[name] = 1;
-        let editor = setElement('span', {
-                'class': 'editor tag'
+        let classNameB = state['class'],
+            classNameE = classNameB + '__',
+            classNameM = classNameB + '--',
+            form = getParentForm(source),
+            // Capture the closest `<form>` element
+            self = setElement('span', {
+                'class': classNameB,
+                'tabindex': sourceIsDisabled() ? false : '-1'
             }),
-            editorInput = setElement('span', {
+            text = setElement('span', {
+                'class': classNameE + 'tag ' + classNameE + 'text'
+            }),
+            textInput = setElement('span', {
                 'contenteditable': sourceIsDisabled() ? false : 'true',
                 'spellcheck': 'false',
                 'style': 'white-space:pre;'
             }),
-            editorInputPlaceholder = setElement('span'),
-            form = getParentForm(source),
-            // Capture the closest `<form>` element
-            self = setElement('span', {
-                'class': state['class'],
-                'tabindex': sourceIsDisabled() ? false : '-1'
-            }),
-            tags = setElement('span', {
-                'class': 'tags'
+            textInputHint = setElement('span'),
+            textOutput = setElement('span', {
+                'class': classNameE + 'tags'
             });
+        let currentTagIndex = 0,
+            currentTags = {};
 
-        function n(text) {
-            return $.f(text).replace(toPattern('(' + state.escape.join('|').replace(/\\/g, '\\\\') + ')+'), "").trim();
+        function getCurrentTags() {
+            return currentTags;
+        }
+
+        function setCurrentTags() {
+            currentTags = {}; // Reset!
+            let i,
+                items = getChildren(textOutput),
+                j = toCount(items) - 1; // Minus 1 to skip the tag editor element
+            for (i = 0; i < j; ++i) {
+                if (hasClass(items[i], classNameE + 'tag--focus')) {
+                    currentTags[i] = items[i];
+                }
+            }
+        }
+
+        function n(v) {
+            return $.f(v).replace(toPattern('(' + state.escape.join('|').replace(/\\/g, '\\\\') + ')+'), "").trim();
+        }
+
+        function doBlurTags(exceptThisTag) {
+            doToTags(exceptThisTag, function(index) {
+                letClass(this, classNameE + 'tag--focus');
+            });
+        }
+
+        function doFocusTags(exceptThisTag) {
+            doToTags(exceptThisTag, function(index) {
+                setClass(this, classNameE + 'tag--focus');
+            });
+        }
+
+        function doToTags(exceptThisTag, then) {
+            let i,
+                items = getChildren(textOutput),
+                j = toCount(items) - 1; // Minus 1 to skip the tag editor element
+            for (i = 0; i < j; ++i) {
+                if (exceptThisTag === items[i]) {
+                    continue;
+                }
+                then.call(items[i], i);
+            }
+        }
+
+        function onBlurFocusTag(e) {
+            currentTags = {}; // Reset!
+            let t = this,
+                type = e.type,
+                tag = t.title,
+                tags = $.tags,
+                index = toArrayKey(tag, tags),
+                classNameTagM = classNameE + 'tag--';
+            if ('blur' === type) {
+                letClass(t, classNameTagM + 'focus');
+                letClasses(self, [classNameM + 'focus', classNameM + 'focus-tag']);
+            } else {
+                setClass(t, classNameTagM + 'focus');
+                setClasses(self, [classNameM + 'focus', classNameM + 'focus-tag']);
+                currentTagIndex = index;
+                currentTags[index] = t;
+            }
+            fire(type + '.tag', [tag, index]);
+        }
+
+        function onBlurFocusText(e) {
+            let tags = $.tags,
+                type = e.type,
+                classNameTextM = classNameE + 'text--';
+            if ('blur' === type) {
+                letClass(text, classNameTextM + 'focus');
+                letClasses(self, [classNameM + 'focus', classNameM + 'focus-text']);
+                onInput();
+            } else {
+                setClass(text, classNameTextM + 'focus');
+                setClasses(self, [classNameM + 'focus', classNameM + 'focus-text']);
+                doBlurTags(text);
+            }
+            fire(type, [tags, toCount(tags)]);
+        }
+
+        function onBlurFocusSelf(e) {
+            let type = e.type;
+            if ('blur' === type) {
+                letClass(self, classNameM + 'focus');
+            } else {
+                setClass(self, classNameM + 'focus');
+            }
+        }
+
+        function onClickSelf(e) {
+            if (e && self === e.target) {
+                textInput.focus();
+            }
+            let tags = $.tags;
+            fire('click', [tags, toCount(tags)]);
+        }
+
+        function onClickTag() {
+            let t = this,
+                tag = t.title,
+                tags = $.tags;
+            fire('click.tag', [tag, toArrayKey(tag, tags)]);
         }
 
         function onInput() {
             if (sourceIsDisabled() || sourceIsReadOnly()) {
                 return setInput("");
             }
-            let tag = n(getText(editorInput)),
+            let tag = n(getText(textInput)),
                 index;
             if (tag) {
                 if (!getTag(tag)) {
@@ -462,24 +583,8 @@
             }
         }
 
-        function onBlurInput() {
-            onInput();
-            letClasses(self, ['focus', 'focus.input']);
-            fire('blur', [$.tags, toCount($.tags)]);
-        }
-
         function onBlurSelf() {
-            letClasses(self, ['focus.self', 'focus.tags']);
-        }
-
-        function onClickInput() {
-            fire('click', [$.tags]);
-        }
-
-        function onFocusInput() {
-            setClass(self, 'focus');
-            setClass(self, 'focus.input');
-            fire('focus', [$.tags]);
+            letClass(self, classNameM + 'focus-self');
         }
 
         function onKeyDownInput(e) {
@@ -494,10 +599,10 @@
                 keyIsShift = e.shiftKey,
                 keyIsTab = KEY_TAB[0] === key || KEY_TAB[1] === keyCode,
                 tag,
-                theTagLast = getPrev(editor),
+                theTagLast = getPrev(text),
                 theTagsCount = toCount($.tags),
                 theTagsMax = state.max,
-                theValueLast = n(getText(editorInput)); // Last value before delay
+                theValueLast = n(getText(textInput)); // Last value before delay
             // Set preferred key name
             if (keyIsEnter) {
                 key = '\n';
@@ -526,10 +631,10 @@
                 doSubmitTry(), offEventDefault(e);
             } else {
                 delay(() => {
-                    let text = getText(editorInput) || "",
-                        value = n(text); // Last try for buggy key detection on mobile device(s)
+                    let theText = getText(textInput) || "",
+                        value = n(theText); // Last try for buggy key detection on mobile device(s)
                     // Check for the last typed key in the tag editor
-                    if (hasValue(text.slice(-1), escape)) {
+                    if (hasValue(theText.slice(-1), escape)) {
                         if (theTagsCount < theTagsMax) {
                             // Add the tag name found in the tag editor
                             onInput();
@@ -540,7 +645,7 @@
                         offEventDefault(e); // Escape character only, delete!
                     } else if ("" === value && !keyIsCtrl && !keyIsShift) {
                         if ("" === theValueLast && (KEY_DELETE_LEFT[0] === key || KEY_DELETE_LEFT[0] === keyCode)) {
-                            letClass(self, 'focus.tag');
+                            letClass(self, classNameM + 'focus-tag');
                             tag = $.tags[theTagsCount - 1];
                             letTagElement(tag), letTag(tag);
                             if (theTagLast) {
@@ -552,7 +657,7 @@
                             theTagLast && theTagLast.focus();
                         }
                     }
-                    setText(editorInputPlaceholder, value ? "" : thePlaceholder);
+                    setText(textInputHint, value ? "" : thePlaceholder);
                 }, 0);
             }
         }
@@ -565,23 +670,93 @@
                 // Legacy browser(s)
                 keyIsCtrl = e.ctrlKey,
                 keyIsShift = e.shiftKey;
-            if (!sourceIsReadOnly() && !keyIsCtrl && key && 1 === toCount(key)) {
-                // Typing a single character should delete the entire tag(s)
-                setTags(""), setInput(key, 1), offEventDefault(e);
-            } else if (!keyIsCtrl && !keyIsShift) {
-                if (KEY_DELETE_LEFT[0] === key || KEY_DELETE_LEFT[1] === keyCode || KEY_DELETE_RIGHT[0] === key || KEY_DELETE_RIGHT[1] === keyCode) {
-                    setTags(""), setInput("", 1), offEventDefault(e);
-                } else if (KEY_ARROW_RIGHT[0] === key || KEY_ARROW_RIGHT[1] === keyCode) {
-                    setInput("", 1), offEventDefault(e);
-                }
+            if (sourceIsReadOnly()) {
+                return;
             }
+            let classNameTagM = classNameE + 'tag--';
+            let theTag, theTagNext, theTagPrev, theTags, theTagIndex;
+            if (!keyIsCtrl) {
+                // Remove tag(s) with `Backspace` or `Delete` key
+                if (!keyIsShift && (KEY_DELETE_LEFT[0] === key || KEY_DELETE_LEFT[1] === keyCode || KEY_DELETE_RIGHT[0] === key || KEY_DELETE_RIGHT[1] === keyCode)) {
+                    setCurrentTags();
+                    theTags = getCurrentTags();
+                    let isBackspace = KEY_DELETE_LEFT[0] === key || KEY_DELETE_LEFT[1] === keyCode,
+                        theTagTitle;
+                    for (theTagIndex in theTags) {
+                        theTag = theTags[theTagIndex];
+                        letTagElement(theTagTitle = theTag.title), letTag(theTagTitle);
+                    }
+                    currentTagIndex = toObjectKeys(theTags);
+                    currentTagIndex = +(currentTagIndex[0] || 0);
+                    if (theTag = getChildren(textOutput, isBackspace ? currentTagIndex - 1 : currentTagIndex)) {
+                        if (text === theTag) {
+                            setInput("", 1);
+                        } else {
+                            theTag.focus();
+                        }
+                    } else {
+                        setInput("", 1);
+                    }
+                    offEventDefault(e); // Focus to the previous tag
+                } else if (KEY_ARROW_LEFT[0] === key || KEY_ARROW_LEFT[1] === keyCode) {
+                    if (theTag = getChildren(textOutput, currentTagIndex - 1)) {
+                        let theTagWasFocus = hasClass(theTag, classNameTagM + 'focus');
+                        theTag.focus(), offEventDefault(e);
+                        if (keyIsShift) {
+                            setClass(theTagNext = getNext(theTag), classNameTagM + 'focus');
+                            if (theTagWasFocus) {
+                                letClass(theTagNext, classNameTagM + 'focus');
+                            }
+                        } else {
+                            doBlurTags(theTag);
+                        }
+                    } else if (!keyIsShift) {
+                        doBlurTags(getChildren(textOutput, 0));
+                    } // Focus to the next tag or to the tag editor
+                } else if (KEY_ARROW_RIGHT[0] === key || KEY_ARROW_RIGHT[1] === keyCode) {
+                    if (theTag = getChildren(textOutput, currentTagIndex + 1)) {
+                        let theTagWasFocus = hasClass(theTag, classNameTagM + 'focus');
+                        text === theTag && !keyIsShift ? setInput("", 1) : theTag.focus(), offEventDefault(e);
+                        if (keyIsShift) {
+                            setClass(theTagPrev = getPrev(theTag), classNameTagM + 'focus');
+                            if (theTagWasFocus) {
+                                letClass(theTagPrev, classNameTagM + 'focus');
+                            }
+                        } else {
+                            doBlurTags(theTag);
+                        }
+                    }
+                }
+            } else {
+                // Select all tag(s) with `Ctrl+A` key
+                if (KEY_A[0] === key || KEY_A[1] === keyCode) {
+                    self.focus(), doFocusTags(), setCurrentTags(), offEventDefault(e);
+                }
+            } // if (!sourceIsReadOnly() && !keyIsCtrl && key && 1 === toCount(key)) {
+            //     // Typing a single character should delete the entire tag(s)
+            //     setTags(""), setInput(key, 1), offEventDefault(e);
+            // } else if (!keyIsCtrl && !keyIsShift) {
+            //     if (
+            //         KEY_DELETE_LEFT[0] === key ||
+            //         KEY_DELETE_LEFT[1] === keyCode ||
+            //         KEY_DELETE_RIGHT[0] === key ||
+            //         KEY_DELETE_RIGHT[1] === keyCode
+            //     ) {
+            //         setTags(""), setInput("", 1), offEventDefault(e);
+            //     } else if (
+            //         KEY_ARROW_RIGHT[0] === key ||
+            //         KEY_ARROW_RIGHT[1] === keyCode
+            //     ) {
+            //         setInput("", 1), offEventDefault(e);
+            //     }
+            // }
         }
 
         function setTags(values) {
             // Remove …
             if (hasParent(self)) {
                 let prev;
-                while (prev = getPrev(editor)) {
+                while (prev = getPrev(text)) {
                     letTagElement(prev.title);
                 }
             }
@@ -621,50 +796,21 @@
         function onPasteInput() {
             delay(() => {
                 if (!sourceIsDisabled() && !sourceIsReadOnly()) {
-                    setTags(getText(editorInput));
+                    setTags(getText(textInput));
                 }
                 setInput("");
             }, 0);
         }
 
-        function onClickSelf(e) {
-            if (e && self === e.target) {
-                editorInput.focus(), onClickInput();
-            }
-        }
-
         function onFocusSelf(e) {
-            let key = e.key,
-                keyCode = e.keyCode,
-                keyIsCtrl = e.ctrlKey;
-            if (keyIsCtrl && (KEY_A[0] === key || KEY_A[1] === keyCode)) {
-                setClass(self, 'focus.tags');
-            }
-            setClass(self, 'focus.self');
+            e.key;
+            e.keyCode;
+            e.ctrlKey;
+            setClass(self, classNameM + 'focus-self');
         }
 
         function onFocusSource() {
-            editorInput.focus();
-        }
-
-        function onBlurTag() {
-            let t = this,
-                tag = t.title;
-            letClasses(self, ['focus', 'focus.tag']);
-            fire('blur.tag', [tag, toArrayKey(tag, $.tags)]);
-        }
-
-        function onClickTag() {
-            let t = this,
-                tag = t.title;
-            fire('click.tag', [tag, toArrayKey(tag, $.tags)]);
-        }
-
-        function onFocusTag() {
-            let t = this,
-                tag = t.title;
-            setClasses(self, ['focus', 'focus.tag']);
-            fire('focus.tag', [tag, toArrayKey(tag, $.tags)]);
+            textInput.focus();
         }
 
         function onClickTagX(e) {
@@ -680,68 +826,14 @@
             offEventDefault(e);
         }
 
-        function onKeyDownTag(e) {
-            offEventPropagation(e);
-            let key = e.key,
-                // Modern browser(s)
-                keyCode = e.keyCode,
-                // Legacy browser(s)
-                keyIsCtrl = e.ctrlKey,
-                keyIsShift = e.shiftKey,
-                t = this,
-                theTagNext = getNext(t),
-                theTagPrev = getPrev(t);
-            if (!sourceIsReadOnly() && !keyIsCtrl && key && 1 === toCount(key)) {
-                // Typing a single character should delete the tag
-                let tag = t.title,
-                    index = toArrayKey(tag, $.tags);
-                letTagElement(tag), letTag(tag), setInput(key, 1), offEventDefault(e);
-                fire('change', [tag, index]);
-                fire('let.tag', [tag, index]);
-            } else if (!keyIsCtrl && !keyIsShift) {
-                // Focus to the previous tag
-                if (!sourceIsReadOnly() && (KEY_ARROW_LEFT[0] === key || KEY_ARROW_LEFT[1] === keyCode)) {
-                    theTagPrev && (theTagPrev.focus(), offEventDefault(e)); // Focus to the next tag or to the tag input
-                } else if (!sourceIsReadOnly() && (KEY_ARROW_RIGHT[0] === key || KEY_ARROW_RIGHT[1] === keyCode)) {
-                    theTagNext && theTagNext !== editor ? theTagNext.focus() : setInput("", 1);
-                    offEventDefault(e); // Remove tag with `Backspace` or `Delete` key
-                } else if (KEY_DELETE_LEFT[0] === key || KEY_DELETE_LEFT[1] === keyCode || KEY_DELETE_RIGHT[0] === key || KEY_DELETE_RIGHT[1] === keyCode) {
-                    if (!sourceIsReadOnly()) {
-                        let tag = t.title,
-                            index = toArrayKey(tag, $.tags);
-                        letClass(self, 'focus.tag');
-                        letTagElement(tag), letTag(tag); // Focus to the previous tag or to the tag input after remove
-                        if (KEY_DELETE_LEFT[0] === key || KEY_DELETE_LEFT[1] === keyCode) {
-                            theTagPrev ? theTagPrev.focus() : setInput("", 1); // Focus to the next tag or to the tag input after remove
-                        } else
-                        /* if (
-                        KEY_DELETE_RIGHT[0] === key ||
-                        KEY_DELETE_RIGHT[1] === keyCode
-                        ) */
-                        {
-                            theTagNext && theTagNext !== editor ? theTagNext.focus() : setInput("", 1);
-                        }
-                        fire('change', [tag, index]);
-                        fire('let.tag', [tag, index]);
-                    }
-                    offEventDefault(e);
-                }
-            } else if (keyIsCtrl) {
-                // Select all tag(s) with `Ctrl+A` key
-                if (KEY_A[0] === key || KEY_A[1] === keyCode) {
-                    self.focus(), onFocusSelf(e), offEventDefault(e);
-                }
-            }
-        }
-
         function setInput(value, fireFocus) {
-            setText(editorInput, value);
-            setText(editorInputPlaceholder, value ? "" : thePlaceholder);
+            setText(textInput, value);
+            setText(textInputHint, value ? "" : thePlaceholder);
             if (fireFocus) {
-                editorInput.focus(); // Move caret to the end!
+                textInput.focus(); // Move caret to the end!
                 let range = D.createRange(),
                     selection = W.getSelection();
-                range.selectNodeContents(editorInput);
+                range.selectNodeContents(textInput);
                 range.collapse(false);
                 selection.removeAllRanges();
                 selection.addRange(range);
@@ -777,26 +869,25 @@
 
         function setTagElement(tag, index) {
             let element = setElement('span', {
-                'class': 'tag',
+                'class': classNameE + 'tag',
                 'tabindex': sourceIsDisabled() ? false : '0',
                 'title': tag
             });
             let x = setElement('a', {
+                'class': classNameE + 'tag-x',
                 'href': "",
                 'tabindex': '-1',
                 'target': '_top'
             });
             onEvent('click', x, onClickTagX);
             setChildLast(element, x);
-            onEvent('blur', element, onBlurTag);
             onEvent('click', element, onClickTag);
-            onEvent('focus', element, onFocusTag);
-            onEvent('keydown', element, onKeyDownTag);
-            if (hasParent(tags)) {
+            onEvents(['blur', 'focus'], element, onBlurFocusTag); // onEvent('keydown', element, onKeyDownTag);
+            if (hasParent(textOutput)) {
                 if (isNumber(index) && $.tags[index]) {
-                    setPrev(getChildren(tags, index), element);
+                    setPrev(getChildren(textOutput, index), element);
                 } else {
-                    setPrev(editor, element);
+                    setPrev(text, element);
                 }
             }
         }
@@ -804,11 +895,9 @@
         function letTagElement(tag) {
             let index = toArrayKey(tag, $.tags),
                 element;
-            if (isNumber(index) && index >= 0 && (element = getChildren(tags, index))) {
-                offEvent('blur', element, onBlurTag);
+            if (isNumber(index) && index >= 0 && (element = getChildren(textOutput, index))) {
                 offEvent('click', element, onClickTag);
-                offEvent('focus', element, onFocusTag);
-                offEvent('keydown', element, onKeyDownTag);
+                offEvents(['blur', 'focus'], element, onBlurFocusTag); // offEvent('keydown', element, onKeyDownTag);
                 let x = getChildFirst(element);
                 if (x) {
                     offEvent('click', x, onClickTagX);
@@ -823,38 +912,35 @@
                 cancelable: true
             }));
         }
-        setChildLast(self, tags);
-        setChildLast(tags, editor);
-        setChildLast(editor, editorInput);
-        setChildLast(editor, editorInputPlaceholder);
-        setClass(source, state['class'] + '-source');
+        setChildLast(self, textOutput);
+        setChildLast(textOutput, text);
+        setChildLast(text, textInput);
+        setChildLast(text, textInputHint);
+        setClass(source, classNameE + 'source');
         setNext(source, self);
         setElement(source, {
             'tabindex': '-1'
         });
-        onEvent('blur', editorInput, onBlurInput);
+        onEvents(['blur', 'focus'], textInput, onBlurFocusText);
         onEvent('blur', self, onBlurSelf);
-        onEvent('click', editorInput, onClickInput);
         onEvent('click', self, onClickSelf);
-        onEvent('focus', editorInput, onFocusInput);
+        onEvents(['blur', 'focus'], self, onBlurFocusSelf);
         onEvent('focus', self, onFocusSelf);
         onEvent('focus', source, onFocusSource);
-        onEvent('keydown', editorInput, onKeyDownInput);
+        onEvent('keydown', textInput, onKeyDownInput);
         onEvent('keydown', self, onKeyDownSelf);
-        onEvent('paste', editorInput, onPasteInput);
-        form && onEvent('submit', form, onSubmitForm);
-        $.blur = () => (!sourceIsDisabled() && (editorInput.blur(), onBlurInput()), $);
+        onEvent('paste', textInput, onPasteInput);
+        form && onEvent('submit', form, onSubmitForm); // $.blur = () => ((!sourceIsDisabled() && (textInput.blur(), onBlurInput())), $);
         $.click = () => (self.click(), onClickSelf(), $); // Default filter for the tag name
-        $.f = text => toCaseLower(text || "").replace(/[^ a-z\d-]/g, "");
-        $.focus = () => {
-            if (!sourceIsDisabled()) {
-                editorInput.focus();
-                onFocusInput();
-            }
-            return $;
-        };
+        $.f = text => toCaseLower(text || "").replace(/[^ a-z\d-]/g, ""); // $.focus = () => {
+        //     if (!sourceIsDisabled()) {
+        //         textInput.focus();
+        //         onFocusInput();
+        //     }
+        //     return $;
+        // };
         $.get = tag => sourceIsDisabled() ? null : getTag(tag, 1);
-        $.input = editorInput;
+        $.input = textInput;
         $.let = tag => {
             if (!sourceIsDisabled() && !sourceIsReadOnly()) {
                 if (!tag) {
@@ -877,17 +963,16 @@
             }
             delete source[name];
             let tags = $.tags;
-            letClass(source, state['class'] + '-source');
-            offEvent('blur', editorInput, onBlurInput);
+            letClass(source, classNameE + 'source');
+            offEvents(['blur', 'focus'], textInput, onBlurFocusText);
             offEvent('blur', self, onBlurSelf);
-            offEvent('click', editorInput, onClickInput);
             offEvent('click', self, onClickSelf);
-            offEvent('focus', editorInput, onFocusInput);
+            offEvents(['blur', 'focus'], self, onBlurFocusSelf);
             offEvent('focus', self, onFocusSelf);
             offEvent('focus', source, onFocusSource);
-            offEvent('keydown', editorInput, onKeyDownInput);
+            offEvent('keydown', textInput, onKeyDownInput);
             offEvent('keydown', self, onKeyDownSelf);
-            offEvent('paste', editorInput, onPasteInput);
+            offEvent('paste', textInput, onPasteInput);
             form && offEvent('submit', form, onSubmitForm);
             tags.forEach(letTagElement);
             setElement(source, {
@@ -933,6 +1018,6 @@
         'max': 9999,
         'min': 0
     };
-    TP.version = '3.2.1';
+    TP.version = '3.3.0';
     return TP;
 });

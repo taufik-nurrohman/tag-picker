@@ -1,3 +1,5 @@
+$name: 'tag-picker';
+
 $color-back-lock: #eee;
 $color-back: #fff;
 $color-border-focus: #00f;
@@ -12,133 +14,118 @@ $color: #000;
 
 $height: 1.5em;
 
-.tag-picker {
+.#{$name} {
   &,
   & * {
     box-sizing: border-box;
     font: inherit;
     color: inherit;
   }
-  &,
-  & .tags {
-    display: flex;
-    flex: 1;
-    flex-wrap: wrap;
-    min-height: $height;
-    line-height: $height;
-  }
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  min-height: $height;
+  line-height: $height;
   background: $color-back;
   border: 1px solid $color-border;
   padding: .125em;
   cursor: text;
   outline: 0;
-  &:focus,
-  &:focus-within {
+  &--focus {
     border-color: $color-border-focus;
   }
-  .tag {
-    background: $color-tag-back;
-    color: $color-tag;
-    text-decoration: none;
-    margin: .125em;
-    padding: 0 .5em;
-    height: $height; // Same with `min-height` of container
-    cursor: pointer;
-    outline: 0;
-    &:focus,
-    &:focus-within {
-      background: $color-tag-back-focus;
-    }
-    &[title] {
-      a {
-        margin-left: .5em;
-        text-decoration: none;
-        color: $color-tag-x;
-        outline: 0;
-        &::before {
-          content: '\00d7'; // The “×” button
-          font-family: sans-serif;
-        }
-      }
-      &::before {
-        content: attr(title);
-      }
-    }
-    + .editor {
-      span {
-        + span {
-          // Hide the placeholder if we have at least one tag
-          display: none;
-        }
-      }
-    }
-    &.editor {
-      background: none;
-      color: inherit;
-      cursor: inherit;
-      position: relative;
-      flex: 1;
-      &:focus,
-      &:focus-within {
-        background: none;
-      }
-      span {
-        display: block;
-        height: 100%;
-        outline: 0;
-        position: relative;
-        z-index: 1;
-        + span {
-          position: absolute;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          padding: inherit;
-          white-space: nowrap;
-          z-index: 0;
-          opacity: .5;
-        }
+}
+
+.#{$name}__tag {
+  background: $color-tag-back;
+  color: $color-tag;
+  text-decoration: none;
+  margin: .125em;
+  padding: 0 .5em;
+  height: $height; // Same with `min-height` of container
+  cursor: pointer;
+  outline: 0;
+  &--focus {
+    background: $color-tag-back-focus;
+  }
+  &::before {
+    content: attr(title);
+  }
+  + .#{$name}__text {
+    span {
+      + span {
+        // Hide the placeholder if we have at least one tag
+        display: none;
       }
     }
   }
-  &.focus\.tags {
-    .tag {
-      background: $color-tag-back-focus;
-      &.editor {
-        background: none;
-      }
+  &-x {
+    margin-left: .5em;
+    text-decoration: none;
+    color: $color-tag-x;
+    outline: 0;
+    &::before {
+      content: '\00d7'; // The “×” button
+      font-family: sans-serif;
     }
   }
 }
 
-.tag-picker-source {
+.#{$name}__text {
+  background: none;
+  color: inherit;
+  cursor: inherit;
+  position: relative;
+  flex: 1;
+  span {
+    display: block;
+    height: 100%;
+    outline: 0;
+    position: relative;
+    z-index: 1;
+    + span {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      padding: inherit;
+      white-space: nowrap;
+      z-index: 0;
+      opacity: .5;
+    }
+  }
+}
+
+.#{$name}__tags {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  min-height: $height;
+  line-height: $height;
+}
+
+.#{$name}__source {
   position: fixed;
   top: -9999px;
   left: -9999px;
   &[disabled] {
-    + .tag-picker {
+    + .#{$name} {
       &,
       & * {
         cursor: not-allowed;
       }
-      .tag {
-        &[title] {
-          background: $color-tag-back-lock;
-        }
+      .#{$name}__tag {
+        background: $color-tag-back-lock;
       }
       background: $color-back-lock;
       border-color: $color-border-lock;
     }
   }
   &[readonly] {
-    + .tag-picker {
-      .tag {
-        &[title] {
-          a {
-            cursor: not-allowed;
-          }
-        }
+    + .#{$name} {
+      .#{$name}__tag-x {
+        cursor: not-allowed;
       }
       background: $color-back-lock;
       border-color: $color-border-lock;

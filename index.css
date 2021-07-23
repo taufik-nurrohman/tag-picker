@@ -1,4 +1,9 @@
 .tag-picker {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  min-height: 1.5em;
+  line-height: 1.5em;
   background: #fff;
   border: 1px solid #000;
   padding: .125em;
@@ -13,21 +18,11 @@
   color: inherit;
 }
 
-.tag-picker,
-.tag-picker .tags {
-  display: flex;
-  flex: 1;
-  flex-wrap: wrap;
-  min-height: 1.5em;
-  line-height: 1.5em;
-}
-
-.tag-picker:focus,
-.tag-picker:focus-within {
+.tag-picker--focus {
   border-color: #00f;
 }
 
-.tag-picker .tag {
+.tag-picker__tag {
   background: #f00;
   color: #000;
   text-decoration: none;
@@ -38,32 +33,31 @@
   outline: 0;
 }
 
-.tag-picker .tag:focus,
-.tag-picker .tag:focus-within {
+.tag-picker__tag--focus {
   background: #c00;
 }
 
-.tag-picker .tag[title] a {
+.tag-picker__tag::before {
+  content: attr(title);
+}
+
+.tag-picker__tag + .tag-picker__text span + span {
+  display: none;
+}
+
+.tag-picker__tag-x {
   margin-left: .5em;
   text-decoration: none;
   color: #fff;
   outline: 0;
 }
 
-.tag-picker .tag[title] a::before {
+.tag-picker__tag-x::before {
   content: '\00d7';
   font-family: sans-serif;
 }
 
-.tag-picker .tag[title]::before {
-  content: attr(title);
-}
-
-.tag-picker .tag + .editor span + span {
-  display: none;
-}
-
-.tag-picker .tag.editor {
+.tag-picker__text {
   background: none;
   color: inherit;
   cursor: inherit;
@@ -71,12 +65,7 @@
   flex: 1;
 }
 
-.tag-picker .tag.editor:focus,
-.tag-picker .tag.editor:focus-within {
-  background: none;
-}
-
-.tag-picker .tag.editor span {
+.tag-picker__text span {
   display: block;
   height: 100%;
   outline: 0;
@@ -84,7 +73,7 @@
   z-index: 1;
 }
 
-.tag-picker .tag.editor span + span {
+.tag-picker__text span + span {
   position: absolute;
   top: 0;
   right: 0;
@@ -96,39 +85,39 @@
   opacity: .5;
 }
 
-.tag-picker.focus\.tags .tag {
-  background: #c00;
+.tag-picker__tags {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  min-height: 1.5em;
+  line-height: 1.5em;
 }
 
-.tag-picker.focus\.tags .tag.editor {
-  background: none;
-}
-
-.tag-picker-source {
+.tag-picker__source {
   position: fixed;
   top: -9999px;
   left: -9999px;
 }
 
-.tag-picker-source[disabled] + .tag-picker {
+.tag-picker__source[disabled] + .tag-picker {
   background: #eee;
   border-color: #999;
 }
 
-.tag-picker-source[disabled] + .tag-picker,
-.tag-picker-source[disabled] + .tag-picker * {
+.tag-picker__source[disabled] + .tag-picker,
+.tag-picker__source[disabled] + .tag-picker * {
   cursor: not-allowed;
 }
 
-.tag-picker-source[disabled] + .tag-picker .tag[title] {
+.tag-picker__source[disabled] + .tag-picker .tag-picker__tag {
   background: #aaa;
 }
 
-.tag-picker-source[readonly] + .tag-picker {
+.tag-picker__source[readonly] + .tag-picker {
   background: #eee;
   border-color: #999;
 }
 
-.tag-picker-source[readonly] + .tag-picker .tag[title] a {
+.tag-picker__source[readonly] + .tag-picker .tag-picker__tag-x {
   cursor: not-allowed;
 }
