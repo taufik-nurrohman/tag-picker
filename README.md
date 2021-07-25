@@ -3,7 +3,7 @@ Tag Picker
 
 > Better tags input interaction with JavaScript.
 
-![Tag Picker](https://user-images.githubusercontent.com/1669261/69968635-633f9d80-154d-11ea-8632-1694fd52a985.gif)
+![Tag Picker](https://user-images.githubusercontent.com/1669261/126890558-ddbb720b-06af-4122-9775-78ec62334ce8.gif)
 
 Tag Picker is a simple JavaScript application that aims to provide better experience for users in adding and removing comma-separated list of words.
 
