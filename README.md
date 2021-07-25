@@ -29,6 +29,7 @@ Release Notes
  - Added `copy`, `cut`, `paste` hooks.
  - Added `not.tag` hook and `pattern` option.
  - Added ability to remove multiple tags at once via `picker.let()` method.
+ - Changed CSS classes to follow the [BEM](http://getbem.com) approach.
  - Improved keyboard interaction by adding more key strokes. This includes <kbd>⌘</kbd><kbd>a</kbd>, <kbd>⌘</kbd><kbd>c</kbd>, <kbd>⌘</kbd><kbd>p</kbd>, <kbd>⌘</kbd><kbd>x</kbd>, <kbd>⌘</kbd><kbd>⇧</kbd><kbd>←</kbd>, <kbd>⌘</kbd><kbd>⇧</kbd><kbd>→</kbd>, <kbd>Home</kbd>, <kbd>End</kbd>.
 
 ### 3.2.1
