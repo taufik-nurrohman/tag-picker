@@ -656,8 +656,8 @@
         }
 
         function doSubmitTry() {
-            alert('on submit form');
             onSubmitForm() && form && form.dispatchEvent(new Event('submit', {
+                bubbles: true,
                 cancelable: true
             }));
         }
@@ -917,7 +917,6 @@
                 return; // :)
             } // Submit the closest `<form>` element with `Enter` key
             if (keyIsEnter) {
-                alert('key is enter');
                 doSubmitTry(), offEventDefault(e);
                 return;
             } // Select all tag(s) with `Ctrl+A` key
