@@ -250,22 +250,20 @@ function TP(source, state = {}) {
     }
 
     function doInput() {
+        if (sourceIsDisabled() || sourceIsReadOnly()) {
+            return;
+        }
         let tag = doValidTagChar(getText(textInput)).trim(),
             pattern = state.pattern;
-        alert(tag);
-        if (pattern) {
+        if (pattern && tag) {
             if (!toPattern(pattern, "").test(tag)) {
                 fire('not.tag', [tag, -1]);
                 setValue(tag, 1);
                 return;
             }
         }
-        tag = doValidTag(tag);
         setValue("");
-        if (sourceIsDisabled() || sourceIsReadOnly()) {
-            return;
-        }
-        if (tag) {
+        if (tag = doValidTag(tag)) {
             if (!getTag(tag)) {
                 setTagElement(tag), setTag(tag);
                 let index = toCount($.tags);
