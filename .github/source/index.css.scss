@@ -96,6 +96,9 @@ $height: 1.5em;
     outline: 0;
     position: relative;
     z-index: 1;
+    * {
+      display: inline; // Remove (hide) line-break in tag editor
+    }
     + span {
       position: absolute;
       top: 0;

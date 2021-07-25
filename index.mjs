@@ -528,6 +528,12 @@ function TP(source, state = {}) {
             keyIsEnter = KEY_ENTER === key,
             keyIsShift = e.shiftKey,
             keyIsTab = KEY_TAB === key;
+        if (keyIsEnter) {
+            key = '\n';
+        }
+        if (keyIsTab) {
+            key = '\t';
+        }
         delay(() => {
             let theValueAfter = doValidTag(getText(textInput));
             setText(textInputHint, theValueAfter ? "" : thePlaceholder);
@@ -543,26 +549,11 @@ function TP(source, state = {}) {
                 offEventDefault(e);
             }
         });
-        // Skip `Tab` key
-        if (keyIsTab) {
-            return; // :)
-        }
-        // Submit the closest `<form>` element with `Enter` key
-        if (keyIsEnter) {
-            doSubmitTry(), offEventDefault(e);
-            return;
-        }
         // Select all tag(s) with `Ctrl+A` key
         if (keyIsCtrl && "" === theValue && KEY_A === key) {
             setTextCopy(1);
             doFocusTags(), setCurrentTags(), offEventDefault(e);
             return;
-        }
-        // Set preferred key name
-        if (keyIsEnter) {
-            key = '\n';
-        } else if (keyIsTab) {
-            key = '\t';
         }
         if (hasValue(key, escapes)) {
             if (theTagsCount < theTagsMax) {
@@ -573,6 +564,15 @@ function TP(source, state = {}) {
                 fire('max.tags', [theTagsMax]);
             }
             offEventDefault(e);
+            return;
+        }
+        // Skip `Tab` key
+        if (keyIsTab) {
+            return; // :)
+        }
+        // Submit the closest `<form>` element with `Enter` key
+        if (!keyIsCtrl && keyIsEnter) {
+            doSubmitTry();
             return;
         }
         if (theTagLast && "" === theValue && !sourceIsReadOnly()) {

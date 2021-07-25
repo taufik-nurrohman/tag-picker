@@ -85,6 +85,10 @@
   z-index: 1;
 }
 
+.tag-picker__text span * {
+  display: inline;
+}
+
 .tag-picker__text span + span {
   position: absolute;
   top: 0;
