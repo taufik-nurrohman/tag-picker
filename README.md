@@ -3,7 +3,7 @@ Tag Picker
 
 > Better tags input interaction with JavaScript.
 
-![Tag Picker](https://user-images.githubusercontent.com/1669261/126890558-ddbb720b-06af-4122-9775-78ec62334ce8.gif)
+![Tag Picker](https://user-images.githubusercontent.com/1669261/126896222-c4d40a5e-a130-4319-a15a-3ec490b175b3.png)
 
 Tag Picker is a simple JavaScript application that aims to provide better experience for users in adding and removing comma-separated list of words.
 
@@ -24,7 +24,7 @@ Contribute
 Release Notes
 -------------
 
-### 3.3.0
+### 3.3.1
 
  - Added `copy`, `cut`, `paste` hooks.
  - Added `not.tag` hook and `pattern` option.

@@ -14,13 +14,14 @@ $color: #000;
 
 $height: 1.5em;
 
+.#{$name},
+.#{$name} * {
+  box-sizing: border-box;
+  font: inherit;
+  color: inherit;
+}
+
 .#{$name} {
-  &,
-  & * {
-    box-sizing: border-box;
-    font: inherit;
-    color: inherit;
-  }
   position: relative;
   display: flex;
   flex: 1;

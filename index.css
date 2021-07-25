@@ -1,3 +1,10 @@
+.tag-picker,
+.tag-picker * {
+  box-sizing: border-box;
+  font: inherit;
+  color: inherit;
+}
+
 .tag-picker {
   position: relative;
   display: flex;
@@ -10,13 +17,6 @@
   padding: .125em;
   cursor: text;
   outline: 0;
-}
-
-.tag-picker,
-.tag-picker * {
-  box-sizing: border-box;
-  font: inherit;
-  color: inherit;
 }
 
 .tag-picker--focus {

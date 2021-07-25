@@ -250,7 +250,7 @@ function TP(source, state = {}) {
     }
 
     function doInput() {
-        let tag = getText(textInput);
+        let tag = doValidTagChar(getText(textInput)).trim();
         if (state.pattern) {
             if (!toPattern(state.pattern, "").test(tag)) {
                 fire('not.tag', [tag, -1]);
@@ -293,7 +293,15 @@ function TP(source, state = {}) {
     }
 
     function doValidTag(v) {
-        return $.f(v).replace(toPattern('(' + state.escape.join('|').replace(/\\/g, '\\\\') + ')+'), "").trim();
+        return doValidTagChar($.f(v)).trim();
+    }
+
+    function doValidTagChar(v) {
+        v = v || "";
+        state.escape.forEach(char => {
+            v = v.split(char).join("");
+        });
+        return v;
     }
 
     function onBlurFocusTextCopy(e) {
@@ -645,7 +653,7 @@ function TP(source, state = {}) {
     $.click = () => (self.click(), onClickSelf(), $);
 
     // Default filter for the tag name
-    $.f = text => toCaseLower(text || "").replace(/[^ a-z\d-]/g, "");
+    $.f = v => toCaseLower(v || "").replace(/[^ a-z\d-]/g, "").trim();
 
     $.focus = () => {
         if (!sourceIsDisabled()) {
@@ -756,6 +764,6 @@ TP.state = {
     'pattern': null
 };
 
-TP.version = '3.3.0';
+TP.version = '3.3.1';
 
 export default TP;
