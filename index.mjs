@@ -250,9 +250,11 @@ function TP(source, state = {}) {
     }
 
     function doInput() {
-        let tag = doValidTagChar(getText(textInput)).trim();
-        if (state.pattern) {
-            if (!toPattern(state.pattern, "").test(tag)) {
+        let tag = doValidTagChar(getText(textInput)).trim(),
+            pattern = state.pattern;
+        alert(tag);
+        if (pattern) {
+            if (!toPattern(pattern, "").test(tag)) {
                 fire('not.tag', [tag, -1]);
                 setValue(tag, 1);
                 return;
@@ -276,6 +278,7 @@ function TP(source, state = {}) {
     }
 
     function doSubmitTry() {
+        alert('on submit form');
         onSubmitForm() && form && form.dispatchEvent(new Event('submit', {
             cancelable: true
         }));
@@ -548,6 +551,7 @@ function TP(source, state = {}) {
         }
         // Submit the closest `<form>` element with `Enter` key
         if (keyIsEnter) {
+            alert('key is enter');
             doSubmitTry(), offEventDefault(e);
             return;
         }
