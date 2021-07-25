@@ -1,4 +1,5 @@
 .tag-picker {
+  position: relative;
   display: flex;
   flex: 1;
   flex-wrap: wrap;
@@ -20,6 +21,17 @@
 
 .tag-picker--focus {
   border-color: #00f;
+}
+
+.tag-picker__copy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
 }
 
 .tag-picker__tag {
@@ -120,4 +132,9 @@
 
 .tag-picker__source[readonly] + .tag-picker .tag-picker__tag-x {
   cursor: not-allowed;
+}
+
+.tag-picker__source[disabled] + .tag-picker .tag-picker__text,
+.tag-picker__source[readonly] + .tag-picker .tag-picker__text {
+  background: none;
 }

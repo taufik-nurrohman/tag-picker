@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker--focus {
+        border-color: #00f;
+        box-shadow: 0 0 0 3px rgba(0, 0, 255, .25);
+      }
+      .tag-picker--error {
+        border-color: #f00;
+        box-shadow: 0 0 0 3px rgba(255, 0, 0, .25);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p>Add <em>foo</em> again, or add <em>3</em> more tags, or type a weird tag name:</p>
+      <p><input type="text" value="foo, bar, baz"></p>
+    </main>
+    <script src="../index.min.js"></script>
+    <script>
+      const picker = new TP(document.querySelector('input'), {
+          max: 5,
+          pattern: '^[a-z\\d]+(-[a-z\\d]+)*$'
+      });
+
+      function setError() {
+          picker.self.classList.add(picker.state['class'] + '--error');
+          setTimeout(() => {
+              picker.self.classList.remove(picker.state['class'] + '--error');
+          }, 2000);
+      }
+
+      function letError() {
+          picker.self.classList.remove(picker.state['class'] + '--error');
+      }
+
+      picker.on('blur', letError);
+      picker.on('has.tag', setError);
+      picker.on('let.tag', letError);
+      picker.on('max.tags', setError);
+      picker.on('min.tags', setError);
+      picker.on('not.tag', setError);
+      picker.on('set.tag', letError);
+    </script>
+  </body>
+</html>

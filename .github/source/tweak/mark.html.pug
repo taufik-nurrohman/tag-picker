@@ -10,18 +10,18 @@ block script
     | const picker = new TP(document.querySelector('input'));
     |
     | picker.on('has.tag', function(tag, index) {
-    |     const node = this.self.querySelector('[title="' + tag + '"]');
+    |     const node = this.self.querySelector('.' + this.state['class'] + '__tag[title="' + tag + '"]');
     |     if (node) {
-    |         node.classList.add('highlight');
+    |         node.classList.add(this.state['class'] + '__tag--mark');
     |         setTimeout(() => {
-    |             node.classList.remove('highlight');
+    |             node.classList.remove(this.state['class'] + '__tag--mark');
     |         }, 2000);
     |     }
     | });
 
 block style
   style
-    | .tag-picker .tag.highlight {
+    | .tag-picker__tag--mark {
     |   background: #0f0;
     | }
 

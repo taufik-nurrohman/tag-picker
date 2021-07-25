@@ -21,6 +21,7 @@ $height: 1.5em;
     font: inherit;
     color: inherit;
   }
+  position: relative;
   display: flex;
   flex: 1;
   flex-wrap: wrap;
@@ -34,6 +35,17 @@ $height: 1.5em;
   &--focus {
     border-color: $color-border-focus;
   }
+}
+
+.#{$name}__copy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
 }
 
 .#{$name}__tag {
@@ -129,6 +141,14 @@ $height: 1.5em;
       }
       background: $color-back-lock;
       border-color: $color-border-lock;
+    }
+  }
+  &[disabled],
+  &[readonly] {
+    + .#{$name} {
+      .#{$name}__text {
+        background: none;
+      }
     }
   }
 }

@@ -8,11 +8,12 @@ block state
 block script
   script
     | const picker = new TP(document.querySelector('input'), {
-    |     escape: [',', ' ', '\n', '\t']
+    |     pattern: '^[a-z\\d]+(-[a-z\\d]+)*$'
     | });
 
 block content
   main
-    form
-      p Disable #[kbd ,], #[kbd Space], #[kbd Tab] and #[kbd Enter] key.
-      p: input(type='text' value='foo, bar, baz')
+    p Allowed pattern in tag: #[code='^[a-z\\d](-[a-z\\d])*$'].
+    form(method='get')
+      p: input(name='tags' type='text')
+      p: button(type='submit') Submit

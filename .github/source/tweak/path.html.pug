@@ -17,28 +17,28 @@ block style
     | .tag-picker {
     |   padding: 0 .25em;
     | }
-    | .tag-picker .tags::before {
-    |   content: 'C:/server/www/';
-    | }
-    | .tag-picker .tag {
+    | .tag-picker__tag {
     |   background: none;
     |   margin: 0;
     |   padding: 0;
     | }
-    | .tag-picker .tag:focus {
+    | .tag-picker__tag--focus {
     |   background: #ff0;
     | }
-    | .tag-picker .tag::before {
+    | .tag-picker__tag::before {
     |   color: #00f;
     | }
-    | .tag-picker .tag a {
+    | .tag-picker__tag-x {
     |   display: none;
     | }
-    | .tag-picker .tag::after {
+    | .tag-picker__tag::after {
     |   content: '/'
     | }
-    | .tag-picker .editor::before,
-    | .tag-picker .editor::after {
+    | .tag-picker__tags::before {
+    |   content: 'C:/server/www/';
+    | }
+    | .tag-picker__text::before,
+    | .tag-picker__text::after {
     |   display: none;
     | }
 

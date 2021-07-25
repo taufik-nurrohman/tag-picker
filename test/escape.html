@@ -17,12 +17,7 @@
     <script src="../index.min.js"></script>
     <script>
       const picker = new TP(document.querySelector('input'), {
-          escape: [
-              // Modern browser(s)
-              ',', ' ', '\n', '\t',
-              // Legacy browser(s)
-              188, 32, 13, 9
-          ]
+          escape: [',', ' ', '\n', '\t']
       });
     </script>
   </body>

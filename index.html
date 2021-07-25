@@ -82,6 +82,7 @@
     <main>
       <p>Tags are comma-separated list of words. This application has support for hooks, so you can listen to events that occur at each interaction to provide additional features. Each tag item can also be selected using the arrow keys and a mouse click to perform actions on the selected tag, for example, to delete the tag.</p>
       <form method="get" target="_blank">
+        <p tabindex="0">Previous tabbable element. Some text to copy &hellip; foo, bar, baz, qux</p>
         <p><input id="tags" name="tags" placeholder="foo, bar, baz" type="text" value="foo, bar"></p>
         <p>Test connection with <code>&lt;label&gt;</code> element: <label for="tags" style="cursor:pointer;text-decoration:underline;">click here to focus!</label></p>
         <p>Test add and remove methods: <a href="javascript:void(picker.set('wow').focus());">add &ldquo;wow&rdquo;</a> <a href="javascript:void(picker.let('wow').focus());">remove &ldquo;wow&rdquo;</a></p>
@@ -126,11 +127,13 @@ const picker = new TP(document.querySelector('input'));</code></pre>
         <li><a href="test/value.html" target="_blank">Set Pre-Defined Value</a></li>
         <li><a href="test/placeholder.html" target="_blank">Set Placeholder</a></li>
         <li><a href="test/focus.html" target="_blank">Focus State</a></li>
+        <li><a href="tweak/error.html" target="_blank">Error State (Custom)</a></li>
         <li><a href="tweak/focus.placeholder.html" target="_blank">Hide Placeholder on Focus</a></li>
         <li><a href="test/disabled.html" target="_blank">Disabled Input</a></li>
         <li><a href="test/readonly.html" target="_blank">Read-Only Input</a></li>
         <li><a href="test/min.html" target="_blank">Limit Minimum Tags</a></li>
         <li><a href="test/max.html" target="_blank">Limit Maximum Tags</a></li>
+        <li><a href="test/not.html" target="_blank">Check for Valid Tag Pattern</a></li>
         <li><a href="test/form.html" target="_blank">Form Event</a></li>
         <li><a href="test/paste.html" target="_blank">Paste Event</a></li>
         <li><a href="tweak/alert.html" target="_blank">Warn for Duplicate Tags with Alert Message</a></li>
@@ -176,6 +179,10 @@ const picker = new TP(document.querySelector('input'));</code></pre>
             <td><code>state.min</code></td>
             <td>Minimum tags allowed.</td>
           </tr>
+          <tr>
+            <td><code>pattern</code></td>
+            <td>If defined, tag addition will be performed only if value is matched with pattern.</td>
+          </tr>
         </tbody>
       </table>
       <pre><code>const picker = new TP(<var>source</var>, <var>join</var> = ', ');</code></pre>
@@ -183,7 +190,8 @@ const picker = new TP(document.querySelector('input'));</code></pre>
     escape: [','],
     join: ', ',
     max: 9999,
-    min: 0
+    min: 0,
+    pattern: null
 });</code></pre>
       <h2>Methods and Properties</h2>
       <h3>TP.instances</h3>
@@ -279,6 +287,14 @@ picker.set('foo', 1); // Insert a `foo` tag exactly at index `1`</code></pre>
             <td>Will be triggered after click on a tag item.</td>
           </tr>
           <tr>
+            <td><code>copy</code></td>
+            <td>Will be triggered after copy event.</td>
+          </tr>
+          <tr>
+            <td><code>cut</code></td>
+            <td>Will be triggered after cut event.</td>
+          </tr>
+          <tr>
             <td><code>focus</code></td>
             <td>Will be triggered after focus on the tag editor.</td>
           </tr>
@@ -305,6 +321,14 @@ picker.set('foo', 1); // Insert a `foo` tag exactly at index `1`</code></pre>
           <tr>
             <td><code>min.tags</code></td>
             <td>Will be triggered if number of tags you want to submit is less than the <code>picker.state.min</code> value.</td>
+          </tr>
+          <tr>
+            <td><code>not.tag</code></td>
+            <td>Will be triggered if tag value does not match with <code>state.pattern</code>.</td>
+          </tr>
+          <tr>
+            <td><code>paste</code></td>
+            <td>Will be triggered after paste event.</td>
           </tr>
           <tr>
             <td><code>pop</code></td>

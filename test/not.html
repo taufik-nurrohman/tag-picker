@@ -6,25 +6,20 @@
     <meta content="Better tags input interaction with JavaScript." name="description">
     <title>Tag Picker</title>
     <link href="../index.min.css" rel="stylesheet">
-    <style>
-      .tag-picker--focus {
-        background: #ff0;
-      }
-      .tag-picker--focus-self {
-        background: #0ff;
-      }
-      .tag-picker--focus-tag {
-        background: #0f0;
-      }
-    </style>
   </head>
   <body>
     <main>
-      <p><input placeholder="Placeholder here&hellip;" type="text"></p>
+      <p>Allowed pattern in tag: <code>^[a-z\d](-[a-z\d])*$</code>.</p>
+      <form method="get">
+        <p><input name="tags" type="text"></p>
+        <p><button type="submit">Submit</button></p>
+      </form>
     </main>
     <script src="../index.min.js"></script>
     <script>
-      const picker = new TP(document.querySelector('input'));
+      const picker = new TP(document.querySelector('input'), {
+          pattern: '^[a-z\\d]+(-[a-z\\d]+)*$'
+      });
     </script>
   </body>
 </html>
