@@ -1013,11 +1013,18 @@
         $.input = textInput;
         $.let = tag => {
             if (!sourceIsDisabled() && !sourceIsReadOnly()) {
+                let theTagsMin = state.min;
                 if (!tag) {
                     setTags("");
+                } else if (isArray(tag)) {
+                    tag.forEach(v => {
+                        if (theTagsMin > 0 && toCount($.tags) < theTagsMin) {
+                            fire('min.tags', [theTagsMin]);
+                            return $;
+                        }
+                        letTagElement(v), letTag(v);
+                    });
                 } else {
-                    let theTagsMin = state.min;
-                    doInput();
                     if (theTagsMin > 0 && toCount($.tags) < theTagsMin) {
                         fire('min.tags', [theTagsMin]);
                         return $;

@@ -230,6 +230,10 @@ block content
     pre: code
       | picker.let('foo'); // Remove `foo` tag
       | picker.let(); // Remove all tags
+    h3 picker.let(tags)
+    p Remove multiple tags at once.
+    pre: code
+      | picker.let(['foo', 'bar', 'baz']); // Remove `foo`, `bar` and `baz`
     h3 picker.output
     p Alias for #[code picker.source] property.
     h3 picker.pop()
