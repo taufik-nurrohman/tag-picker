@@ -657,7 +657,6 @@
 
         function doSubmitTry() {
             onSubmitForm() && form && form.dispatchEvent(new Event('submit', {
-                bubbles: true,
                 cancelable: true
             }));
         }
@@ -939,7 +938,7 @@
                 return; // :)
             } // Submit the closest `<form>` element with `Enter` key
             if (!keyIsCtrl && keyIsEnter) {
-                doSubmitTry();
+                doSubmitTry(), offEventDefault(e);
                 return;
             }
             if (theTagLast && "" === theValue && !sourceIsReadOnly()) {
