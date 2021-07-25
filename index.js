@@ -911,19 +911,23 @@
                     }
                     offEventDefault(e);
                 }
-            }); // Set preferred key name
-            if (keyIsEnter) {
-                key = '\n';
-            } else if (keyIsTab) {
-                key = '\t';
-            } // Skip `Tab` key
+            }); // Skip `Tab` key
             if (keyIsTab) {
                 return; // :)
+            } // Submit the closest `<form>` element with `Enter` key
+            if (keyIsEnter) {
+                doSubmitTry(), offEventDefault(e);
+                return;
             } // Select all tag(s) with `Ctrl+A` key
             if (keyIsCtrl && "" === theValue && KEY_A === key) {
                 setTextCopy(1);
                 doFocusTags(), setCurrentTags(), offEventDefault(e);
                 return;
+            } // Set preferred key name
+            if (keyIsEnter) {
+                key = '\n';
+            } else if (keyIsTab) {
+                key = '\t';
             }
             if (hasValue(key, escapes)) {
                 if (theTagsCount < theTagsMax) {
@@ -949,10 +953,6 @@
                     theTagLast.focus(); // Focus to the last tag
                     return;
                 }
-            } // Submit the closest `<form>` element with `Enter` key
-            if (keyIsEnter) {
-                doSubmitTry(), offEventDefault(e);
-                return;
             }
         }
 
