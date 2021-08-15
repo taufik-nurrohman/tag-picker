@@ -43,7 +43,7 @@ function TP(source, state = {}) {
 
     let {hooks, fire} = hook($);
 
-    $.state = state = fromStates(TP.state, isString(state) ? {
+    $.state = state = fromStates({}, TP.state, isString(state) ? {
         join: state
     } : (state || {}));
 
@@ -764,6 +764,6 @@ TP.state = {
     'pattern': null
 };
 
-TP.version = '3.3.1';
+TP.version = '3.3.2';
 
 export default TP;

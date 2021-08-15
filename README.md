@@ -24,7 +24,7 @@ Contribute
 Release Notes
 -------------
 
-### 3.3.1
+### 3.3.2
 
  - Added `copy`, `cut`, `paste` hooks.
  - Added `not.tag` hook and `pattern` option.

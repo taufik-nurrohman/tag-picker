@@ -43,7 +43,7 @@ function TP(source, state = {}) {
 
     let {hooks, fire} = hook($);
 
-    $.state = state = fromStates(TP.state, isString(state) ? {
+    $.state = state = fromStates({}, TP.state, isString(state) ? {
         join: state
     } : (state || {}));
 
