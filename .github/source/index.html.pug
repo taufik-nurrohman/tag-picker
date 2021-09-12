@@ -71,8 +71,12 @@ block style
     | /* Add Bootstrap-like focus ring effect */
     | .tag-picker--focus,
     | .tag-picker--focus:hover {
-    |   border-color: #00f;
-    |   box-shadow: 0 0 0 3px rgba(0, 0, 255, .25);
+    |   --shadow-tag-picker--focus: 0 0 0 3px rgba(0, 0, 255, .25);
+    |   --shadow-tag-picker--hover: 0 0 0 3px rgba(0, 0, 255, .25);
+    |   --shadow-tag-picker: 0 0 0 3px rgba(0, 0, 255, .25);
+    |   --stroke-tag-picker--focus: #00f;
+    |   --stroke-tag-picker--hover: #00f;
+    |   --stroke-tag-picker: #00f;
     | }
 
 block content
