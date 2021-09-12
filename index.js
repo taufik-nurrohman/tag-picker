@@ -521,7 +521,7 @@
                 items = getChildren(textOutput),
                 j = toCount(items) - 1; // Minus 1 to skip the tag editor element
             for (i = 0; i < j; ++i) {
-                if (hasClass(items[i], classNameE + 'tag--focus')) {
+                if (hasClass(items[i], classNameE + 'tag--selected')) {
                     currentTags[i] = items[i];
                 }
             }
@@ -645,13 +645,13 @@
 
         function doBlurTags(exceptThisTag) {
             doToTags(exceptThisTag, function() {
-                letClass(this, classNameE + 'tag--focus');
+                letClass(this, classNameE + 'tag--selected');
             });
         }
 
         function doFocusTags(exceptThisTag) {
             doToTags(exceptThisTag, function() {
-                setClass(this, classNameE + 'tag--focus');
+                setClass(this, classNameE + 'tag--selected');
             });
         }
 
@@ -735,11 +735,11 @@
             if ('blur' === type) {
                 if (!_keyIsShift || _keyIsTab) {
                     doBlurTags(t);
-                    letClass(t, classNameTagM + 'focus');
+                    letClass(t, classNameTagM + 'selected');
                     letClasses(self, [classNameM + 'focus', classNameM + 'focus-tag']);
                 }
             } else {
-                setClass(t, classNameTagM + 'focus');
+                setClass(t, classNameTagM + 'selected');
                 setClasses(self, [classNameM + 'focus', classNameM + 'focus-tag']);
                 currentTagIndex = index;
                 currentTags[index] = t;
@@ -872,12 +872,12 @@
                     } // Focus to the previous tag
                 } else if (KEY_ARROW_LEFT === key) {
                     if (theTag = getChildren(textOutput, currentTagIndex - 1)) {
-                        let theTagWasFocus = hasClass(theTag, classNameTagM + 'focus');
+                        let theTagWasFocus = hasClass(theTag, classNameTagM + 'selected');
                         theTag.focus(), offEventDefault(e);
                         if (keyIsShift) {
                             theTagNext = getNext(theTag);
                             if (theTagWasFocus) {
-                                letClass(theTagNext, classNameTagM + 'focus');
+                                letClass(theTagNext, classNameTagM + 'selected');
                             }
                         } else {
                             doBlurTags(theTag);
@@ -887,12 +887,12 @@
                     } // Focus to the next tag or to the tag editor
                 } else if (KEY_ARROW_RIGHT === key) {
                     if (theTag = getChildren(textOutput, currentTagIndex + 1)) {
-                        let theTagWasFocus = hasClass(theTag, classNameTagM + 'focus');
+                        let theTagWasFocus = hasClass(theTag, classNameTagM + 'selected');
                         text === theTag && !keyIsShift ? setValue("", 1) : theTag.focus(), offEventDefault(e);
                         if (keyIsShift) {
                             theTagPrev = getPrev(theTag);
                             if (theTagWasFocus) {
-                                letClass(theTagPrev, classNameTagM + 'focus');
+                                letClass(theTagPrev, classNameTagM + 'selected');
                             }
                         } else {
                             doBlurTags(theTag);
@@ -1133,6 +1133,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.3.3';
+    TP.version = '3.4.0';
     return TP;
 });

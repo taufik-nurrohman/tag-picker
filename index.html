@@ -5,7 +5,7 @@
     <meta content="#000" name="theme-color">
     <meta content="width=device-width" name="viewport">
     <meta content="Better tags input interaction with JavaScript." name="description">
-    <title>Tag Picker 3.3.3</title>
+    <title>Tag Picker 3.4.0</title>
     <link href="index.min.css" rel="stylesheet">
     <style>
       * {
@@ -13,8 +13,8 @@
       }
       :root {
         background: #fff;
-        color: #000;
         border-top: 4px solid;
+        color: #000;
         font: normal normal 16px/1.25 serif;
       }
       a {
@@ -33,13 +33,13 @@
       header,
       main,
       nav {
-        max-width: 700px;
         margin: 0 auto;
+        max-width: 700px;
       }
       hr {
         border: 0;
-        color: inherit;
         border-top: 1px dashed;
+        color: inherit;
         height: 0;
       }
       pre {
@@ -47,8 +47,8 @@
         word-wrap: break-word;
       }
       pre code {
-        display: block;
         background: #eee;
+        display: block;
         padding: 1em;
       }
       table {
@@ -67,7 +67,9 @@
       }
 
       /* Add Bootstrap-like focus ring effect */
-      .tag-picker--focus {
+      .tag-picker--focus,
+      .tag-picker--focus:hover {
+        border-color: #00f;
         box-shadow: 0 0 0 3px rgba(0, 0, 255, .25);
       }
     </style>
@@ -75,7 +77,7 @@
   <body>
     <p>Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
-      <h1>Tag Picker 3.3.3</h1>
+      <h1>Tag Picker 3.4.0</h1>
       <p>Tag Picker is a simple JavaScript application that aims to provide better experience for users in adding and removing comma-separated list of words.</p>
       <hr>
     </header>
@@ -137,7 +139,7 @@ const picker = new TP(document.querySelector('input'));</code></pre>
         <li><a href="test/form.html" target="_blank">Form Event</a></li>
         <li><a href="test/paste.html" target="_blank">Paste Event</a></li>
         <li><a href="tweak/alert.html" target="_blank">Warn for Duplicate Tags with Alert Message</a></li>
-        <li><a href="tweak/mark.html" target="_blank">Warn for Duplicate Tags with Flash Highlight</a></li>
+        <li><a href="tweak/target.html" target="_blank">Warn for Duplicate Tags with Flash Highlight</a></li>
         <li><a href="test/escape.html" target="_blank">Disable Characters with <code>picker.state.escape</code></a></li>
         <li><a href="test/f.html" target="_blank">Filter Characters with <code>picker.f()</code> Method</a></li>
         <li><a href="tweak/path.html" target="_blank">Directory</a> (Experiment)</li>

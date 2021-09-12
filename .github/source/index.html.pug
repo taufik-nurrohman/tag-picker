@@ -20,8 +20,8 @@ block style
     | }
     | :root {
     |   background: #fff;
-    |   color: #000;
     |   border-top: 4px solid;
+    |   color: #000;
     |   font: normal normal 16px/1.25 serif;
     | }
     | a {
@@ -36,13 +36,13 @@ block style
     |   font-size: 80%;
     | }
     | footer, header, main, nav {
-    |   max-width: 700px;
     |   margin: 0 auto;
+    |   max-width: 700px;
     | }
     | hr {
     |   border: 0;
-    |   color: inherit;
     |   border-top: 1px dashed;
+    |   color: inherit;
     |   height: 0;
     | }
     | pre {
@@ -50,8 +50,8 @@ block style
     |   word-wrap: break-word;
     | }
     | pre code {
-    |   display: block;
     |   background: #eee;
+    |   display: block;
     |   padding: 1em;
     | }
     | table {
@@ -69,7 +69,9 @@ block style
     | }
     |
     | /* Add Bootstrap-like focus ring effect */
-    | .tag-picker--focus {
+    | .tag-picker--focus,
+    | .tag-picker--focus:hover {
+    |   border-color: #00f;
     |   box-shadow: 0 0 0 3px rgba(0, 0, 255, .25);
     | }
 
@@ -138,7 +140,7 @@ block content
       li: a(href='test/form.html' target='_blank') Form Event
       li: a(href='test/paste.html' target='_blank') Paste Event
       li: a(href='tweak/alert.html' target='_blank') Warn for Duplicate Tags with Alert Message
-      li: a(href='tweak/mark.html' target='_blank') Warn for Duplicate Tags with Flash Highlight
+      li: a(href='tweak/target.html' target='_blank') Warn for Duplicate Tags with Flash Highlight
       li: a(href='test/escape.html' target='_blank') Disable Characters with #[code picker.state.escape]
       li: a(href='test/f.html' target='_blank') Filter Characters with #[code picker.f()] Method
       li #[a(href='tweak/path.html' target='_blank') Directory] (Experiment)

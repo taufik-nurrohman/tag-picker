@@ -7,7 +7,7 @@
     <title>Tag Picker</title>
     <link href="../index.min.css" rel="stylesheet">
     <style>
-      .tag-picker__tag--mark {
+      .tag-picker__tag--target:not(.tag-picker__text) {
         background: #0f0;
       }
     </style>
@@ -24,9 +24,9 @@
       picker.on('has.tag', function(tag, index) {
           const node = this.self.querySelector('.' + this.state['class'] + '__tag[title="' + tag + '"]');
           if (node) {
-              node.classList.add(this.state['class'] + '__tag--mark');
+              node.classList.add(this.state['class'] + '__tag--target');
               setTimeout(() => {
-                  node.classList.remove(this.state['class'] + '__tag--mark');
+                  node.classList.remove(this.state['class'] + '__tag--target');
               }, 2000);
           }
       });

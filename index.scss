@@ -1,65 +1,116 @@
 $name: 'tag-picker';
 
-$color-back-lock: #eee;
-$color-back: #fff;
-$color-border-focus: #00f;
-$color-border-lock: #999;
-$color-border: #000;
-$color-tag-back-focus: #c00;
-$color-tag-back-lock: #aaa;
-$color-tag-back: #f00;
-$color-tag-x: #fff;
-$color-tag: #000;
-$color: #000;
-
-$height: 1.5em;
+:root {
+  --color-tag-picker: #000;
+  --color-tag-picker__tag-x: #fff;
+  --color-tag-picker__tag: #000;
+  --fill-tag-picker--disabled: #eee;
+  --fill-tag-picker--read-only: #eee;
+  --fill-tag-picker: #fff;
+  --fill-tag-picker__tag--disabled: #aaa;
+  --fill-tag-picker__tag--focus: #c00;
+  --fill-tag-picker__tag--read-only: #f00;
+  --fill-tag-picker__tag--selected: #c00;
+  --fill-tag-picker__tag: #f00;
+  --height-tag-picker: 1.5em;
+  --radius-tag-picker: 0;
+  --radius-tag-picker__tag: 0;
+  --shadow-tag-picker: none;
+  --shadow-tag-picker__tag: none;
+  --stroke-tag-picker--disabled: #999;
+  --stroke-tag-picker--focus: #00f;
+  --stroke-tag-picker--read-only: #999;
+  --stroke-tag-picker: #000;
+  --stroke-tag-picker__tag: transparent;
+}
 
 .#{$name},
 .#{$name} * {
   box-sizing: border-box;
-  font: inherit;
   color: inherit;
+  font: inherit;
 }
 
 .#{$name} {
-  position: relative;
-  display: flex;
-  flex: 1;
-  flex-wrap: wrap;
-  min-height: $height;
-  line-height: $height;
-  background: $color-back;
-  border: 1px solid $color-border;
-  padding: .125em;
+  background: var(--fill-#{$name});
+  border: 1px solid;
+  border-color: var(--stroke-#{$name});
+  color: var(--color-#{$name});
   cursor: text;
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+  line-height: var(--height-#{$name});
+  min-height: var(--height-#{$name});
   outline: 0;
-  &--focus {
-    border-color: $color-border-focus;
+  padding: .125em;
+  position: relative;
+  $states: hover, focus, active;
+  @each $state in $states {
+    &:#{$state} {
+      background: var(--fill-#{$name}--#{$state}, var(--fill-#{$name}));
+      border-color: var(--stroke-#{$name}--#{$state}, var(--stroke-#{$name}));
+      box-shadow: var(--shadow-#{$name}--#{$state}, var(--shadow-#{$name}));
+      color: var(--color-#{$name}--#{$state}, var(--color-#{$name}));
+    }
+  }
+  $states: focus, disabled;
+  @each $state in $states {
+    &--#{$state} {
+      background: var(--fill-#{$name}--#{$state}, var(--fill-#{$name}));
+      border-color: var(--stroke-#{$name}--#{$state}, var(--stroke-#{$name}));
+      box-shadow: var(--shadow-#{$name}--#{$state}, var(--shadow-#{$name}));
+      color: var(--color-#{$name}--#{$state}, var(--color-#{$name}));
+    }
   }
 }
 
 .#{$name}__copy {
-  position: absolute;
-  top: 0;
+  height: 1px;
   left: 0;
   margin: 0;
-  padding: 0;
-  width: 1px;
-  height: 1px;
   opacity: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  width: 1px;
 }
 
 .#{$name}__tag {
-  background: $color-tag-back;
-  color: $color-tag;
-  text-decoration: none;
+  height: var(--height-#{$name}); // Same with `min-height` of container
   margin: .125em;
-  padding: 0 .5em;
-  height: $height; // Same with `min-height` of container
-  cursor: pointer;
   outline: 0;
-  &--focus {
-    background: $color-tag-back-focus;
+  padding: 0 .5em;
+  position: relative;
+  text-decoration: none;
+  &:not(.#{$name}__text) {
+    background: var(--fill-#{$name}__tag);
+    border: 0 solid;
+    border-color: var(--stroke-#{$name}__tag);
+    border-radius: var(--radius-#{$name}__tag);
+    box-shadow: var(--shadow-#{$name}__tag);
+    color: var(--color-#{$name}__tag);
+    cursor: pointer;
+  }
+  $states: hover, focus, active;
+  @each $state in $states {
+    &:not(.#{$name}__text):#{$state} {
+      background: var(--fill-#{$name}__tag--#{$state}, var(--fill-#{$name}__tag));
+      border-color: var(--stroke-#{$name}__tag--#{$state}, var(--stroke-#{$name}__tag));
+      border-radius: var(--radius-#{$name}__tag--#{$state}, var(--radius-#{$name}__tag));
+      box-shadow: var(--shadow-#{$name}__tag--#{$state}, var(--shadow-#{$name}__tag));
+      color: var(--color-#{$name}__tag--#{$state}, var(--color-#{$name}__tag));
+    }
+  }
+  $states: selected, disabled;
+  @each $state in $states {
+    &--#{$state}:not(.#{$name}__text) {
+      background: var(--fill-#{$name}__tag--#{$state}, var(--fill-#{$name}__tag));
+      border-color: var(--stroke-#{$name}__tag--#{$state}, var(--stroke-#{$name}__tag));
+      border-radius: var(--radius-#{$name}__tag--#{$state}, var(--radius-#{$name}__tag));
+      box-shadow: var(--shadow-#{$name}__tag--#{$state}, var(--shadow-#{$name}__tag));
+      color: var(--color-#{$name}__tag--#{$state}, var(--color-#{$name}__tag));
+    }
   }
   &::before {
     content: attr(title);
@@ -73,10 +124,16 @@ $height: 1.5em;
     }
   }
   &-x {
+    color: var(--color-#{$name}__tag-x);
     margin-left: .5em;
-    text-decoration: none;
-    color: $color-tag-x;
     outline: 0;
+    text-decoration: none;
+    $states: hover, focus, active;
+    @each $state in $states {
+      &:#{$state} {
+        color: var(--color-#{$name}__tag-x--#{$state}, var(--color-#{$name}__tag-x));
+      }
+    }
     &::before {
       content: '\00d7'; // The “×” button
       font-family: sans-serif;
@@ -85,10 +142,6 @@ $height: 1.5em;
 }
 
 .#{$name}__text {
-  background: none;
-  color: inherit;
-  cursor: inherit;
-  position: relative;
   flex: 1;
   span {
     display: block;
@@ -100,59 +153,64 @@ $height: 1.5em;
       display: inline; // Remove (hide) line-break in tag editor
     }
     + span {
-      position: absolute;
-      top: 0;
-      right: 0;
       bottom: 0;
       left: 0;
+      opacity: .5;
       padding: inherit;
+      position: absolute;
+      right: 0;
+      top: 0;
       white-space: nowrap;
       z-index: 0;
-      opacity: .5;
     }
   }
 }
 
 .#{$name}__tags {
   display: flex;
-  flex: 1;
   flex-wrap: wrap;
-  min-height: $height;
-  line-height: $height;
+  flex: 1;
+  line-height: var(--height-#{$name});
+  min-height: var(--height-#{$name});
 }
 
 .#{$name}__source {
+  left: -9999px;
   position: fixed;
   top: -9999px;
-  left: -9999px;
-  &[disabled] {
+  &:read-only {
+    + .#{$name} {
+      .#{$name}__tag-x {
+        cursor: not-allowed;
+      }
+      .#{$name}__tag:not(.#{$name}__text) {
+        background: var(--fill-#{$name}__tag--read-only, var(--fill-#{$name}__tag));
+        border-color: var(--stroke-#{$name}__tag--read-only, var(--stroke-#{$name}__tag));
+        box-shadow: var(--shadow-#{$name}__tag--read-only, var(--shadow-#{$name}__tag));
+        color: var(--color-#{$name}__tag--read-only, var(--color-#{$name}__tag));
+      }
+      background: var(--fill-#{$name}--read-only, var(--fill-#{$name}));
+      border-color: var(--stroke-#{$name}--read-only, var(--stroke-#{$name}));
+      box-shadow: var(--shadow-#{$name}--read-only, var(--shadow-#{$name}));
+      color: var(--color-#{$name}--read-only, var(--color-#{$name}));
+    }
+  }
+  &:disabled {
     + .#{$name} {
       &,
       & * {
         cursor: not-allowed;
       }
-      .#{$name}__tag {
-        background: $color-tag-back-lock;
+      .#{$name}__tag:not(.#{$name}__text) {
+        background: var(--fill-#{$name}__tag--disabled, var(--fill-#{$name}__tag));
+        border-color: var(--stroke-#{$name}__tag--disabled, var(--stroke-#{$name}__tag));
+        box-shadow: var(--shadow-#{$name}__tag--disabled, var(--shadow-#{$name}__tag));
+        color: var(--color-#{$name}__tag--disabled, var(--color-#{$name}__tag));
       }
-      background: $color-back-lock;
-      border-color: $color-border-lock;
-    }
-  }
-  &[readonly] {
-    + .#{$name} {
-      .#{$name}__tag-x {
-        cursor: not-allowed;
-      }
-      background: $color-back-lock;
-      border-color: $color-border-lock;
-    }
-  }
-  &[disabled],
-  &[readonly] {
-    + .#{$name} {
-      .#{$name}__text {
-        background: none;
-      }
+      background: var(--fill-#{$name}--disabled, var(--fill-#{$name}));
+      border-color: var(--stroke-#{$name}--disabled, var(--stroke-#{$name}));
+      box-shadow: var(--shadow-#{$name}--disabled, var(--shadow-#{$name}));
+      color: var(--color-#{$name}--disabled, var(--color-#{$name}));
     }
   }
 }

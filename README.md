@@ -24,6 +24,10 @@ Contribute
 Release Notes
 -------------
 
+### 3.4.0
+
+ - Added CSS variables for easy integration with third-party applications.
+
 ### 3.3.3
 
  - Added `copy`, `cut`, `paste` hooks.
