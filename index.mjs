@@ -764,6 +764,6 @@ TP.state = {
     'pattern': null
 };
 
-TP.version = '3.4.0';
+TP.version = '3.4.1';
 
 export default TP;

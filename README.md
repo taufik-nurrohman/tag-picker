@@ -24,7 +24,7 @@ Contribute
 Release Notes
 -------------
 
-### 3.4.0
+### 3.4.1
 
  - Added CSS variables for easy integration with third-party applications.
 
