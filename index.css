@@ -3,9 +3,6 @@
   --color-tag-picker__tag-x: #fff;
   --color-tag-picker__tag: #000;
   --fill-tag-picker--disabled: #eee;
-  --font-face-tag-picker: inherit;
-  --font-height-tag-picker: 1.5em;
-  --font-size-tag-picker: inherit;
   --fill-tag-picker--read-only: #eee;
   --fill-tag-picker: #fff;
   --fill-tag-picker__tag--disabled: #aaa;
@@ -13,14 +10,17 @@
   --fill-tag-picker__tag--read-only: #f00;
   --fill-tag-picker__tag--selected: #c00;
   --fill-tag-picker__tag: #f00;
+  --font-face-tag-picker: inherit;
   --font-height-tag-picker: 1.5em;
+  --font-height-tag-picker: 1.5em;
+  --font-size-tag-picker: inherit;
   --radius-tag-picker: 0;
   --radius-tag-picker__tag: 0;
   --shadow-tag-picker: none;
   --shadow-tag-picker__tag: none;
-  --stroke-tag-picker--disabled: #999;
+  --stroke-tag-picker--disabled: #666;
   --stroke-tag-picker--focus: #00f;
-  --stroke-tag-picker--read-only: #999;
+  --stroke-tag-picker--read-only: #666;
   --stroke-tag-picker: #000;
   --stroke-tag-picker__tag: transparent;
 }

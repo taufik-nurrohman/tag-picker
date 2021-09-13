@@ -446,7 +446,7 @@
         if (!source) return;
         const $ = this; // Already instantiated, skip!
         if (source[name]) {
-            return;
+            return source[name];
         } // Return new instance if `TP` was called without the `new` operator
         if (!isInstance($, TP)) {
             return new TP(source, state);
@@ -464,7 +464,7 @@
         } : state || {});
         $.source = source; // Store current instance to `TP.instances`
         TP.instances[source.id || source.name || toObjectCount(TP.instances)] = $; // Mark current DOM as active tag picker to prevent duplicate instance
-        source[name] = 1;
+        source[name] = $;
         let classNameB = state['class'],
             classNameE = classNameB + '__',
             classNameM = classNameB + '--',
@@ -492,7 +492,7 @@
             });
         let currentTagIndex = 0,
             currentTags = {};
-        let _keyIsShift, _keyIsTab;
+        let _keyIsCtrl, _keyIsShift, _keyIsTab;
 
         function getCharBeforeCaret(container) {
             let range,
@@ -733,7 +733,8 @@
                 index = toArrayKey(tag, tags),
                 classNameTagM = classNameE + 'tag--';
             if ('blur' === type) {
-                if (!_keyIsShift || _keyIsTab) {
+                if (!_keyIsCtrl && !_keyIsShift || _keyIsShift && _keyIsTab // Do not do multiple selection on Shift+Tab
+                ) {
                     doBlurTags(t);
                     letClass(t, classNameTagM + 'selected');
                     letClasses(self, [classNameM + 'focus', classNameM + 'focus-tag']);
@@ -833,7 +834,7 @@
             }
             $.tags;
             let key = e.key,
-                keyIsCtrl = e.ctrlKey,
+                keyIsCtrl = _keyIsCtrl = e.ctrlKey,
                 keyIsShift = _keyIsShift = e.shiftKey,
                 classNameTagM = classNameE + 'tag--';
             _keyIsTab = KEY_TAB === key;
@@ -861,16 +862,22 @@
                     } else {
                         setValue("", 1);
                     }
-                    offEventDefault(e); // Focus to the first tag
-                } else if (KEY_BEGIN === key) {
+                    offEventDefault(e);
+                    return;
+                } // Focus to the first tag
+                if (KEY_BEGIN === key) {
                     if (theTag = getChildren(textOutput, 0)) {
                         theTag.focus(), offEventDefault(e);
-                    } // Focus to the last tag
-                } else if (KEY_END === key) {
+                    }
+                    return;
+                } // Focus to the last tag
+                if (KEY_END === key) {
                     if (theTag = getChildren(textOutput, toCount($.tags) - 1)) {
                         theTag.focus(), offEventDefault(e);
-                    } // Focus to the previous tag
-                } else if (KEY_ARROW_LEFT === key) {
+                        return;
+                    }
+                } // Focus to the previous tag
+                if (KEY_ARROW_LEFT === key) {
                     if (theTag = getChildren(textOutput, currentTagIndex - 1)) {
                         let theTagWasFocus = hasClass(theTag, classNameTagM + 'selected');
                         theTag.focus(), offEventDefault(e);
@@ -879,13 +886,17 @@
                             if (theTagWasFocus) {
                                 letClass(theTagNext, classNameTagM + 'selected');
                             }
-                        } else {
-                            doBlurTags(theTag);
+                            return;
                         }
-                    } else if (!keyIsShift) {
+                        doBlurTags(theTag);
+                        return;
+                    }
+                    if (!keyIsShift) {
                         doBlurTags(getChildren(textOutput, 0));
-                    } // Focus to the next tag or to the tag editor
-                } else if (KEY_ARROW_RIGHT === key) {
+                        return;
+                    }
+                } // Focus to the next tag or to the tag editor
+                if (KEY_ARROW_RIGHT === key) {
                     if (theTag = getChildren(textOutput, currentTagIndex + 1)) {
                         let theTagWasFocus = hasClass(theTag, classNameTagM + 'selected');
                         text === theTag && !keyIsShift ? setValue("", 1) : theTag.focus(), offEventDefault(e);
@@ -894,17 +905,16 @@
                             if (theTagWasFocus) {
                                 letClass(theTagPrev, classNameTagM + 'selected');
                             }
-                        } else {
-                            doBlurTags(theTag);
+                            return;
                         }
+                        doBlurTags(theTag);
+                        return;
                     }
                 }
-            } else {
-                // Select all tag(s) with `Ctrl+A` key
-                if (KEY_A === key) {
-                    setTextCopy(1);
-                    doFocusTags(), setCurrentTags(), offEventDefault(e);
-                }
+            } // Select all tag(s) with `Ctrl+A` key
+            if (KEY_A === key) {
+                setTextCopy(1);
+                doFocusTags(), setCurrentTags(), offEventDefault(e);
             }
         }
 
@@ -920,10 +930,10 @@
                 theTagsMax = state.max,
                 theValue = doValidTag(getText(textInput)),
                 key = e.key,
-                keyIsCtrl = e.ctrlKey,
+                keyIsCtrl = _keyIsCtrl = e.ctrlKey,
                 keyIsEnter = KEY_ENTER === key;
-            e.shiftKey;
-            let keyIsTab = KEY_TAB === key;
+            _keyIsShift = e.shiftKey;
+            let keyIsTab = _keyIsTab = KEY_TAB === key;
             if (keyIsEnter) {
                 key = '\n';
             }
@@ -943,7 +953,19 @@
                     }
                     offEventDefault(e);
                 }
-            }); // Select all tag(s) with `Ctrl+A` key
+            }); // Focus to the first tag
+            if ("" === theValue && KEY_BEGIN === key) {
+                if (theTag = getChildren(textOutput, 0)) {
+                    theTag.focus(), offEventDefault(e);
+                    return;
+                }
+            } // Focus to the last tag
+            if ("" === theValue && KEY_END === key) {
+                if (theTag = getChildren(textOutput, toCount($.tags) - 1)) {
+                    theTag.focus(), offEventDefault(e);
+                    return;
+                }
+            } // Select all tag(s) with `Ctrl+A` key
             if (keyIsCtrl && "" === theValue && KEY_A === key) {
                 setTextCopy(1);
                 doFocusTags(), setCurrentTags(), offEventDefault(e);
@@ -984,7 +1006,7 @@
         }
 
         function onKeyUpSelf() {
-            _keyIsShift = false;
+            _keyIsCtrl = _keyIsShift = false;
         }
 
         function onPasteText() {
@@ -1133,6 +1155,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.4.1';
+    TP.version = '3.4.2';
     return TP;
 });
