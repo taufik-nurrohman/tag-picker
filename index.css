@@ -23,6 +23,7 @@
   --stroke-tag-picker--read-only: #666;
   --stroke-tag-picker: #000;
   --stroke-tag-picker__tag: transparent;
+  --width-tag-picker: 100%;
 }
 
 .tag-picker,
@@ -39,7 +40,7 @@
   border-radius: var(--radius-tag-picker);
   color: var(--color-tag-picker);
   cursor: text;
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
   flex: 1;
   font: inherit;

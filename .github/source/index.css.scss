@@ -25,6 +25,7 @@ $name: 'tag-picker';
   --stroke-#{$name}--read-only: #666;
   --stroke-#{$name}: #000;
   --stroke-#{$name}__tag: transparent;
+  --width-#{$name}: 100%;
 }
 
 .#{$name},
@@ -41,7 +42,7 @@ $name: 'tag-picker';
   border-radius: var(--radius-#{$name});
   color: var(--color-#{$name});
   cursor: text;
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
   flex: 1;
   font: inherit;

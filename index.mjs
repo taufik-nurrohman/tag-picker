@@ -59,7 +59,7 @@ function TP(source, state = {}) {
         classNameE = classNameB + '__',
         classNameM = classNameB + '--',
         form = getParentForm(source), // Capture the closest `<form>` element
-        self = setElement('span', {
+        self = setElement('div', {
             'class': classNameB,
             'tabindex': sourceIsDisabled() ? false : '-1'
         }),
@@ -794,6 +794,6 @@ TP.state = {
     'pattern': null
 };
 
-TP.version = '3.4.2';
+TP.version = '3.4.3';
 
 export default TP;

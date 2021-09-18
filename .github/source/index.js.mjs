@@ -59,7 +59,7 @@ function TP(source, state = {}) {
         classNameE = classNameB + '__',
         classNameM = classNameB + '--',
         form = getParentForm(source), // Capture the closest `<form>` element
-        self = setElement('span', {
+        self = setElement('div', {
             'class': classNameB,
             'tabindex': sourceIsDisabled() ? false : '-1'
         }),

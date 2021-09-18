@@ -470,7 +470,7 @@
             classNameM = classNameB + '--',
             form = getParentForm(source),
             // Capture the closest `<form>` element
-            self = setElement('span', {
+            self = setElement('div', {
                 'class': classNameB,
                 'tabindex': sourceIsDisabled() ? false : '-1'
             }),
@@ -1155,6 +1155,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.4.2';
+    TP.version = '3.4.3';
     return TP;
 });
