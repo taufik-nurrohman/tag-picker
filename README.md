@@ -35,13 +35,13 @@ Release Notes
  - Added `not.tag` hook and `pattern` option.
  - Added ability to remove multiple tags at once via `picker.let()` method.
  - Changed CSS classes to follow the [BEM](http://getbem.com) approach.
- - Improved keyboard interaction by adding more key strokes. This includes <kbd>⌘</kbd><kbd>a</kbd>, <kbd>⌘</kbd><kbd>c</kbd>, <kbd>⌘</kbd><kbd>v</kbd>, <kbd>⌘</kbd><kbd>x</kbd>, <kbd>⌘</kbd><kbd>⇧</kbd><kbd>←</kbd>, <kbd>⌘</kbd><kbd>⇧</kbd><kbd>→</kbd>, <kbd>Home</kbd>, <kbd>End</kbd>.
+ - Improved keyboard interaction by adding more key strokes. This includes <kbd>Control</kbd><kbd>a</kbd>, <kbd>Control</kbd><kbd>c</kbd>, <kbd>Control</kbd><kbd>v</kbd>, <kbd>Control</kbd><kbd>x</kbd>, <kbd>Control</kbd><kbd>Shift</kbd><kbd>ArrowLeft</kbd>, <kbd>Control</kbd><kbd>Shift</kbd><kbd>ArrowRight</kbd>, <kbd>Home</kbd>, <kbd>End</kbd>.
  - Maintenance.
 
 ### 3.2.1
 
  - Improved focus state.
- - Improved keyboard interaction to make it possible to select all tags with <kbd>⌘</kbd><kbd>a</kbd>.
+ - Improved keyboard interaction to make it possible to select all tags with <kbd>Control</kbd><kbd>a</kbd>.
 
 ### 3.2.0
 
