@@ -24,12 +24,12 @@ function TP(source, state = {}) {
 
     if (!source) return;
 
-    const $ = this;
-
     // Already instantiated, skip!
     if (source[name]) {
         return source[name];
     }
+
+    const $ = this;
 
     // Return new instance if `TP` was called without the `new` operator
     if (!isInstance($, TP)) {
@@ -61,13 +61,14 @@ function TP(source, state = {}) {
         form = getParentForm(source), // Capture the closest `<form>` element
         self = setElement('div', {
             'class': classNameB,
-            'tabindex': sourceIsDisabled() ? false : '-1'
+            'tabindex': sourceIsDisabled() ? false : -1
         }),
         text = setElement('span', {
             'class': classNameE + 'tag ' + classNameE + 'text'
         }),
         textCopy = setElement('input', {
             'class': classNameE + 'copy',
+            'tabindex': -1,
             'type': 'text'
         }),
         textInput = setElement('span', {
@@ -131,13 +132,13 @@ function TP(source, state = {}) {
     function setTagElement(tag, index) {
         let element = setElement('span', {
             'class': classNameE + 'tag',
-            'tabindex': sourceIsDisabled() ? false : '0',
+            'tabindex': sourceIsDisabled() || sourceIsReadOnly() ? false : 0,
             'title': tag
         });
         let x = setElement('a', {
             'class': classNameE + 'tag-x',
             'href': "",
-            'tabindex': '-1',
+            'tabindex': -1,
             'target': '_top'
         });
         onEvent('click', x, onClickTagX);
@@ -658,7 +659,7 @@ function TP(source, state = {}) {
     setNext(source, self);
 
     setElement(source, {
-        'tabindex': '-1'
+        'tabindex': -1
     });
 
     onEvent('blur', self, onBlurSelf);
