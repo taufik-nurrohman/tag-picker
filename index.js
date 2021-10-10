@@ -829,7 +829,7 @@
         }
 
         function onKeyDownSelf(e) {
-            if (sourceIsDisabled()) {
+            if (sourceIsDisabled() || sourceIsReadOnly()) {
                 return;
             }
             $.tags;
@@ -838,9 +838,6 @@
                 keyIsShift = _keyIsShift = e.shiftKey,
                 classNameTagM = classNameE + 'tag--';
             _keyIsTab = KEY_TAB === key;
-            if (sourceIsReadOnly()) {
-                return;
-            }
             let theTag, theTagIndex, theTagNext, theTagPrev, theTagTitle, theTags;
             if (!keyIsCtrl) {
                 // Remove tag(s) with `Backspace` or `Delete` key
@@ -920,7 +917,7 @@
 
         function onKeyDownText(e) {
             offEventPropagation(e);
-            if (sourceIsReadOnly()) {
+            if (sourceIsReadOnly() && 'Tab' !== e.key) {
                 offEventDefault(e);
             }
             let escapes = state.escape,
@@ -1155,6 +1152,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.4.3';
+    TP.version = '3.4.4';
     return TP;
 });

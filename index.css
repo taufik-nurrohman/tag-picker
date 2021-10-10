@@ -42,7 +42,6 @@
   cursor: text;
   display: inline-flex;
   flex-wrap: wrap;
-  flex: 1;
   font: inherit;
   font-family: var(--font-face-tag-picker);
   font-size: var(--font-size-tag-picker);

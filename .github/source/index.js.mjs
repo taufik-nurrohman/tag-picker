@@ -427,7 +427,7 @@ function TP(source, state = {}) {
     }
 
     function onKeyDownSelf(e) {
-        if (sourceIsDisabled()) {
+        if (sourceIsDisabled() || sourceIsReadOnly()) {
             return;
         }
         let tags = $.tags,
@@ -436,9 +436,6 @@ function TP(source, state = {}) {
             keyIsShift = _keyIsShift = e.shiftKey,
             classNameTagM = classNameE + 'tag--';
         _keyIsTab = KEY_TAB === key;
-        if (sourceIsReadOnly()) {
-            return;
-        }
         let theTag,
             theTagIndex,
             theTagNext,
@@ -528,7 +525,7 @@ function TP(source, state = {}) {
 
     function onKeyDownText(e) {
         offEventPropagation(e);
-        if (sourceIsReadOnly()) {
+        if (sourceIsReadOnly() && 'Tab' !== e.key) {
             offEventDefault(e);
         }
         let escapes = state.escape,
