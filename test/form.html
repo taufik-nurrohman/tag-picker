@@ -20,7 +20,6 @@
     <script>
       const form = document.forms[0];
       const picker = new TP(form.test);
-
       form.addEventListener('submit', e => {
           console.log(form.test.value);
           form.js.checked && e.preventDefault();

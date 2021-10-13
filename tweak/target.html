@@ -20,7 +20,6 @@
     <script src="../index.min.js"></script>
     <script>
       const picker = new TP(document.querySelector('input'));
-
       picker.on('has.tag', function(tag, index) {
           const node = this.self.querySelector('.' + this.state['class'] + '__tag[title="' + tag + '"]');
           if (node) {

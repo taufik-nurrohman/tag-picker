@@ -15,7 +15,6 @@
     <script src="../index.min.js"></script>
     <script>
       const picker = new TP(document.querySelector('input'));
-
       picker.on('has.tag', (tag, index) => {
           alert('Tag “' + tag + '” already exists at index “' + index + '”.');
       });

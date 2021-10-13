@@ -36,7 +36,6 @@
       function letError() {
           picker.self.classList.remove(picker.state['class'] + '--error');
       }
-
       picker.on('blur', letError);
       picker.on('has.tag', setError);
       picker.on('let.tag', letError);

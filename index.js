@@ -443,11 +443,11 @@
     const KEY_TAB = 'Tab';
 
     function TP(source, state = {}) {
-        if (!source) return;
-        const $ = this; // Already instantiated, skip!
+        if (!source) return; // Already instantiated, skip!
         if (source[name]) {
             return source[name];
-        } // Return new instance if `TP` was called without the `new` operator
+        }
+        const $ = this; // Return new instance if `TP` was called without the `new` operator
         if (!isInstance($, TP)) {
             return new TP(source, state);
         }
