@@ -351,6 +351,7 @@ function TP(source, state = {}) {
         let tags = $.tags,
             type = e.type,
             classNameTextM = classNameE + 'text--';
+        letClass(self, classNameM + 'focus-tag');
         if ('blur' === type) {
             letClass(text, classNameTextM + 'focus');
             letClasses(self, [classNameM + 'focus', classNameM + 'focus-text']);

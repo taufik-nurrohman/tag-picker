@@ -753,6 +753,7 @@
             let tags = $.tags,
                 type = e.type,
                 classNameTextM = classNameE + 'text--';
+            letClass(self, classNameM + 'focus-tag');
             if ('blur' === type) {
                 letClass(text, classNameTextM + 'focus');
                 letClasses(self, [classNameM + 'focus', classNameM + 'focus-text']);
@@ -1153,6 +1154,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.4.4';
+    TP.version = '3.4.5';
     return TP;
 });
