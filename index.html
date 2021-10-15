@@ -148,6 +148,14 @@ const picker = new TP(document.querySelector('input'));</code></pre>
         <li><a href="tweak/path.html" target="_blank">Directory</a> (Experiment)</li>
       </ul>
       <h2>Settings</h2>
+      <pre><code>let picker = new TP(<var>source</var>, <var>join</var> = ', ');</code></pre>
+      <pre><code>let picker = new TP(<var>source</var>, <var>state</var> = {
+        escape: [','],
+        join: ', ',
+        max: 9999,
+        min: 0,
+        pattern: null
+    });</code></pre>
       <table border="1">
         <thead>
           <tr>
@@ -190,14 +198,6 @@ const picker = new TP(document.querySelector('input'));</code></pre>
           </tr>
         </tbody>
       </table>
-      <pre><code>let picker = new TP(<var>source</var>, <var>join</var> = ', ');</code></pre>
-      <pre><code>let picker = new TP(<var>source</var>, <var>state</var> = {
-        escape: [','],
-        join: ', ',
-        max: 9999,
-        min: 0,
-        pattern: null
-    });</code></pre>
       <h2>Methods and Properties</h2>
       <h3>TP.instances</h3>
       <p>Return the application instances.</p>

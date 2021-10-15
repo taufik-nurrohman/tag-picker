@@ -148,6 +148,15 @@ block content
       li: a(href='test/f.html' target='_blank') Filter Characters with #[code picker.f()] Method
       li #[a(href='tweak/path.html' target='_blank') Directory] (Experiment)
     h2 Settings
+    pre: code let picker = new TP(#[var source], #[var join] = ', ');
+    pre: code
+      | let picker = new TP(#[var source], #[var state] = {
+      |         escape: [','],
+      |         join: ', ',
+      |         max: 9999,
+      |         min: 0,
+      |         pattern: null
+      |     });
     table(border='1')
       thead
         tr
@@ -178,15 +187,6 @@ block content
         tr
           td: code state.pattern
           td If defined, tag addition will be performed only if value is matched with pattern.
-    pre: code let picker = new TP(#[var source], #[var join] = ', ');
-    pre: code
-      | let picker = new TP(#[var source], #[var state] = {
-      |         escape: [','],
-      |         join: ', ',
-      |         max: 9999,
-      |         min: 0,
-      |         pattern: null
-      |     });
     h2 Methods and Properties
     h3 TP.instances
     p Return the application instances.
