@@ -11,28 +11,32 @@
         padding: 0 .25em;
       }
       .tag-picker__tag {
-        background: none;
         margin: 0;
         padding: 0;
       }
-      .tag-picker__tag--focus {
+      .tag-picker__tag:not(.tag-picker__text),
+      .tag-picker__tag:not(.tag-picker__text):hover,
+      .tag-picker__tag:not(.tag-picker__text):focus,
+      .tag-picker__tag:not(.tag-picker__text):active {
+        background: none;
+      }
+      .tag-picker__tag--selected:not(.tag-picker__text),
+      .tag-picker__tag--selected:not(.tag-picker__text):hover,
+      .tag-picker__tag--selected:not(.tag-picker__text):focus,
+      .tag-picker__tag--selected:not(.tag-picker__text):active {
         background: #ff0;
       }
-      .tag-picker__tag::before {
+      .tag-picker__tag:not(.tag-picker__text)::before {
         color: #00f;
+      }
+      .tag-picker__tag:not(.tag-picker__text)::after {
+        content: '/'
       }
       .tag-picker__tag-x {
         display: none;
       }
-      .tag-picker__tag::after {
-        content: '/'
-      }
       .tag-picker__tags::before {
-        content: 'C:/server/www/';
-      }
-      .tag-picker__text::before,
-      .tag-picker__text::after {
-        display: none;
+        content: '/srv/http/';
       }
     </style>
   </head>

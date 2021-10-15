@@ -69,13 +69,10 @@ block style
     | }
     |
     | /* Add Bootstrap-like focus ring effect */
-    | .tag-picker--focus,
-    | .tag-picker--focus:hover {
+    | .tag-picker--focus {
     |   --shadow-tag-picker--focus: 0 0 0 3px rgba(0, 0, 255, .25);
-    |   --shadow-tag-picker--hover: 0 0 0 3px rgba(0, 0, 255, .25);
     |   --shadow-tag-picker: 0 0 0 3px rgba(0, 0, 255, .25);
     |   --stroke-tag-picker--focus: #00f;
-    |   --stroke-tag-picker--hover: #00f;
     |   --stroke-tag-picker: #00f;
     | }
 
@@ -95,7 +92,7 @@ block content
       p: button(type='submit') Submit
     h2 Features
     ul
-      li Light-weight, no dependencies. It uses vanilla JavaScript.
+      li Light-weight, no dependencies.
       li Simple #[abbr(title='Application Programming Interface') API]. Easy to master.
       li Care about accessibility. Interacts very well using the keyboard keys. Free from the focus traps.
     h2 Usage
@@ -109,10 +106,12 @@ block content
       |     &lt;link href="#[a(href='index.min.css' target='_blank') ./index.min.css]" rel="stylesheet"&gt;
       |   &lt;/head&gt;
       |   &lt;body&gt;
-      |     &lt;p&gt;&lt;input type="text"&gt;&lt;/p&gt;
+      |     &lt;p&gt;
+      |       &lt;input type="text"&gt;
+      |     &lt;/p&gt;
       |     &lt;script src="#[a(href='index.min.js' target='_blank') ./index.min.js]"&gt;&lt;/script&gt;
       |     &lt;script&gt;
-      |     const picker = new TP(document.querySelector('input'));
+      |       const picker = new TP(document.querySelector('input'));
       |     &lt;/script&gt;
       |   &lt;/body&gt;
       | &lt;/html&gt;
@@ -134,7 +133,7 @@ block content
       li: a(href='test/value.html' target='_blank') Set Pre-Defined Value
       li: a(href='test/placeholder.html' target='_blank') Set Placeholder
       li: a(href='test/focus.html' target='_blank') Focus State
-      li: a(href='tweak/error.html' target='_blank') Error State (Custom)
+      li: a(href='tweak/invalid.html' target='_blank') Invalid State (Custom)
       li: a(href='tweak/focus.placeholder.html' target='_blank') Hide Placeholder on Focus
       li: a(href='test/disabled.html' target='_blank') Disabled Input
       li: a(href='test/read-only.html' target='_blank') Read-Only Input
@@ -179,15 +178,15 @@ block content
         tr
           td: code state.pattern
           td If defined, tag addition will be performed only if value is matched with pattern.
-    pre: code const picker = new TP(#[var source], #[var join] = ', ');
+    pre: code let picker = new TP(#[var source], #[var join] = ', ');
     pre: code
-      | const picker = new TP(#[var source], #[var state] = {
-      |     escape: [','],
-      |     join: ', ',
-      |     max: 9999,
-      |     min: 0,
-      |     pattern: null
-      | });
+      | let picker = new TP(#[var source], #[var state] = {
+      |         escape: [','],
+      |         join: ', ',
+      |         max: 9999,
+      |         min: 0,
+      |         pattern: null
+      |     });
     h2 Methods and Properties
     h3 TP.instances
     p Return the application instances.

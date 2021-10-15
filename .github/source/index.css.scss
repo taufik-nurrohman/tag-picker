@@ -16,8 +16,6 @@ $name: 'tag-picker';
   --font-height-#{$name}: 1.5em;
   --font-height-#{$name}: 1.5em;
   --font-size-#{$name}: inherit;
-  --radius-#{$name}: 0;
-  --radius-#{$name}__tag: 0;
   --shadow-#{$name}: none;
   --shadow-#{$name}__tag: none;
   --stroke-#{$name}--disabled: #666;
@@ -39,12 +37,11 @@ $name: 'tag-picker';
   background: var(--fill-#{$name});
   border: 1px solid;
   border-color: var(--stroke-#{$name});
-  border-radius: var(--radius-#{$name});
+  border-radius: var(--corner-#{$name});
   color: var(--color-#{$name});
   cursor: text;
   display: inline-flex;
   flex-wrap: wrap;
-  font: inherit;
   font-family: var(--font-face-#{$name});
   font-size: var(--font-size-#{$name});
   height: var(--height-#{$name}, auto);
@@ -66,14 +63,15 @@ $name: 'tag-picker';
       color: var(--color-#{$name}--#{$state}, var(--color-#{$name}));
     }
   }
-  $states: focus, disabled;
-  @each $state in $states {
-    &--#{$state} {
-      background: var(--fill-#{$name}--#{$state}, var(--fill-#{$name}));
-      border-color: var(--stroke-#{$name}--#{$state}, var(--stroke-#{$name}));
-      box-shadow: var(--shadow-#{$name}--#{$state}, var(--shadow-#{$name}));
-      color: var(--color-#{$name}--#{$state}, var(--color-#{$name}));
-    }
+}
+
+$states: focus, disabled;
+@each $state in $states {
+  .#{$name}.#{$name}--#{$state} {
+    background: var(--fill-#{$name}--#{$state}, var(--fill-#{$name}));
+    border-color: var(--stroke-#{$name}--#{$state}, var(--stroke-#{$name}));
+    box-shadow: var(--shadow-#{$name}--#{$state}, var(--shadow-#{$name}));
+    color: var(--color-#{$name}--#{$state}, var(--color-#{$name}));
   }
 }
 
@@ -99,7 +97,7 @@ $name: 'tag-picker';
     background: var(--fill-#{$name}__tag);
     border: 0 solid;
     border-color: var(--stroke-#{$name}__tag);
-    border-radius: var(--radius-#{$name}__tag);
+    border-radius: var(--corner-#{$name}__tag);
     box-shadow: var(--shadow-#{$name}__tag);
     color: var(--color-#{$name}__tag);
     cursor: pointer;

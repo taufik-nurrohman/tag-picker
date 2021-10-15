@@ -5,7 +5,7 @@
     <meta content="#000" name="theme-color">
     <meta content="width=device-width" name="viewport">
     <meta content="Better tags input interaction with JavaScript." name="description">
-    <title>Tag Picker 3.4.4</title>
+    <title>Tag Picker 3.4.5</title>
     <link href="index.min.css" rel="stylesheet">
     <style>
       * {
@@ -67,13 +67,10 @@
       }
 
       /* Add Bootstrap-like focus ring effect */
-      .tag-picker--focus,
-      .tag-picker--focus:hover {
+      .tag-picker--focus {
         --shadow-tag-picker--focus: 0 0 0 3px rgba(0, 0, 255, .25);
-        --shadow-tag-picker--hover: 0 0 0 3px rgba(0, 0, 255, .25);
         --shadow-tag-picker: 0 0 0 3px rgba(0, 0, 255, .25);
         --stroke-tag-picker--focus: #00f;
-        --stroke-tag-picker--hover: #00f;
         --stroke-tag-picker: #00f;
       }
     </style>
@@ -81,7 +78,7 @@
   <body>
     <p>Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
-      <h1>Tag Picker 3.4.4</h1>
+      <h1>Tag Picker 3.4.5</h1>
       <p>Tag Picker is a simple JavaScript application that aims to provide better experience for users in adding and removing comma-separated list of words.</p>
       <hr>
     </header>
@@ -96,7 +93,7 @@
       </form>
       <h2>Features</h2>
       <ul>
-        <li>Light-weight, no dependencies. It uses vanilla JavaScript.</li>
+        <li>Light-weight, no dependencies.</li>
         <li>Simple <abbr title="Application Programming Interface">API</abbr>. Easy to master.</li>
         <li>Care about accessibility. Interacts very well using the keyboard keys. Free from the focus traps.</li>
       </ul>
@@ -110,10 +107,12 @@
     &lt;link href="<a href="index.min.css" target="_blank">./index.min.css</a>" rel="stylesheet"&gt;
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p&gt;&lt;input type="text"&gt;&lt;/p&gt;
+    &lt;p&gt;
+      &lt;input type="text"&gt;
+    &lt;/p&gt;
     &lt;script src="<a href="index.min.js" target="_blank">./index.min.js</a>"&gt;&lt;/script&gt;
     &lt;script&gt;
-    const picker = new TP(document.querySelector('input'));
+      const picker = new TP(document.querySelector('input'));
     &lt;/script&gt;
   &lt;/body&gt;
 &lt;/html&gt;</code></pre>
@@ -133,7 +132,7 @@ const picker = new TP(document.querySelector('input'));</code></pre>
         <li><a href="test/value.html" target="_blank">Set Pre-Defined Value</a></li>
         <li><a href="test/placeholder.html" target="_blank">Set Placeholder</a></li>
         <li><a href="test/focus.html" target="_blank">Focus State</a></li>
-        <li><a href="tweak/error.html" target="_blank">Error State (Custom)</a></li>
+        <li><a href="tweak/invalid.html" target="_blank">Invalid State (Custom)</a></li>
         <li><a href="tweak/focus.placeholder.html" target="_blank">Hide Placeholder on Focus</a></li>
         <li><a href="test/disabled.html" target="_blank">Disabled Input</a></li>
         <li><a href="test/read-only.html" target="_blank">Read-Only Input</a></li>
@@ -191,14 +190,14 @@ const picker = new TP(document.querySelector('input'));</code></pre>
           </tr>
         </tbody>
       </table>
-      <pre><code>const picker = new TP(<var>source</var>, <var>join</var> = ', ');</code></pre>
-      <pre><code>const picker = new TP(<var>source</var>, <var>state</var> = {
-    escape: [','],
-    join: ', ',
-    max: 9999,
-    min: 0,
-    pattern: null
-});</code></pre>
+      <pre><code>let picker = new TP(<var>source</var>, <var>join</var> = ', ');</code></pre>
+      <pre><code>let picker = new TP(<var>source</var>, <var>state</var> = {
+        escape: [','],
+        join: ', ',
+        max: 9999,
+        min: 0,
+        pattern: null
+    });</code></pre>
       <h2>Methods and Properties</h2>
       <h3>TP.instances</h3>
       <p>Return the application instances.</p>

@@ -7,7 +7,8 @@
     <title>Tag Picker</title>
     <link href="../index.min.css" rel="stylesheet">
     <style>
-      .tag-picker--error {
+      .tag-picker.tag-picker--invalid {
+        --stroke-tag-picker--active: #f00;
         --stroke-tag-picker--focus: #f00;
         --stroke-tag-picker--hover: #f00;
         --stroke-tag-picker: #f00;
@@ -26,23 +27,23 @@
           pattern: '^[a-z\\d]+(-[a-z\\d]+)*$'
       });
 
-      function setError() {
-          picker.self.classList.add(picker.state['class'] + '--error');
+      function setInvalid() {
+          picker.self.classList.add(picker.state['class'] + '--invalid');
           setTimeout(() => {
-              picker.self.classList.remove(picker.state['class'] + '--error');
+              picker.self.classList.remove(picker.state['class'] + '--invalid');
           }, 2000);
       }
 
-      function letError() {
-          picker.self.classList.remove(picker.state['class'] + '--error');
+      function letInvalid() {
+          picker.self.classList.remove(picker.state['class'] + '--invalid');
       }
-      picker.on('blur', letError);
-      picker.on('has.tag', setError);
-      picker.on('let.tag', letError);
-      picker.on('max.tags', setError);
-      picker.on('min.tags', setError);
-      picker.on('not.tag', setError);
-      picker.on('set.tag', letError);
+      picker.on('blur', letInvalid);
+      picker.on('has.tag', setInvalid);
+      picker.on('let.tag', letInvalid);
+      picker.on('max.tags', setInvalid);
+      picker.on('min.tags', setInvalid);
+      picker.on('not.tag', setInvalid);
+      picker.on('set.tag', letInvalid);
     </script>
   </body>
 </html>
