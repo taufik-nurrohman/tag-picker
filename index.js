@@ -439,11 +439,13 @@
     const KEY_TAB = 'Tab';
 
     function TP(source, state = {}) {
-        if (!source) return; // Already instantiated, skip!
+        const $ = this;
+        if (!source) {
+            return $;
+        } // Already instantiated, skip!
         if (source[name]) {
             return source[name];
-        }
-        const $ = this; // Return new instance if `TP` was called without the `new` operator
+        } // Return new instance if `TP` was called without the `new` operator
         if (!isInstance($, TP)) {
             return new TP(source, state);
         }
@@ -1150,6 +1152,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.4.6';
+    TP.version = '3.4.7';
     return TP;
 });
