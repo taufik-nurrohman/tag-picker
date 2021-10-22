@@ -36,7 +36,7 @@
   background: var(--fill-tag-picker);
   border: 1px solid;
   border-color: var(--stroke-tag-picker);
-  border-radius: var(--corner-tag-picker);
+  border-radius: var(--arc-tag-picker);
   color: var(--color-tag-picker);
   cursor: text;
   display: inline-flex;
@@ -110,7 +110,7 @@
   background: var(--fill-tag-picker__tag);
   border: 0 solid;
   border-color: var(--stroke-tag-picker__tag);
-  border-radius: var(--corner-tag-picker__tag);
+  border-radius: var(--arc-tag-picker__tag);
   box-shadow: var(--shadow-tag-picker__tag);
   color: var(--color-tag-picker__tag);
   cursor: pointer;

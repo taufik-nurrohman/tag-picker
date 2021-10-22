@@ -191,7 +191,10 @@
     var getNext = function getNext(node) {
         return node.nextElementSibling || null;
     };
-    var getParent = function getParent(node) {
+    var getParent = function getParent(node, query) {
+        if (query) {
+            return node.closest(query) || null;
+        }
         return node.parentNode || null;
     };
     var getParentForm = function getParentForm(node) {
@@ -199,14 +202,7 @@
         if (hasState(node, state) && state === getName(node[state])) {
             return node[state];
         }
-        var parent = getParent(node);
-        while (parent) {
-            if (state === getName(parent)) {
-                break;
-            }
-            parent = getParent(parent);
-        }
-        return parent || null;
+        return getParent(node, state);
     };
     var getPrev = function getPrev(node) {
         return node.previousElementSibling || null;
@@ -229,8 +225,8 @@
     var hasClass = function hasClass(node, value) {
         return node.classList.contains(value);
     };
-    var hasParent = function hasParent(node) {
-        return null !== getParent(node);
+    var hasParent = function hasParent(node, query) {
+        return null !== getParent(node, query);
     };
     var hasState = function hasState(node, state) {
         return state in node;
@@ -1154,6 +1150,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.4.5';
+    TP.version = '3.4.6';
     return TP;
 });
