@@ -1,14 +1,14 @@
 import {D, W, getAttribute, getChildFirst, getChildren, getNext, getParent, getParentForm, getPrev, getText, hasClass, hasParent, letClass, letClasses, letElement, setClass, setChildLast, setClasses, setElement, setNext, setPrev, setText} from '@taufik-nurrohman/document';
-import {offEvent, offEvents, offEventDefault, offEventPropagation, onEvent, onEvents} from '@taufik-nurrohman/event';
+import {delay} from '@taufik-nurrohman/tick';
 import {fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isInstance, isNumber, isSet, isString} from '@taufik-nurrohman/is';
-import {toPattern} from '@taufik-nurrohman/pattern';
+import {offEvent, offEvents, offEventDefault, offEventPropagation, onEvent, onEvents} from '@taufik-nurrohman/event';
 import {toArrayKey, toCaseLower, toCount, toObjectCount, toObjectKeys} from '@taufik-nurrohman/to';
+import {toPattern} from '@taufik-nurrohman/pattern';
 
-let delay = W.setTimeout,
-    name = '%(js.name)';
+let name = '%(js.name)';
 
 const KEY_A = 'a';
 const KEY_ARROW_LEFT = 'ArrowLeft';
@@ -66,7 +66,7 @@ function TP(source, state = {}) {
             'tabindex': sourceIsDisabled() ? false : -1
         }),
         text = setElement('span', {
-            'class': classNameE + 'tag ' + classNameE + 'text'
+            'class': classNameE + 'tag ' + classNameE + 'input'
         }),
         textCopy = setElement('input', {
             'class': classNameE + 'copy',
@@ -356,11 +356,11 @@ function TP(source, state = {}) {
         letClass(self, classNameM + 'focus-tag');
         if ('blur' === type) {
             letClass(text, classNameTextM + 'focus');
-            letClasses(self, [classNameM + 'focus', classNameM + 'focus-text']);
+            letClasses(self, [classNameM + 'focus', classNameM + 'focus-input']);
             doInput();
         } else {
             setClass(text, classNameTextM + 'focus');
-            setClasses(self, [classNameM + 'focus', classNameM + 'focus-text']);
+            setClasses(self, [classNameM + 'focus', classNameM + 'focus-input']);
             doBlurTags(text);
         }
         fire(type, [tags, toCount(tags)]);
@@ -406,20 +406,20 @@ function TP(source, state = {}) {
     function onCopyCutPasteTextCopy(e) {
         let type = e.type;
         if ('copy' === type) {
-            delay(() => letTextCopy(1));
+            delay(() => letTextCopy(1))();
         } else if ('cut' === type) {
             !sourceIsReadOnly() && setTags("");
-            delay(() => letTextCopy(1));
+            delay(() => letTextCopy(1))();
         } else if ('paste' === type) {
             delay(() => {
                 !sourceIsReadOnly() && setTags(textCopy.value);
                 letTextCopy(1);
-            });
+            })();
         }
         delay(() => {
             let tags = $.tags;
             fire(type, [tags, toCount(tags)]);
-        }, 1);
+        }, 1)();
     }
 
     function onBlurSelf() {
@@ -529,7 +529,7 @@ function TP(source, state = {}) {
 
     function onKeyDownText(e) {
         offEventPropagation(e);
-        if (sourceIsReadOnly() && 'Tab' !== e.key) {
+        if (sourceIsReadOnly() && KEY_TAB !== e.key) {
             offEventDefault(e);
         }
         let escapes = state.escape,
@@ -564,7 +564,7 @@ function TP(source, state = {}) {
                 }
                 offEventDefault(e);
             }
-        });
+        })();
         // Focus to the first tag
         if ("" === theValue && KEY_BEGIN === key) {
             if (theTag = getChildren(textOutput, 0)) {
@@ -635,7 +635,7 @@ function TP(source, state = {}) {
                 });
             }
             setValue("");
-        });
+        })();
     }
 
     function onSubmitForm(e) {

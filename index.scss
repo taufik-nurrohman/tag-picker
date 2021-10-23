@@ -54,24 +54,22 @@ $name: 'tag-picker';
   padding: .125em;
   position: relative;
   width: var(--width-#{$name}, auto);
-  $states: hover, focus, active;
-  @each $state in $states {
-    &:#{$state} {
-      background: var(--fill-#{$name}--#{$state}, var(--fill-#{$name}));
-      border-color: var(--stroke-#{$name}--#{$state}, var(--stroke-#{$name}));
-      box-shadow: var(--shadow-#{$name}--#{$state}, var(--shadow-#{$name}));
-      color: var(--color-#{$name}--#{$state}, var(--color-#{$name}));
+  @each $v in (hover, focus, active) {
+    &:#{$v} {
+      background: var(--fill-#{$name}--#{$v}, var(--fill-#{$name}));
+      border-color: var(--stroke-#{$name}--#{$v}, var(--stroke-#{$name}));
+      box-shadow: var(--shadow-#{$name}--#{$v}, var(--shadow-#{$name}));
+      color: var(--color-#{$name}--#{$v}, var(--color-#{$name}));
     }
   }
 }
 
-$states: focus, disabled;
-@each $state in $states {
-  .#{$name}.#{$name}--#{$state} {
-    background: var(--fill-#{$name}--#{$state}, var(--fill-#{$name}));
-    border-color: var(--stroke-#{$name}--#{$state}, var(--stroke-#{$name}));
-    box-shadow: var(--shadow-#{$name}--#{$state}, var(--shadow-#{$name}));
-    color: var(--color-#{$name}--#{$state}, var(--color-#{$name}));
+@each $v in (focus, disabled) {
+  .#{$name}.#{$name}--#{$v} {
+    background: var(--fill-#{$name}--#{$v}, var(--fill-#{$name}));
+    border-color: var(--stroke-#{$name}--#{$v}, var(--stroke-#{$name}));
+    box-shadow: var(--shadow-#{$name}--#{$v}, var(--shadow-#{$name}));
+    color: var(--color-#{$name}--#{$v}, var(--color-#{$name}));
   }
 }
 
@@ -93,7 +91,7 @@ $states: focus, disabled;
   padding: 0 .5em;
   position: relative;
   text-decoration: none;
-  &:not(.#{$name}__text) {
+  &:not(.#{$name}__input) {
     background: var(--fill-#{$name}__tag);
     border: 0 solid;
     border-color: var(--stroke-#{$name}__tag);
@@ -102,28 +100,26 @@ $states: focus, disabled;
     color: var(--color-#{$name}__tag);
     cursor: pointer;
   }
-  $states: hover, focus, active;
-  @each $state in $states {
-    &:not(.#{$name}__text):#{$state} {
-      background: var(--fill-#{$name}__tag--#{$state}, var(--fill-#{$name}__tag));
-      border-color: var(--stroke-#{$name}__tag--#{$state}, var(--stroke-#{$name}__tag));
-      box-shadow: var(--shadow-#{$name}__tag--#{$state}, var(--shadow-#{$name}__tag));
-      color: var(--color-#{$name}__tag--#{$state}, var(--color-#{$name}__tag));
+  @each $v in (hover, focus, active) {
+    &:not(.#{$name}__input):#{$v} {
+      background: var(--fill-#{$name}__tag--#{$v}, var(--fill-#{$name}__tag));
+      border-color: var(--stroke-#{$name}__tag--#{$v}, var(--stroke-#{$name}__tag));
+      box-shadow: var(--shadow-#{$name}__tag--#{$v}, var(--shadow-#{$name}__tag));
+      color: var(--color-#{$name}__tag--#{$v}, var(--color-#{$name}__tag));
     }
   }
-  $states: selected, disabled;
-  @each $state in $states {
-    &--#{$state}:not(.#{$name}__text) {
-      background: var(--fill-#{$name}__tag--#{$state}, var(--fill-#{$name}__tag));
-      border-color: var(--stroke-#{$name}__tag--#{$state}, var(--stroke-#{$name}__tag));
-      box-shadow: var(--shadow-#{$name}__tag--#{$state}, var(--shadow-#{$name}__tag));
-      color: var(--color-#{$name}__tag--#{$state}, var(--color-#{$name}__tag));
+  @each $v in (selected, disabled) {
+    &--#{$v}:not(.#{$name}__input) {
+      background: var(--fill-#{$name}__tag--#{$v}, var(--fill-#{$name}__tag));
+      border-color: var(--stroke-#{$name}__tag--#{$v}, var(--stroke-#{$name}__tag));
+      box-shadow: var(--shadow-#{$name}__tag--#{$v}, var(--shadow-#{$name}__tag));
+      color: var(--color-#{$name}__tag--#{$v}, var(--color-#{$name}__tag));
     }
   }
   &::before {
     content: attr(title);
   }
-  + .#{$name}__text {
+  + .#{$name}__input {
     span {
       + span {
         // Hide the placeholder if we have at least one tag
@@ -136,10 +132,9 @@ $states: focus, disabled;
     margin-left: .5em;
     outline: 0;
     text-decoration: none;
-    $states: hover, focus, active;
-    @each $state in $states {
-      &:#{$state} {
-        color: var(--color-#{$name}__tag-x--#{$state}, var(--color-#{$name}__tag-x));
+    @each $v in (hover, focus, active) {
+      &:#{$v} {
+        color: var(--color-#{$name}__tag-x--#{$v}, var(--color-#{$name}__tag-x));
       }
     }
     &::before {
@@ -149,7 +144,7 @@ $states: focus, disabled;
   }
 }
 
-.#{$name}__text {
+.#{$name}__input {
   flex: 1;
   span {
     display: block;
@@ -191,7 +186,7 @@ $states: focus, disabled;
       .#{$name}__tag-x {
         cursor: not-allowed;
       }
-      .#{$name}__tag:not(.#{$name}__text) {
+      .#{$name}__tag:not(.#{$name}__input) {
         background: var(--fill-#{$name}__tag--read-only, var(--fill-#{$name}__tag));
         border-color: var(--stroke-#{$name}__tag--read-only, var(--stroke-#{$name}__tag));
         box-shadow: var(--shadow-#{$name}__tag--read-only, var(--shadow-#{$name}__tag));
@@ -209,7 +204,7 @@ $states: focus, disabled;
       & * {
         cursor: not-allowed;
       }
-      .#{$name}__tag:not(.#{$name}__text) {
+      .#{$name}__tag:not(.#{$name}__input) {
         background: var(--fill-#{$name}__tag--disabled, var(--fill-#{$name}__tag));
         border-color: var(--stroke-#{$name}__tag--disabled, var(--stroke-#{$name}__tag));
         box-shadow: var(--shadow-#{$name}__tag--disabled, var(--shadow-#{$name}__tag));

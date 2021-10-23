@@ -106,7 +106,7 @@
   position: relative;
   text-decoration: none;
 }
-.tag-picker__tag:not(.tag-picker__text) {
+.tag-picker__tag:not(.tag-picker__input) {
   background: var(--fill-tag-picker__tag);
   border: 0 solid;
   border-color: var(--stroke-tag-picker__tag);
@@ -115,31 +115,31 @@
   color: var(--color-tag-picker__tag);
   cursor: pointer;
 }
-.tag-picker__tag:not(.tag-picker__text):hover {
+.tag-picker__tag:not(.tag-picker__input):hover {
   background: var(--fill-tag-picker__tag--hover, var(--fill-tag-picker__tag));
   border-color: var(--stroke-tag-picker__tag--hover, var(--stroke-tag-picker__tag));
   box-shadow: var(--shadow-tag-picker__tag--hover, var(--shadow-tag-picker__tag));
   color: var(--color-tag-picker__tag--hover, var(--color-tag-picker__tag));
 }
-.tag-picker__tag:not(.tag-picker__text):focus {
+.tag-picker__tag:not(.tag-picker__input):focus {
   background: var(--fill-tag-picker__tag--focus, var(--fill-tag-picker__tag));
   border-color: var(--stroke-tag-picker__tag--focus, var(--stroke-tag-picker__tag));
   box-shadow: var(--shadow-tag-picker__tag--focus, var(--shadow-tag-picker__tag));
   color: var(--color-tag-picker__tag--focus, var(--color-tag-picker__tag));
 }
-.tag-picker__tag:not(.tag-picker__text):active {
+.tag-picker__tag:not(.tag-picker__input):active {
   background: var(--fill-tag-picker__tag--active, var(--fill-tag-picker__tag));
   border-color: var(--stroke-tag-picker__tag--active, var(--stroke-tag-picker__tag));
   box-shadow: var(--shadow-tag-picker__tag--active, var(--shadow-tag-picker__tag));
   color: var(--color-tag-picker__tag--active, var(--color-tag-picker__tag));
 }
-.tag-picker__tag--selected:not(.tag-picker__text) {
+.tag-picker__tag--selected:not(.tag-picker__input) {
   background: var(--fill-tag-picker__tag--selected, var(--fill-tag-picker__tag));
   border-color: var(--stroke-tag-picker__tag--selected, var(--stroke-tag-picker__tag));
   box-shadow: var(--shadow-tag-picker__tag--selected, var(--shadow-tag-picker__tag));
   color: var(--color-tag-picker__tag--selected, var(--color-tag-picker__tag));
 }
-.tag-picker__tag--disabled:not(.tag-picker__text) {
+.tag-picker__tag--disabled:not(.tag-picker__input) {
   background: var(--fill-tag-picker__tag--disabled, var(--fill-tag-picker__tag));
   border-color: var(--stroke-tag-picker__tag--disabled, var(--stroke-tag-picker__tag));
   box-shadow: var(--shadow-tag-picker__tag--disabled, var(--shadow-tag-picker__tag));
@@ -148,7 +148,7 @@
 .tag-picker__tag::before {
   content: attr(title);
 }
-.tag-picker__tag + .tag-picker__text span + span {
+.tag-picker__tag + .tag-picker__input span + span {
   display: none;
 }
 .tag-picker__tag-x {
@@ -171,20 +171,20 @@
   font-family: sans-serif;
 }
 
-.tag-picker__text {
+.tag-picker__input {
   flex: 1;
 }
-.tag-picker__text span {
+.tag-picker__input span {
   display: block;
   height: 100%;
   outline: 0;
   position: relative;
   z-index: 1;
 }
-.tag-picker__text span * {
+.tag-picker__input span * {
   display: inline;
 }
-.tag-picker__text span + span {
+.tag-picker__input span + span {
   bottom: 0;
   left: 0;
   opacity: 0.5;
@@ -218,7 +218,7 @@
 .tag-picker__source:read-only + .tag-picker .tag-picker__tag-x {
   cursor: not-allowed;
 }
-.tag-picker__source:read-only + .tag-picker .tag-picker__tag:not(.tag-picker__text) {
+.tag-picker__source:read-only + .tag-picker .tag-picker__tag:not(.tag-picker__input) {
   background: var(--fill-tag-picker__tag--read-only, var(--fill-tag-picker__tag));
   border-color: var(--stroke-tag-picker__tag--read-only, var(--stroke-tag-picker__tag));
   box-shadow: var(--shadow-tag-picker__tag--read-only, var(--shadow-tag-picker__tag));
@@ -234,7 +234,7 @@
 .tag-picker__source:disabled + .tag-picker * {
   cursor: not-allowed;
 }
-.tag-picker__source:disabled + .tag-picker .tag-picker__tag:not(.tag-picker__text) {
+.tag-picker__source:disabled + .tag-picker .tag-picker__tag:not(.tag-picker__input) {
   background: var(--fill-tag-picker__tag--disabled, var(--fill-tag-picker__tag));
   border-color: var(--stroke-tag-picker__tag--disabled, var(--stroke-tag-picker__tag));
   box-shadow: var(--shadow-tag-picker__tag--disabled, var(--shadow-tag-picker__tag));
