@@ -8,11 +8,12 @@ block state
 block script
   script
     | const picker = new TP(document.querySelector('input'));
-    |
-    | picker.on('change', function(tag, index) {
-    |     console.log([tag, index, this.tags]);
-    | });
 
 block content
   main
-    p: input(type='text' value='foo, bar')
+    form(method='get')
+      p
+        = 'text '
+        input(name='tags' type='text')
+        = ' text'
+      p: button(type='submit') Submit

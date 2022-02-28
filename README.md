@@ -1,6 +1,8 @@
 Tag Picker
 ==========
 
+![Code Size](https://img.shields.io/github/languages/code-size/taufik-nurrohman/tag-picker?color=%23444&style=for-the-badge) ![License](https://img.shields.io/github/license/taufik-nurrohman/tag-picker?color=%23444&style=for-the-badge)
+
 > Better tags input interaction with JavaScript.
 
 ![Tag Picker](https://user-images.githubusercontent.com/1669261/126896222-c4d40a5e-a130-4319-a15a-3ec490b175b3.png)
@@ -24,10 +26,11 @@ Contribute
 Release Notes
 -------------
 
-### 3.4.8
+### 3.4.9
 
  - Added CSS variables for easy integration with third-party applications.
  - Fixed focus trap in read-only tag picker (#20).
+ - Fixed the custom tag picker insertion node that does not consider the text node.
 
 ### 3.3.3
 

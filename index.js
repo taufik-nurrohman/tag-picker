@@ -2,7 +2,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright © 2021 Taufik Nurrohman <https://github.com/taufik-nurrohman>
+ * Copyright © 2022 Taufik Nurrohman <https://github.com/taufik-nurrohman>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the “Software”), to deal
@@ -320,9 +320,6 @@
         }
         var state = 'innerHTML';
         return hasState(node, state) && (node[state] = trim ? content.trim() : content), node;
-    };
-    var setNext = function setNext(current, node) {
-        return getParent(current).insertBefore(node, getNext(current)), node;
     };
     var setPrev = function setPrev(current, node) {
         return getParent(current).insertBefore(node, current), node;
@@ -1046,7 +1043,7 @@
         setChildLast(text, textInputHint);
         setChildLast(textOutput, text);
         setClass(source, classNameE + 'source');
-        setNext(source, self);
+        getParent(source).insertBefore(self, source.nextSibling);
         setElement(source, {
             'tabindex': -1
         });
@@ -1160,6 +1157,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.4.8';
+    TP.version = '3.4.9';
     return TP;
 });
