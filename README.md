@@ -26,7 +26,7 @@ Contribute
 Release Notes
 -------------
 
-### 3.4.9
+### 3.4.10
 
  - Added CSS variables for easy integration with third-party applications.
  - Fixed focus trap in read-only tag picker (#20).

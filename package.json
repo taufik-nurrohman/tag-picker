@@ -3,7 +3,7 @@
   "browser": "index.min.js",
   "bugs": "https://github.com/taufik-nurrohman/tag-picker/issues",
   "dependencies": {
-    "@taufik-nurrohman/document": "^0.2.0",
+    "@taufik-nurrohman/document": "^0.2.1",
     "@taufik-nurrohman/event": "^0.3.1",
     "@taufik-nurrohman/from": "^0.0.9",
     "@taufik-nurrohman/has": "^0.0.3",
@@ -50,5 +50,5 @@
     "pack": "pack --clean=false --from=.github/source --js-format=umd --js-name=TP --js-top='%(js.license)' --mjs=true --scss=true --to=."
   },
   "type": "module",
-  "version": "3.4.9"
+  "version": "3.4.10"
 }
