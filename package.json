@@ -3,9 +3,9 @@
   "browser": "index.min.js",
   "bugs": "https://github.com/taufik-nurrohman/tag-picker/issues",
   "dependencies": {
-    "@taufik-nurrohman/document": "^0.2.1",
+    "@taufik-nurrohman/document": "^0.3.1",
     "@taufik-nurrohman/event": "^0.3.1",
-    "@taufik-nurrohman/from": "^0.0.9",
+    "@taufik-nurrohman/from": "^0.0.10",
     "@taufik-nurrohman/has": "^0.0.3",
     "@taufik-nurrohman/hook": "^0.1.2",
     "@taufik-nurrohman/is": "^0.1.2",
@@ -16,7 +16,7 @@
   },
   "description": "Better tags input interaction with JavaScript.",
   "devDependencies": {
-    "@taufik-nurrohman/factory": "^1.0.2"
+    "@taufik-nurrohman/factory": "^1.0.3"
   },
   "exports": {
     "import": "./index.mjs",
@@ -50,5 +50,5 @@
     "pack": "pack --clean=false --from=.github/source --js-format=umd --js-name=TP --js-top='%(js.license)' --mjs=true --scss=true --to=."
   },
   "type": "module",
-  "version": "3.4.10"
+  "version": "3.4.11"
 }

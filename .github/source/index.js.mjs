@@ -1,4 +1,4 @@
-import {D, W, getAttribute, getChildFirst, getChildren, getNext, getParent, getParentForm, getPrev, getText, hasClass, hasParent, letClass, letClasses, letElement, setClass, setChildLast, setClasses, setElement, setPrev, setText} from '@taufik-nurrohman/document';
+import {D, W, getAttribute, getChildFirst, getChildren, getNext, getParent, getParentForm, getPrev, getText, hasClass, hasParent, letClass, letClasses, letElement, setClass, setChildLast, setClasses, setElement, setNext, setPrev, setText} from '@taufik-nurrohman/document';
 import {delay} from '@taufik-nurrohman/tick';
 import {fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
@@ -659,7 +659,7 @@ function TP(source, state = {}) {
     setChildLast(text, textInputHint);
     setChildLast(textOutput, text);
     setClass(source, classNameE + 'source');
-    getParent(source).insertBefore(self, source.nextSibling);
+    setNext(source, self);
 
     setElement(source, {
         'tabindex': -1
