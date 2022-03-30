@@ -1160,6 +1160,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.4.11';
+    TP.version = '3.4.12';
     return TP;
 });
