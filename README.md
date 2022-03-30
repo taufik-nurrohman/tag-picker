@@ -58,7 +58,7 @@ This project exists thanks to all the people who contribute.
 Release Notes
 -------------
 
-### 3.4.11
+### 3.4.12
 
  - Added CSS variables for easy integration with third-party applications.
  - Fixed focus trap in read-only tag picker (#20).
