@@ -23,9 +23,9 @@
  * SOFTWARE.
  *
  */
-(function(global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() : typeof define === 'function' && define.amd ? define(factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.TP = factory());
-})(this, function() {
+(function(g, f) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = f() : typeof define === 'function' && define.amd ? define(f) : (g = typeof globalThis !== 'undefined' ? globalThis : g || self, g.TP = f());
+})(this, (function() {
     'use strict';
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
@@ -33,13 +33,13 @@
     var isArray = function isArray(x) {
         return Array.isArray(x);
     };
-    var isDefined = function isDefined(x) {
+    var isDefined$1 = function isDefined(x) {
         return 'undefined' !== typeof x;
     };
-    var isInstance = function isInstance(x, of ) {
-        return x && isSet( of ) && x instanceof of ;
+    var isInstance = function isInstance(x, of) {
+        return x && isSet$1(of) && x instanceof of ;
     };
-    var isNull = function isNull(x) {
+    var isNull$1 = function isNull(x) {
         return null === x;
     };
     var isNumber = function isNumber(x) {
@@ -57,8 +57,8 @@
         }
         return isPlain ? isInstance(x, Object) : true;
     };
-    var isSet = function isSet(x) {
-        return isDefined(x) && !isNull(x);
+    var isSet$1 = function isSet(x) {
+        return isDefined$1(x) && !isNull$1(x);
     };
     var isString = function isString(x) {
         return 'string' === typeof x;
@@ -119,7 +119,7 @@
         for (var i = 0, j = toCount(lot); i < j; ++i) {
             for (var k in lot[i]) {
                 // Assign value
-                if (!isSet(out[k])) {
+                if (!isSet$1(out[k])) {
                     out[k] = lot[i][k];
                     continue;
                 } // Merge array
@@ -346,6 +346,15 @@
             }, time);
         };
     };
+    var isDefined = function isDefined(x) {
+        return 'undefined' !== typeof x;
+    };
+    var isNull = function isNull(x) {
+        return null === x;
+    };
+    var isSet = function isSet(x) {
+        return isDefined(x) && !isNull(x);
+    };
 
     function hook($) {
         var hooks = {};
@@ -433,21 +442,24 @@
             return pattern;
         } // No need to escape `/` in the pattern string
         pattern = pattern.replace(/\//g, '\\/');
-        return new RegExp(pattern, isSet(opt) ? opt : 'g');
+        return new RegExp(pattern, isSet$1(opt) ? opt : 'g');
     };
-    let name = 'TP';
-    const KEY_A = 'a';
-    const KEY_ARROW_LEFT = 'ArrowLeft';
-    const KEY_ARROW_RIGHT = 'ArrowRight';
-    const KEY_BEGIN = 'Home';
-    const KEY_DELETE_LEFT = 'Backspace';
-    const KEY_DELETE_RIGHT = 'Delete';
-    const KEY_END = 'End';
-    const KEY_ENTER = 'Enter';
-    const KEY_TAB = 'Tab';
+    var name = 'TP';
+    var KEY_A = 'a';
+    var KEY_ARROW_LEFT = 'ArrowLeft';
+    var KEY_ARROW_RIGHT = 'ArrowRight';
+    var KEY_BEGIN = 'Home';
+    var KEY_DELETE_LEFT = 'Backspace';
+    var KEY_DELETE_RIGHT = 'Delete';
+    var KEY_END = 'End';
+    var KEY_ENTER = 'Enter';
+    var KEY_TAB = 'Tab';
 
-    function TP(source, state = {}) {
-        const $ = this;
+    function TP(source, state) {
+        if (state === void 0) {
+            state = {};
+        }
+        var $ = this;
         if (!source) {
             return $;
         } // Already instantiated, skip!
@@ -457,21 +469,24 @@
         if (!isInstance($, TP)) {
             return new TP(source, state);
         }
-        let sourceIsDisabled = () => source.disabled,
-            sourceIsReadOnly = () => source.readOnly,
+        var sourceIsDisabled = function sourceIsDisabled() {
+                return source.disabled;
+            },
+            sourceIsReadOnly = function sourceIsReadOnly() {
+                return source.readOnly;
+            },
             thePlaceholder = getAttribute(source, 'placeholder'),
             theTabIndex = getAttribute(source, 'tabindex');
-        let {
-            hooks,
-            fire
-        } = hook($);
+        var _hook = hook($);
+        _hook.hooks;
+        var fire = _hook.fire;
         $.state = state = fromStates({}, TP.state, isString(state) ? {
             join: state
         } : state || {});
         $.source = source; // Store current instance to `TP.instances`
         TP.instances[source.id || source.name || toObjectCount(TP.instances)] = $; // Mark current DOM as active tag picker to prevent duplicate instance
         source[name] = $;
-        let classNameB = state['class'],
+        var classNameB = state['class'],
             classNameE = classNameB + '__',
             classNameM = classNameB + '--',
             form = getParentForm(source),
@@ -497,12 +512,12 @@
             textOutput = setElement('span', {
                 'class': classNameE + 'tags'
             });
-        let currentTagIndex = 0,
+        var currentTagIndex = 0,
             currentTags = {};
-        let _keyIsCtrl, _keyIsShift, _keyIsTab;
+        var _keyIsCtrl, _keyIsShift, _keyIsTab;
 
         function getCharBeforeCaret(container) {
-            let range,
+            var range,
                 selection = W.getSelection();
             if (selection.rangeCount > 0) {
                 range = selection.getRangeAt(0).cloneRange();
@@ -517,14 +532,14 @@
         }
 
         function getTag(tag, fireHooks) {
-            let index = toArrayKey(tag, $.tags);
+            var index = toArrayKey(tag, $.tags);
             fireHooks && fire('get.tag', [tag, index]);
             return isNumber(index) ? tag : null;
         }
 
         function setCurrentTags() {
             currentTags = {}; // Reset!
-            let i,
+            var i,
                 items = getChildren(textOutput),
                 j = toCount(items) - 1; // Minus 1 to skip the tag editor element
             for (i = 0; i < j; ++i) {
@@ -545,12 +560,12 @@
         }
 
         function setTagElement(tag, index) {
-            let element = setElement('span', {
+            var element = setElement('span', {
                 'class': classNameE + 'tag',
                 'tabindex': sourceIsDisabled() || sourceIsReadOnly() ? false : 0,
                 'title': tag
             });
-            let x = setElement('a', {
+            var x = setElement('a', {
                 'class': classNameE + 'tag-x',
                 'href': "",
                 'tabindex': -1,
@@ -572,7 +587,7 @@
         function setTags(values) {
             values = values ? values.split(state.join) : []; // Remove all tag(s) …
             if (hasParent(self)) {
-                let theTagPrev, theTagPrevIndex, theTagPrevTitle;
+                var theTagPrev, theTagPrevIndex, theTagPrevTitle;
                 while (theTagPrev = getPrev(text)) {
                     letTagElement(theTagPrevTitle = theTagPrev.title);
                     if (!hasValue(theTagPrevTitle, values)) {
@@ -584,7 +599,7 @@
             }
             $.tags = [];
             source.value = ""; // … then add tag(s)
-            for (let i = 0, theTagsMax = state.max, value; i < theTagsMax; ++i) {
+            for (var i = 0, theTagsMax = state.max, value; i < theTagsMax; ++i) {
                 if (!values[i]) {
                     break;
                 }
@@ -597,7 +612,7 @@
         }
 
         function letTag(tag) {
-            let index = toArrayKey(tag, $.tags);
+            var index = toArrayKey(tag, $.tags);
             if (isNumber(index) && index >= 0) {
                 $.tags.splice(index, 1);
                 source.value = $.tags.join(state.join);
@@ -605,12 +620,12 @@
         }
 
         function letTagElement(tag) {
-            let index = toArrayKey(tag, $.tags),
+            var index = toArrayKey(tag, $.tags),
                 element;
             if (isNumber(index) && index >= 0 && (element = getChildren(textOutput, index))) {
                 offEvent('click', element, onClickTag);
                 offEvents(['blur', 'focus'], element, onBlurFocusTag);
-                let x = getChildFirst(element);
+                var x = getChildFirst(element);
                 if (x) {
                     offEvent('click', x, onClickTagX);
                     letElement(x);
@@ -640,7 +655,7 @@
             setText(textInputHint, value ? "" : thePlaceholder);
             if (fireFocus) {
                 textInput.focus(); // Move caret to the end!
-                let range = D.createRange(),
+                var range = D.createRange(),
                     selection = W.getSelection();
                 range.selectNodeContents(textInput);
                 range.collapse(false);
@@ -666,7 +681,7 @@
             if (sourceIsDisabled() || sourceIsReadOnly()) {
                 return;
             }
-            let tag = doValidTagChar(getText(textInput)).trim(),
+            var tag = doValidTagChar(getText(textInput)).trim(),
                 pattern = state.pattern;
             if (pattern && tag) {
                 if (!toPattern(pattern, "").test(tag)) {
@@ -679,7 +694,7 @@
             if (tag = doValidTag(tag)) {
                 if (!getTag(tag)) {
                     setTagElement(tag), setTag(tag);
-                    let index = toCount($.tags);
+                    var index = toCount($.tags);
                     fire('change', [tag, index]);
                     fire('set.tag', [tag, index]);
                 } else {
@@ -695,7 +710,7 @@
         }
 
         function doToTags(exceptThisTag, then) {
-            let i,
+            var i,
                 items = getChildren(textOutput),
                 j = toCount(items) - 1; // Minus 1 to skip the tag editor element
             for (i = 0; i < j; ++i) {
@@ -712,14 +727,14 @@
 
         function doValidTagChar(v) {
             v = v || "";
-            state.escape.forEach(char => {
+            state.escape.forEach(function(char) {
                 v = v.split(char).join("");
             });
             return v;
         }
 
         function onBlurFocusTextCopy(e) {
-            let type = e.type;
+            var type = e.type;
             if ('blur' === type) {
                 doBlurTags();
                 letClasses(self, [classNameM + 'focus', classNameM + 'focus-self']);
@@ -733,7 +748,7 @@
                 return;
             }
             currentTags = {}; // Reset!
-            let t = this,
+            var t = this,
                 type = e.type,
                 tag = t.title,
                 tags = $.tags,
@@ -756,7 +771,7 @@
         }
 
         function onBlurFocusText(e) {
-            let tags = $.tags,
+            var tags = $.tags,
                 type = e.type,
                 classNameTextM = classNameE + 'text--';
             letClass(self, classNameM + 'focus-tag');
@@ -773,7 +788,7 @@
         }
 
         function onBlurFocusSelf(e) {
-            let type = e.type;
+            var type = e.type;
             if ('blur' === type) {
                 letClass(self, classNameM + 'focus');
             } else {
@@ -785,12 +800,12 @@
             if (e && self === e.target) {
                 textInput.focus();
             }
-            let tags = $.tags;
+            var tags = $.tags;
             fire('click', [tags, toCount(tags)]);
         }
 
         function onClickTag() {
-            let t = this,
+            var t = this,
                 tag = t.title,
                 tags = $.tags;
             fire('click.tag', [tag, toArrayKey(tag, tags)]);
@@ -798,7 +813,7 @@
 
         function onClickTagX(e) {
             if (!sourceIsDisabled() && !sourceIsReadOnly()) {
-                let t = this,
+                var t = this,
                     tag = getParent(t).title,
                     index = toArrayKey(tag, $.tags);
                 letTagElement(tag), letTag(tag), setValue("", 1);
@@ -810,20 +825,24 @@
         }
 
         function onCopyCutPasteTextCopy(e) {
-            let type = e.type;
+            var type = e.type;
             if ('copy' === type) {
-                delay(() => letTextCopy(1))();
+                delay(function() {
+                    return letTextCopy(1);
+                })();
             } else if ('cut' === type) {
                 !sourceIsReadOnly() && setTags("");
-                delay(() => letTextCopy(1))();
+                delay(function() {
+                    return letTextCopy(1);
+                })();
             } else if ('paste' === type) {
-                delay(() => {
+                delay(function() {
                     !sourceIsReadOnly() && setTags(textCopy.value);
                     letTextCopy(1);
                 })();
             }
-            delay(() => {
-                let tags = $.tags;
+            delay(function() {
+                var tags = $.tags;
                 fire(type, [tags, toCount(tags)]);
             }, 1)();
         }
@@ -841,18 +860,18 @@
                 return;
             }
             $.tags;
-            let key = e.key,
+            var key = e.key,
                 keyIsCtrl = _keyIsCtrl = e.ctrlKey,
                 keyIsShift = _keyIsShift = e.shiftKey,
                 classNameTagM = classNameE + 'tag--';
             _keyIsTab = KEY_TAB === key;
-            let theTag, theTagIndex, theTagNext, theTagPrev, theTagTitle, theTags;
+            var theTag, theTagIndex, theTagNext, theTagPrev, theTagTitle, theTags;
             if (!keyIsCtrl) {
                 // Remove tag(s) with `Backspace` or `Delete` key
                 if (!keyIsShift && (KEY_DELETE_LEFT === key || KEY_DELETE_RIGHT === key)) {
                     setCurrentTags();
                     theTags = getCurrentTags();
-                    let isBackspace = KEY_DELETE_LEFT === key;
+                    var isBackspace = KEY_DELETE_LEFT === key;
                     for (theTagIndex in theTags) {
                         theTag = theTags[theTagIndex];
                         letTagElement(theTagTitle = theTag.title), letTag(theTagTitle);
@@ -884,7 +903,7 @@
                 } // Focus to the previous tag
                 if (KEY_ARROW_LEFT === key) {
                     if (theTag = getChildren(textOutput, currentTagIndex - 1)) {
-                        let theTagWasFocus = hasClass(theTag, classNameTagM + 'selected');
+                        var theTagWasFocus = hasClass(theTag, classNameTagM + 'selected');
                         theTag.focus(), offEventDefault(e);
                         if (keyIsShift) {
                             theTagNext = getNext(theTag);
@@ -903,11 +922,11 @@
                 } // Focus to the next tag or to the tag editor
                 if (KEY_ARROW_RIGHT === key) {
                     if (theTag = getChildren(textOutput, currentTagIndex + 1)) {
-                        let theTagWasFocus = hasClass(theTag, classNameTagM + 'selected');
+                        var _theTagWasFocus = hasClass(theTag, classNameTagM + 'selected');
                         text === theTag && !keyIsShift ? setValue("", 1) : theTag.focus(), offEventDefault(e);
                         if (keyIsShift) {
                             theTagPrev = getPrev(theTag);
-                            if (theTagWasFocus) {
+                            if (_theTagWasFocus) {
                                 letClass(theTagPrev, classNameTagM + 'selected');
                             }
                             return;
@@ -928,7 +947,7 @@
             if (sourceIsReadOnly() && KEY_TAB !== e.key) {
                 offEventDefault(e);
             }
-            let escapes = state.escape,
+            var escapes = state.escape,
                 theTag,
                 theTagLast = getPrev(text),
                 theTagsCount = toCount($.tags),
@@ -938,15 +957,15 @@
                 keyIsCtrl = _keyIsCtrl = e.ctrlKey,
                 keyIsEnter = KEY_ENTER === key;
             _keyIsShift = e.shiftKey;
-            let keyIsTab = _keyIsTab = KEY_TAB === key;
+            var keyIsTab = _keyIsTab = KEY_TAB === key;
             if (keyIsEnter) {
                 key = '\n';
             }
             if (keyIsTab) {
                 key = '\t';
             }
-            delay(() => {
-                let theValueAfter = doValidTag(getText(textInput));
+            delay(function() {
+                var theValueAfter = doValidTag(getText(textInput));
                 setText(textInputHint, theValueAfter ? "" : thePlaceholder); // Try to add support for browser(s) without `KeyboardEvent.prototype.key` feature
                 if (hasValue(getCharBeforeCaret(textInput), escapes)) {
                     if (theTagsCount < theTagsMax) {
@@ -1015,9 +1034,9 @@
         }
 
         function onPasteText() {
-            delay(() => {
+            delay(function() {
                 if (!sourceIsDisabled() && !sourceIsReadOnly()) {
-                    getText(textInput).split(state.join).forEach(v => {
+                    getText(textInput).split(state.join).forEach(function(v) {
                         if (!hasValue(v, $.tags)) {
                             setTagElement(v), setTag(v);
                         }
@@ -1031,7 +1050,7 @@
             if (sourceIsDisabled()) {
                 return;
             }
-            let theTagsMin = state.min;
+            var theTagsMin = state.min;
             doInput(); // Force to add the tag name found in the tag editor
             if (theTagsMin > 0 && toCount($.tags) < theTagsMin) {
                 setValue("", 1);
@@ -1062,24 +1081,32 @@
         onEvents(['blur', 'focus'], textInput, onBlurFocusText);
         onEvents(['copy', 'cut', 'paste'], textCopy, onCopyCutPasteTextCopy);
         form && onEvent('submit', form, onSubmitForm);
-        $.blur = () => (!sourceIsDisabled() && textInput.blur(), $);
-        $.click = () => (self.click(), onClickSelf(), $); // Default filter for the tag name
-        $.f = v => toCaseLower(v || "").replace(/[^ a-z\d-]/g, "").trim();
-        $.focus = () => {
+        $.blur = function() {
+            return !sourceIsDisabled() && textInput.blur(), $;
+        };
+        $.click = function() {
+            return self.click(), onClickSelf(), $;
+        }; // Default filter for the tag name
+        $.f = function(v) {
+            return toCaseLower(v || "").replace(/[^ a-z\d-]/g, "").trim();
+        };
+        $.focus = function() {
             if (!sourceIsDisabled()) {
                 setValue(getText(textInput), 1);
             }
             return $;
         };
-        $.get = tag => sourceIsDisabled() ? null : getTag(tag, 1);
+        $.get = function(tag) {
+            return sourceIsDisabled() ? null : getTag(tag, 1);
+        };
         $.input = textInput;
-        $.let = tag => {
+        $.let = function(tag) {
             if (!sourceIsDisabled() && !sourceIsReadOnly()) {
-                let theTagsMin = state.min;
+                var theTagsMin = state.min;
                 if (!tag) {
                     setTags("");
                 } else if (isArray(tag)) {
-                    tag.forEach(v => {
+                    tag.forEach(function(v) {
                         if (theTagsMin > 0 && toCount($.tags) < theTagsMin) {
                             fire('min.tags', [theTagsMin]);
                             return $;
@@ -1096,12 +1123,12 @@
             }
             return $;
         };
-        $.pop = () => {
+        $.pop = function() {
             if (!source[name]) {
                 return $; // Already ejected!
             }
             delete source[name];
-            let tags = $.tags;
+            var tags = $.tags;
             letClass(source, classNameE + 'source');
             offEvent('blur', self, onBlurSelf);
             offEvent('click', self, onClickSelf);
@@ -1122,7 +1149,7 @@
             return letElement(self), fire('pop', [tags]);
         };
         $.self = self;
-        $.set = (tag, index) => {
+        $.set = function(tag, index) {
             if (!tag) {
                 return $;
             }
@@ -1130,7 +1157,7 @@
                 if (isArray(tag)) {
                     setTags(tag.join(state.join));
                 } else {
-                    let tags = $.tags,
+                    var tags = $.tags,
                         theTagsMax = state.max;
                     if (!getTag(tag)) {
                         if (toCount(tags) < theTagsMax) {
@@ -1160,6 +1187,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.4.12';
+    TP.version = '3.4.13';
     return TP;
-});
+}));

@@ -3,20 +3,20 @@
   "browser": "index.min.js",
   "bugs": "https://github.com/taufik-nurrohman/tag-picker/issues",
   "dependencies": {
-    "@taufik-nurrohman/document": "^0.3.1",
-    "@taufik-nurrohman/event": "^0.3.1",
-    "@taufik-nurrohman/from": "^0.0.10",
-    "@taufik-nurrohman/has": "^0.0.3",
-    "@taufik-nurrohman/hook": "^0.1.2",
-    "@taufik-nurrohman/is": "^0.1.2",
-    "@taufik-nurrohman/pattern": "^0.1.7",
-    "@taufik-nurrohman/rect": "^0.0.11",
-    "@taufik-nurrohman/tick": "^0.0.2",
-    "@taufik-nurrohman/to": "^0.0.18"
+    "@taufik-nurrohman/document": "*",
+    "@taufik-nurrohman/event": "*",
+    "@taufik-nurrohman/from": "*",
+    "@taufik-nurrohman/has": "*",
+    "@taufik-nurrohman/hook": "*",
+    "@taufik-nurrohman/is": "*",
+    "@taufik-nurrohman/pattern": "*",
+    "@taufik-nurrohman/rect": "*",
+    "@taufik-nurrohman/tick": "*",
+    "@taufik-nurrohman/to": "*"
   },
   "description": "Better tags input interaction with JavaScript.",
   "devDependencies": {
-    "@taufik-nurrohman/factory": "^1.0.8"
+    "@taufik-nurrohman/factory": "*"
   },
   "exports": {
     "import": "./index.mjs",
@@ -49,6 +49,5 @@
   "scripts": {
     "pack": "pack --clean=false --from=.github/factory --js-format=umd --js-name=TP --js-top='%(js.license)' --mjs=true --scss=true --to=."
   },
-  "type": "module",
-  "version": "3.4.12"
+  "version": "3.4.13"
 }
