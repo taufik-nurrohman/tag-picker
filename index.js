@@ -23,9 +23,9 @@
  * SOFTWARE.
  *
  */
-(function(g, f) {
+(function (g, f) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = f() : typeof define === 'function' && define.amd ? define(f) : (g = typeof globalThis !== 'undefined' ? globalThis : g || self, g.TP = f());
-})(this, (function() {
+})(this, (function () {
     'use strict';
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
@@ -87,7 +87,7 @@
     };
     var toValue = function toValue(x) {
         if (isArray(x)) {
-            return x.map(function(v) {
+            return x.map(function (v) {
                 return toValue(v);
             });
         }
@@ -145,7 +145,7 @@
     };
     var fromValue = function fromValue(x) {
         if (isArray(x)) {
-            return x.map(function(v) {
+            return x.map(function (v) {
                 return fromValue(x);
             });
         }
@@ -239,7 +239,7 @@
     };
     var letClasses = function letClasses(node, classes) {
         if (isArray(classes)) {
-            return classes.forEach(function(name) {
+            return classes.forEach(function (name) {
                 return node.classList.remove(name);
             }), node;
         }
@@ -281,7 +281,7 @@
     };
     var setClasses = function setClasses(node, classes) {
         if (isArray(classes)) {
-            return classes.forEach(function(name) {
+            return classes.forEach(function (name) {
                 return node.classList.add(name);
             }), node;
         }
@@ -338,10 +338,10 @@
         return hasState(node, state) && (node[state] = trim ? content.trim() : content), node;
     };
     var delay = function delay(then, time) {
-        return function() {
+        return function () {
             var _arguments2 = arguments,
                 _this2 = this;
-            setTimeout(function() {
+            setTimeout(function () {
                 return then.apply(_this2, _arguments2);
             }, time);
         };
@@ -363,7 +363,7 @@
             if (!isSet(hooks[name])) {
                 return $;
             }
-            hooks[name].forEach(function(then) {
+            hooks[name].forEach(function (then) {
                 return then.apply($, data);
             });
             return $;
@@ -416,7 +416,7 @@
         return e && e.stopPropagation();
     };
     var offEvents = function offEvents(names, node, then) {
-        names.forEach(function(name) {
+        names.forEach(function (name) {
             return offEvent(name, node, then);
         });
     };
@@ -430,7 +430,7 @@
         if (options === void 0) {
             options = false;
         }
-        names.forEach(function(name) {
+        names.forEach(function (name) {
             return onEvent(name, node, then, options);
         });
     };
@@ -666,13 +666,13 @@
         setValue("");
 
         function doBlurTags(exceptThisTag) {
-            doToTags(exceptThisTag, function() {
+            doToTags(exceptThisTag, function () {
                 letClass(this, classNameE + 'tag--selected');
             });
         }
 
         function doFocusTags(exceptThisTag) {
-            doToTags(exceptThisTag, function() {
+            doToTags(exceptThisTag, function () {
                 setClass(this, classNameE + 'tag--selected');
             });
         }
@@ -727,7 +727,7 @@
 
         function doValidTagChar(v) {
             v = v || "";
-            state.escape.forEach(function(char) {
+            state.escape.forEach(function (char) {
                 v = v.split(char).join("");
             });
             return v;
@@ -827,21 +827,21 @@
         function onCopyCutPasteTextCopy(e) {
             var type = e.type;
             if ('copy' === type) {
-                delay(function() {
+                delay(function () {
                     return letTextCopy(1);
                 })();
             } else if ('cut' === type) {
                 !sourceIsReadOnly() && setTags("");
-                delay(function() {
+                delay(function () {
                     return letTextCopy(1);
                 })();
             } else if ('paste' === type) {
-                delay(function() {
+                delay(function () {
                     !sourceIsReadOnly() && setTags(textCopy.value);
                     letTextCopy(1);
                 })();
             }
-            delay(function() {
+            delay(function () {
                 var tags = $.tags;
                 fire(type, [tags, toCount(tags)]);
             }, 1)();
@@ -964,7 +964,7 @@
             if (keyIsTab) {
                 key = '\t';
             }
-            delay(function() {
+            delay(function () {
                 var theValueAfter = doValidTag(getText(textInput));
                 setText(textInputHint, theValueAfter ? "" : thePlaceholder); // Try to add support for browser(s) without `KeyboardEvent.prototype.key` feature
                 if (hasValue(getCharBeforeCaret(textInput), escapes)) {
@@ -1034,9 +1034,9 @@
         }
 
         function onPasteText() {
-            delay(function() {
+            delay(function () {
                 if (!sourceIsDisabled() && !sourceIsReadOnly()) {
-                    getText(textInput).split(state.join).forEach(function(v) {
+                    getText(textInput).split(state.join).forEach(function (v) {
                         if (!hasValue(v, $.tags)) {
                             setTagElement(v), setTag(v);
                         }
@@ -1081,32 +1081,32 @@
         onEvents(['blur', 'focus'], textInput, onBlurFocusText);
         onEvents(['copy', 'cut', 'paste'], textCopy, onCopyCutPasteTextCopy);
         form && onEvent('submit', form, onSubmitForm);
-        $.blur = function() {
+        $.blur = function () {
             return !sourceIsDisabled() && textInput.blur(), $;
         };
-        $.click = function() {
+        $.click = function () {
             return self.click(), onClickSelf(), $;
         }; // Default filter for the tag name
-        $.f = function(v) {
+        $.f = function (v) {
             return toCaseLower(v || "").replace(/[^ a-z\d-]/g, "").trim();
         };
-        $.focus = function() {
+        $.focus = function () {
             if (!sourceIsDisabled()) {
                 setValue(getText(textInput), 1);
             }
             return $;
         };
-        $.get = function(tag) {
+        $.get = function (tag) {
             return sourceIsDisabled() ? null : getTag(tag, 1);
         };
         $.input = textInput;
-        $.let = function(tag) {
+        $.let = function (tag) {
             if (!sourceIsDisabled() && !sourceIsReadOnly()) {
                 var theTagsMin = state.min;
                 if (!tag) {
                     setTags("");
                 } else if (isArray(tag)) {
-                    tag.forEach(function(v) {
+                    tag.forEach(function (v) {
                         if (theTagsMin > 0 && toCount($.tags) < theTagsMin) {
                             fire('min.tags', [theTagsMin]);
                             return $;
@@ -1123,7 +1123,7 @@
             }
             return $;
         };
-        $.pop = function() {
+        $.pop = function () {
             if (!source[name]) {
                 return $; // Already ejected!
             }
@@ -1149,7 +1149,7 @@
             return letElement(self), fire('pop', [tags]);
         };
         $.self = self;
-        $.set = function(tag, index) {
+        $.set = function (tag, index) {
             if (!tag) {
                 return $;
             }
@@ -1187,6 +1187,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.4.13';
+    TP.version = '3.4.14';
     return TP;
 }));

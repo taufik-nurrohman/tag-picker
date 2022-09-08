@@ -241,13 +241,13 @@ function TP(source, state = {}) {
     } setValue("");
 
     function doBlurTags(exceptThisTag) {
-        doToTags(exceptThisTag, function() {
+        doToTags(exceptThisTag, function () {
             letClass(this, classNameE + 'tag--selected');
         });
     }
 
     function doFocusTags(exceptThisTag) {
-        doToTags(exceptThisTag, function() {
+        doToTags(exceptThisTag, function () {
             setClass(this, classNameE + 'tag--selected');
         });
     }
@@ -795,6 +795,6 @@ TP.state = {
     'pattern': null
 };
 
-TP.version = '3.4.13';
+TP.version = '3.4.14';
 
 export default TP;
