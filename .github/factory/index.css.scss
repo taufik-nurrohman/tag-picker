@@ -85,9 +85,11 @@ $name: 'tag-picker';
 }
 
 .#{$name}__tag {
+  display: flex;
   height: var(--height-#{$name}); // Same with `min-height` of container
   margin: .125em;
   outline: 0;
+  overflow: hidden;
   padding: 0 .5em;
   position: relative;
   text-decoration: none;
@@ -116,8 +118,9 @@ $name: 'tag-picker';
       color: var(--color-#{$name}__tag--#{$v}, var(--color-#{$name}__tag));
     }
   }
-  &::before {
+  &:not(.#{$name}__input)::before {
     content: attr(title);
+    flex: 1;
   }
   + .#{$name}__input {
     span {
@@ -129,6 +132,7 @@ $name: 'tag-picker';
   }
   &-x {
     color: var(--color-#{$name}__tag-x);
+    font-family: sans-serif;
     margin-left: .5em;
     outline: 0;
     text-decoration: none;
@@ -139,7 +143,7 @@ $name: 'tag-picker';
     }
     &::before {
       content: '\00d7'; // The “×” button
-      font-family: sans-serif;
+      font: inherit;
     }
   }
 }
@@ -147,7 +151,7 @@ $name: 'tag-picker';
 .#{$name}__input {
   flex: 1;
   span {
-    display: block;
+    flex: 1;
     height: 100%;
     outline: 0;
     position: relative;

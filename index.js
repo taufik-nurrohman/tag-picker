@@ -33,13 +33,13 @@
     var isArray = function isArray(x) {
         return Array.isArray(x);
     };
-    var isDefined = function isDefined(x) {
+    var isDefined$1 = function isDefined(x) {
         return 'undefined' !== typeof x;
     };
     var isInstance = function isInstance(x, of) {
-        return x && isSet(of) && x instanceof of ;
+        return x && isSet$1(of) && x instanceof of ;
     };
-    var isNull = function isNull(x) {
+    var isNull$1 = function isNull(x) {
         return null === x;
     };
     var isNumber = function isNumber(x) {
@@ -57,8 +57,8 @@
         }
         return isPlain ? isInstance(x, Object) : true;
     };
-    var isSet = function isSet(x) {
-        return isDefined(x) && !isNull(x);
+    var isSet$1 = function isSet(x) {
+        return isDefined$1(x) && !isNull$1(x);
     };
     var isString = function isString(x) {
         return 'string' === typeof x;
@@ -119,7 +119,7 @@
         for (var i = 0, j = toCount(lot); i < j; ++i) {
             for (var k in lot[i]) {
                 // Assign value
-                if (!isSet(out[k])) {
+                if (!isSet$1(out[k])) {
                     out[k] = lot[i][k];
                     continue;
                 } // Merge array
@@ -346,6 +346,15 @@
             }, time);
         };
     };
+    var isDefined = function isDefined(x) {
+        return 'undefined' !== typeof x;
+    };
+    var isNull = function isNull(x) {
+        return null === x;
+    };
+    var isSet = function isSet(x) {
+        return isDefined(x) && !isNull(x);
+    };
 
     function hook($) {
         var hooks = {};
@@ -433,7 +442,7 @@
             return pattern;
         } // No need to escape `/` in the pattern string
         pattern = pattern.replace(/\//g, '\\/');
-        return new RegExp(pattern, isSet(opt) ? opt : 'g');
+        return new RegExp(pattern, isSet$1(opt) ? opt : 'g');
     };
     var name = 'TP';
     var KEY_A = 'a';
@@ -1178,6 +1187,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.4.14';
+    TP.version = '3.4.15';
     return TP;
 }));
