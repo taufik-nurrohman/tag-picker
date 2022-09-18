@@ -952,7 +952,7 @@
                 theTagLast = getPrev(text),
                 theTagsCount = toCount($.tags),
                 theTagsMax = state.max,
-                theValue = doValidTag(getText(textInput)),
+                theValue = getText(textInput) || "",
                 key = e.key,
                 keyIsCtrl = _keyIsCtrl = e.ctrlKey,
                 keyIsEnter = KEY_ENTER === key;
@@ -965,8 +965,8 @@
                 key = '\t';
             }
             delay(function () {
-                var theValueAfter = doValidTag(getText(textInput));
-                setText(textInputHint, theValueAfter ? "" : thePlaceholder); // Try to add support for browser(s) without `KeyboardEvent.prototype.key` feature
+                theValue = getText(textInput) || "";
+                setText(textInputHint, theValue ? "" : thePlaceholder); // Try to add support for browser(s) without `KeyboardEvent.prototype.key` feature
                 if (hasValue(getCharBeforeCaret(textInput), escapes)) {
                     if (theTagsCount < theTagsMax) {
                         // Add the tag name found in the tag editor
@@ -1187,6 +1187,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.4.15';
+    TP.version = '3.4.16';
     return TP;
 }));

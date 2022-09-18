@@ -538,7 +538,7 @@ function TP(source, state = {}) {
             theTagLast = getPrev(text),
             theTagsCount = toCount($.tags),
             theTagsMax = state.max,
-            theValue = doValidTag(getText(textInput)),
+            theValue = getText(textInput) || "",
             key = e.key,
             keyIsCtrl = _keyIsCtrl = e.ctrlKey,
             keyIsEnter = KEY_ENTER === key,
@@ -551,8 +551,8 @@ function TP(source, state = {}) {
             key = '\t';
         }
         delay(() => {
-            let theValueAfter = doValidTag(getText(textInput));
-            setText(textInputHint, theValueAfter ? "" : thePlaceholder);
+            theValue = getText(textInput) || "";
+            setText(textInputHint, theValue ? "" : thePlaceholder);
             // Try to add support for browser(s) without `KeyboardEvent.prototype.key` feature
             if (hasValue(getCharBeforeCaret(textInput), escapes)) {
                 if (theTagsCount < theTagsMax) {
@@ -795,6 +795,6 @@ TP.state = {
     'pattern': null
 };
 
-TP.version = '3.4.15';
+TP.version = '3.4.16';
 
 export default TP;
