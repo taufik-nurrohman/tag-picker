@@ -47,6 +47,7 @@ $name: 'tag-picker';
   border: 1px solid;
   border-color: var(--stroke-#{$name});
   border-radius: var(--arc-#{$name});
+  box-shadow: var(--shadow-#{$name});
   color: var(--color-#{$name});
   cursor: text;
   display: inline-flex;

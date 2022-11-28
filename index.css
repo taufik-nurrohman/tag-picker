@@ -44,6 +44,7 @@
   border: 1px solid;
   border-color: var(--stroke-tag-picker);
   border-radius: var(--arc-tag-picker);
+  box-shadow: var(--shadow-tag-picker);
   color: var(--color-tag-picker);
   cursor: text;
   display: inline-flex;
