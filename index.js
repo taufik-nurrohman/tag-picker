@@ -2,7 +2,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright © 2022 Taufik Nurrohman <https://github.com/taufik-nurrohman>
+ * Copyright © 2023 Taufik Nurrohman <https://github.com/taufik-nurrohman>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the “Software”), to deal
@@ -33,13 +33,13 @@
     var isArray = function isArray(x) {
         return Array.isArray(x);
     };
-    var isDefined$1 = function isDefined(x) {
+    var isDefined = function isDefined(x) {
         return 'undefined' !== typeof x;
     };
     var isInstance = function isInstance(x, of) {
-        return x && isSet$1(of) && x instanceof of ;
+        return x && isSet(of) && x instanceof of ;
     };
-    var isNull$1 = function isNull(x) {
+    var isNull = function isNull(x) {
         return null === x;
     };
     var isNumber = function isNumber(x) {
@@ -57,8 +57,8 @@
         }
         return isPlain ? isInstance(x, Object) : true;
     };
-    var isSet$1 = function isSet(x) {
-        return isDefined$1(x) && !isNull$1(x);
+    var isSet = function isSet(x) {
+        return isDefined(x) && !isNull(x);
     };
     var isString = function isString(x) {
         return 'string' === typeof x;
@@ -119,23 +119,23 @@
         for (var i = 0, j = toCount(lot); i < j; ++i) {
             for (var k in lot[i]) {
                 // Assign value
-                if (!isSet$1(out[k])) {
+                if (!isSet(out[k])) {
                     out[k] = lot[i][k];
                     continue;
-                } // Merge array
+                }
+                // Merge array
                 if (isArray(out[k]) && isArray(lot[i][k])) {
-                    out[k] = [
-                        /* Clone! */
-                    ].concat(out[k]);
+                    out[k] = [ /* Clone! */ ].concat(out[k]);
                     for (var ii = 0, jj = toCount(lot[i][k]); ii < jj; ++ii) {
                         if (!hasValue(lot[i][k][ii], out[k])) {
                             out[k].push(lot[i][k][ii]);
                         }
-                    } // Merge object recursive
+                    }
+                    // Merge object recursive
                 } else if (isObject(out[k]) && isObject(lot[i][k])) {
                     out[k] = fromStates({
-                        /* Clone! */
-                    }, out[k], lot[i][k]); // Replace value
+                        /* Clone! */ }, out[k], lot[i][k]);
+                    // Replace value
                 } else {
                     out[k] = lot[i][k];
                 }
@@ -293,8 +293,10 @@
                     node.classList.remove(name);
                 }
             }
-        } // if (isString(classes)) {
-        node.className = classes; // }
+        }
+        // if (isString(classes)) {
+        node.className = classes;
+        // }
         return node;
     };
     var setElement = function setElement(node, content, attributes) {
@@ -346,15 +348,6 @@
             }, time);
         };
     };
-    var isDefined = function isDefined(x) {
-        return 'undefined' !== typeof x;
-    };
-    var isNull = function isNull(x) {
-        return null === x;
-    };
-    var isSet = function isSet(x) {
-        return isDefined(x) && !isNull(x);
-    };
 
     function hook($) {
         var hooks = {};
@@ -380,7 +373,8 @@
                             hooks[name].splice(i, 1);
                             break;
                         }
-                    } // Clean-up empty hook(s)
+                    }
+                    // Clean-up empty hook(s)
                     if (0 === j) {
                         delete hooks[name];
                     }
@@ -440,9 +434,10 @@
     var toPattern = function toPattern(pattern, opt) {
         if (isPattern(pattern)) {
             return pattern;
-        } // No need to escape `/` in the pattern string
+        }
+        // No need to escape `/` in the pattern string
         pattern = pattern.replace(/\//g, '\\/');
-        return new RegExp(pattern, isSet$1(opt) ? opt : 'g');
+        return new RegExp(pattern, isSet(opt) ? opt : 'g');
     };
     var name = 'TP';
     var KEY_A = 'a';
@@ -462,10 +457,12 @@
         var $ = this;
         if (!source) {
             return $;
-        } // Already instantiated, skip!
+        }
+        // Already instantiated, skip!
         if (source[name]) {
             return source[name];
-        } // Return new instance if `TP` was called without the `new` operator
+        }
+        // Return new instance if `TP` was called without the `new` operator
         if (!isInstance($, TP)) {
             return new TP(source, state);
         }
@@ -483,8 +480,10 @@
         $.state = state = fromStates({}, TP.state, isString(state) ? {
             join: state
         } : state || {});
-        $.source = source; // Store current instance to `TP.instances`
-        TP.instances[source.id || source.name || toObjectCount(TP.instances)] = $; // Mark current DOM as active tag picker to prevent duplicate instance
+        $.source = source;
+        // Store current instance to `TP.instances`
+        TP.instances[source.id || source.name || toObjectCount(TP.instances)] = $;
+        // Mark current DOM as active tag picker to prevent duplicate instance
         source[name] = $;
         var classNameB = state['class'],
             classNameE = classNameB + '__',
@@ -585,7 +584,8 @@
         }
 
         function setTags(values) {
-            values = values ? values.split(state.join) : []; // Remove all tag(s) …
+            values = values ? values.split(state.join) : [];
+            // Remove all tag(s) …
             if (hasParent(self)) {
                 var theTagPrev, theTagPrevIndex, theTagPrevTitle;
                 while (theTagPrev = getPrev(text)) {
@@ -598,7 +598,8 @@
                 }
             }
             $.tags = [];
-            source.value = ""; // … then add tag(s)
+            source.value = "";
+            // … then add tag(s)
             for (var i = 0, theTagsMax = state.max, value; i < theTagsMax; ++i) {
                 if (!values[i]) {
                     break;
@@ -654,7 +655,8 @@
             setText(textInput, value);
             setText(textInputHint, value ? "" : thePlaceholder);
             if (fireFocus) {
-                textInput.focus(); // Move caret to the end!
+                textInput.focus();
+                // Move caret to the end!
                 var range = D.createRange(),
                     selection = W.getSelection();
                 range.selectNodeContents(textInput);
@@ -829,17 +831,17 @@
             if ('copy' === type) {
                 delay(function () {
                     return letTextCopy(1);
-                })();
+                }, 1)();
             } else if ('cut' === type) {
                 !sourceIsReadOnly() && setTags("");
                 delay(function () {
                     return letTextCopy(1);
-                })();
+                }, 1)();
             } else if ('paste' === type) {
                 delay(function () {
                     !sourceIsReadOnly() && setTags(textCopy.value);
                     letTextCopy(1);
-                })();
+                }, 1)();
             }
             delay(function () {
                 var tags = $.tags;
@@ -888,19 +890,22 @@
                     }
                     offEventDefault(e);
                     return;
-                } // Focus to the first tag
+                }
+                // Focus to the first tag
                 if (KEY_BEGIN === key) {
                     if (theTag = getChildren(textOutput, 0)) {
                         theTag.focus(), offEventDefault(e);
                     }
                     return;
-                } // Focus to the last tag
+                }
+                // Focus to the last tag
                 if (KEY_END === key) {
                     if (theTag = getChildren(textOutput, toCount($.tags) - 1)) {
                         theTag.focus(), offEventDefault(e);
                         return;
                     }
-                } // Focus to the previous tag
+                }
+                // Focus to the previous tag
                 if (KEY_ARROW_LEFT === key) {
                     if (theTag = getChildren(textOutput, currentTagIndex - 1)) {
                         var theTagWasFocus = hasClass(theTag, classNameTagM + 'selected');
@@ -919,7 +924,8 @@
                         doBlurTags(getChildren(textOutput, 0));
                         return;
                     }
-                } // Focus to the next tag or to the tag editor
+                }
+                // Focus to the next tag or to the tag editor
                 if (KEY_ARROW_RIGHT === key) {
                     if (theTag = getChildren(textOutput, currentTagIndex + 1)) {
                         var _theTagWasFocus = hasClass(theTag, classNameTagM + 'selected');
@@ -935,7 +941,8 @@
                         return;
                     }
                 }
-            } // Select all tag(s) with `Ctrl+A` key
+            }
+            // Select all tag(s) with `Ctrl+A` key
             if (KEY_A === key) {
                 setTextCopy(1);
                 doFocusTags(), setCurrentTags(), offEventDefault(e);
@@ -966,7 +973,8 @@
             }
             delay(function () {
                 theValue = getText(textInput) || "";
-                setText(textInputHint, theValue ? "" : thePlaceholder); // Try to add support for browser(s) without `KeyboardEvent.prototype.key` feature
+                setText(textInputHint, theValue ? "" : thePlaceholder);
+                // Try to add support for browser(s) without `KeyboardEvent.prototype.key` feature
                 if (hasValue(getCharBeforeCaret(textInput), escapes)) {
                     if (theTagsCount < theTagsMax) {
                         // Add the tag name found in the tag editor
@@ -977,19 +985,22 @@
                     }
                     offEventDefault(e);
                 }
-            })(); // Focus to the first tag
+            }, 1)();
+            // Focus to the first tag
             if ("" === theValue && KEY_BEGIN === key) {
                 if (theTag = getChildren(textOutput, 0)) {
                     theTag.focus(), offEventDefault(e);
                     return;
                 }
-            } // Focus to the last tag
+            }
+            // Focus to the last tag
             if ("" === theValue && KEY_END === key) {
                 if (theTag = getChildren(textOutput, toCount($.tags) - 1)) {
                     theTag.focus(), offEventDefault(e);
                     return;
                 }
-            } // Select all tag(s) with `Ctrl+A` key
+            }
+            // Select all tag(s) with `Ctrl+A` key
             if (keyIsCtrl && "" === theValue && KEY_A === key) {
                 setTextCopy(1);
                 doFocusTags(), setCurrentTags(), offEventDefault(e);
@@ -1005,10 +1016,12 @@
                 }
                 offEventDefault(e);
                 return;
-            } // Skip `Tab` key
+            }
+            // Skip `Tab` key
             if (keyIsTab) {
                 return; // :)
-            } // Submit the closest `<form>` element with `Enter` key
+            }
+            // Submit the closest `<form>` element with `Enter` key
             if (!keyIsCtrl && keyIsEnter) {
                 doSubmitTry(), offEventDefault(e);
                 return;
@@ -1043,7 +1056,7 @@
                     });
                 }
                 setValue("");
-            })();
+            }, 1)();
         }
 
         function onSubmitForm(e) {
@@ -1057,7 +1070,8 @@
                 fire('min.tags', [theTagsMin]);
                 offEventDefault(e);
                 return;
-            } // Do normal `submit` event
+            }
+            // Do normal `submit` event
             return 1;
         }
         setChildLast(self, textOutput);
@@ -1086,7 +1100,8 @@
         };
         $.click = function () {
             return self.click(), onClickSelf(), $;
-        }; // Default filter for the tag name
+        };
+        // Default filter for the tag name
         $.f = function (v) {
             return toCaseLower(v || "").replace(/[^ a-z\d-]/g, "").trim();
         };
@@ -1187,6 +1202,6 @@
         'min': 0,
         'pattern': null
     };
-    TP.version = '3.4.17';
+    TP.version = '3.4.18';
     return TP;
 }));

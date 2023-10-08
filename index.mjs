@@ -406,15 +406,15 @@ function TP(source, state = {}) {
     function onCopyCutPasteTextCopy(e) {
         let type = e.type;
         if ('copy' === type) {
-            delay(() => letTextCopy(1))();
+            delay(() => letTextCopy(1), 1)();
         } else if ('cut' === type) {
             !sourceIsReadOnly() && setTags("");
-            delay(() => letTextCopy(1))();
+            delay(() => letTextCopy(1), 1)();
         } else if ('paste' === type) {
             delay(() => {
                 !sourceIsReadOnly() && setTags(textCopy.value);
                 letTextCopy(1);
-            })();
+            }, 1)();
         }
         delay(() => {
             let tags = $.tags;
@@ -564,7 +564,7 @@ function TP(source, state = {}) {
                 }
                 offEventDefault(e);
             }
-        })();
+        }, 1)();
         // Focus to the first tag
         if ("" === theValue && KEY_BEGIN === key) {
             if (theTag = getChildren(textOutput, 0)) {
@@ -635,7 +635,7 @@ function TP(source, state = {}) {
                 });
             }
             setValue("");
-        })();
+        }, 1)();
     }
 
     function onSubmitForm(e) {
@@ -795,6 +795,6 @@ TP.state = {
     'pattern': null
 };
 
-TP.version = '3.4.17';
+TP.version = '3.4.18';
 
 export default TP;
