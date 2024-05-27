@@ -47,7 +47,7 @@
     "url": "git+https://github.com/taufik-nurrohman/tag-picker.git"
   },
   "scripts": {
-    "pack": "pack --clean=false --from=.github/factory --js-format=umd --js-name=TP --js-top='%(js.license)' --mjs=true --scss=true --to=."
+    "pack": "pack --clean=false --from=.factory --js-format=umd --js-name=TagPicker --js-top='%(js.license)' --mjs=true --scss=true --to=."
   },
-  "version": "3.4.18"
+  "version": "4.0.0"
 }

@@ -58,7 +58,7 @@ TagPicker.state = {
     'with': []
 };
 
-TagPicker.version = '4.0.0';
+TagPicker.version = '%(version)';
 
 Object.defineProperty(TagPicker, 'name', {
     value: 'TagPicker'

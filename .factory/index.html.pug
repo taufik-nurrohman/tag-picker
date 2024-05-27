@@ -3,12 +3,12 @@ extends _index.pug
 block state
   - const title = 'Tag Picker ' + version
   - const theme = '#000'
-  - const scripts = ['index.min.js']
+  - const scripts = ['index.js']
   - const styles = ['index.min.css']
 
 block script
   script
-    | const picker = new TP(document.forms[0].tags);
+    | const picker = new TagPicker(document.forms[0].tags);
     | picker.on('has.tag', tag => {
     |     alert('Tag “' + tag + '” already exists.');
     | });
@@ -109,7 +109,7 @@ block content
       |     &lt;/p&gt;
       |     &lt;script src="#[a(href='index.min.js' target='_blank') ./index.min.js]"&gt;&lt;/script&gt;
       |     &lt;script&gt;
-      |       const picker = new TP(document.querySelector('input'));
+      |       const picker = new TagPicker(document.querySelector('input'));
       |     &lt;/script&gt;
       |   &lt;/body&gt;
       | &lt;/html&gt;
@@ -117,14 +117,14 @@ block content
     p Functions and methods in this application are mostly native JavaScript and are intended for use by the browser. Node.js doesn&rsquo;t know about the DOM, so this kind of practice will probably be used more often to build new browser packages than to be used directly in the Node.js server.
     h4 CommonJS
     pre: code
-      | const TP = require('@taufik-nurrohman/tag-picker').default;
+      | const TagPicker = require('@taufik-nurrohman/tag-picker').default;
       |
-      | const picker = new TP(document.querySelector('input'));
+      | const picker = new TagPicker(document.querySelector('input'));
     h4 ECMAScript
     pre: code
-      | import TP from '@taufik-nurrohman/tag-picker';
+      | import TagPicker from '@taufik-nurrohman/tag-picker';
       |
-      | const picker = new TP(document.querySelector('input'));
+      | const picker = new TagPicker(document.querySelector('input'));
     h2 Examples
     ul
       li: a(href='test.html' target='_blank') No Idea?
@@ -146,9 +146,9 @@ block content
       li: a(href='test/f.html' target='_blank') Filter Characters with #[code picker.f()] Method
       li #[a(href='tweak/path.html' target='_blank') Directory] (Experiment)
     h2 Settings
-    pre: code let picker = new TP(#[var source], #[var join] = ', ');
+    pre: code let picker = new TagPicker(#[var source], #[var join] = ', ');
     pre: code
-      | let picker = new TP(#[var source], #[var state] = {
+      | let picker = new TagPicker(#[var source], #[var state] = {
       |         escape: [','],
       |         join: ', ',
       |         max: 9999,
@@ -186,25 +186,25 @@ block content
           td: code state.pattern
           td If defined, tag addition will be performed only if value is matched with pattern.
     h2 Methods and Properties
-    h3 TP.instances
+    h3 TagPicker.instances
     p Return the application instances.
     pre: code
-      | for (let key in TP.instances) {
+      | for (let key in TagPicker.instances) {
       |     console.log(key);
-      |     console.log(TP.instances[key]);
+      |     console.log(TagPicker.instances[key]);
       | }
-    h3 TP.state
+    h3 TagPicker.state
     p This property stores the initial values of #[code picker.state].
     pre: code
-      | const picker = new TP({
+      | const picker = new TagPicker({
       |     foo: ['bar', 'baz', 'qux']
       | });
       |
-      | console.log([TP.state, picker.state]);
-    h3 TP.version
+      | console.log([TagPicker.state, picker.state]);
+    h3 TagPicker.version
     p Return the application version.
     pre: code
-      | let version = TP.version,
+      | let version = TagPicker.version,
       |     major = version.split('.')[0];
       |
       | if (+major &lt; 3) { &hellip; }

@@ -103,7 +103,7 @@ $name: 'tag-picker';
   padding: 0 .5em;
   position: relative;
   text-decoration: none;
-  &:not(.#{$name}__input) {
+  &:not(.#{$name}__text) {
     background: var(--fill-#{$name}__tag);
     border: 0 solid;
     border-color: var(--stroke-#{$name}__tag);
@@ -113,7 +113,7 @@ $name: 'tag-picker';
     cursor: pointer;
   }
   @each $v in (hover, focus, active) {
-    &:not(.#{$name}__input):#{$v} {
+    &:not(.#{$name}__text):#{$v} {
       background: var(--fill-#{$name}__tag--#{$v}, var(--fill-#{$name}__tag));
       border-color: var(--stroke-#{$name}__tag--#{$v}, var(--stroke-#{$name}__tag));
       box-shadow: var(--shadow-#{$name}__tag--#{$v}, var(--shadow-#{$name}__tag));
@@ -121,18 +121,18 @@ $name: 'tag-picker';
     }
   }
   @each $v in (selected, disabled) {
-    &--#{$v}:not(.#{$name}__input) {
+    &--#{$v}:not(.#{$name}__text) {
       background: var(--fill-#{$name}__tag--#{$v}, var(--fill-#{$name}__tag));
       border-color: var(--stroke-#{$name}__tag--#{$v}, var(--stroke-#{$name}__tag));
       box-shadow: var(--shadow-#{$name}__tag--#{$v}, var(--shadow-#{$name}__tag));
       color: var(--color-#{$name}__tag--#{$v}, var(--color-#{$name}__tag));
     }
   }
-  &:not(.#{$name}__input)::before {
+  &:not(.#{$name}__text)::before {
     content: attr(title);
     flex: 1;
   }
-  + .#{$name}__input {
+  + .#{$name}__text {
     span {
       + span {
         // Hide the placeholder if we have at least one tag
@@ -159,7 +159,7 @@ $name: 'tag-picker';
   }
 }
 
-.#{$name}__input {
+.#{$name}__text {
   flex: 1;
   span {
     flex: 1;
@@ -192,7 +192,7 @@ $name: 'tag-picker';
   min-height: var(--height-#{$name});
 }
 
-.#{$name}__source {
+.#{$name}__self {
   left: -9999px;
   position: fixed;
   top: -9999px;
@@ -201,7 +201,7 @@ $name: 'tag-picker';
       .#{$name}__tag-x {
         cursor: not-allowed;
       }
-      .#{$name}__tag:not(.#{$name}__input) {
+      .#{$name}__tag:not(.#{$name}__text) {
         background: var(--fill-#{$name}__tag--read-only, var(--fill-#{$name}__tag));
         border-color: var(--stroke-#{$name}__tag--read-only, var(--stroke-#{$name}__tag));
         box-shadow: var(--shadow-#{$name}__tag--read-only, var(--shadow-#{$name}__tag));
@@ -219,7 +219,7 @@ $name: 'tag-picker';
       & * {
         cursor: not-allowed;
       }
-      .#{$name}__tag:not(.#{$name}__input) {
+      .#{$name}__tag:not(.#{$name}__text) {
         background: var(--fill-#{$name}__tag--disabled, var(--fill-#{$name}__tag));
         border-color: var(--stroke-#{$name}__tag--disabled, var(--stroke-#{$name}__tag));
         box-shadow: var(--shadow-#{$name}__tag--disabled, var(--shadow-#{$name}__tag));

@@ -1,2 +1,7 @@
 * linguist-vendored
 *.js linguist-vendored=false
+.factory export-ignore
+.gitattributes export-ignore
+.github export-ignore
+.gitignore export-ignore
+README.md export-ignore
