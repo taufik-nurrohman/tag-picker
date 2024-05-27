@@ -1,5 +1,5 @@
 import {fromStates} from '@taufik-nurrohman/from';
-import {getParentForm, setChildLast, setClass, setElement, setNext} from '@taufik-nurrohman/document';
+import {getParent, getParentForm, getText, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText} from '@taufik-nurrohman/document';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isFunction, isInstance, isObject, isSet, isString} from '@taufik-nurrohman/is';
 import {offEvent, offEventDefault, onEvent} from '@taufik-nurrohman/event';
@@ -21,6 +21,10 @@ function isDisabled(self) {
 
 function isReadOnly(self) {
     return self.readOnly;
+}
+
+function theText(self, join) {
+    return (getText(self) || "").split(join).join("");
 }
 
 function theValue(self) {
@@ -70,8 +74,31 @@ $$._filter = function (tag) {
     return toCaseLower(tag || "").trim();
 };
 
+function onEventClickTagX(e) {
+    let $ = this,
+        picker = $['_' + TagPicker.name];
+    offEvent('click', $, onEventClickTagX);
+    letElement(getParent($));
+    offEventDefault(e);
+}
+
 function onEventFocusSelf() {
-    this._input && this._input.focus();
+    let $ = this,
+        picker = $['_' + TagPicker.name];
+    picker._shadow.input && picker._shadow.input.focus();
+}
+
+function onEventKeyDownTextInput(e) {
+    let $ = this,
+        key = e.key,
+        keyCode = e.keyCode,
+        picker = $['_' + TagPicker.name],
+        escape = picker.state.escape;
+    if (escape.includes(key) || escape.includes(keyCode)) {
+        console.log(key);
+        return picker.set(theText($, picker.state.join)), offEventDefault(e);
+    }
+    console.log(theText($));
 }
 
 $$.attach = function (self, state) {
@@ -79,8 +106,9 @@ $$.attach = function (self, state) {
     self = self || $.self;
     state = state || $.state;
     $._active = true;
+    $._shadow = {};
     $._value = value = theValue(self);
-    $.self = self;
+    $.self = $._shadow.of = self;
     $.state = state;
     $.tags = value.split(state.join);
     let classNameB = state['class'],
@@ -115,7 +143,12 @@ $$.attach = function (self, state) {
     setClass(self, classNameE + 'self');
     setNext(self, shadow);
     onEvent('focus', self, onEventFocusSelf);
-    self._input = textInput;
+    onEvent('keydown', textInput, onEventKeyDownTextInput);
+    textInput['_' + TagPicker.name] = $;
+    $._shadow.input = textInput;
+    $._shadow.self = shadow;
+    $._shadow.tags = shadowTags;
+    $._shadow.text = text;
     // Attach extension(s)
     if (isSet(state) && isArray(state.with)) {
         for (let i = 0, j = toCount(state.with); i < j; ++i) {
@@ -151,7 +184,7 @@ $$.detach = function () {
         {self, state} = $;
     $._active = false;
     offEvent('focus', self, onEventFocusSelf);
-    delete self._input;
+    offEvent('keydown', self._shadow.input, onEventKeyDownTextInput);
     // Detach extension(s)
     if (isArray(state.with)) {
         for (let i = 0, j = toCount(state.with); i < j; ++i) {
@@ -180,8 +213,24 @@ $$.let = function () {
     let $ = this;
 };
 
-$$.set = function () {
+$$.set = function (v) {
     let $ = this;
+    const tag = setElement('span', {
+        'class': $.state['class'] + '__tag',
+        'tabindex': -1
+    });
+    const tagText = setElement('span', v);
+    const x = setElement('a', {
+        'class': $.state['class'] + '__tag-x',
+        'href': "",
+        'tabindex': -1,
+        'target': '_top'
+    });
+    onEvent('click', x, onEventClickTagX);
+    setChildLast(tag, tagText);
+    setChildLast(tag, x);
+    setPrev($._shadow.text, tag);
+    setText($._shadow.input, "");
 };
 
 Object.defineProperty($$, 'value', {
