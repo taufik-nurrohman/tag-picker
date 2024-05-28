@@ -1,9 +1,9 @@
 import {fromStates} from '@taufik-nurrohman/from';
-import {getParent, getParentForm, getText, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText} from '@taufik-nurrohman/document';
+import {W, getChildFirst, getNext, getParent, getPrev, getParentForm, getText, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText} from '@taufik-nurrohman/document';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isFunction, isInstance, isObject, isSet, isString} from '@taufik-nurrohman/is';
 import {offEvent, offEventDefault, onEvent} from '@taufik-nurrohman/event';
-import {toCaseLower, toCount} from '@taufik-nurrohman/to';
+import {toCaseKebab, toCount, toObjectKeys, toObjectValues} from '@taufik-nurrohman/to';
 
 const KEY_A = 'a';
 const KEY_ARROW_LEFT = 'ArrowLeft';
@@ -23,12 +23,22 @@ function isReadOnly(self) {
     return self.readOnly;
 }
 
-function theText(self, join) {
-    return (getText(self) || "").split(join).join("");
+function theText(self) {
+    return getText(self);
 }
 
 function theValue(self) {
     return self.value.replace(/\r/g, "");
+}
+
+function getCharBeforeCaret(container) {
+    let range, selection = W.getSelection();
+    if (selection.rangeCount > 0) {
+        range = selection.getRangeAt(0).cloneRange();
+        range.collapse(true);
+        range.setStart(container, 0);
+        return (range + "").slice(-1);
+    }
 }
 
 function TagPicker(self, state) {
@@ -70,47 +80,144 @@ Object.defineProperty(TagPicker, 'name', {
 
 const $$ = TagPicker.prototype;
 
-$$._filter = function (tag) {
-    return toCaseLower(tag || "").trim();
+$$._filter = function (v) {
+    let $ = this,
+        {state} = $;
+    v = (v || "").split(state.join).join("").trim();
+    return toCaseKebab(v).replace(/^-+|-+$/g, "");
 };
+
+function onEventBlurShadow() {
+    let $ = this,
+        picker = $['_' + TagPicker.name],
+        {state} = picker;
+    letClass($, state['class'] + '--focus');
+}
+
+function onEventBlurTag() {
+    let $ = this,
+        picker = $['_' + TagPicker.name],
+        {_shadow, state} = picker;
+    letClass(_shadow.self, state['class'] + '--focus');
+    letClass(_shadow.self, state['class'] + '--focus-tag');
+}
+
+function onEventBlurTextInput() {
+    let $ = this,
+        picker = $['_' + TagPicker.name],
+        {_shadow, state} = picker;
+    letClass(_shadow.self, state['class'] + '--focus');
+    letClass(_shadow.self, state['class'] + '--focus-text');
+}
+
+function onEventClickShadow() {
+    let $ = this,
+        picker = $['_' + TagPicker.name];
+}
 
 function onEventClickTagX(e) {
     let $ = this,
-        picker = $['_' + TagPicker.name];
+        tag = getParent($),
+        picker = tag['_' + TagPicker.name];
     offEvent('click', $, onEventClickTagX);
-    letElement(getParent($));
+    picker.let(tag.title);
     offEventDefault(e);
+}
+
+function onEventFocusTextInput() {
+    let $ = this,
+        picker = $['_' + TagPicker.name],
+        {_shadow, state} = picker;
+    setClass(_shadow.self, state['class'] + '--focus');
+    setClass(_shadow.self, state['class'] + '--focus-text');
 }
 
 function onEventFocusSelf() {
     let $ = this,
         picker = $['_' + TagPicker.name];
-    picker._shadow.input && picker._shadow.input.focus();
+    picker.focus();
+}
+
+function onEventFocusShadow() {
+    let $ = this,
+        picker = $['_' + TagPicker.name],
+        {state} = picker;
+    setClass($, state['class'] + '--focus');
+}
+
+function onEventFocusTag() {
+    let $ = this,
+        picker = $['_' + TagPicker.name],
+        {_shadow, state} = picker;
+    setClass(_shadow.self, state['class'] + '--focus');
+    setClass(_shadow.self, state['class'] + '--focus-tag');
+}
+
+function onEventKeyDownTag(e) {
+    let $ = this, exit,
+        key = e.key,
+        keyIsCtrl = e.ctrlKey,
+        keyIsShift = e.shiftKey,
+        picker = $['_' + TagPicker.name],
+        prevTag = getPrev($),
+        nextTag = getNext($),
+        {text} = picker._shadow;
+    if (KEY_ARROW_LEFT === key) {
+        prevTag && prevTag.focus();
+        exit = true;
+    } else if (KEY_ARROW_RIGHT === key) {
+        nextTag && text !== nextTag ? nextTag.focus() : picker.focus();
+        exit = true;
+    } else if (KEY_DELETE_LEFT === key) {
+        picker.let($.title);
+        prevTag ? prevTag.focus() : picker.focus();
+        exit = true;
+    } else if (KEY_DELETE_RIGHT === key) {
+        picker.let($.title);
+        nextTag && text !== nextTag ? nextTag.focus() : picker.focus();
+        exit = true;
+    } else if (keyIsCtrl && !keyIsShift && KEY_A === key) {
+        console.log('select all tags');
+        exit = true;
+    }
+    exit && offEventDefault(e);
 }
 
 function onEventKeyDownTextInput(e) {
     let $ = this,
         key = e.key,
         keyCode = e.keyCode,
+        keyIsCtrl = e.ctrlKey,
+        keyIsShift = e.shiftKey,
         picker = $['_' + TagPicker.name],
-        escape = picker.state.escape;
+        {_tags, state} = picker, lastTag;
+        escape = state.escape;
     if (escape.includes(key) || escape.includes(keyCode)) {
-        console.log(key);
-        return picker.set(theText($, picker.state.join)), offEventDefault(e);
+        return picker.set(theText($)), picker.focus(), offEventDefault(e);
     }
-    console.log(theText($));
+    if (KEY_ARROW_LEFT === key && "" === getCharBeforeCaret($)) {
+        lastTag = toObjectValues(_tags).pop();
+        lastTag && lastTag.focus();
+        offEventDefault(e);
+    } else if (KEY_DELETE_LEFT === key && null === getText($)) {
+        lastTag = toObjectValues(_tags).pop();
+        lastTag && picker.let(lastTag.title);
+        picker.focus(), offEventDefault(e);
+    } else if (keyIsCtrl && !keyIsShift && KEY_A === key) {
+        console.log('select all tags');
+    }
 }
 
 $$.attach = function (self, state) {
-    let $ = this, value;
+    let $ = this;
     self = self || $.self;
     state = state || $.state;
     $._active = true;
     $._shadow = {};
-    $._value = value = theValue(self);
+    $._tags = {};
+    $._value = theValue(self);
     $.self = $._shadow.of = self;
     $.state = state;
-    $.tags = value.split(state.join);
     let classNameB = state['class'],
         classNameE = classNameB + '__',
         classNameM = classNameB + '--';
@@ -142,8 +249,14 @@ $$.attach = function (self, state) {
     setChildLast(text, textInputHint);
     setClass(self, classNameE + 'self');
     setNext(self, shadow);
+    onEvent('blur', shadow, onEventBlurShadow);
+    onEvent('blur', textInput, onEventBlurTextInput);
+    onEvent('click', shadow, onEventClickShadow);
     onEvent('focus', self, onEventFocusSelf);
+    onEvent('focus', shadow, onEventFocusShadow);
+    onEvent('focus', textInput, onEventFocusTextInput);
     onEvent('keydown', textInput, onEventKeyDownTextInput);
+    shadow['_' + TagPicker.name] = $;
     textInput['_' + TagPicker.name] = $;
     $._shadow.input = textInput;
     $._shadow.self = shadow;
@@ -181,10 +294,17 @@ $$.click = function () {
 
 $$.detach = function () {
     let $ = this,
-        {self, state} = $;
+        {_shadow, self, state} = $,
+        {input} = _shadow,
+        shadow = _shadow.self;
     $._active = false;
+    offEvent('blur', input, onEventBlurTextInput);
+    offEvent('blur', shadow, onEventBlurShadow);
+    offEvent('click', shadow, onEventClickShadow);
+    offEvent('focus', input, onEventFocusTextInput);
     offEvent('focus', self, onEventFocusSelf);
-    offEvent('keydown', self._shadow.input, onEventKeyDownTextInput);
+    offEvent('focus', shadow, onEventFocusShadow);
+    offEvent('keydown', input, onEventKeyDownTextInput);
     // Detach extension(s)
     if (isArray(state.with)) {
         for (let i = 0, j = toCount(state.with); i < j; ++i) {
@@ -198,40 +318,98 @@ $$.detach = function () {
             }
         }
     }
+    $._shadow = {
+        of: self
+    };
+    letClass(self, state['class'] + '__self');
+    letElement(shadow);
     return $;
 };
 
 $$.focus = function () {
-    let $ = this;
+    let $ = this,
+        {_shadow} = $;
+    _shadow.input && _shadow.input.focus();
+    return $;
 };
 
-$$.get = function () {
-    let $ = this;
+$$.get = function (v) {
+    let $ = this,
+        {_active, _shadow, _tags} = $;
+    if (!_active) {
+        return false;
+    }
+    if (!_tags[v]) {
+        return null;
+    }
+    return v;
 };
 
-$$.let = function () {
-    let $ = this;
+$$.let = function (v) {
+    let $ = this,
+        {_active, _shadow, _tags} = $;
+    if (!_active) {
+        return $;
+    }
+    if (!_tags[v]) {
+        return false;
+    }
+    let tag = _tags[v],
+        tagX = getChildFirst(tag);
+    offEvent('blur', tag, onEventBlurTag);
+    offEvent('click', tagX, onEventClickTagX);
+    offEvent('focus', tag, onEventFocusTag);
+    offEvent('keydown', tag, onEventKeyDownTag);
+    letElement(tag);
+    delete _tags[v];
+    return $;
 };
 
 $$.set = function (v) {
-    let $ = this;
+    let $ = this,
+        {_active, _filter, _shadow, _tags} = $;
+    if (!_active) {
+        return $;
+    }
+    if (isFunction(_filter)) {
+        v = _filter.call($, v);
+    }
+    if ("" === v || _tags[v]) {
+        return false;
+    }
     const tag = setElement('span', {
         'class': $.state['class'] + '__tag',
-        'tabindex': -1
+        'tabindex': -1,
+        'title': v
     });
-    const tagText = setElement('span', v);
-    const x = setElement('a', {
+    const tagX = setElement('a', {
         'class': $.state['class'] + '__tag-x',
         'href': "",
         'tabindex': -1,
         'target': '_top'
     });
-    onEvent('click', x, onEventClickTagX);
-    setChildLast(tag, tagText);
-    setChildLast(tag, x);
-    setPrev($._shadow.text, tag);
-    setText($._shadow.input, "");
+    onEvent('blur', tag, onEventBlurTag);
+    onEvent('click', tagX, onEventClickTagX);
+    onEvent('focus', tag, onEventFocusTag);
+    onEvent('keydown', tag, onEventKeyDownTag);
+    tag['_' + TagPicker.name] = $;
+    setChildLast(tag, tagX);
+    setPrev(_shadow.text, tag);
+    setText(_shadow.input, "");
+    $._tags[v] = tag;
+    return $;
 };
+
+Object.defineProperty($$, 'tags', {
+    get: function () {
+        return toObjectKeys(this._tags);
+    },
+    set: function (tags) {
+        tags.forEach(tag => {
+            this.set(tag);
+        });
+    }
+});
 
 Object.defineProperty($$, 'value', {
     get: function () {
