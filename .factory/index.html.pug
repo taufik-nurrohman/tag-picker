@@ -86,7 +86,7 @@ block content
       p(tabindex='0') Previous tabbable element. Some text to copy &hellip; foo, bar, baz, qux
       p: input(id='tags' name='tags' placeholder='foo, bar, baz' type='text' value='foo, bar')
       p Test connection with #[code &lt;label&gt;] element: #[label(for='tags' style={'cursor':'pointer','text-decoration':'underline'}) click here to focus!]
-      p Test add and remove methods: #[a(href='javascript:void(picker.set(\'wow\').focus());') add &ldquo;wow&rdquo;] #[a(href='javascript:void(picker.let(\'wow\').focus());') remove &ldquo;wow&rdquo;]
+      p Test add and remove methods: #[a(href='javascript:void(picker.set(\'wow\'), picker.focus());') add &ldquo;wow&rdquo;] #[a(href='javascript:void(picker.let(\'wow\'), picker.focus());') remove &ldquo;wow&rdquo;]
       p: button(type='submit') Submit
     h2 Features
     ul

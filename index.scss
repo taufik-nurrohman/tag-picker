@@ -16,10 +16,13 @@ $name: 'tag-picker';
   --fill-#{$name}--disabled: #eee;
   --fill-#{$name}--read-only: #eee;
   --fill-#{$name}: #fff;
+  --fill-#{$name}__tag--active: #090;
   --fill-#{$name}__tag--disabled: #aaa;
   --fill-#{$name}__tag--focus: #c00;
   --fill-#{$name}__tag--read-only: #f00;
-  --fill-#{$name}__tag--selected: #c00;
+  --fill-#{$name}__tag--selected--active: #090;
+  --fill-#{$name}__tag--selected--focus: #090;
+  --fill-#{$name}__tag--selected: #0c0;
   --fill-#{$name}__tag: #f00;
   --font-face-#{$name}: inherit;
   --font-height-#{$name}: 1.5em;
@@ -45,15 +48,19 @@ $name: 'tag-picker';
 .#{$name} {
   background: var(--fill-#{$name});
   border: 1px solid;
-  border-color: var(--stroke-#{$name});
-  border-radius: var(--arc-#{$name});
+  border: {
+    color: var(--stroke-#{$name});
+    radius: var(--arc-#{$name});
+  }
   box-shadow: var(--shadow-#{$name});
   color: var(--color-#{$name});
   cursor: text;
   display: inline-flex;
   flex-wrap: wrap;
-  font-family: var(--font-face-#{$name});
-  font-size: var(--font-size-#{$name});
+  font: {
+    family: var(--font-face-#{$name});
+    size: var(--font-size-#{$name});
+  }
   height: var(--height-#{$name}, auto);
   line-height: var(--font-height-#{$name});
   max-height: var(--height-max-#{$name}, 100%);
@@ -61,7 +68,7 @@ $name: 'tag-picker';
   min-height: var(--height-min-#{$name}, 0);
   min-width: var(--width-min-#{$name}, 0);
   outline: 0;
-  padding: .125em;
+  padding: 0.125em;
   position: relative;
   width: var(--width-#{$name}, auto);
   @each $v in (hover, focus, active) {
@@ -83,37 +90,41 @@ $name: 'tag-picker';
   }
 }
 
-.#{$name}__copy {
-  height: 1px;
-  left: 0;
-  margin: 0;
-  opacity: 0;
-  padding: 0;
-  position: absolute;
-  top: 0;
-  width: 1px;
+// .#{$name}__copy {
+//   height: 1px;
+//   left: 0;
+//   margin: 0;
+//   opacity: 0;
+//   padding: 0;
+//   position: absolute;
+//   top: 0;
+//   width: 1px;
+// }
+
+%tag {
+  display: flex;
+  height: var(--height-#{$name}); // Same with `min-height` of container
+  margin: 0.125em;
+  outline: 0;
+  overflow: hidden;
+  padding: 0 0.5em;
+  position: relative;
+  text-decoration: none;
 }
 
 .#{$name}__tag {
-  display: flex;
-  height: var(--height-#{$name}); // Same with `min-height` of container
-  margin: .125em;
-  outline: 0;
-  overflow: hidden;
-  padding: 0 .5em;
-  position: relative;
-  text-decoration: none;
-  &:not(.#{$name}__text) {
-    background: var(--fill-#{$name}__tag);
-    border: 0 solid;
-    border-color: var(--stroke-#{$name}__tag);
-    border-radius: var(--arc-#{$name}__tag);
-    box-shadow: var(--shadow-#{$name}__tag);
-    color: var(--color-#{$name}__tag);
-    cursor: pointer;
+  @extend %tag;
+  background: var(--fill-#{$name}__tag);
+  border: 0 solid;
+  border: {
+    color: var(--stroke-#{$name}__tag);
+    radius: var(--arc-#{$name}__tag);
   }
+  box-shadow: var(--shadow-#{$name}__tag);
+  color: var(--color-#{$name}__tag);
+  cursor: pointer;
   @each $v in (hover, focus, active) {
-    &:not(.#{$name}__text):#{$v} {
+    &:#{$v} {
       background: var(--fill-#{$name}__tag--#{$v}, var(--fill-#{$name}__tag));
       border-color: var(--stroke-#{$name}__tag--#{$v}, var(--stroke-#{$name}__tag));
       box-shadow: var(--shadow-#{$name}__tag--#{$v}, var(--shadow-#{$name}__tag));
@@ -121,14 +132,27 @@ $name: 'tag-picker';
     }
   }
   @each $v in (selected, disabled) {
-    &--#{$v}:not(.#{$name}__text) {
-      background: var(--fill-#{$name}__tag--#{$v}, var(--fill-#{$name}__tag));
-      border-color: var(--stroke-#{$name}__tag--#{$v}, var(--stroke-#{$name}__tag));
-      box-shadow: var(--shadow-#{$name}__tag--#{$v}, var(--shadow-#{$name}__tag));
-      color: var(--color-#{$name}__tag--#{$v}, var(--color-#{$name}__tag));
+    &--#{$v} {
+      &,
+      &:hover,
+      &:focus,
+      &:active {
+        background: var(--fill-#{$name}__tag--#{$v}, var(--fill-#{$name}__tag));
+        border-color: var(--stroke-#{$name}__tag--#{$v}, var(--stroke-#{$name}__tag));
+        box-shadow: var(--shadow-#{$name}__tag--#{$v}, var(--shadow-#{$name}__tag));
+        color: var(--color-#{$name}__tag--#{$v}, var(--color-#{$name}__tag));
+      }
     }
   }
-  &:not(.#{$name}__text)::before {
+  @each $v in (active, focus) {
+    &--selected:#{$v} {
+      background: var(--fill-#{$name}__tag--selected--#{$v}, var(--fill-#{$name}__tag--selected, var(--fill-#{$name}__tag)));
+      border-color: var(--stroke-#{$name}__tag--selected--#{$v}, var(--stroke-#{$name}__tag--selected, var(--stroke-#{$name}__tag)));
+      box-shadow: var(--shadow-#{$name}__tag--selected--#{$v}, var(--shadow-#{$name}__tag--selected, var(--shadow-#{$name}__tag)));
+      color: var(--color-#{$name}__tag--selected--#{$v}, var(--color-#{$name}__tag--selected, var(--color-#{$name}__tag)));
+    }
+  }
+  &::before {
     content: attr(title);
     flex: 1;
   }
@@ -143,8 +167,10 @@ $name: 'tag-picker';
   &-x {
     color: var(--color-#{$name}__tag-x);
     font-family: #{$name}__tag-x, sans-serif;
-    margin-left: .5em;
-    margin-right: -.125em;
+    margin: {
+      left: 0.5em;
+      right: -0.125em;
+    }
     outline: 0;
     text-decoration: none;
     @each $v in (hover, focus, active) {
@@ -157,6 +183,10 @@ $name: 'tag-picker';
       font: inherit;
     }
   }
+}
+
+.#{$name}__text {
+  @extend %tag;
 }
 
 .#{$name}__text {
@@ -173,7 +203,7 @@ $name: 'tag-picker';
     + span {
       bottom: 0;
       left: 0;
-      opacity: .5;
+      opacity: 0.5;
       padding: inherit;
       position: absolute;
       right: 0;
@@ -201,7 +231,7 @@ $name: 'tag-picker';
       .#{$name}__tag-x {
         cursor: not-allowed;
       }
-      .#{$name}__tag:not(.#{$name}__text) {
+      .#{$name}__tag {
         background: var(--fill-#{$name}__tag--read-only, var(--fill-#{$name}__tag));
         border-color: var(--stroke-#{$name}__tag--read-only, var(--stroke-#{$name}__tag));
         box-shadow: var(--shadow-#{$name}__tag--read-only, var(--shadow-#{$name}__tag));
@@ -219,7 +249,7 @@ $name: 'tag-picker';
       & * {
         cursor: not-allowed;
       }
-      .#{$name}__tag:not(.#{$name}__text) {
+      .#{$name}__tag {
         background: var(--fill-#{$name}__tag--disabled, var(--fill-#{$name}__tag));
         border-color: var(--stroke-#{$name}__tag--disabled, var(--stroke-#{$name}__tag));
         box-shadow: var(--shadow-#{$name}__tag--disabled, var(--shadow-#{$name}__tag));
