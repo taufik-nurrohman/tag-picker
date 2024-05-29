@@ -98,6 +98,17 @@
   color: var(--color-tag-picker--disabled, var(--color-tag-picker));
 }
 
+.tag-picker__copy {
+  border: 0;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
 .tag-picker__text,
 .tag-picker__tag {
   display: flex;

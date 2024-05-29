@@ -119,9 +119,17 @@ function onBlurTextInput() {
 function onClickMask(e) {
     let $ = this,
         picker = $['_' + TagPicker.name],
-        {_mask, mask} = picker,
-        {copy, input} = _mask;
-    mask === getParent(copy) ? (copy.focus(), copy.select()) : input.focus();
+        {_mask, mask, state} = picker,
+        {copy, input} = _mask,
+        c = state['class'];
+    if (mask === getParent(copy)) {
+        copy.focus(), copy.select();
+        setClass(mask, c += '--focus');
+        letClass(mask, c + '-tag');
+        setClass(mask, c += '-tags');
+    } else {
+        input.focus();
+    }
     offEventDefault(e);
 }
 
@@ -329,11 +337,11 @@ function onKeyUpMask() {
         picker = $['_' + TagPicker.name],
         {_mask, _tags, mask, state} = picker,
         {copy} = _mask,
-        c = state['class'] + '__tag--selected';
+        c = state['class'];
     _keyIsCtrl = _keyIsShift = false;
     let selection = [];
     for (let k in _tags) {
-        if (hasClass(_tags[k], c)) {
+        if (hasClass(_tags[k], c + '__tag--selected')) {
             selection.push(k);
         }
     }
@@ -341,6 +349,9 @@ function onKeyUpMask() {
         copy.value = selection.join(state.join);
         setChildLast(mask, copy);
         copy.focus(), copy.select();
+        setClass(mask, c += '--focus');
+        letClass(mask, c + '-tag');
+        setClass(mask, c += '-tags');
     }
 }
 

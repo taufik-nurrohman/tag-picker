@@ -435,9 +435,18 @@
             picker = $['_' + TagPicker.name],
             _mask = picker._mask,
             mask = picker.mask,
+            state = picker.state,
             copy = _mask.copy,
-            input = _mask.input;
-        mask === getParent(copy) ? (copy.focus(), copy.select()) : input.focus();
+            input = _mask.input,
+            c = state['class'];
+        if (mask === getParent(copy)) {
+            copy.focus(), copy.select();
+            setClass(mask, c += '--focus');
+            letClass(mask, c + '-tag');
+            setClass(mask, c += '-tags');
+        } else {
+            input.focus();
+        }
         offEventDefault(e);
     }
 
@@ -678,11 +687,11 @@
             mask = picker.mask,
             state = picker.state,
             copy = _mask.copy,
-            c = state['class'] + '__tag--selected';
+            c = state['class'];
         _keyIsCtrl = false;
         var selection = [];
         for (var k in _tags) {
-            if (hasClass(_tags[k], c)) {
+            if (hasClass(_tags[k], c + '__tag--selected')) {
                 selection.push(k);
             }
         }
@@ -690,6 +699,9 @@
             copy.value = selection.join(state.join);
             setChildLast(mask, copy);
             copy.focus(), copy.select();
+            setClass(mask, c += '--focus');
+            letClass(mask, c + '-tag');
+            setClass(mask, c += '-tags');
         }
     }
 

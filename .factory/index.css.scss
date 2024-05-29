@@ -90,16 +90,17 @@ $name: 'tag-picker';
   }
 }
 
-// .#{$name}__copy {
-//   height: 1px;
-//   left: 0;
-//   margin: 0;
-//   opacity: 0;
-//   padding: 0;
-//   position: absolute;
-//   top: 0;
-//   width: 1px;
-// }
+.#{$name}__copy {
+  // opacity: 0;
+  border: 0;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
 
 %tag {
   display: flex;
