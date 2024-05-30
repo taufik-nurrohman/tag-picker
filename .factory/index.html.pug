@@ -83,7 +83,7 @@ block content
   main
     p Tags are comma-separated list of words. This application has support for hooks, so you can listen to events that occur at each interaction to provide additional features. Each tag item can also be selected using the arrow keys and a mouse click to perform actions on the selected tag, for example, to delete the tag.
     form(method='get' target='_blank')
-      p(tabindex='0') Previous tabbable element. Some text to copy &hellip; foo, bar, baz, qux
+      p(tabindex='0') Previous tabbable element. Some text to copy: #[mark(style={'user-select': 'all'} tabindex='-1') foo, bar, baz, qux]
       p: input(id='tags' name='tags' placeholder='foo, bar, baz' type='text' value='foo, bar')
       p Test connection with #[code &lt;label&gt;] element: #[label(for='tags' style={'cursor':'pointer','text-decoration':'underline'}) click here to focus!]
       p Test add and remove methods: #[a(href='javascript:void(picker.set(\'wow\'), picker.focus());') add &ldquo;wow&rdquo;] #[a(href='javascript:void(picker.let(\'wow\'), picker.focus());') remove &ldquo;wow&rdquo;]
