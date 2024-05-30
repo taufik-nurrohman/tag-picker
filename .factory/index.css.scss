@@ -20,7 +20,6 @@ $name: 'tag-picker';
   --fill-#{$name}__tag--disabled: #aaa;
   --fill-#{$name}__tag--focus: #c00;
   --fill-#{$name}__tag--read-only: #f00;
-  --fill-#{$name}__tag--selected: #0c0;
   --fill-#{$name}__tag: #f00;
   --font-face-#{$name}: inherit;
   --font-height-#{$name}: 1.5em;
@@ -130,17 +129,15 @@ $name: 'tag-picker';
       color: var(--color-#{$name}__tag--#{$v}, var(--color-#{$name}__tag));
     }
   }
-  @each $v in (selected, disabled) {
-    &--#{$v} {
-      &,
-      &:hover,
-      &:focus,
-      &:active {
-        background: var(--fill-#{$name}__tag--#{$v}, var(--fill-#{$name}__tag));
-        border-color: var(--stroke-#{$name}__tag--#{$v}, var(--stroke-#{$name}__tag));
-        box-shadow: var(--shadow-#{$name}__tag--#{$v}, var(--shadow-#{$name}__tag));
-        color: var(--color-#{$name}__tag--#{$v}, var(--color-#{$name}__tag));
-      }
+  &--active {
+    &,
+    &:hover,
+    &:focus,
+    &:active {
+      background: var(--fill-#{$name}__tag--active, var(--fill-#{$name}__tag));
+      border-color: var(--stroke-#{$name}__tag--active, var(--stroke-#{$name}__tag));
+      box-shadow: var(--shadow-#{$name}__tag--active, var(--shadow-#{$name}__tag));
+      color: var(--color-#{$name}__tag--active, var(--color-#{$name}__tag));
     }
   }
   &::before {
