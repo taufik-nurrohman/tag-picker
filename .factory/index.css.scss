@@ -16,12 +16,10 @@ $name: 'tag-picker';
   --fill-#{$name}--disabled: #eee;
   --fill-#{$name}--read-only: #eee;
   --fill-#{$name}: #fff;
-  --fill-#{$name}__tag--active: #090;
+  --fill-#{$name}__tag--active: #0c0;
   --fill-#{$name}__tag--disabled: #aaa;
   --fill-#{$name}__tag--focus: #c00;
   --fill-#{$name}__tag--read-only: #f00;
-  --fill-#{$name}__tag--selected--active: #090;
-  --fill-#{$name}__tag--selected--focus: #090;
   --fill-#{$name}__tag--selected: #0c0;
   --fill-#{$name}__tag: #f00;
   --font-face-#{$name}: inherit;
@@ -91,19 +89,15 @@ $name: 'tag-picker';
 }
 
 .#{$name}__copy {
-  opacity: 0.75;
   border: 0;
-  // height: 1px;
+  height: 1px;
   left: 0;
   margin: 0;
+  opacity: 0;
   padding: 0;
   position: absolute;
   top: 0;
-  // width: 1px;
-  &--cover {
-    height: 100%;
-    width: 100%;
-  }
+  width: 1px;
 }
 
 %tag {
@@ -147,14 +141,6 @@ $name: 'tag-picker';
         box-shadow: var(--shadow-#{$name}__tag--#{$v}, var(--shadow-#{$name}__tag));
         color: var(--color-#{$name}__tag--#{$v}, var(--color-#{$name}__tag));
       }
-    }
-  }
-  @each $v in (active, focus) {
-    &--selected:#{$v} {
-      background: var(--fill-#{$name}__tag--selected--#{$v}, var(--fill-#{$name}__tag--selected, var(--fill-#{$name}__tag)));
-      border-color: var(--stroke-#{$name}__tag--selected--#{$v}, var(--stroke-#{$name}__tag--selected, var(--stroke-#{$name}__tag)));
-      box-shadow: var(--shadow-#{$name}__tag--selected--#{$v}, var(--shadow-#{$name}__tag--selected, var(--shadow-#{$name}__tag)));
-      color: var(--color-#{$name}__tag--selected--#{$v}, var(--color-#{$name}__tag--selected, var(--color-#{$name}__tag)));
     }
   }
   &::before {

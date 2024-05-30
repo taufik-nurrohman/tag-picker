@@ -347,6 +347,10 @@
     var KEY_ENTER = 'Enter';
     var KEY_ESCAPE = 'Escape';
 
+    function defineProperty(of, key, state) {
+        Object.defineProperty(of, key, state);
+    }
+
     function delay(of, time) {
         return W.setTimeout(of, 1);
     }
@@ -408,10 +412,34 @@
         'with': []
     };
     TagPicker.version = '4.0.0';
-    Object.defineProperty(TagPicker, 'name', {
+    defineProperty(TagPicker, 'name', {
         value: 'TagPicker'
     });
     var $$ = TagPicker.prototype;
+    defineProperty($$, 'tags', {
+        get: function get() {
+            return toObjectKeys(this._tags);
+        },
+        set: function set(tags) {
+            var $ = this,
+                self = $.self,
+                set = $.set;
+            $._tags = {};
+            self.value = "";
+            tags.forEach(function (tag) {
+                return set(tag);
+            });
+        }
+    });
+    defineProperty($$, 'value', {
+        get: function get() {
+            var value = this.self.value;
+            return "" === value ? null : value;
+        },
+        set: function set(value) {
+            this.self.value = value;
+        }
+    });
     $$._filter = function (v) {
         var $ = this,
             state = $.state;
@@ -500,19 +528,13 @@
 
     function onFocusTextCopy() {
         var $ = this,
-            picker = $['_' + TagPicker.name],
-            _tags = picker._tags,
-            mask = picker.mask,
+            picker = $['_' + TagPicker.name];
+        picker._tags;
+        var mask = picker.mask,
             state = picker.state,
             c = state['class'];
-        var selection = 0;
-        for (var k in _tags) {
-            if (hasClass(_tags[k], c + '__tag--selected')) {
-                ++selection;
-            }
-        }
-        setClass(mask, c += '--focus');
-        setClass(mask, c += '-tag' + (selection > 1 ? 's' : ""));
+        setClass(mask, c + '--focus');
+        setClass(mask, c + '--select');
     }
 
     function onFocusTextInput() {
@@ -531,9 +553,8 @@
         for (var k in _tags) {
             letClass(_tags[k], c + '__tag--selected');
         }
-        letClass(mask, c + '--focus-tag');
-        letClass(mask, c + '--focus-tags');
         letElement(copy);
+        letClass(mask, c + '--select');
         setClass(text, c + '__text--focus');
         setClass(mask, c += '--focus');
         setClass(mask, c += '-text');
@@ -552,8 +573,9 @@
     function onFocusMask() {
         var $ = this,
             picker = $['_' + TagPicker.name],
-            state = picker.state;
-        setClass($, state['class'] + '--focus');
+            state = picker.state,
+            c = state['class'];
+        setClass($, c + '--focus');
     }
 
     function onFocusTag() {
@@ -564,23 +586,20 @@
             state = picker.state,
             c = state['class'];
         setClass(mask, c += '--focus');
-        if (!hasClass(mask, c + '-tags')) {
-            setClass(mask, c += '-tag');
-        }
+        setClass(mask, c += '-tag');
     }
-    var _keyIsCtrl = false;
+    var _keyIsCtrl = false,
+        _keyIsShift = false;
 
     function onKeyDownMask(e) {
         _keyIsCtrl = e.ctrlKey;
-        e.shiftKey;
+        _keyIsShift = e.shiftKey;
     }
 
     function onKeyDownTag(e) {
         var $ = this,
             exit,
             key = e.key,
-            keyIsCtrl = e.ctrlKey,
-            keyIsShift = e.shiftKey,
             picker = $['_' + TagPicker.name],
             _mask = picker._mask,
             _tags = picker._tags,
@@ -593,8 +612,8 @@
             firstTag,
             lastTag,
             c = state['class'];
-        if (keyIsCtrl) {
-            if (!keyIsShift && KEY_A === key) {
+        if (_keyIsCtrl) {
+            if (!_keyIsShift && KEY_A === key) {
                 for (var k in _tags) {
                     setClass(_tags[k], c + '__tag--selected');
                 }
@@ -635,9 +654,7 @@
     function onKeyDownTextCopy(e) {
         var $ = this,
             key = e.key,
-            keyIsCtrl = e.ctrlKey;
-        e.shiftKey;
-        var picker = $['_' + TagPicker.name],
+            picker = $['_' + TagPicker.name],
             _mask = picker._mask,
             _tags = picker._tags,
             state = picker.state,
@@ -651,7 +668,7 @@
                 letClass(_tags[k], c + '__tag--selected');
             }
         }
-        if (!keyIsCtrl) {
+        if (!_keyIsCtrl) {
             if (KEY_BEGIN === key || KEY_ARROW_LEFT === key) {
                 cancel(), toObjectValues(_tags).shift().focus();
             } else if (KEY_END === key || KEY_ARROW_RIGHT === key) {
@@ -673,8 +690,6 @@
             v,
             key = e.key,
             keyCode = e.keyCode,
-            keyIsCtrl = e.ctrlKey,
-            keyIsShift = e.shiftKey,
             picker = $['_' + TagPicker.name],
             _mask = picker._mask,
             _tags = picker._tags,
@@ -695,15 +710,15 @@
         });
         var caretIsToTheFirst = "" === getCharBeforeCaret($),
             textIsVoid = null === getText($);
-        if (KEY_BEGIN === key && (keyIsCtrl || textIsVoid)) {
+        if (KEY_BEGIN === key && (_keyIsCtrl || textIsVoid)) {
             firstTag = toObjectValues(_tags).shift();
             firstTag && firstTag.focus();
             exit = true;
-        } else if (KEY_END === key && (keyIsCtrl || textIsVoid)) {
+        } else if (KEY_END === key && (_keyIsCtrl || textIsVoid)) {
             lastTag = toObjectValues(_tags).pop();
             lastTag && lastTag.focus();
             exit = true;
-        } else if (KEY_ARROW_LEFT === key && (keyIsCtrl || caretIsToTheFirst)) {
+        } else if (KEY_ARROW_LEFT === key && (_keyIsCtrl || caretIsToTheFirst)) {
             lastTag = toObjectValues(_tags).pop();
             lastTag && lastTag.focus();
             exit = true;
@@ -720,7 +735,7 @@
                 submit ? form.requestSubmit(submit) : form.requestSubmit();
             }
             exit = true;
-        } else if (keyIsCtrl && !keyIsShift && KEY_A === key && null === getText($) && null !== (v = picker.value)) {
+        } else if (_keyIsCtrl && !_keyIsShift && KEY_A === key && null === getText($) && null !== (v = picker.value)) {
             for (var k in _tags) {
                 setClass(_tags[k], c + '__tag--selected');
             }
@@ -741,7 +756,7 @@
             state = picker.state,
             copy = _mask.copy,
             c = state['class'];
-        _keyIsCtrl = false;
+        _keyIsCtrl = _keyIsShift = false;
         var selection = [];
         for (var k in _tags) {
             if (hasClass(_tags[k], c + '__tag--selected')) {
@@ -837,37 +852,28 @@
             selection = 0;
         if (!_keyIsCtrl) {
             for (var k in _tags) {
-                if (hasClass(_tags[k], c)) {
-                    ++selection;
-                }
                 if ($ === _tags[k]) {
                     continue;
                 }
+                if (hasClass(_tags[k], c)) {
+                    ++selection;
+                }
                 if (!copyWasVisible) {
-                    letClass(_tags[k], c); // De-select other tag(s)
+                    letClass(_tags[k], c);
                 }
             }
             letElement(copy);
         }
         if (copyWasVisible && selection > 1) {
-            setClass($, c); // Re-select this tag
+            setClass($, c);
+            ++selection;
         } else {
             toggleClass($, c);
-            if (_keyIsCtrl) {
-                selection = 0;
-                for (var _k in _tags) {
-                    if (hasClass(_tags[_k], c)) {
-                        ++selection;
-                    }
-                }
-                c = state['class'] + '--focus-tag';
-                letClass(mask, c);
-                letClass(mask, c + 's');
-                if (selection > 0) {
-                    setClass(mask, c + (selection > 1 ? 's' : ""));
-                }
+            if (hasClass($, c)) {
+                ++selection;
             }
         }
+        toggleClass(mask, state['class'] + '--select', selection > 0);
         offEventPropagation(e);
     }
 
@@ -1110,29 +1116,5 @@
         $._tags[v] = tag;
         return self.value = toObjectKeys($._tags).join(state.join), $;
     };
-    Object.defineProperty($$, 'tags', {
-        get: function get() {
-            return toObjectKeys(this._tags);
-        },
-        set: function set(tags) {
-            var $ = this,
-                self = $.self,
-                set = $.set;
-            $._tags = {};
-            self.value = "";
-            tags.forEach(function (tag) {
-                return set(tag);
-            });
-        }
-    });
-    Object.defineProperty($$, 'value', {
-        get: function get() {
-            var value = this.self.value;
-            return "" === value ? null : value;
-        },
-        set: function set(value) {
-            this.self.value = value;
-        }
-    });
     return TagPicker;
 }));

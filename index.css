@@ -13,12 +13,10 @@
   --fill-tag-picker--disabled: #eee;
   --fill-tag-picker--read-only: #eee;
   --fill-tag-picker: #fff;
-  --fill-tag-picker__tag--active: #090;
+  --fill-tag-picker__tag--active: #0c0;
   --fill-tag-picker__tag--disabled: #aaa;
   --fill-tag-picker__tag--focus: #c00;
   --fill-tag-picker__tag--read-only: #f00;
-  --fill-tag-picker__tag--selected--active: #090;
-  --fill-tag-picker__tag--selected--focus: #090;
   --fill-tag-picker__tag--selected: #0c0;
   --fill-tag-picker__tag: #f00;
   --font-face-tag-picker: inherit;
@@ -99,17 +97,15 @@
 }
 
 .tag-picker__copy {
-  opacity: 0.75;
   border: 0;
+  height: 1px;
   left: 0;
   margin: 0;
+  opacity: 0;
   padding: 0;
   position: absolute;
   top: 0;
-}
-.tag-picker__copy--cover {
-  height: 100%;
-  width: 100%;
+  width: 1px;
 }
 
 .tag-picker__text,
@@ -168,18 +164,6 @@
   border-color: var(--stroke-tag-picker__tag--disabled, var(--stroke-tag-picker__tag));
   box-shadow: var(--shadow-tag-picker__tag--disabled, var(--shadow-tag-picker__tag));
   color: var(--color-tag-picker__tag--disabled, var(--color-tag-picker__tag));
-}
-.tag-picker__tag--selected:active {
-  background: var(--fill-tag-picker__tag--selected--active, var(--fill-tag-picker__tag--selected, var(--fill-tag-picker__tag)));
-  border-color: var(--stroke-tag-picker__tag--selected--active, var(--stroke-tag-picker__tag--selected, var(--stroke-tag-picker__tag)));
-  box-shadow: var(--shadow-tag-picker__tag--selected--active, var(--shadow-tag-picker__tag--selected, var(--shadow-tag-picker__tag)));
-  color: var(--color-tag-picker__tag--selected--active, var(--color-tag-picker__tag--selected, var(--color-tag-picker__tag)));
-}
-.tag-picker__tag--selected:focus {
-  background: var(--fill-tag-picker__tag--selected--focus, var(--fill-tag-picker__tag--selected, var(--fill-tag-picker__tag)));
-  border-color: var(--stroke-tag-picker__tag--selected--focus, var(--stroke-tag-picker__tag--selected, var(--stroke-tag-picker__tag)));
-  box-shadow: var(--shadow-tag-picker__tag--selected--focus, var(--shadow-tag-picker__tag--selected, var(--shadow-tag-picker__tag)));
-  color: var(--color-tag-picker__tag--selected--focus, var(--color-tag-picker__tag--selected, var(--color-tag-picker__tag)));
 }
 .tag-picker__tag::before {
   content: attr(title);
