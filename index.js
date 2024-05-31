@@ -532,9 +532,9 @@
             state = picker.state,
             c = state['class'];
         setClass(mask, c + '--focus');
-        if (!_keyIsCtrl) {
-            setClass(mask, c + '--select');
-        }
+        // if (!_keyIsCtrl) {
+        setClass(mask, c + '--select');
+        // }
     }
 
     function onFocusTextInput() {
@@ -592,13 +592,13 @@
 
     function onKeyDownMask(e) {
         var $ = this,
-            picker = $['_' + name],
-            mask = picker.mask,
-            state = picker.state,
-            c = state['class'] + '--select';
+            picker = $['_' + name];
+        picker.mask;
+        var state = picker.state;
+        state['class'] + '--select';
         _keyIsCtrl = e.ctrlKey;
         e.shiftKey;
-        letClass(mask, c);
+        // letClass(mask, c);
     }
 
     function onKeyDownTag(e) {
@@ -859,7 +859,6 @@
             mask = picker.mask,
             state = picker.state,
             copy = _mask.copy,
-            copyWasVisible = mask === getParent(copy),
             c = state['class'] + '__tag--focus';
         toggleClass($, c);
         if (!_keyIsCtrl) {
@@ -867,9 +866,7 @@
                 if ($ === _tags[k]) {
                     continue;
                 }
-                if (!copyWasVisible) {
-                    letClass(_tags[k], c);
-                }
+                letClass(_tags[k], c);
             }
             if (hasClass($, c)) {
                 copy.value = $.title;
