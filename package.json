@@ -10,8 +10,6 @@
     "@taufik-nurrohman/hook": "*",
     "@taufik-nurrohman/is": "*",
     "@taufik-nurrohman/pattern": "*",
-    "@taufik-nurrohman/rect": "*",
-    "@taufik-nurrohman/tick": "*",
     "@taufik-nurrohman/to": "*"
   },
   "description": "Better tags input interaction with JavaScript.",

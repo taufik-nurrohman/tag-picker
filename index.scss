@@ -16,10 +16,10 @@ $name: 'tag-picker';
   --fill-#{$name}--disabled: #eee;
   --fill-#{$name}--read-only: #eee;
   --fill-#{$name}: #fff;
-  --fill-#{$name}__tag--active: #0c0;
   --fill-#{$name}__tag--disabled: #aaa;
   --fill-#{$name}__tag--focus: #c00;
   --fill-#{$name}__tag--read-only: #f00;
+  --fill-#{$name}__tag--selected: #0c0;
   --fill-#{$name}__tag: #f00;
   --font-face-#{$name}: inherit;
   --font-height-#{$name}: 1.5em;
@@ -35,11 +35,13 @@ $name: 'tag-picker';
   --width-#{$name}: 100%;
 }
 
-.#{$name},
-.#{$name} * {
-  box-sizing: border-box;
-  color: inherit;
-  font: inherit;
+.#{$name} {
+  &,
+  & * {
+    box-sizing: border-box;
+    color: inherit;
+    font: inherit;
+  }
 }
 
 .#{$name} {
@@ -76,10 +78,18 @@ $name: 'tag-picker';
       color: var(--color-#{$name}--#{$v}, var(--color-#{$name}));
     }
   }
+  &--select {
+    .#{$name}__tag--focus {
+      --color-#{$name}__tag--focus: var(--color-#{$name}__tag--selected);
+      --fill-#{$name}__tag--focus: var(--fill-#{$name}__tag--selected);
+      --shadow-#{$name}__tag--focus: var(--shadow-#{$name}__tag--selected);
+      --stroke-#{$name}__tag--focus: var(--stroke-#{$name}__tag--selected);
+    }
+  }
 }
 
-@each $v in (focus, disabled) {
-  .#{$name}.#{$name}--#{$v} {
+@each $v in (disabled, focus, select) {
+  .#{$name}--#{$v} {
     background: var(--fill-#{$name}--#{$v}, var(--fill-#{$name}));
     border-color: var(--stroke-#{$name}--#{$v}, var(--stroke-#{$name}));
     box-shadow: var(--shadow-#{$name}--#{$v}, var(--shadow-#{$name}));
@@ -88,126 +98,15 @@ $name: 'tag-picker';
 }
 
 .#{$name}__copy {
+  // height: 1px;
+  // width: 1px;
   border: 0;
-  height: 1px;
   left: 0;
   margin: 0;
-  opacity: 0;
+  opacity: 0.65;
   padding: 0;
   position: absolute;
   top: 0;
-  width: 1px;
-}
-
-%tag {
-  display: flex;
-  height: var(--height-#{$name}); // Same with `min-height` of container
-  margin: 0.125em;
-  outline: 0;
-  overflow: hidden;
-  padding: 0 0.5em;
-  position: relative;
-  text-decoration: none;
-}
-
-.#{$name}__tag {
-  @extend %tag;
-  background: var(--fill-#{$name}__tag);
-  border: 0 solid;
-  border: {
-    color: var(--stroke-#{$name}__tag);
-    radius: var(--arc-#{$name}__tag);
-  }
-  box-shadow: var(--shadow-#{$name}__tag);
-  color: var(--color-#{$name}__tag);
-  cursor: pointer;
-  @each $v in (hover, focus, active) {
-    &:#{$v} {
-      background: var(--fill-#{$name}__tag--#{$v}, var(--fill-#{$name}__tag));
-      border-color: var(--stroke-#{$name}__tag--#{$v}, var(--stroke-#{$name}__tag));
-      box-shadow: var(--shadow-#{$name}__tag--#{$v}, var(--shadow-#{$name}__tag));
-      color: var(--color-#{$name}__tag--#{$v}, var(--color-#{$name}__tag));
-    }
-  }
-  &--active {
-    &,
-    &:hover,
-    &:focus,
-    &:active {
-      background: var(--fill-#{$name}__tag--active, var(--fill-#{$name}__tag));
-      border-color: var(--stroke-#{$name}__tag--active, var(--stroke-#{$name}__tag));
-      box-shadow: var(--shadow-#{$name}__tag--active, var(--shadow-#{$name}__tag));
-      color: var(--color-#{$name}__tag--active, var(--color-#{$name}__tag));
-    }
-  }
-  &::before {
-    content: attr(title);
-    flex: 1;
-  }
-  + .#{$name}__text {
-    span {
-      + span {
-        // Hide the placeholder if we have at least one tag
-        display: none;
-      }
-    }
-  }
-  &-x {
-    color: var(--color-#{$name}__tag-x);
-    font-family: #{$name}__tag-x, sans-serif;
-    margin: {
-      left: 0.5em;
-      right: -0.125em;
-    }
-    outline: 0;
-    text-decoration: none;
-    @each $v in (hover, focus, active) {
-      &:#{$v} {
-        color: var(--color-#{$name}__tag-x--#{$v}, var(--color-#{$name}__tag-x));
-      }
-    }
-    &::before {
-      content: '\00d7'; // The “×” button
-      font: inherit;
-    }
-  }
-}
-
-.#{$name}__text {
-  @extend %tag;
-}
-
-.#{$name}__text {
-  flex: 1;
-  span {
-    flex: 1;
-    height: 100%;
-    outline: 0;
-    position: relative;
-    z-index: 1;
-    * {
-      display: inline; // Remove (hide) line-break in tag editor
-    }
-    + span {
-      bottom: 0;
-      left: 0;
-      opacity: 0.5;
-      padding: inherit;
-      position: absolute;
-      right: 0;
-      top: 0;
-      white-space: nowrap;
-      z-index: 0;
-    }
-  }
-}
-
-.#{$name}__tags {
-  display: flex;
-  flex-wrap: wrap;
-  flex: 1;
-  line-height: var(--height-#{$name});
-  min-height: var(--height-#{$name});
 }
 
 .#{$name}__self {
@@ -247,6 +146,121 @@ $name: 'tag-picker';
       border-color: var(--stroke-#{$name}--disabled, var(--stroke-#{$name}));
       box-shadow: var(--shadow-#{$name}--disabled, var(--shadow-#{$name}));
       color: var(--color-#{$name}--disabled, var(--color-#{$name}));
+    }
+  }
+}
+
+%tag {
+  display: flex;
+  height: var(--height-#{$name}); // Same with `min-height` of container
+  margin: 0.125em;
+  outline: 0;
+  overflow: hidden;
+  padding: 0 0.5em;
+  position: relative;
+  text-decoration: none;
+}
+
+.#{$name}__tag {
+  @extend %tag;
+  background: var(--fill-#{$name}__tag);
+  border: 0 solid;
+  border: {
+    color: var(--stroke-#{$name}__tag);
+    radius: var(--arc-#{$name}__tag);
+  }
+  box-shadow: var(--shadow-#{$name}__tag);
+  color: var(--color-#{$name}__tag);
+  cursor: pointer;
+  @each $v in (hover, active) {
+    &:#{$v} {
+      background: var(--fill-#{$name}__tag--#{$v}, var(--fill-#{$name}__tag));
+      border-color: var(--stroke-#{$name}__tag--#{$v}, var(--stroke-#{$name}__tag));
+      box-shadow: var(--shadow-#{$name}__tag--#{$v}, var(--shadow-#{$name}__tag));
+      color: var(--color-#{$name}__tag--#{$v}, var(--color-#{$name}__tag));
+    }
+  }
+  &:focus-visible {
+    background: var(--fill-#{$name}__tag--focus, var(--fill-#{$name}__tag));
+    border-color: var(--stroke-#{$name}__tag--focus, var(--stroke-#{$name}__tag));
+    box-shadow: var(--shadow-#{$name}__tag--focus, var(--shadow-#{$name}__tag));
+    color: var(--color-#{$name}__tag--focus, var(--color-#{$name}__tag));
+  }
+  &--focus {
+    &,
+    &:hover,
+    &:focus,
+    &:focus-visible,
+    &:active {
+      background: var(--fill-#{$name}__tag--focus, var(--fill-#{$name}__tag));
+      border-color: var(--stroke-#{$name}__tag--focus, var(--stroke-#{$name}__tag));
+      box-shadow: var(--shadow-#{$name}__tag--focus, var(--shadow-#{$name}__tag));
+      color: var(--color-#{$name}__tag--focus, var(--color-#{$name}__tag));
+    }
+  }
+  &::before {
+    content: attr(title);
+    flex: 1;
+  }
+  + .#{$name}__text {
+    span {
+      + span {
+        // Hide the placeholder if we have at least one tag
+        display: none;
+      }
+    }
+  }
+  &-x {
+    color: var(--color-#{$name}__tag-x);
+    font-family: #{$name}__tag-x, sans-serif;
+    margin: {
+      left: 0.5em;
+      right: -0.125em;
+    }
+    outline: 0;
+    text-decoration: none;
+    @each $v in (hover, focus, active) {
+      &:#{$v} {
+        color: var(--color-#{$name}__tag-x--#{$v}, var(--color-#{$name}__tag-x));
+      }
+    }
+    &::before {
+      content: '\00d7'; // The “×” button
+      font: inherit;
+    }
+  }
+}
+
+.#{$name}__tags {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+  line-height: var(--height-#{$name});
+  min-height: var(--height-#{$name});
+}
+
+.#{$name}__text {
+  @extend %tag;
+  flex: 1;
+  span {
+    flex: 1;
+    height: 100%;
+    outline: 0;
+    position: relative;
+    z-index: 1;
+    * {
+      display: inline; // Remove (hide) line-break in tag editor
+    }
+    + span {
+      bottom: 0;
+      left: 0;
+      opacity: 0.5;
+      padding: inherit;
+      position: absolute;
+      right: 0;
+      top: 0;
+      white-space: nowrap;
+      z-index: 0;
     }
   }
 }

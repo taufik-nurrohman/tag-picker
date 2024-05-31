@@ -17,6 +17,13 @@ const KEY_ENTER = 'Enter';
 const KEY_ESCAPE = 'Escape';
 const KEY_TAB = 'Tab';
 
+// <https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus#focusvisible>
+const focusOptions = {
+    focusVisible: true
+};
+
+const name = 'TagPicker';
+
 function defineProperty(of, key, state) {
     Object.defineProperty(of, key, state);
 }
@@ -52,10 +59,6 @@ function setCaretToEnd(container) {
     selection.addRange(range);
 }
 
-function theText(self) {
-    return getText(self);
-}
-
 function theValue(self) {
     return self.value.replace(/\r/g, "");
 }
@@ -73,7 +76,7 @@ function TagPicker(self, state) {
         return new TagPicker(self, state);
     }
 
-    self['_' + TagPicker.name] = hook($, TagPicker.prototype);
+    self['_' + name] = hook($, TagPicker.prototype);
 
     return $.attach(self, fromStates({}, TagPicker.state, isString(state) ? {
         join: state
@@ -94,21 +97,17 @@ TagPicker.state = {
 TagPicker.version = '4.0.0';
 
 defineProperty(TagPicker, 'name', {
-    value: 'TagPicker'
+    value: name
 });
 
 const $$ = TagPicker.prototype;
 
-defineProperty($$, 'tags', {
+defineProperty($$, 'text', {
     get: function () {
-        return toObjectKeys(this._tags);
+        return getText(this._mask.input);
     },
-    set: function (tags) {
-        let $ = this,
-            {self, set} = $;
-        $._tags = {};
-        self.value = "";
-        tags.forEach(tag => set(tag));
+    set: function (text) {
+        setText(this._mask.input, text);
     }
 });
 
@@ -118,7 +117,9 @@ defineProperty($$, 'value', {
         return "" === value ? null : value;
     },
     set: function (value) {
-        this.self.value = value;
+        let $ = this,
+            {state} = $;
+        value.split(state.join).forEach(tag => $.set(tag));
     }
 });
 
@@ -131,14 +132,14 @@ $$._filter = function (v) {
 
 function onBlurMask() {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {state} = picker;
     letClass($, state['class'] + '--focus');
 }
 
 function onBlurTag() {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask, mask, state} = picker,
         c = state['class'];
     letClass(mask, c += '--focus');
@@ -147,7 +148,7 @@ function onBlurTag() {
 
 function onBlurTextInput() {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask, mask, state} = picker,
         {text} = _mask,
         c = state['class'];
@@ -158,10 +159,10 @@ function onBlurTextInput() {
 
 function onContextMenuMask(e) {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask, _tags, mask, state} = picker,
         {copy} = _mask,
-        c = state['class'] + '__tag--active';
+        c = state['class'] + '__tag--focus';
     let selection = [];
     for (let k in _tags) {
         if (hasClass(_tags[k], c)) {
@@ -179,7 +180,7 @@ function onContextMenuMask(e) {
 
 function onCopyTextCopy() {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask} = picker,
         {input} = _mask;
     delay(() => (letElement($), picker.focus()));
@@ -187,7 +188,7 @@ function onCopyTextCopy() {
 
 function onCutTextCopy() {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask, state} = picker,
         {input} = _mask;
     $.value.split(state.join).forEach(tag => picker.let(tag));
@@ -196,22 +197,26 @@ function onCutTextCopy() {
 
 function onFocusTextCopy() {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_tags, mask, state} = picker,
         c = state['class'];
     setClass(mask, c + '--focus');
+    if (!_keyIsCtrl) {
+        setClass(mask, c + '--select');
+    }
 }
 
 function onFocusTextInput() {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask, _tags, mask, self, state} = picker,
         {copy, hint, input, text} = _mask,
         c = state['class'];
     for (let k in _tags) {
-        letClass(_tags[k], c + '__tag--active');
+        letClass(_tags[k], c + '__tag--focus');
     }
     letElement(copy);
+    letClass(mask, c + '--select');
     setClass(text, c + '__text--focus');
     setClass(mask, c += '--focus');
     setClass(mask, c += '-text');
@@ -221,13 +226,13 @@ function onFocusTextInput() {
 
 function onFocusSelf() {
     let $ = this,
-        picker = $['_' + TagPicker.name];
+        picker = $['_' + name];
     picker.focus();
 }
 
 function onFocusMask() {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {state} = picker,
         c = state['class'];
     setClass($, c + '--focus');
@@ -235,7 +240,7 @@ function onFocusMask() {
 
 function onFocusTag() {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask, mask, state} = picker,
         c = state['class'];
     setClass(mask, c += '--focus');
@@ -245,22 +250,27 @@ function onFocusTag() {
 let _keyIsCtrl = false, _keyIsShift = false;
 
 function onKeyDownMask(e) {
+    let $ = this,
+        picker = $['_' + name],
+        {mask, state} = picker,
+        c = state['class'] + '--select';
     _keyIsCtrl = e.ctrlKey;
     _keyIsShift = e.shiftKey;
+    letClass(mask, c);
 }
 
 function onKeyDownTag(e) {
     let $ = this, exit,
         key = e.key,
-        keyIsCtrl = e.ctrlKey,
-        keyIsShift = e.shiftKey,
-        picker = $['_' + TagPicker.name],
+        keyIsCtrl = _keyIsCtrl = e.ctrlKey,
+        keyIsShift = _keyIsShift = e.shiftKey,
+        picker = $['_' + name],
         {_mask, _tags, mask, state} = picker,
         {copy, text} = _mask,
         prevTag = getPrev($),
         nextTag = getNext($),
         firstTag, lastTag,
-        c = state['class'] + '__tag--active';
+        c = state['class'] + '__tag--focus';
     if (keyIsCtrl) {
         if (!keyIsShift && KEY_A === key) {
             for (let k in _tags) {
@@ -277,25 +287,25 @@ function onKeyDownTag(e) {
         }
         if (KEY_BEGIN === key) {
             firstTag = toObjectValues(_tags).shift();
-            firstTag && firstTag.focus();
+            firstTag && firstTag.focus(focusOptions);
             exit = true;
         } else if (KEY_END === key) {
             lastTag = toObjectValues(_tags).pop();
-            lastTag && lastTag.focus();
+            lastTag && lastTag.focus(focusOptions);
             exit = true;
         } else if (KEY_ARROW_LEFT === key) {
-            prevTag && prevTag.focus();
+            prevTag && prevTag.focus(focusOptions);
             exit = true;
         } else if (KEY_ARROW_RIGHT === key) {
-            nextTag && text !== nextTag ? nextTag.focus() : picker.focus();
+            nextTag && text !== nextTag ? nextTag.focus(focusOptions) : picker.focus();
             exit = true;
         } else if (KEY_DELETE_LEFT === key) {
             picker.let($.title);
-            prevTag ? prevTag.focus() : picker.focus();
+            prevTag ? prevTag.focus(focusOptions) : picker.focus();
             exit = true;
         } else if (KEY_DELETE_RIGHT === key) {
             picker.let($.title);
-            nextTag && text !== nextTag ? nextTag.focus() : picker.focus();
+            nextTag && text !== nextTag ? nextTag.focus(focusOptions) : picker.focus();
             exit = true;
         }
     }
@@ -307,10 +317,10 @@ function onKeyDownTextCopy(e) {
         key = e.key,
         keyIsCtrl = e.ctrlKey,
         keyIsShift = e.shiftKey,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask, _tags, state} = picker,
         {copy, input} = _mask,
-        c = state['class'] + '__tag--active';
+        c = state['class'] + '__tag--focus';
     function cancel() {
         letElement(copy);
         for (let k in _tags) {
@@ -319,14 +329,13 @@ function onKeyDownTextCopy(e) {
     }
     if (!keyIsCtrl) {
         if (KEY_BEGIN === key || KEY_ARROW_LEFT === key) {
-            cancel(), toObjectValues(_tags).shift().focus();
+            cancel(), toObjectValues(_tags).shift().focus(focusOptions);
         } else if (KEY_END === key || KEY_ARROW_RIGHT === key) {
-            cancel(), toObjectValues(_tags).pop().focus();
+            cancel(), toObjectValues(_tags).pop().focus(focusOptions);
         } else if (KEY_ESCAPE === key) {
             cancel(), picker.focus();
         } else {
-            $.value.split(state.join).forEach(tag => picker.let(tag));
-            picker.focus();
+            $.value.split(state.join).forEach(tag => picker.let(tag)), picker.focus();
         }
     }
 }
@@ -337,29 +346,29 @@ function onKeyDownTextInput(e) {
         keyCode = e.keyCode,
         keyIsCtrl = e.ctrlKey,
         keyIsShift = e.shiftKey,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask, _tags, mask, self, state} = picker,
         {copy, hint} = _mask,
-        c = state['class'] + '__tag--active',
+        c = state['class'] + '__tag--focus',
         firstTag, lastTag;
         escape = state.escape;
     if (escape.includes(key) || escape.includes(keyCode)) {
-        return picker.set(theText($)), setText($, ""), setText(hint, self.placeholder), picker.focus(), offEventDefault(e);
+        return picker.set(getText($)), setText($, ""), setText(hint, self.placeholder), picker.focus(), offEventDefault(e);
     }
     delay(() => setText(hint, getText($) ? "" : self.placeholder));
     let caretIsToTheFirst = "" === getCharBeforeCaret($),
         textIsVoid = null === getText($);
     if (KEY_BEGIN === key && (keyIsCtrl || textIsVoid)) {
         firstTag = toObjectValues(_tags).shift();
-        firstTag && firstTag.focus();
+        firstTag && firstTag.focus(focusOptions);
         exit = true;
     } else if (KEY_END === key && (keyIsCtrl || textIsVoid)) {
         lastTag = toObjectValues(_tags).pop();
-        lastTag && lastTag.focus();
+        lastTag && lastTag.focus(focusOptions);
         exit = true;
     } else if (KEY_ARROW_LEFT === key && (keyIsCtrl || caretIsToTheFirst)) {
         lastTag = toObjectValues(_tags).pop();
-        lastTag && lastTag.focus();
+        lastTag && lastTag.focus(focusOptions);
         exit = true;
     } else if (KEY_DELETE_LEFT === key && textIsVoid) {
         lastTag = toObjectValues(_tags).pop();
@@ -388,10 +397,10 @@ function onKeyDownTextInput(e) {
 
 function onKeyUpMask() {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask, _tags, mask, state} = picker,
         {copy} = _mask,
-        c = state['class'] + '__tag--active';
+        c = state['class'] + '__tag--focus';
     _keyIsCtrl = _keyIsShift = false;
     let selection = [];
     for (let k in _tags) {
@@ -399,7 +408,7 @@ function onKeyUpMask() {
             selection.push(k);
         }
     }
-    if (toCount(selection) > 1) {
+    if (toCount(selection)) {
         copy.value = selection.join(state.join);
         setChildLast(mask, copy);
         copy.focus(), copy.select();
@@ -409,7 +418,7 @@ function onKeyUpMask() {
 function onPasteTextCopy() {
     let $ = this,
         {value} = $, // Old value
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask, state} = picker,
         {copy, input} = _mask;
     delay(() => {
@@ -424,7 +433,7 @@ function onPasteTextCopy() {
 
 function onPasteTextInput() {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask, state} = picker,
         {hint} = _mask;
     delay(() => {
@@ -438,10 +447,10 @@ function onPasteTextInput() {
 
 function onPointerDownMask(e) {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask, _tags, mask, state} = picker,
         {copy, input} = _mask,
-        c = state['class'] + '__tag--active';
+        c = state['class'] + '__tag--focus';
     if (mask === getParent(copy)) {
         if (input === e.target) {
             let selection = 0;
@@ -464,34 +473,37 @@ function onPointerDownMask(e) {
 
 function onPointerDownTag(e) {
     let $ = this,
-        picker = $['_' + TagPicker.name],
+        picker = $['_' + name],
         {_mask, _tags, mask, state} = picker,
         {copy} = _mask,
-        c = state['class'] + '__tag--active',
         copyWasVisible = mask === getParent(copy),
-        selection = 0;
+        c = state['class'] + '__tag--focus';
+    toggleClass($, c);
     if (!_keyIsCtrl) {
         for (let k in _tags) {
             if ($ === _tags[k]) {
                 continue;
             }
-            if (hasClass(_tags[k], c)) {
-                ++selection;
-            }
             if (!copyWasVisible) {
                 letClass(_tags[k], c);
             }
         }
-        letElement(copy);
-    }
-    if (copyWasVisible && selection > 1) {
-        setClass($, c);
-        ++selection;
-    } else {
-        toggleClass($, c);
         if (hasClass($, c)) {
-            ++selection;
+            copy.value = $.title;
+            setChildLast(mask, copy);
+            delay(() => (copy.focus(), copy.select()));
+        } else {
+            letElement(copy);
         }
+    } else {
+        let selection = [];
+        for (let k in _tags) {
+            if (hasClass(_tags[k], c)) {
+                selection.push(k);
+            }
+        }
+        copy.value = selection.join(state.join);
+        copy.focus(), copy.select();
     }
     offEventPropagation(e);
 }
@@ -499,7 +511,7 @@ function onPointerDownTag(e) {
 function onPointerDownTagX(e) {
     let $ = this,
         tag = getParent($),
-        picker = tag['_' + TagPicker.name],
+        picker = tag['_' + name],
         {_mask} = picker,
         {input} = _mask;
     offEvent('click', $, onPointerDownTagX);
@@ -517,7 +529,7 @@ $$.attach = function (self, state) {
     $.self = self;
     $.state = state;
     let c = state['class'],
-        n = '_' + TagPicker.name;
+        n = '_' + name;
     const form = getParentForm(self);
     const mask = setElement('div', {
         'class': c,
@@ -728,7 +740,7 @@ $$.set = function (v) {
     onEvent('mousedown', tagX, onPointerDownTagX);
     onEvent('touchstart', tag, onPointerDownTag);
     onEvent('touchstart', tagX, onPointerDownTagX);
-    tag['_' + TagPicker.name] = $;
+    tag['_' + name] = $;
     setChildLast(tag, tagX);
     setPrev(text, tag);
     $._tags[v] = tag;
