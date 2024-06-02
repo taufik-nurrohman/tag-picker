@@ -29,6 +29,7 @@ $name: 'tag-picker';
   --shadow-#{$name}__tag: none;
   --stroke-#{$name}--disabled: #666;
   --stroke-#{$name}--focus: #00f;
+  --stroke-#{$name}--select: #00f;
   --stroke-#{$name}--read-only: #666;
   --stroke-#{$name}: #000;
   --stroke-#{$name}__tag: transparent;
@@ -70,14 +71,6 @@ $name: 'tag-picker';
   padding: 0.125em;
   position: relative;
   width: var(--width-#{$name}, auto);
-  @each $v in (hover, focus, active) {
-    &:#{$v} {
-      background: var(--fill-#{$name}--#{$v}, var(--fill-#{$name}));
-      border-color: var(--stroke-#{$name}--#{$v}, var(--stroke-#{$name}));
-      box-shadow: var(--shadow-#{$name}--#{$v}, var(--shadow-#{$name}));
-      color: var(--color-#{$name}--#{$v}, var(--color-#{$name}));
-    }
-  }
   &--select {
     .#{$name}__tag--focus {
       --color-#{$name}__tag--focus: var(--color-#{$name}__tag--selected);
@@ -88,7 +81,7 @@ $name: 'tag-picker';
   }
 }
 
-@each $v in (disabled, focus, select) {
+@each $v in (focus, select) {
   .#{$name}--#{$v} {
     background: var(--fill-#{$name}--#{$v}, var(--fill-#{$name}));
     border-color: var(--stroke-#{$name}--#{$v}, var(--stroke-#{$name}));
@@ -204,6 +197,9 @@ $name: 'tag-picker';
   }
   + .#{$name}__text {
     span {
+      br {
+        display: none;
+      }
       + span {
         // Hide the placeholder if we have at least one tag
         display: none;

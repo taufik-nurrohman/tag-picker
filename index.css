@@ -26,6 +26,7 @@
   --shadow-tag-picker__tag: none;
   --stroke-tag-picker--disabled: #666;
   --stroke-tag-picker--focus: #00f;
+  --stroke-tag-picker--select: #00f;
   --stroke-tag-picker--read-only: #666;
   --stroke-tag-picker: #000;
   --stroke-tag-picker__tag: transparent;
@@ -62,36 +63,11 @@
   position: relative;
   width: var(--width-tag-picker, auto);
 }
-.tag-picker:hover {
-  background: var(--fill-tag-picker--hover, var(--fill-tag-picker));
-  border-color: var(--stroke-tag-picker--hover, var(--stroke-tag-picker));
-  box-shadow: var(--shadow-tag-picker--hover, var(--shadow-tag-picker));
-  color: var(--color-tag-picker--hover, var(--color-tag-picker));
-}
-.tag-picker:focus {
-  background: var(--fill-tag-picker--focus, var(--fill-tag-picker));
-  border-color: var(--stroke-tag-picker--focus, var(--stroke-tag-picker));
-  box-shadow: var(--shadow-tag-picker--focus, var(--shadow-tag-picker));
-  color: var(--color-tag-picker--focus, var(--color-tag-picker));
-}
-.tag-picker:active {
-  background: var(--fill-tag-picker--active, var(--fill-tag-picker));
-  border-color: var(--stroke-tag-picker--active, var(--stroke-tag-picker));
-  box-shadow: var(--shadow-tag-picker--active, var(--shadow-tag-picker));
-  color: var(--color-tag-picker--active, var(--color-tag-picker));
-}
 .tag-picker--select .tag-picker__tag--focus {
   --color-tag-picker__tag--focus: var(--color-tag-picker__tag--selected);
   --fill-tag-picker__tag--focus: var(--fill-tag-picker__tag--selected);
   --shadow-tag-picker__tag--focus: var(--shadow-tag-picker__tag--selected);
   --stroke-tag-picker__tag--focus: var(--stroke-tag-picker__tag--selected);
-}
-
-.tag-picker--disabled {
-  background: var(--fill-tag-picker--disabled, var(--fill-tag-picker));
-  border-color: var(--stroke-tag-picker--disabled, var(--stroke-tag-picker));
-  box-shadow: var(--shadow-tag-picker--disabled, var(--shadow-tag-picker));
-  color: var(--color-tag-picker--disabled, var(--color-tag-picker));
 }
 
 .tag-picker--focus {
@@ -207,6 +183,9 @@
 .tag-picker__tag::before {
   content: attr(title);
   flex: 1;
+}
+.tag-picker__tag + .tag-picker__text span br {
+  display: none;
 }
 .tag-picker__tag + .tag-picker__text span + span {
   display: none;
