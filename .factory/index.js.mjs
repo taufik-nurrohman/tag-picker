@@ -198,10 +198,13 @@ function onFocusTextCopy() {
         {_tags, mask, state} = picker,
         c = state['class'];
     setClass(mask, c + '--focus');
-    setClass(mask, c + '--select');
+    if (!_keyIsCtrl) {
+        setClass(mask, c + '--select');
+    }
 }
 
 function onFocusTextInput() {
+    _firstTagSelected = false;
     let $ = this,
         picker = $['_' + name],
         {_mask, _tags, mask, self, state} = picker,
@@ -242,19 +245,13 @@ function onFocusTag() {
     setClass(mask, c += '-tag');
 }
 
-let _keyIsCtrl = false, _keyIsShift = false;
+let _keyIsCtrl = false,
+    _keyIsShift = false,
+    _firstTagSelected = false;
 
 function onKeyDownMask(e) {
-    let $ = this,
-        key = e.key,
-        picker = $['_' + name],
-        {mask, state} = picker,
-        c = state['class'] + '--select';
     _keyIsCtrl = e.ctrlKey;
     _keyIsShift = e.shiftKey;
-    if (KEY_A !== key && (_keyIsCtrl || _keyIsShift)) {
-        // letClass(mask, c);
-    }
 }
 
 function onKeyDownTag(e) {
@@ -269,7 +266,13 @@ function onKeyDownTag(e) {
         nextTag = getNext($),
         firstTag, lastTag,
         c = state['class'] + '__tag--focus';
-    if (keyIsCtrl) {
+    if (keyIsShift) {
+        setClass(_firstTagSelected = $, c);
+        copy.value = picker.value;
+        setChildLast(mask, copy);
+        copy.focus(), copy.select();
+    } else if (keyIsCtrl) {
+        letClass(mask, state['class'] + '--select');
         if (!keyIsShift && KEY_A === key) {
             for (let k in _tags) {
                 setClass(_tags[k], c);
@@ -316,20 +319,42 @@ function onKeyDownTag(e) {
 function onKeyDownTextCopy(e) {
     let $ = this,
         key = e.key,
+        keyIsAlt = e.altKey,
         keyIsCtrl = _keyIsCtrl = e.ctrlKey,
         keyIsShift = _keyIsShift = e.shiftKey,
         picker = $['_' + name],
-        {_mask, _tags, state} = picker,
+        {_mask, _tags, mask, state} = picker,
         {copy, input, text} = _mask,
         c = state['class'] + '__tag--focus',
         firstTag, lastTag, nextTag, prevTag;
+    if (keyIsAlt) {
+        return;
+    }
     function cancel() {
         letElement(copy);
         for (let k in _tags) {
             letClass(_tags[k], c);
         }
     }
-    if (!keyIsCtrl) {
+    if (keyIsShift) {
+        _firstTagSelected = _firstTagSelected || _tags[$.value.split(state.join).shift()];
+        console.log(_firstTagSelected);
+        if (KEY_ARROW_LEFT === key) {
+            if (prevTag = getPrev(_firstTagSelected)) {
+                console.log(prevTag);
+                setClass(prevTag, c);
+                _firstTagSelected = prevTag;
+            }
+        } else if (KEY_ARROW_RIGHT === key) {
+            if (nextTag = getNext(_firstTagSelected)) {
+                console.log(nextTag);
+                if (text !== nextTag) {
+                    setClass(nextTag, c);
+                    _firstTagSelected = nextTag;
+                }
+            }
+        }
+    } else if (!keyIsCtrl) {
         if (KEY_ARROW_LEFT === key) {
             firstTag = _tags[$.value.split(state.join).shift()];
             cancel();
@@ -359,6 +384,7 @@ function onKeyDownTextCopy(e) {
             $.value.split(state.join).forEach(tag => picker.let(tag)), picker.focus();
         }
     } else {
+        letClass(mask, state['class'] + '--select');
         if (KEY_A === key) {
             for (let k in _tags) {
                 setClass(_tags[k], c);
