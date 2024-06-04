@@ -537,7 +537,7 @@
             state = picker.state,
             c = state['class'];
         setClass(mask, c + '--focus');
-        if (!_keyIsCtrl) {
+        if (!_keyIsCtrl && !_keyIsShift) {
             setClass(mask, c + '--select');
         }
     }
@@ -595,11 +595,12 @@
         setClass(mask, c += '-tag');
     }
     var _keyIsCtrl = false,
+        _keyIsShift = false,
         _firstTagSelected = false;
 
     function onKeyDownMask(e) {
         _keyIsCtrl = e.ctrlKey;
-        e.shiftKey;
+        _keyIsShift = e.shiftKey;
     }
 
     function onKeyDownTag(e) {
@@ -607,7 +608,7 @@
             exit,
             key = e.key,
             keyIsCtrl = _keyIsCtrl = e.ctrlKey,
-            keyIsShift = e.shiftKey,
+            keyIsShift = _keyIsShift = e.shiftKey,
             picker = $['_' + name],
             _mask = picker._mask,
             _tags = picker._tags,
@@ -622,12 +623,11 @@
             c = state['class'] + '__tag--focus';
         if (keyIsShift) {
             setClass(_firstTagSelected = $, c);
-            copy.value = picker.value;
+            copy.value = $.title;
             setChildLast(mask, copy);
             copy.focus(), copy.select();
         } else if (keyIsCtrl) {
-            letClass(mask, state['class'] + '--select');
-            if (!keyIsShift && KEY_A === key) {
+            if (KEY_A === key) {
                 for (var k in _tags) {
                     setClass(_tags[k], c);
                 }
@@ -637,9 +637,7 @@
                 exit = true;
             }
         } else {
-            if (!keyIsShift) {
-                letClass($, c);
-            }
+            letClass($, c);
             if (KEY_BEGIN === key) {
                 firstTag = toObjectValues(_tags).shift();
                 firstTag && firstTag.focus(focusOptions);
@@ -650,6 +648,9 @@
                 exit = true;
             } else if (KEY_ENTER === key || ' ' === key) {
                 toggleClass($, c);
+                if (hasClass($, c)) {
+                    _firstTagSelected = $;
+                }
                 exit = true;
             } else if (KEY_ARROW_LEFT === key) {
                 prevTag && prevTag.focus(focusOptions);
@@ -675,12 +676,12 @@
             key = e.key,
             keyIsAlt = e.altKey,
             keyIsCtrl = _keyIsCtrl = e.ctrlKey,
-            keyIsShift = e.shiftKey,
+            keyIsShift = _keyIsShift = e.shiftKey,
             picker = $['_' + name],
             _mask = picker._mask,
-            _tags = picker._tags,
-            mask = picker.mask,
-            state = picker.state,
+            _tags = picker._tags;
+        picker.mask;
+        var state = picker.state,
             copy = _mask.copy;
         _mask.input;
         var text = _mask.text,
@@ -701,23 +702,36 @@
         }
         if (keyIsShift) {
             _firstTagSelected = _firstTagSelected || _tags[$.value.split(state.join).shift()];
-            console.log(_firstTagSelected);
             if (KEY_ARROW_LEFT === key) {
                 if (prevTag = getPrev(_firstTagSelected)) {
-                    console.log(prevTag);
-                    setClass(prevTag, c);
+                    if (hasClass(prevTag, c)) {
+                        letClass(_firstTagSelected, c);
+                    } else {
+                        setClass(prevTag, c);
+                    }
                     _firstTagSelected = prevTag;
                 }
             } else if (KEY_ARROW_RIGHT === key) {
                 if (nextTag = getNext(_firstTagSelected)) {
-                    console.log(nextTag);
                     if (text !== nextTag) {
-                        setClass(nextTag, c);
+                        if (hasClass(nextTag, c)) {
+                            letClass(_firstTagSelected, c);
+                        } else {
+                            setClass(nextTag, c);
+                        }
                         _firstTagSelected = nextTag;
                     }
                 }
             }
-        } else if (!keyIsCtrl) {
+        } else if (keyIsCtrl) {
+            if (KEY_A === key) {
+                for (var k in _tags) {
+                    setClass(_tags[k], c);
+                }
+                copy.value = picker.value;
+                copy.focus(), copy.select();
+            }
+        } else {
             if (KEY_ARROW_LEFT === key) {
                 firstTag = _tags[$.value.split(state.join).shift()];
                 cancel();
@@ -748,15 +762,6 @@
                     return picker.let(tag);
                 }), picker.focus();
             }
-        } else {
-            letClass(mask, state['class'] + '--select');
-            if (KEY_A === key) {
-                for (var k in _tags) {
-                    setClass(_tags[k], c);
-                }
-                copy.value = picker.value;
-                copy.focus(), copy.select();
-            }
         }
     }
 
@@ -767,7 +772,7 @@
             key = e.key,
             keyCode = e.keyCode,
             keyIsCtrl = _keyIsCtrl = e.ctrlKey,
-            keyIsShift = e.shiftKey,
+            keyIsShift = _keyIsShift = e.shiftKey,
             picker = $['_' + name],
             _mask = picker._mask,
             _tags = picker._tags,
@@ -788,39 +793,80 @@
         }, 1)();
         var caretIsToTheFirst = "" === getCharBeforeCaret($),
             textIsVoid = null === getText($, false);
-        if (KEY_BEGIN === key && (keyIsCtrl || textIsVoid)) {
-            firstTag = toObjectValues(_tags).shift();
-            firstTag && firstTag.focus(focusOptions);
-            exit = true;
-        } else if (KEY_END === key && (keyIsCtrl || textIsVoid)) {
-            lastTag = toObjectValues(_tags).pop();
-            lastTag && lastTag.focus(focusOptions);
-            exit = true;
-        } else if (KEY_ARROW_LEFT === key && (keyIsCtrl || caretIsToTheFirst)) {
-            lastTag = toObjectValues(_tags).pop();
-            lastTag && lastTag.focus(focusOptions);
-            exit = true;
-        } else if (KEY_DELETE_LEFT === key && textIsVoid) {
-            lastTag = toObjectValues(_tags).pop();
-            lastTag && picker.let(lastTag.title);
-            picker.focus();
-            exit = true;
-        } else if (KEY_ENTER === key) {
-            var form = getParentForm(self);
-            if (form && isFunction(form.requestSubmit)) {
-                // <https://developer.mozilla.org/en-US/docs/Glossary/Submit_button>
-                var submit = getElement('button:not([type]),button[type=submit],input[type=image],input[type=submit]', form);
-                submit ? form.requestSubmit(submit) : form.requestSubmit();
+        if (keyIsShift) {
+            if (textIsVoid || caretIsToTheFirst) {
+                if (KEY_ARROW_LEFT === key) {
+                    lastTag = toObjectValues(_tags).pop();
+                    if (lastTag) {
+                        lastTag && lastTag.focus(focusOptions);
+                        setClass(lastTag, c);
+                        setClass(mask, state['class'] + '--select');
+                        exit = true;
+                    }
+                }
             }
-            exit = true;
-        } else if (keyIsCtrl && !keyIsShift && KEY_A === key && null === getText($, false) && null !== (v = picker.value)) {
-            for (var k in _tags) {
-                setClass(_tags[k], c);
+        } else if (keyIsCtrl) {
+            if (KEY_A === key && null === getText($, false) && null !== (v = picker.value)) {
+                for (var k in _tags) {
+                    setClass(_tags[k], c);
+                }
+                copy.value = v;
+                setChildLast(mask, copy);
+                copy.focus(), copy.select();
+                exit = true;
+            } else if (KEY_BEGIN === key) {
+                firstTag = toObjectValues(_tags).shift();
+                firstTag && firstTag.focus(focusOptions);
+                exit = true;
+            } else if (KEY_END === key) {
+                lastTag = toObjectValues(_tags).pop();
+                lastTag && lastTag.focus(focusOptions);
+                exit = true;
+            } else if (KEY_ARROW_LEFT === key) {
+                lastTag = toObjectValues(_tags).pop();
+                lastTag && lastTag.focus(focusOptions);
+                exit = true;
+            } else if (KEY_DELETE_LEFT === key) {
+                lastTag = toObjectValues(_tags).pop();
+                lastTag && picker.let(lastTag.title);
+                picker.focus();
+                exit = true;
             }
-            copy.value = v;
-            setChildLast(mask, copy);
-            copy.focus(), copy.select();
-            exit = true;
+        } else {
+            if (KEY_ENTER === key) {
+                var form = getParentForm(self);
+                if (form && isFunction(form.requestSubmit)) {
+                    // <https://developer.mozilla.org/en-US/docs/Glossary/Submit_button>
+                    var submit = getElement('button:not([type]),button[type=submit],input[type=image],input[type=submit]', form);
+                    submit ? form.requestSubmit(submit) : form.requestSubmit();
+                }
+                exit = true;
+            } else if (textIsVoid) {
+                if (KEY_BEGIN === key) {
+                    firstTag = toObjectValues(_tags).shift();
+                    firstTag && firstTag.focus(focusOptions);
+                    exit = true;
+                } else if (KEY_END === key) {
+                    lastTag = toObjectValues(_tags).pop();
+                    lastTag && lastTag.focus(focusOptions);
+                    exit = true;
+                } else if (KEY_ARROW_LEFT === key) {
+                    lastTag = toObjectValues(_tags).pop();
+                    lastTag && lastTag.focus(focusOptions);
+                    exit = true;
+                } else if (KEY_DELETE_LEFT === key) {
+                    lastTag = toObjectValues(_tags).pop();
+                    lastTag && picker.let(lastTag.title);
+                    picker.focus();
+                    exit = true;
+                }
+            } else if (caretIsToTheFirst) {
+                if (KEY_ARROW_LEFT === key) {
+                    lastTag = toObjectValues(_tags).pop();
+                    lastTag && lastTag.focus(focusOptions);
+                    exit = true;
+                }
+            }
         }
         exit && offEventDefault(e);
     }
@@ -834,7 +880,7 @@
             state = picker.state,
             copy = _mask.copy,
             c = state['class'] + '__tag--focus';
-        _keyIsCtrl = false;
+        _keyIsCtrl = _keyIsShift = false;
         var selection = [];
         for (var k in _tags) {
             if (hasClass(_tags[k], c)) {
