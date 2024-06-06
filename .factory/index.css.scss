@@ -90,18 +90,6 @@ $name: 'tag-picker';
   }
 }
 
-.#{$name}__copy {
-  // height: 1px;
-  // width: 1px;
-  border: 0;
-  left: 0;
-  margin: 0;
-  opacity: 0.65;
-  padding: 0;
-  position: absolute;
-  top: 0;
-}
-
 .#{$name}__self {
   left: -9999px;
   position: fixed;
@@ -191,10 +179,10 @@ $name: 'tag-picker';
       color: var(--color-#{$name}__tag--focus, var(--color-#{$name}__tag));
     }
   }
-  &::before {
-    content: attr(title);
-    flex: 1;
-  }
+  // &::before {
+  //   content: attr(title);
+  //   flex: 1;
+  // }
   + .#{$name}__text {
     span {
       br {

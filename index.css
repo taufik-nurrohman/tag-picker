@@ -84,16 +84,6 @@
   color: var(--color-tag-picker--select, var(--color-tag-picker));
 }
 
-.tag-picker__copy {
-  border: 0;
-  left: 0;
-  margin: 0;
-  opacity: 0.65;
-  padding: 0;
-  position: absolute;
-  top: 0;
-}
-
 .tag-picker__self {
   left: -9999px;
   position: fixed;
@@ -179,10 +169,6 @@
   border-color: var(--stroke-tag-picker__tag--focus, var(--stroke-tag-picker__tag));
   box-shadow: var(--shadow-tag-picker__tag--focus, var(--shadow-tag-picker__tag));
   color: var(--color-tag-picker__tag--focus, var(--color-tag-picker__tag));
-}
-.tag-picker__tag::before {
-  content: attr(title);
-  flex: 1;
 }
 .tag-picker__tag + .tag-picker__text span br {
   display: none;
