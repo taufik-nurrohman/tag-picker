@@ -16,7 +16,6 @@
   --fill-tag-picker__tag--disabled: #aaa;
   --fill-tag-picker__tag--focus: #c00;
   --fill-tag-picker__tag--read-only: #f00;
-  --fill-tag-picker__tag--selected: #0c0;
   --fill-tag-picker__tag: #f00;
   --font-face-tag-picker: inherit;
   --font-height-tag-picker: 1.5em;
@@ -26,7 +25,6 @@
   --shadow-tag-picker__tag: none;
   --stroke-tag-picker--disabled: #666;
   --stroke-tag-picker--focus: #00f;
-  --stroke-tag-picker--select: #00f;
   --stroke-tag-picker--read-only: #666;
   --stroke-tag-picker: #000;
   --stroke-tag-picker__tag: transparent;
@@ -63,25 +61,12 @@
   position: relative;
   width: var(--width-tag-picker, auto);
 }
-.tag-picker--select .tag-picker__tag--focus {
-  --color-tag-picker__tag--focus: var(--color-tag-picker__tag--selected);
-  --fill-tag-picker__tag--focus: var(--fill-tag-picker__tag--selected);
-  --shadow-tag-picker__tag--focus: var(--shadow-tag-picker__tag--selected);
-  --stroke-tag-picker__tag--focus: var(--stroke-tag-picker__tag--selected);
-}
 
 .tag-picker--focus {
   background: var(--fill-tag-picker--focus, var(--fill-tag-picker));
   border-color: var(--stroke-tag-picker--focus, var(--stroke-tag-picker));
   box-shadow: var(--shadow-tag-picker--focus, var(--shadow-tag-picker));
   color: var(--color-tag-picker--focus, var(--color-tag-picker));
-}
-
-.tag-picker--select {
-  background: var(--fill-tag-picker--select, var(--fill-tag-picker));
-  border-color: var(--stroke-tag-picker--select, var(--stroke-tag-picker));
-  box-shadow: var(--shadow-tag-picker--select, var(--shadow-tag-picker));
-  color: var(--color-tag-picker--select, var(--color-tag-picker));
 }
 
 .tag-picker__self {

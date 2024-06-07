@@ -45,6 +45,9 @@
     var isNull = function isNull(x) {
         return null === x;
     };
+    var isNumber = function isNumber(x) {
+        return 'number' === typeof x;
+    };
     var isObject = function isObject(x, isPlain) {
         if (isPlain === void 0) {
             isPlain = true;
@@ -139,6 +142,10 @@
     var W = window;
     var getChildFirst = function getChildFirst(parent) {
         return parent.firstElementChild || null;
+    };
+    var getChildren = function getChildren(parent, index) {
+        var children = parent.children;
+        return isNumber(index) ? children[index] || null : children || [];
     };
     var getElement = function getElement(query, scope) {
         return (scope || D).querySelector(query);
@@ -354,6 +361,8 @@
     var KEY_DELETE_RIGHT = 'Delete';
     var KEY_END = 'End';
     var KEY_ENTER = 'Enter';
+    var KEY_ESCAPE = 'Escape';
+    var KEY_TAB = 'Tab';
     // <https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus#focusvisible>
     var focusOptions = {
         focusVisible: true
@@ -371,6 +380,10 @@
         }
     }
 
+    function blurFromAll() {
+        blurFrom();
+    }
+
     function focusTo(node) {
         node.focus();
     }
@@ -386,20 +399,20 @@
         }
     }
 
+    function getValue(self) {
+        return self.value.replace(/\r/g, "");
+    }
+
     function isDisabled(self) {
         return self.disabled;
     }
 
     function selectTo(node) {
         var selection = D.getSelection();
-        blurFrom();
+        blurFromAll();
         var range = D.createRange();
         range.selectNodeContents(node);
         selection.addRange(range);
-    }
-
-    function theValue(self) {
-        return self.value.replace(/\r/g, "");
     }
 
     function TagPicker(self, state) {
@@ -435,7 +448,14 @@
             return getText(this._mask.input);
         },
         set: function set(text) {
-            setText(this._mask.input, text);
+            var $ = this,
+                _mask = $._mask,
+                self = $.self,
+                hint = _mask.hint,
+                input = _mask.input;
+            text = text + "";
+            setText(hint, "" === text ? self.placeholder : "");
+            setText(input, text);
         }
     });
     defineProperty($$, 'value', {
@@ -463,12 +483,13 @@
         var $ = this,
             picker = $['_' + name];
         picker._mask;
+        picker._tags;
         var mask = picker.mask,
             state = picker.state,
             c = state['class'];
         letClass(mask, c += '--focus');
         letClass(mask, c += '-tag');
-        blurFrom();
+        blurFromAll();
     }
 
     function onBlurTextInput() {
@@ -482,7 +503,7 @@
         letClass(text, c + '__text--focus');
         letClass(mask, c += '--focus');
         letClass(mask, c += '-text');
-        blurFrom();
+        blurFromAll();
     }
 
     function onContextMenuTag(e) {
@@ -517,9 +538,9 @@
             picker = $['_' + name],
             _mask = picker._mask,
             _tags = picker._tags,
-            state = picker.state,
-            input = _mask.input,
-            c = state['class'] + '__tag--focus';
+            state = picker.state;
+        _mask.input;
+        var c = state['class'] + '__tag--focus';
         var selection = [];
         for (var k in _tags) {
             if (hasClass(_tags[k], c)) {
@@ -529,7 +550,7 @@
             }
         }
         e.clipboardData.setData('text/plain', selection.join(state.join));
-        focusTo(input), selectTo(input);
+        picker.focus();
         offEventDefault(e);
         console.log(selection);
     }
@@ -552,7 +573,7 @@
         setClass(text, c + '__text--focus');
         setClass(mask, c += '--focus');
         setClass(mask, c += '-text');
-        focusTo(input), selectTo(input);
+        picker.focus();
         delay(function () {
             return setText(hint, getText(input, false) ? "" : self.placeholder);
         }, 1)();
@@ -603,7 +624,7 @@
                 exit = true;
             }
         } else {
-            letClass($, c);
+            // letClass($, c);
             if (KEY_BEGIN === key) {
                 firstTag = toObjectValues(_tags).shift();
                 firstTag && firstTag.focus(focusOptions);
@@ -614,7 +635,11 @@
                 exit = true;
             } else if (KEY_ENTER === key || ' ' === key) {
                 toggleClass($, c);
-                if (hasClass($, c));
+                if (hasClass($, c)) {
+                    focusTo($), selectTo(getChildFirst($));
+                } else {
+                    blurFromAll();
+                }
                 exit = true;
             } else if (KEY_ARROW_LEFT === key) {
                 prevTag && prevTag.focus(focusOptions);
@@ -624,11 +649,14 @@
                 exit = true;
             } else if (KEY_DELETE_LEFT === key) {
                 picker.let($.title);
-                prevTag ? prevTag.focus(focusOptions) : picker.focus();
+                prevTag ? (focusTo(prevTag), selectTo(getChildFirst(prevTag))) : picker.focus();
                 exit = true;
             } else if (KEY_DELETE_RIGHT === key) {
                 picker.let($.title);
-                nextTag && text !== nextTag ? nextTag.focus(focusOptions) : picker.focus();
+                nextTag && text !== nextTag ? (focusTo(nextTag), selectTo(getChildFirst(nextTag))) : picker.focus();
+                exit = true;
+            } else if (KEY_ESCAPE === key || KEY_TAB === key) {
+                picker.focus();
                 exit = true;
             }
         }
@@ -648,9 +676,9 @@
             keyIsShift = e.shiftKey,
             picker = $['_' + name],
             _mask = picker._mask,
-            _tags = picker._tags,
-            mask = picker.mask,
-            self = picker.self,
+            _tags = picker._tags;
+        picker.mask;
+        var self = picker.self,
             state = picker.state,
             hint = _mask.hint,
             c = state['class'] + '__tag--focus',
@@ -672,7 +700,6 @@
                     if (lastTag) {
                         lastTag && lastTag.focus(focusOptions);
                         setClass(lastTag, c);
-                        setClass(mask, state['class'] + '--select');
                         exit = true;
                     }
                 }
@@ -771,7 +798,7 @@
         toggleClass($, c);
         if (_keyIsCtrl);
         else {
-            blurFrom();
+            blurFromAll();
             var asContextMenu = 2 === e.button,
                 // Probably a “right-click”
                 selection = 0;
@@ -783,14 +810,15 @@
                     letClass(_tags[k], c);
                 }
             }
+            // If it has selection(s) previously, use the event to cancel the other(s)
             if (selection > 0) {
-                setClass($, c);
+                setClass($, c); // Then select the current tag
             }
         }
         if (hasClass($, c)) {
             focusTo($), selectTo(getChildFirst($));
         } else {
-            blurFrom();
+            blurFromAll();
         }
         offEventDefault(e);
         offEventPropagation(e);
@@ -812,7 +840,7 @@
         state = state || $.state;
         $._active = true;
         $._tags = {};
-        $._value = theValue(self);
+        $._value = getValue(self);
         $.self = self;
         $.state = state;
         var c = state['class'],
@@ -947,8 +975,9 @@
         if (!_tags[v]) {
             return false;
         }
-        var tag = _tags[v],
-            tagX = getChildFirst(tag);
+        var tag = _tags[v];
+        getChildren(tag, 0);
+        var tagX = getChildren(tag, 1);
         offEvent('blur', tag, onBlurTag);
         offEvent('contextmenu', tag, onContextMenuTag);
         offEvent('copy', tag, onCopyTag);

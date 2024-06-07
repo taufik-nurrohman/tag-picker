@@ -1,4 +1,4 @@
-import {D, W, getChildFirst, getElement, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
+import {D, W, getChildFirst, getChildren, getElement, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
 import {delay} from '@taufik-nurrohman/tick';
 import {fromStates} from '@taufik-nurrohman/from';
 import {hook} from '@taufik-nurrohman/hook';
@@ -36,6 +36,10 @@ function blurFrom(node) {
     }
 }
 
+function blurFromAll() {
+    blurFrom();
+}
+
 function focusTo(node) {
     node.focus();
 }
@@ -50,6 +54,10 @@ function getCharBeforeCaret(container) {
     }
 }
 
+function getValue(self) {
+    return self.value.replace(/\r/g, "");
+}
+
 function isDisabled(self) {
     return self.disabled;
 }
@@ -60,14 +68,10 @@ function isReadOnly(self) {
 
 function selectTo(node) {
     const selection = D.getSelection();
-    blurFrom();
+    blurFromAll();
     const range = D.createRange();
     range.selectNodeContents(node);
     selection.addRange(range);
-}
-
-function theValue(self) {
-    return self.value.replace(/\r/g, "");
 }
 
 function TagPicker(self, state) {
@@ -114,7 +118,12 @@ defineProperty($$, 'text', {
         return getText(this._mask.input);
     },
     set: function (text) {
-        setText(this._mask.input, text);
+        let $ = this,
+            {_mask, self} = $,
+            {hint, input} = _mask;
+        text = text + "";
+        setText(hint, "" === text ? self.placeholder : "");
+        setText(input, text);
     }
 });
 
@@ -144,11 +153,16 @@ let _keyIsCtrl = false,
 function onBlurTag() {
     let $ = this,
         picker = $['_' + name],
-        {_mask, mask, state} = picker,
+        {_mask, _tags, mask, state} = picker,
         c = state['class'];
+    if (!_keyIsCtrl) {
+        for (let k in _tags) {
+            // letClass(_tags[k], c + '__tag--focus');
+        }
+    }
     letClass(mask, c += '--focus');
     letClass(mask, c += '-tag');
-    blurFrom();
+    blurFromAll();
 }
 
 function onBlurTextInput() {
@@ -160,7 +174,7 @@ function onBlurTextInput() {
     letClass(text, c + '__text--focus');
     letClass(mask, c += '--focus');
     letClass(mask, c += '-text');
-    blurFrom();
+    blurFromAll();
 }
 
 function onContextMenuTag(e) {
@@ -203,7 +217,7 @@ function onCutTag(e) {
         }
     }
     e.clipboardData.setData('text/plain', selection.join(state.join));
-    focusTo(input), selectTo(input);
+    picker.focus();
     offEventDefault(e);
     console.log(selection);
 }
@@ -221,7 +235,7 @@ function onFocusTextInput() {
     setClass(text, c + '__text--focus');
     setClass(mask, c += '--focus');
     setClass(mask, c += '-text');
-    focusTo(input), selectTo(input);
+    picker.focus();
     delay(() => setText(hint, getText(input, false) ? "" : self.placeholder), 1)();
 }
 
@@ -263,7 +277,7 @@ function onKeyDownTag(e) {
             exit = true;
         }
     } else {
-        letClass($, c);
+        // letClass($, c);
         if (KEY_BEGIN === key) {
             firstTag = toObjectValues(_tags).shift();
             firstTag && firstTag.focus(focusOptions);
@@ -275,7 +289,10 @@ function onKeyDownTag(e) {
         } else if (KEY_ENTER === key || ' ' === key) {
             toggleClass($, c);
             if (hasClass($, c)) {
+                focusTo($), selectTo(getChildFirst($));
                 _firstTagSelected = $;
+            } else {
+                blurFromAll();
             }
             exit = true;
         } else if (KEY_ARROW_LEFT === key) {
@@ -286,11 +303,14 @@ function onKeyDownTag(e) {
             exit = true;
         } else if (KEY_DELETE_LEFT === key) {
             picker.let($.title);
-            prevTag ? prevTag.focus(focusOptions) : picker.focus();
+            prevTag ? (focusTo(prevTag), selectTo(getChildFirst(prevTag))) : picker.focus();
             exit = true;
         } else if (KEY_DELETE_RIGHT === key) {
             picker.let($.title);
-            nextTag && text !== nextTag ? nextTag.focus(focusOptions) : picker.focus();
+            nextTag && text !== nextTag ? (focusTo(nextTag), selectTo(getChildFirst(nextTag))) : picker.focus();
+            exit = true;
+        } else if (KEY_ESCAPE === key || KEY_TAB === key) {
+            picker.focus();
             exit = true;
         }
     }
@@ -326,7 +346,6 @@ function onKeyDownTextInput(e) {
                 if (lastTag) {
                     lastTag && lastTag.focus(focusOptions);
                     setClass(lastTag, c);
-                    setClass(mask, state['class'] + '--select');
                     exit = true;
                 }
             }
@@ -422,7 +441,7 @@ function onPointerDownTag(e) {
     if (_keyIsCtrl) {
 
     } else {
-        blurFrom();
+        blurFromAll();
         let asContextMenu = 2 === e.button, // Probably a “right-click”
             selection = 0;
         for (let k in _tags) {
@@ -433,14 +452,15 @@ function onPointerDownTag(e) {
                 letClass(_tags[k], c);
             }
         }
+        // If it has selection(s) previously, use the event to cancel the other(s)
         if (selection > 0) {
-            setClass($, c);
+            setClass($, c); // Then select the current tag
         }
     }
     if (hasClass($, c)) {
         focusTo($), selectTo(getChildFirst($));
     } else {
-        blurFrom();
+        blurFromAll();
     }
     offEventDefault(e);
     offEventPropagation(e);
@@ -463,7 +483,7 @@ $$.attach = function (self, state) {
     state = state || $.state;
     $._active = true;
     $._tags = {};
-    $._value = theValue(self);
+    $._value = getValue(self);
     $.self = self;
     $.state = state;
     let c = state['class'],
@@ -602,7 +622,8 @@ $$.let = function (v) {
         return false;
     }
     let tag = _tags[v],
-        tagX = getChildFirst(tag);
+        tagText = getChildren(tag, 0),
+        tagX = getChildren(tag, 1);
     offEvent('blur', tag, onBlurTag);
     offEvent('contextmenu', tag, onContextMenuTag);
     offEvent('copy', tag, onCopyTag);

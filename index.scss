@@ -19,7 +19,6 @@ $name: 'tag-picker';
   --fill-#{$name}__tag--disabled: #aaa;
   --fill-#{$name}__tag--focus: #c00;
   --fill-#{$name}__tag--read-only: #f00;
-  --fill-#{$name}__tag--selected: #0c0;
   --fill-#{$name}__tag: #f00;
   --font-face-#{$name}: inherit;
   --font-height-#{$name}: 1.5em;
@@ -29,7 +28,6 @@ $name: 'tag-picker';
   --shadow-#{$name}__tag: none;
   --stroke-#{$name}--disabled: #666;
   --stroke-#{$name}--focus: #00f;
-  --stroke-#{$name}--select: #00f;
   --stroke-#{$name}--read-only: #666;
   --stroke-#{$name}: #000;
   --stroke-#{$name}__tag: transparent;
@@ -71,17 +69,9 @@ $name: 'tag-picker';
   padding: 0.125em;
   position: relative;
   width: var(--width-#{$name}, auto);
-  &--select {
-    .#{$name}__tag--focus {
-      --color-#{$name}__tag--focus: var(--color-#{$name}__tag--selected);
-      --fill-#{$name}__tag--focus: var(--fill-#{$name}__tag--selected);
-      --shadow-#{$name}__tag--focus: var(--shadow-#{$name}__tag--selected);
-      --stroke-#{$name}__tag--focus: var(--stroke-#{$name}__tag--selected);
-    }
-  }
 }
 
-@each $v in (focus, select) {
+@each $v in (focus) {
   .#{$name}--#{$v} {
     background: var(--fill-#{$name}--#{$v}, var(--fill-#{$name}));
     border-color: var(--stroke-#{$name}--#{$v}, var(--stroke-#{$name}));
@@ -179,10 +169,6 @@ $name: 'tag-picker';
       color: var(--color-#{$name}__tag--focus, var(--color-#{$name}__tag));
     }
   }
-  // &::before {
-  //   content: attr(title);
-  //   flex: 1;
-  // }
   + .#{$name}__text {
     span {
       br {
