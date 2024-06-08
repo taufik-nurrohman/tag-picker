@@ -7,13 +7,24 @@ block state
 
 block script
   script
-    | const picker = new TP(document.querySelector('input'), {
+    | const picker = new TagPicker(document.querySelector('input'), {
     |     max: 3
     | });
+    |
+    | picker.on('max.tags', function (tag) {
+    |     console.error('Maximum tags allowed to be inserted is ' + picker.state.max + '.');
+    |     tag && console.info('Last typed tag name is “' + tag + '”');
+    | });
+
+block style
+  style
+    | .tag-picker {
+    |   width: 100%;
+    | }
 
 block content
   main
-    p Maximum tags allowed: #[code 3].
+    p Maximum tags allowed to be inserted is 3. Some text to copy: #[mark(style={'user-select': 'all'} tabindex='0') foo, bar, baz, qux]
     form(method='get')
       p: input(name='tags' type='text')
       p: button(type='submit') Submit

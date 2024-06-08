@@ -9,6 +9,12 @@ block script
   script
     | const picker = new TagPicker(document.querySelector('input'));
 
+block style
+  style
+    | .tag-picker {
+    |   width: 100%;
+    | }
+
 block content
   main
     p: input(placeholder!='Tags go here&hellip;' type='text')

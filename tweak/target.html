@@ -7,26 +7,29 @@
     <title>Tag Picker</title>
     <link href="../index.min.css" rel="stylesheet">
     <style>
-      .tag-picker__tag--target:not(.tag-picker__input) {
-        background: #0f0;
+      .tag-picker {
+        width: 100%;
+      }
+      .tag-picker__tag--target {
+        background: rgb(255, 0, 0, 0.5);
       }
     </style>
   </head>
   <body>
     <main>
-      <p>Add <em>foo</em> again to see the effect:</p>
+      <p>Add <em>foo</em> again to see the effect!</p>
       <p><input type="text" value="foo, bar, baz"></p>
     </main>
     <script src="../index.min.js"></script>
     <script>
-      const picker = new TP(document.querySelector('input'));
-      picker.on('has.tag', function (tag, index) {
-          const node = this.self.querySelector('.' + this.state['class'] + '__tag[title="' + tag + '"]');
+      const picker = new TagPicker(document.querySelector('input'));
+      picker.on('has.tag', function (tag) {
+          const node = this._tags[tag];
           if (node) {
-              node.classList.add(this.state['class'] + '__tag--target');
+              node.classList.add(this.state.n + '__tag--target');
               setTimeout(() => {
-                  node.classList.remove(this.state['class'] + '__tag--target');
-              }, 2000);
+                  node.classList.remove(this.state.n + '__tag--target');
+              }, 1000);
           }
       });
     </script>

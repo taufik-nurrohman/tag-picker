@@ -7,13 +7,19 @@ block state
 
 block script
   script
-    | const picker = new TP(document.querySelector('input'));
+    | const picker = new TagPicker(document.querySelector('input'));
     |
-    | picker.on('has.tag', (tag, index) => {
-    |     alert('Tag “' + tag + '” already exists at index “' + index + '”.');
+    | picker.on('has.tag', function (tag) {
+    |     alert('Tag “' + tag + '” already exists.');
     | });
+
+block style
+  style
+    | .tag-picker {
+    |   width: 100%;
+    | }
 
 block content
   main
-    p Add #[em foo] again to see the default effect:
+    p Add #[em foo] again to see the effect!
     p: input(type='text' value='foo, bar, baz')

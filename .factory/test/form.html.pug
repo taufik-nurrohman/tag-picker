@@ -7,22 +7,27 @@ block state
 
 block script
   script
-    | const form = document.forms[0];
-    | const picker = new TP(form.test);
+    | const picker = new TagPicker(document.forms[0].tags);
     |
-    | form.addEventListener('submit', e => {
-    |     console.log(form.test.value);
-    |     form.js.checked && e.preventDefault();
+    | picker.self.form.addEventListener('submit', function (e) {
+    |     console.log(picker.value);
+    |     this.prevent.checked && e.preventDefault();
     | });
+
+block style
+  style
+    | .tag-picker {
+    |   width: 100%;
+    | }
 
 block content
   main
-    p Submitting a form by pressing the submit button vs. pressing the #[kbd Enter] key in tag picker element.
+    p Submitting a form by pressing the #[em Submit] button vs. pressing the #[kbd Enter] key in a tag picker visual.
     form(method='get' target='_blank')
-      p: input(name='test' type='text')
+      p: input(name='tags' type='text' value='foo, bar')
       p
         label
-          input(name='js' type='checkbox')
+          input(name='prevent' type='checkbox')
           = ' '
           span Test Default Prevention via JavaScript
       p: button(type='submit') Submit

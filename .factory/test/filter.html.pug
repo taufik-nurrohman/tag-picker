@@ -7,13 +7,19 @@ block state
 
 block script
   script
-    | const picker = new TP(document.querySelector('input'));
+    | const picker = new TagPicker(document.querySelector('input'));
     |
-    | picker.f = text => {
+    | picker._filter = text => {
     |     return (text || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "");
     | };
 
+block style
+  style
+    | .tag-picker {
+    |   width: 100%;
+    | }
+
 block content
   main
-    p Replace all characters except #[code='[a-z0-9-]'] and convert all characters to their lower-case mode:
+    p Convert tag name to #[code kebab-case].
     p: input(type='text')

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p>Some text to copy: <mark style="user-select:all;" tabindex="0">foo, bar, baz, qux</mark></p>
+      <p><input type="text" value="a, b, c, d"></p>
+    </main>
+    <script src="../index.min.js"></script>
+    <script>
+      const picker = new TagPicker(document.querySelector('input'));
+      picker.on('copy', function (e, tags) {
+          console.info('Tags “' + tags.join(this.state.join) + '” copied successfully.');
+      });
+      picker.on('cut', function (e, tags) {
+          console.info('Tags “' + tags.join(this.state.join) + '” cut successfully.');
+      });
+      picker.on('paste', function (e, tags) {
+          console.info('Tags “' + tags.join(this.state.join) + '” are going to be pasted.');
+      });
+      picker.on('let.tag', function (tag) {
+          console.info('Tag “' + tag + '” deleted successfully.');
+      });
+      picker.on('set.tag', function (tag) {
+          console.info('Tag “' + tag + '” inserted successfully.');
+      });
+    </script>
+  </body>
+</html>

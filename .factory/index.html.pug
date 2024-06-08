@@ -15,6 +15,12 @@ block script
 
 block style
   style
+    | .tag-picker,
+    | .tag-picker__tag,
+    | .tag-picker__text {
+    |   border-width: 2px;
+    | }
+    |
     | .tag-picker {
     |   border-color: #000;
     |   color: #000;
@@ -22,21 +28,15 @@ block style
     |   line-height: calc(1.5em - 4px);
     | }
     |
-    | .tag-picker,
-    | .tag-picker__tag,
-    | .tag-picker__text {
-    |   border-width: 2px;
+    | .tag-picker.tag-picker--focus {
+    |   border-color: #00f;
+    |   box-shadow: 0 0 0 4px rgba(0, 0, 255, 0.25);
     | }
     |
     | .tag-picker__tag {
     |   background: #f00;
     |   border-color: transparent;
     |   gap: 0.5em;
-    |   padding-left: 0.5em;
-    |   padding-right: 0.5em;
-    | }
-    |
-    | .tag-picker__text {
     |   padding-left: 0.5em;
     |   padding-right: 0.5em;
     | }
@@ -59,21 +59,20 @@ block style
     |   padding: 2px;
     | }
     |
-    | .tag-picker.tag-picker--focus {
-    |   border-color: #00f;
-    |   box-shadow: 0 0 0 4px rgba(0, 0, 255, 0.25);
+    | .tag-picker__text {
+    |   padding-left: 0.5em;
+    |   padding-right: 0.5em;
     | }
 
 block content
   p(role='alert') Do you like this project? Please support my #[a(href='https://github.com/mecha-cms') Mecha CMS] project too. Thank you!
   header
-    h1= title
-    p Tag Picker is a simple JavaScript application that aims to provide better experience for users in adding and removing comma-separated list of words.
-    hr
+    hgroup
+      h1= title
+      p Tag Picker is a JavaScript application designed to simplify the management of comma-separated lists of words, offering a minimalist interface for an enhanced user experience. Users can easily add tags by typing a word and pressing the #[kbd ,] key (by default), or remove tags with a quick click (or by using common keys such as the #[kbd Backspace] or #[kbd Delete] keys). Developers can easily integrate and customize this application styles to match the design of their web project.
+    p It supports native keyboard interaction as if it were plain text. You should be able to copy, cut, and paste from/to the visual. Click a tag to select it, press the #[kbd Control] key while clicking the tag to select multiple tags. You can also select the tags using a combination of #[kbd Shift] and #[kbd ArrowLeft] or #[kbd ArrowRight] keys.
   main
-    p Tags are comma-separated list of words. This application has support for hooks, so you can listen to events that occur at each interaction to provide additional features. Each tag item can also be selected using the arrow keys and a mouse click to perform actions on the selected tag, for example, to delete the tag.
     form(method='get' target='_blank')
-      p(tabindex='0') Previous tabbable element.
       p(role='group')
         input(id='tags' name='tags' placeholder='foo, bar, baz' type='text' value='foo, bar')
         = ' '
@@ -83,6 +82,8 @@ block content
     h2#usage
       a(href='#usage') #
       = ' Usage'
+    div(role='note')
+      p #[strong Note:] CSS variables have been removed since version 4.0.0. From now on, I will provide a minimal style just to make the interaction decent. Expect it to look ugly by default. The main goal of this application is to be able to integrate it seamlessly into your web design. By providing a minimal style, it is easy to add other styles to adapt it to your web design. Have a look at the source code on this page to see how I adapted the style so that it resembles the default style of the previous version.
     h3 Browser
     pre: code
       | &lt;!DOCTYPE html&gt;
@@ -90,6 +91,11 @@ block content
       |   &lt;head&gt;
       |     &lt;meta charset="utf-8"&gt;
       |     &lt;link href="#[a(href='index.min.css' target='_blank') ./index.min.css]" rel="stylesheet"&gt;
+      |     &lt;style&gt;
+      |       .tag-picker {
+      |         width: 100%;
+      |       }
+      |     &lt;/style&gt;
       |   &lt;/head&gt;
       |   &lt;body&gt;
       |     &lt;p&gt;
@@ -113,28 +119,33 @@ block content
       | import TagPicker from '@taufik-nurrohman/tag-picker';
       |
       | const picker = new TagPicker(document.querySelector('input'));
-    h2#examples
-      a(href='#examples') #
-      = ' Examples'
+    h2#tests
+      a(href='#tests') #
+      = ' Tests'
     ul
       li: a(href='test.html' target='_blank') No Idea?
-      li: a(href='test/value.html' target='_blank') Set Pre-Defined Value
-      li: a(href='test/hint.html' target='_blank') Set Hint/Placeholder
-      li: a(href='test/focus.html' target='_blank') Focus State
-      li: a(href='tweak/invalid.html' target='_blank') Invalid State (Custom)
-      li: a(href='tweak/focus.hint.html' target='_blank') Hide Hint/Placeholder on Focus
+      li: a(href='test/copy,cut,paste.html' target='_blank') Copy, Cut, and Paste Events
       li: a(href='test/disabled.html' target='_blank') Disabled Input
-      li: a(href='test/read-only.html' target='_blank') Read-Only Input
-      li: a(href='test/min.html' target='_blank') Limit Minimum Tags
-      li: a(href='test/max.html' target='_blank') Limit Maximum Tags
-      li: a(href='test/not.html' target='_blank') Check for Valid Tag Pattern
-      li: a(href='test/form.html' target='_blank') Form Event
-      li: a(href='test/paste.html' target='_blank') Paste Event
-      li: a(href='tweak/alert.html' target='_blank') Warn for Duplicate Tags with Alert Message
-      li: a(href='tweak/target.html' target='_blank') Warn for Duplicate Tags with Flash Highlight
       li: a(href='test/escape.html' target='_blank') Disable Characters with #[code picker.state.escape]
-      li: a(href='test/f.html' target='_blank') Filter Characters with #[code picker.f()] Method
-      li #[a(href='tweak/path.html' target='_blank') Directory] (Experiment)
+      li: a(href='test/filter.html' target='_blank') Filter Characters with #[code picker._filter()]
+      li: a(href='test/focus-auto.html' target='_blank') Focus Automatically
+      li: a(href='test/focus.html' target='_blank') Focus States
+      li: a(href='test/form.html' target='_blank') Form Events
+      li: a(href='test/hint.html' target='_blank') Set Input Hint
+      li: a(href='test/max.html' target='_blank') Limit Maximum Tags
+      li: a(href='test/min.html' target='_blank') Limit Minimum Tags
+      li: a(href='test/not.html' target='_blank') Validate Tag Names with #[code picker.state.pattern]
+      li: a(href='test/read-only.html' target='_blank') Read-Only Input
+      li: a(href='test/value.html' target='_blank') Set Pre-Defined Value
+    h2#tweaks
+      a(href='#tweaks') #
+      = ' Tweaks'
+    ul
+      li: a(href='tweak/alert.html' target='_blank') Warn for Duplicate Tags with Alert Message
+      li: a(href='tweak/focus.hint.html' target='_blank') Hide Input Hint on Focus
+      li: a(href='tweak/insert.html' target='_blank') Insert Tag Name on Blur
+      li: a(href='tweak/invalid.html' target='_blank') Invalid State (Custom)
+      li: a(href='tweak/target.html' target='_blank') Warn for Duplicate Tags with Flash Highlight
     h2#constructor
       a(href='#constructor') #
       = ' Constructor'
@@ -180,9 +191,9 @@ block content
      a(href='#properties') #
      = ' Properties'
     h3 Instance Properties
-    p Instance properties are properties that are available through the results of a #[code TextEditor] construct.
+    p Instance properties are properties that are available through the results of a #[code TagPicker] construct.
     h3 Static Properties
-    p Static properties are properties that are directly available on the #[code TextEditor] object.
+    p Static properties are properties that are directly available on the #[code TagPicker] object.
     h2#extensions
       a(href='#extensions') #
       = ' Extensions'

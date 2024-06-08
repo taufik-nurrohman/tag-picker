@@ -9,6 +9,12 @@
     <link href="../layout/index.min.css" rel="stylesheet">
     <link href="index.min.css" rel="stylesheet">
     <style>
+      .tag-picker,
+      .tag-picker__tag,
+      .tag-picker__text {
+        border-width: 2px;
+      }
+
       .tag-picker {
         border-color: #000;
         color: #000;
@@ -16,21 +22,15 @@
         line-height: calc(1.5em - 4px);
       }
 
-      .tag-picker,
-      .tag-picker__tag,
-      .tag-picker__text {
-        border-width: 2px;
+      .tag-picker.tag-picker--focus {
+        border-color: #00f;
+        box-shadow: 0 0 0 4px rgba(0, 0, 255, 0.25);
       }
 
       .tag-picker__tag {
         background: #f00;
         border-color: transparent;
         gap: 0.5em;
-        padding-left: 0.5em;
-        padding-right: 0.5em;
-      }
-
-      .tag-picker__text {
         padding-left: 0.5em;
         padding-right: 0.5em;
       }
@@ -53,32 +53,40 @@
         padding: 2px;
       }
 
-      .tag-picker.tag-picker--focus {
-        border-color: #00f;
-        box-shadow: 0 0 0 4px rgba(0, 0, 255, 0.25);
+      .tag-picker__text {
+        padding-left: 0.5em;
+        padding-right: 0.5em;
       }
     </style>
   </head>
   <body>
     <p role="alert">Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
-      <h1>Tag Picker 4.0.0</h1>
-      <p>Tag Picker is a simple JavaScript application that aims to provide better experience for users in adding and removing comma-separated list of words.</p>
-      <hr>
+      <hgroup>
+        <h1>Tag Picker 4.0.0</h1>
+        <p>Tag Picker is a JavaScript application designed to simplify the management of comma-separated lists of words, offering a minimalist interface for an enhanced user experience. Users can easily add tags by typing a word and pressing the <kbd>,</kbd> key (by default), or remove tags with a quick click (or by using common keys such as the <kbd>Backspace</kbd> or <kbd>Delete</kbd> keys). Developers can easily integrate and customize this application styles to match the design of their web project.</p>
+      </hgroup>
+      <p>It supports native keyboard interaction as if it were plain text. You should be able to copy, cut, and paste from/to the visual. Click a tag to select it, press the <kbd>Control</kbd> key while clicking the tag to select multiple tags. You can also select the tags using a combination of <kbd>Shift</kbd> and <kbd>ArrowLeft</kbd> or <kbd>ArrowRight</kbd> keys.</p>
     </header>
     <main>
-      <p>Tags are comma-separated list of words. This application has support for hooks, so you can listen to events that occur at each interaction to provide additional features. Each tag item can also be selected using the arrow keys and a mouse click to perform actions on the selected tag, for example, to delete the tag.</p>
       <form method="get" target="_blank">
-        <p tabindex="0">Previous tabbable element.</p>
         <p role="group"><input id="tags" name="tags" placeholder="foo, bar, baz" type="text" value="foo, bar"> <button type="submit">Submit</button> <button type="reset">Reset</button></p>
       </form>
       <h2 id="usage"><a href="#usage">#</a> Usage</h2>
+      <div role="note">
+        <p><strong>Note:</strong> CSS variables have been removed since version 4.0.0. From now on, I will provide a minimal style just to make the interaction decent. Expect it to look ugly by default. The main goal of this application is to be able to integrate it seamlessly into your web design. By providing a minimal style, it is easy to add other styles to adapt it to your web design. Have a look at the source code on this page to see how I adapted the style so that it resembles the default style of the previous version.</p>
+      </div>
       <h3>Browser</h3>
       <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html dir="ltr"&gt;
   &lt;head&gt;
     &lt;meta charset="utf-8"&gt;
     &lt;link href="<a href="index.min.css" target="_blank">./index.min.css</a>" rel="stylesheet"&gt;
+    &lt;style&gt;
+      .tag-picker {
+        width: 100%;
+      }
+    &lt;/style&gt;
   &lt;/head&gt;
   &lt;body&gt;
     &lt;p&gt;
@@ -100,26 +108,30 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <pre><code>import TagPicker from '@taufik-nurrohman/tag-picker';
 
 const picker = new TagPicker(document.querySelector('input'));</code></pre>
-      <h2 id="examples"><a href="#examples">#</a> Examples</h2>
+      <h2 id="tests"><a href="#tests">#</a> Tests</h2>
       <ul>
         <li><a href="test.html" target="_blank">No Idea?</a></li>
-        <li><a href="test/value.html" target="_blank">Set Pre-Defined Value</a></li>
-        <li><a href="test/hint.html" target="_blank">Set Hint/Placeholder</a></li>
-        <li><a href="test/focus.html" target="_blank">Focus State</a></li>
-        <li><a href="tweak/invalid.html" target="_blank">Invalid State (Custom)</a></li>
-        <li><a href="tweak/focus.hint.html" target="_blank">Hide Hint/Placeholder on Focus</a></li>
+        <li><a href="test/copy,cut,paste.html" target="_blank">Copy, Cut, and Paste Events</a></li>
         <li><a href="test/disabled.html" target="_blank">Disabled Input</a></li>
-        <li><a href="test/read-only.html" target="_blank">Read-Only Input</a></li>
-        <li><a href="test/min.html" target="_blank">Limit Minimum Tags</a></li>
-        <li><a href="test/max.html" target="_blank">Limit Maximum Tags</a></li>
-        <li><a href="test/not.html" target="_blank">Check for Valid Tag Pattern</a></li>
-        <li><a href="test/form.html" target="_blank">Form Event</a></li>
-        <li><a href="test/paste.html" target="_blank">Paste Event</a></li>
-        <li><a href="tweak/alert.html" target="_blank">Warn for Duplicate Tags with Alert Message</a></li>
-        <li><a href="tweak/target.html" target="_blank">Warn for Duplicate Tags with Flash Highlight</a></li>
         <li><a href="test/escape.html" target="_blank">Disable Characters with <code>picker.state.escape</code></a></li>
-        <li><a href="test/f.html" target="_blank">Filter Characters with <code>picker.f()</code> Method</a></li>
-        <li><a href="tweak/path.html" target="_blank">Directory</a> (Experiment)</li>
+        <li><a href="test/filter.html" target="_blank">Filter Characters with <code>picker._filter()</code></a></li>
+        <li><a href="test/focus-auto.html" target="_blank">Focus Automatically</a></li>
+        <li><a href="test/focus.html" target="_blank">Focus States</a></li>
+        <li><a href="test/form.html" target="_blank">Form Events</a></li>
+        <li><a href="test/hint.html" target="_blank">Set Input Hint</a></li>
+        <li><a href="test/max.html" target="_blank">Limit Maximum Tags</a></li>
+        <li><a href="test/min.html" target="_blank">Limit Minimum Tags</a></li>
+        <li><a href="test/not.html" target="_blank">Validate Tag Names with <code>picker.state.pattern</code></a></li>
+        <li><a href="test/read-only.html" target="_blank">Read-Only Input</a></li>
+        <li><a href="test/value.html" target="_blank">Set Pre-Defined Value</a></li>
+      </ul>
+      <h2 id="tweaks"><a href="#tweaks">#</a> Tweaks</h2>
+      <ul>
+        <li><a href="tweak/alert.html" target="_blank">Warn for Duplicate Tags with Alert Message</a></li>
+        <li><a href="tweak/focus.hint.html" target="_blank">Hide Input Hint on Focus</a></li>
+        <li><a href="tweak/insert.html" target="_blank">Insert Tag Name on Blur</a></li>
+        <li><a href="tweak/invalid.html" target="_blank">Invalid State (Custom)</a></li>
+        <li><a href="tweak/target.html" target="_blank">Warn for Duplicate Tags with Flash Highlight</a></li>
       </ul>
       <h2 id="constructor"><a href="#constructor">#</a> Constructor</h2>
       <pre><code>const picker = new TagPicker(self, join = ', ');</code></pre>
@@ -157,9 +169,9 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <p>Static methods are methods that are directly available on the <code>TagPicker</code> object.</p>
       <h2 id="properties"><a href="#properties">#</a> Properties</h2>
       <h3>Instance Properties</h3>
-      <p>Instance properties are properties that are available through the results of a <code>TextEditor</code> construct.</p>
+      <p>Instance properties are properties that are available through the results of a <code>TagPicker</code> construct.</p>
       <h3>Static Properties</h3>
-      <p>Static properties are properties that are directly available on the <code>TextEditor</code> object.</p>
+      <p>Static properties are properties that are directly available on the <code>TagPicker</code> object.</p>
       <h2 id="extensions"><a href="#extensions">#</a> Extensions</h2>
       <h3>Anatomy of an Extension</h3>
       <p>Extension as a function:</p>

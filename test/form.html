@@ -6,23 +6,27 @@
     <meta content="Better tags input interaction with JavaScript." name="description">
     <title>Tag Picker</title>
     <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker {
+        width: 100%;
+      }
+    </style>
   </head>
   <body>
     <main>
-      <p>Submitting a form by pressing the submit button vs. pressing the <kbd>Enter</kbd> key in tag picker element.</p>
+      <p>Submitting a form by pressing the <em>Submit</em> button vs. pressing the <kbd>Enter</kbd> key in a tag picker visual.</p>
       <form method="get" target="_blank">
-        <p><input name="test" type="text"></p>
-        <p><label><input name="js" type="checkbox"> <span>Test Default Prevention via JavaScript</span></label></p>
+        <p><input name="tags" type="text" value="foo, bar"></p>
+        <p><label><input name="prevent" type="checkbox"> <span>Test Default Prevention via JavaScript</span></label></p>
         <p><button type="submit">Submit</button></p>
       </form>
     </main>
     <script src="../index.min.js"></script>
     <script>
-      const form = document.forms[0];
-      const picker = new TP(form.test);
-      form.addEventListener('submit', e => {
-          console.log(form.test.value);
-          form.js.checked && e.preventDefault();
+      const picker = new TagPicker(document.forms[0].tags);
+      picker.self.form.addEventListener('submit', function (e) {
+          console.log(picker.value);
+          this.prevent.checked && e.preventDefault();
       });
     </script>
   </body>

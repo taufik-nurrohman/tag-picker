@@ -15,9 +15,15 @@ block script
     |     join: '; '
     | });
 
+block style
+  style
+    | .tag-picker {
+    |   width: 100%;
+    | }
+
 block content
   main
-    p Using #[code ,] as tag separator (default):
+    p Using #[code ,] as tags separator (default):
     p: input(type='text' value='foo, bar, baz')
-    p Using #[code ;] as tag separator:
+    p Using #[code ;] as tags separator:
     p: input(type='text' value='foo; bar; baz')

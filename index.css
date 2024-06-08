@@ -20,6 +20,7 @@
   display: inline-flex;
   flex-wrap: wrap;
   position: relative;
+  vertical-align: middle;
 }
 
 .tag-picker__self {

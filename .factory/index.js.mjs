@@ -1,6 +1,7 @@
 import {D, W, getAttribute, getChildFirst, getChildren, getElement, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
 import {delay} from '@taufik-nurrohman/tick';
 import {fromHTML, fromStates} from '@taufik-nurrohman/from';
+import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isDefined, isFunction, isInstance, isObject, isSet, isString} from '@taufik-nurrohman/is';
 import {offEvent, offEventDefault, offEventPropagation, onEvent} from '@taufik-nurrohman/event';
@@ -131,6 +132,7 @@ defineProperty($$, 'text', {
         text = text + "";
         setText(hint, "" === text ? self.placeholder : "");
         setText(input, text);
+        selectTo(input);
     }
 });
 
@@ -179,6 +181,7 @@ function onBlurTextInput(e) {
     letClass(text, n + '__text--focus');
     letClass(mask, n += '--focus');
     letClass(mask, n += '-text');
+    picker.fire('blur', [e]);
 }
 
 function onClickMask(e) {
@@ -213,7 +216,7 @@ function onCopyTag(e) {
         }
     }
     e.clipboardData.setData('text/plain', selection.join(state.join));
-    picker.fire('copy', [e]).focus();
+    picker.fire('copy', [e, selection]).focus();
     offEventDefault(e);
 }
 
@@ -230,11 +233,11 @@ function onCutTag(e) {
         }
     }
     e.clipboardData.setData('text/plain', selection.join(state.join));
-    picker.fire('cut', [e]).focus();
+    picker.fire('cut', [e, selection]).focus();
     offEventDefault(e);
 }
 
-function onFocusTextInput() {
+function onFocusTextInput(e) {
     let $ = this,
         picker = $['_' + name],
         {_mask, _tags, mask, self, state} = picker,
@@ -247,7 +250,7 @@ function onFocusTextInput() {
     setClass(mask, n += '--focus');
     setClass(mask, n += '-text');
     delay(() => setText(hint, getText(input, false) ? "" : self.placeholder), 1)();
-    picker.focus();
+    picker.focus().fire('focus', [e]);
 }
 
 function onFocusSelf() {
@@ -400,7 +403,11 @@ function onInputTextInput(e) {
         picker = $['_' + name],
         {state} = picker,
         escape = state.escape;
-    if (escape.includes(key)) {
+    if (
+        ('\n' === key && (hasValue('\n', escape) || hasValue(13, escape))) ||
+        ('\t' === key && (hasValue('\t', escape) || hasValue(9, escape))) ||
+        (hasValue(key, escape))
+    ) {
         return picker.set(getText($).slice(0, -1)).focus().text = "", offEventDefault(e);
     }
 }
@@ -420,7 +427,11 @@ function onKeyDownTextInput(e) {
     if (!_active) {
         return offEventDefault(e);
     }
-    if (escape.includes(key) || escape.includes(keyCode)) {
+    if (
+        (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape))) ||
+        (KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape))) ||
+        (hasValue(key, escape) || hasValue(keyCode, escape))
+    ) {
         return picker.set(getText($)).focus().text = "", offEventDefault(e);
     }
     delay(() => setText(hint, getText($, false) ? "" : self.placeholder), 1)();
@@ -522,7 +533,7 @@ function onPasteTag(e) {
     if (isAllSelected) {
         picker.value.split(state.join).forEach(tag => picker.let(tag));
     }
-    value.split(state.join).forEach(tag => picker.set(tag)), picker.fire('paste.tag', [e]).focus(), offEventDefault(e);
+    value.split(state.join).forEach(tag => picker.set(tag)), picker.fire('paste', [e, value.split(state.join)]).focus(), offEventDefault(e);
 }
 
 function onPasteTextInput(e) {
@@ -532,7 +543,7 @@ function onPasteTextInput(e) {
         {hint} = _mask;
     let value = (e.clipboardData || W.clipboardData).getData('text') + "";
     setValueAtCaret($, value), setText(hint, getText($) ? "" : self.placeholder);
-    picker.fire('paste', [e]);
+    picker.fire('paste', [e, value.split(state.join)]);
     delay(() => {
         value = getText($);
         picker.text = "";
@@ -598,6 +609,15 @@ function onResetForm() {
     picker.let();
 }
 
+function onSubmitForm(e) {
+    let $ = this,
+        picker = $['_' + name],
+        {_tags, state} = picker;
+    if (toObjectCount(_tags) < state.min) {
+        picker.fire('min.tags').focus(), offEventDefault(e);
+    }
+}
+
 $$.attach = function (self, state) {
     let $ = this;
     self = self || $.self;
@@ -634,6 +654,7 @@ $$.attach = function (self, state) {
     if (form) {
         form['_' + name] = $;
         onEvent('reset', form, onResetForm);
+        onEvent('submit', form, onSubmitForm);
     }
     onEvent('blur', textInput, onBlurTextInput);
     onEvent('click', mask, onClickMask);
@@ -675,9 +696,6 @@ $$.attach = function (self, state) {
             }
         }
     }
-    if (getAttribute(self, 'autofocus')) {
-        return $.focus();
-    }
     return $;
 };
 
@@ -689,7 +707,7 @@ $$.blur = function () {
     for (let k in _tags) {
         _tags[k].blur();
     }
-    return input.blur(), $.fire('blur');
+    return input.blur();
 };
 
 $$.detach = function () {
@@ -700,6 +718,7 @@ $$.detach = function () {
     $._active = false;
     if (form) {
         offEvent('reset', form, onResetForm);
+        offEvent('submit', form, onSubmitForm);
     }
     offEvent('blur', input, onBlurTextInput);
     offEvent('click', mask, onClickMask);
@@ -736,7 +755,7 @@ $$.focus = function () {
     let $ = this,
         {_mask} = $,
         {input} = _mask;
-    return (input && (focusTo(input), selectTo(input))), $.fire('focus');
+    return (input && (focusTo(input), selectTo(input))), $;
 };
 
 $$.get = function (v) {
@@ -765,7 +784,6 @@ $$.let = function (v) {
     if (toObjectCount(_tags) < state.min) {
         return $.fire('min.tags', [v]);
     }
-    $.fire('let.tag', [v]);
     if (!_tags[v]) {
         return $;
     }
@@ -786,7 +804,7 @@ $$.let = function (v) {
     offEvent('touchstart', tagX, onPointerDownTagX);
     letElement(tag);
     delete $._tags[v];
-    return (self.value = toObjectKeys($._tags).join(state.join)), $;
+    return (self.value = toObjectKeys($._tags).join(state.join)), $.fire('let.tag', [v]);
 };
 
 $$.set = function (v, force) {
@@ -798,7 +816,7 @@ $$.set = function (v, force) {
     if (!_active && !force) {
         return $;
     }
-    if (toObjectCount(_tags) > state.max) {
+    if (toObjectCount(_tags) >= state.max) {
         return $.fire('max.tags', [v]);
     }
     if (isFunction(_filter)) {
@@ -811,6 +829,7 @@ $$.set = function (v, force) {
     if (_tags[v]) {
         return $.fire('has.tag', [v]);
     }
+    $.fire('is.tag', [v]);
     const tag = setElement('span', {
         'class': n += '__tag',
         'tabindex': _active ? -1 : false,
@@ -840,7 +859,7 @@ $$.set = function (v, force) {
     setChildLast(tag, tagX);
     setPrev(text, tag);
     $._tags[v] = tag;
-    return (self.value = toObjectKeys($._tags).join(state.join)), $;
+    return (self.value = toObjectKeys($._tags).join(state.join)), $.fire('set.tag', [v]);
 };
 
 export default TagPicker;

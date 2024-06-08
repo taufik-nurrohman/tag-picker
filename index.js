@@ -514,6 +514,7 @@
             text = text + "";
             setText(hint, "" === text ? self.placeholder : "");
             setText(input, text);
+            selectTo(input);
         }
     });
     defineProperty($$, 'value', {
@@ -568,6 +569,7 @@
         letClass(text, n + '__text--focus');
         letClass(mask, n += '--focus');
         letClass(mask, n += '-text');
+        picker.fire('blur', [e]);
     }
 
     function onClickMask(e) {
@@ -604,7 +606,7 @@
             }
         }
         e.clipboardData.setData('text/plain', selection.join(state.join));
-        picker.fire('copy', [e]).focus();
+        picker.fire('copy', [e, selection]).focus();
         offEventDefault(e);
     }
 
@@ -623,11 +625,11 @@
             }
         }
         e.clipboardData.setData('text/plain', selection.join(state.join));
-        picker.fire('cut', [e]).focus();
+        picker.fire('cut', [e, selection]).focus();
         offEventDefault(e);
     }
 
-    function onFocusTextInput() {
+    function onFocusTextInput(e) {
         var $ = this,
             picker = $['_' + name],
             _mask = picker._mask,
@@ -648,7 +650,7 @@
         delay(function () {
             return setText(hint, getText(input, false) ? "" : self.placeholder);
         }, 1)();
-        picker.focus();
+        picker.focus().fire('focus', [e]);
     }
 
     function onFocusSelf() {
@@ -807,7 +809,7 @@
             picker = $['_' + name],
             state = picker.state,
             escape = state.escape;
-        if (escape.includes(key)) {
+        if ('\n' === key && (hasValue('\n', escape) || hasValue(13, escape)) || '\t' === key && (hasValue('\t', escape) || hasValue(9, escape)) || hasValue(key, escape)) {
             return picker.set(getText($).slice(0, -1)).focus().text = "", offEventDefault(e);
         }
     }
@@ -834,7 +836,7 @@
         if (!_active) {
             return offEventDefault(e);
         }
-        if (escape.includes(key) || escape.includes(keyCode)) {
+        if (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape)) || KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape)) || hasValue(key, escape) || hasValue(keyCode, escape)) {
             return picker.set(getText($)).focus().text = "", offEventDefault(e);
         }
         delay(function () {
@@ -943,7 +945,7 @@
         }
         value.split(state.join).forEach(function (tag) {
             return picker.set(tag);
-        }), picker.fire('paste.tag', [e]).focus(), offEventDefault(e);
+        }), picker.fire('paste', [e, value.split(state.join)]).focus(), offEventDefault(e);
     }
 
     function onPasteTextInput(e) {
@@ -955,7 +957,7 @@
             hint = _mask.hint;
         var value = (e.clipboardData || W.clipboardData).getData('text') + "";
         setValueAtCaret($, value), setText(hint, getText($) ? "" : self.placeholder);
-        picker.fire('paste', [e]);
+        picker.fire('paste', [e, value.split(state.join)]);
         delay(function () {
             value = getText($);
             picker.text = "";
@@ -1024,6 +1026,16 @@
             picker = $['_' + name];
         picker.let();
     }
+
+    function onSubmitForm(e) {
+        var $ = this,
+            picker = $['_' + name],
+            _tags = picker._tags,
+            state = picker.state;
+        if (toObjectCount(_tags) < state.min) {
+            picker.fire('min.tags').focus(), offEventDefault(e);
+        }
+    }
     $$.attach = function (self, state) {
         var $ = this;
         self = self || $.self;
@@ -1060,6 +1072,7 @@
         if (form) {
             form['_' + name] = $;
             onEvent('reset', form, onResetForm);
+            onEvent('submit', form, onSubmitForm);
         }
         onEvent('blur', textInput, onBlurTextInput);
         onEvent('click', mask, onClickMask);
@@ -1103,9 +1116,6 @@
                 }
             }
         }
-        if (getAttribute(self, 'autofocus')) {
-            return $.focus();
-        }
         return $;
     };
     $$.blur = function () {
@@ -1117,7 +1127,7 @@
         for (var k in _tags) {
             _tags[k].blur();
         }
-        return input.blur(), $.fire('blur');
+        return input.blur();
     };
     $$.detach = function () {
         var $ = this,
@@ -1130,6 +1140,7 @@
         $._active = false;
         if (form) {
             offEvent('reset', form, onResetForm);
+            offEvent('submit', form, onSubmitForm);
         }
         offEvent('blur', input, onBlurTextInput);
         offEvent('click', mask, onClickMask);
@@ -1165,7 +1176,7 @@
         var $ = this,
             _mask = $._mask,
             input = _mask.input;
-        return input && (focusTo(input), selectTo(input)), $.fire('focus');
+        return input && (focusTo(input), selectTo(input)), $;
     };
     $$.get = function (v) {
         var $ = this,
@@ -1201,7 +1212,6 @@
         if (toObjectCount(_tags) < state.min) {
             return $.fire('min.tags', [v]);
         }
-        $.fire('let.tag', [v]);
         if (!_tags[v]) {
             return $;
         }
@@ -1222,7 +1232,7 @@
         offEvent('touchstart', tagX, onPointerDownTagX);
         letElement(tag);
         delete $._tags[v];
-        return self.value = toObjectKeys($._tags).join(state.join), $;
+        return self.value = toObjectKeys($._tags).join(state.join), $.fire('let.tag', [v]);
     };
     $$.set = function (v, force) {
         var $ = this,
@@ -1238,7 +1248,7 @@
         if (!_active && !force) {
             return $;
         }
-        if (toObjectCount(_tags) > state.max) {
+        if (toObjectCount(_tags) >= state.max) {
             return $.fire('max.tags', [v]);
         }
         if (isFunction(_filter)) {
@@ -1251,6 +1261,7 @@
         if (_tags[v]) {
             return $.fire('has.tag', [v]);
         }
+        $.fire('is.tag', [v]);
         var tag = setElement('span', {
             'class': n += '__tag',
             'tabindex': _active ? -1 : false,
@@ -1280,7 +1291,7 @@
         setChildLast(tag, tagX);
         setPrev(text, tag);
         $._tags[v] = tag;
-        return self.value = toObjectKeys($._tags).join(state.join), $;
+        return self.value = toObjectKeys($._tags).join(state.join), $.fire('set.tag', [v]);
     };
     return TagPicker;
 }));

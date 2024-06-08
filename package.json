@@ -6,7 +6,7 @@
     "@taufik-nurrohman/document": "*",
     "@taufik-nurrohman/event": "*",
     "@taufik-nurrohman/from": "*",
-    "@taufik-nurrohman/has": "*",
+    "@taufik-nurrohman/has": "^1.0.0",
     "@taufik-nurrohman/hook": "*",
     "@taufik-nurrohman/is": "*",
     "@taufik-nurrohman/pattern": "*",

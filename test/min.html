@@ -6,10 +6,15 @@
     <meta content="Better tags input interaction with JavaScript." name="description">
     <title>Tag Picker</title>
     <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker {
+        width: 100%;
+      }
+    </style>
   </head>
   <body>
     <main>
-      <p>Minimum tags allowed: <code>3</code>.</p>
+      <p>Minimum tags inserted to be able to submit the form is 3.</p>
       <form method="get">
         <p><input name="tags" type="text"></p>
         <p><button type="submit">Submit</button></p>
@@ -17,8 +22,11 @@
     </main>
     <script src="../index.min.js"></script>
     <script>
-      const picker = new TP(document.querySelector('input'), {
+      const picker = new TagPicker(document.querySelector('input'), {
           min: 3
+      });
+      picker.on('min.tags', function () {
+          console.error('Minimum tags inserted to be able to submit the form is ' + this.state.min + '.');
       });
     </script>
   </body>

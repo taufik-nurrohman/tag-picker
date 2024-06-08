@@ -8,16 +8,20 @@ block state
 block script
   script
     | const picker = new TagPicker(document.querySelector('input'));
+    |
+    | picker.on('blur', function () {
+    |     const text = this.text;
+    |     text && (this.set(text), this.text = ""); // Insert on blur
+    | });
 
 block style
   style
     | .tag-picker {
     |   width: 100%;
     | }
-    | .tag-picker__text span:focus + span {
-    |   visibility: hidden;
-    | }
 
 block content
   main
-    p: input(placeholder!='Tags go here&hellip;' type='text')
+    form(method='get' target='_blank')
+      p: input(name='tags' type='text' value='foo, bar, baz')
+      p: button(type='submit') Submit

@@ -25,6 +25,7 @@ $name: 'tag-picker';
   display: inline-flex;
   flex-wrap: wrap;
   position: relative;
+  vertical-align: middle;
 }
 
 .#{$name}__self {

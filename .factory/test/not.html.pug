@@ -7,13 +7,27 @@ block state
 
 block script
   script
-    | const picker = new TP(document.querySelector('input'), {
+    | const picker = new TagPicker(document.querySelector('input'), {
     |     pattern: '^[a-z\\d]+(-[a-z\\d]+)*$'
     | });
+    |
+    | picker.on('is.tag', function (tag) {
+    |     console.info('The input “' + tag + '” is a valid tag name.');
+    | });
+    |
+    | picker.on('not.tag', function (tag) {
+    |     console.error('The input “' + tag + '” is not a valid tag name.');
+    | });
+
+block style
+  style
+    | .tag-picker {
+    |   width: 100%;
+    | }
 
 block content
   main
-    p Allowed pattern in tag: #[code='^[a-z\\d](-[a-z\\d])*$'].
+    p Valid tag name must match the #[code='^[a-z\\d](-[a-z\\d])*$'] pattern!
     form(method='get')
       p: input(name='tags' type='text')
       p: button(type='submit') Submit
