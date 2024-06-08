@@ -7,24 +7,27 @@
     <title>Tag Picker</title>
     <link href="../index.min.css" rel="stylesheet">
     <style>
-      .tag-picker.tag-picker--focus {
-        background: #ff0;
+      .tag-picker {
+        border-width: 2px;
       }
-      .tag-picker.tag-picker--focus-self {
-        background: #0ff;
+      .tag-picker.tag-picker--focus {
+        border-color: #f00;
       }
       .tag-picker.tag-picker--focus-tag {
         background: #0f0;
+      }
+      .tag-picker.tag-picker--focus-text {
+        background: #ff0;
       }
     </style>
   </head>
   <body>
     <main>
-      <p><input placeholder="Placeholder here&hellip;" type="text"></p>
+      <p><input placeholder="Tags go here&hellip;" type="text"></p>
     </main>
     <script src="../index.min.js"></script>
     <script>
-      const picker = new TP(document.querySelector('input'));
+      const picker = new TagPicker(document.querySelector('input'));
     </script>
   </body>
 </html>

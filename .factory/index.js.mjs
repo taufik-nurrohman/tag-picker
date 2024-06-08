@@ -1,10 +1,10 @@
-import {D, W, getChildFirst, getChildren, getElement, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
+import {D, W, getAttribute, getChildFirst, getChildren, getElement, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
 import {delay} from '@taufik-nurrohman/tick';
-import {fromStates} from '@taufik-nurrohman/from';
+import {fromHTML, fromStates} from '@taufik-nurrohman/from';
 import {hook} from '@taufik-nurrohman/hook';
-import {isArray, isFunction, isInstance, isObject, isSet, isString} from '@taufik-nurrohman/is';
+import {isArray, isDefined, isFunction, isInstance, isObject, isSet, isString} from '@taufik-nurrohman/is';
 import {offEvent, offEventDefault, offEventPropagation, onEvent} from '@taufik-nurrohman/event';
-import {toCaseKebab, toCount, toObjectKeys, toObjectValues} from '@taufik-nurrohman/to';
+import {toCount, toObjectCount, toObjectKeys, toObjectValues} from '@taufik-nurrohman/to';
 import {toPattern} from '@taufik-nurrohman/pattern';
 
 const KEY_A = 'a';
@@ -18,44 +18,28 @@ const KEY_ENTER = 'Enter';
 const KEY_ESCAPE = 'Escape';
 const KEY_TAB = 'Tab';
 
-// <https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus#focusvisible>
-const focusOptions = {
-    focusVisible: true
-};
-
 const name = 'TagPicker';
 
 function defineProperty(of, key, state) {
     Object.defineProperty(of, key, state);
 }
 
-function blurFrom(node) {
-    const selection = D.getSelection();
-    if (node) {} else {
-        selection.removeAllRanges();
-    }
-}
-
-function blurFromAll() {
-    blurFrom();
-}
-
 function focusTo(node) {
     node.focus();
 }
 
-function getCharBeforeCaret(container) {
+function getCharBeforeCaret(node) {
     let range, selection = W.getSelection();
-    if (selection.rangeCount > 0) {
+    if (selection.rangeCount) {
         range = selection.getRangeAt(0).cloneRange();
         range.collapse(true);
-        range.setStart(container, 0);
+        range.setStart(node, 0);
         return (range + "").slice(-1);
     }
 }
 
 function getValue(self) {
-    return self.value.replace(/\r/g, "");
+    return (self.value || getAttribute(self, 'value', false) || "").replace(/\r/g, "");
 }
 
 function isDisabled(self) {
@@ -66,12 +50,28 @@ function isReadOnly(self) {
     return self.readOnly;
 }
 
+function selectNone(node) {
+    const selection = D.getSelection();
+    if (node) {} else {
+        selection.removeAllRanges();
+    }
+}
+
 function selectTo(node) {
     const selection = D.getSelection();
-    blurFromAll();
+    selectNone();
     const range = D.createRange();
     range.selectNodeContents(node);
     selection.addRange(range);
+}
+
+function setValueAtCaret(node, value) {
+    let range, selection = W.getSelection();
+    if (selection.rangeCount) {
+        range = selection.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(D.createTextNode(value));
+    }
 }
 
 function TagPicker(self, state) {
@@ -89,18 +89,25 @@ function TagPicker(self, state) {
 
     self['_' + name] = hook($, TagPicker.prototype);
 
-    return $.attach(self, fromStates({}, TagPicker.state, isString(state) ? {
+    let newState = fromStates({}, TagPicker.state, isString(state) ? {
         join: state
-    } : (state || {})));
+    } : (state || {}));
+
+    // Special case for `state.escape`: Replace instead of join
+    if (isObject(state) && state.escape) {
+        newState.escape = state.escape;
+    }
+
+    return $.attach(self, newState);
 
 }
 
 TagPicker.state = {
-    'class': 'tag-picker',
     'escape': [','],
     'join': ', ',
     'max': 9999,
     'min': 0,
+    'n': 'tag-picker',
     'pattern': null,
     'with': []
 };
@@ -139,50 +146,47 @@ defineProperty($$, 'value', {
     }
 });
 
+// <https://www.unicode.org/reports/tr18/tr18-23.html#General_Category_Property>
 $$._filter = function (v) {
-    let $ = this,
-        {state} = $;
-    v = (v || "").split(state.join).join("").trim();
-    return toCaseKebab(v).replace(/^-+|-+$/g, "");
+    let $ = this, {state} = $;
+    return (v || "").replace(/[^\p{L}\p{N}\p{P}\p{S}]/gu, ' ').split(state.join).join("").trim();
 };
 
-let _keyIsCtrl = false,
-    _keyIsShift = false,
-    _firstTagSelected = null;
+let _keyIsCtrl = false, _keyIsShift = false;
 
 function onBlurTag() {
+    selectNone();
     let $ = this,
         picker = $['_' + name],
         {_mask, _tags, mask, state} = picker,
-        c = state['class'];
-    if (!_keyIsCtrl) {
+        n = state.n;
+    if (!_keyIsCtrl && !_keyIsShift) {
         for (let k in _tags) {
-            // letClass(_tags[k], c + '__tag--focus');
+            letClass(_tags[k], n + '__tag--selected');
         }
     }
-    letClass(mask, c += '--focus');
-    letClass(mask, c += '-tag');
-    blurFromAll();
+    letClass(mask, n += '--focus');
+    letClass(mask, n += '-tag');
 }
 
-function onBlurTextInput() {
+function onBlurTextInput(e) {
+    selectNone();
     let $ = this,
         picker = $['_' + name],
         {_mask, mask, state} = picker,
         {text} = _mask,
-        c = state['class'];
-    letClass(text, c + '__text--focus');
-    letClass(mask, c += '--focus');
-    letClass(mask, c += '-text');
-    blurFromAll();
+        n = state.n;
+    letClass(text, n + '__text--focus');
+    letClass(mask, n += '--focus');
+    letClass(mask, n += '-text');
 }
 
 function onContextMenuTag(e) {
     let $ = this,
         picker = $['_' + name],
         {_tags, state} = picker,
-        c = state['class'] + '__tag--focus';
-    setClass($, c);
+        n = state.n + '__tag--selected';
+    setClass($, n);
     focusTo($), selectTo(getChildFirst($));
 }
 
@@ -190,16 +194,16 @@ function onCopyTag(e) {
     let $ = this,
         picker = $['_' + name],
         {_tags, state} = picker,
-        c = state['class'] + '__tag--focus';
+        n = state.n + '__tag--selected';
     let selection = [];
     for (let k in _tags) {
-        if (hasClass(_tags[k], c)) {
+        if (hasClass(_tags[k], n)) {
             selection.push(k);
         }
     }
     e.clipboardData.setData('text/plain', selection.join(state.join));
+    picker.fire('copy', [e]).focus();
     offEventDefault(e);
-    console.log(selection);
 }
 
 function onCutTag(e) {
@@ -207,36 +211,34 @@ function onCutTag(e) {
         picker = $['_' + name],
         {_mask, _tags, state} = picker,
         {input} = _mask,
-        c = state['class'] + '__tag--focus';
+        n = state.n + '__tag--selected';
     let selection = [];
     for (let k in _tags) {
-        if (hasClass(_tags[k], c)) {
+        if (hasClass(_tags[k], n)) {
             selection.push(k);
             letElement(_tags[k]);
             delete _tags[k];
         }
     }
     e.clipboardData.setData('text/plain', selection.join(state.join));
-    picker.focus();
+    picker.fire('cut', [e]).focus();
     offEventDefault(e);
-    console.log(selection);
 }
 
 function onFocusTextInput() {
-    _firstTagSelected = false;
     let $ = this,
         picker = $['_' + name],
         {_mask, _tags, mask, self, state} = picker,
         {hint, input, text} = _mask,
-        c = state['class'];
+        n = state.n;
     for (let k in _tags) {
-        letClass(_tags[k], c + '__tag--focus');
+        letClass(_tags[k], n + '__tag--selected');
     }
-    setClass(text, c + '__text--focus');
-    setClass(mask, c += '--focus');
-    setClass(mask, c += '-text');
-    picker.focus();
+    setClass(text, n + '__text--focus');
+    setClass(mask, n += '--focus');
+    setClass(mask, n += '-text');
     delay(() => setText(hint, getText(input, false) ? "" : self.placeholder), 1)();
+    picker.focus();
 }
 
 function onFocusSelf() {
@@ -245,13 +247,14 @@ function onFocusSelf() {
     picker.focus();
 }
 
-function onFocusTag() {
+function onFocusTag(e) {
     let $ = this,
         picker = $['_' + name],
         {_mask, mask, state} = picker,
-        c = state['class'];
-    setClass(mask, c += '--focus');
-    setClass(mask, c += '-tag');
+        n = state.n;
+    setClass(mask, n += '--focus');
+    setClass(mask, n += '-tag');
+    picker.fire('focus.tag', [e]);
 }
 
 function onKeyDownTag(e) {
@@ -265,48 +268,104 @@ function onKeyDownTag(e) {
         prevTag = getPrev($),
         nextTag = getNext($),
         firstTag, lastTag,
-        c = state['class'] + '__tag--focus';
+        n = state.n + '__tag--selected';
     if (keyIsShift) {
-        setClass(_firstTagSelected = $, c);
+        setClass($, n), selectTo(getChildFirst($));
+        if (KEY_ARROW_LEFT === key) {
+            if (prevTag) {
+                if (hasClass(prevTag, n)) {
+                    letClass($, n);
+                } else {
+                    setClass(prevTag, n);
+                }
+                focusTo(prevTag), selectTo(getChildFirst(prevTag));
+            }
+            exit = true;
+        } else if (KEY_ARROW_RIGHT === key) {
+            if (nextTag && text !== nextTag) {
+                if (hasClass(nextTag, n)) {
+                    letClass($, n);
+                } else {
+                    setClass(nextTag, n);
+                }
+                focusTo(nextTag), selectTo(getChildFirst(nextTag));
+            }
+            exit = true;
+        }
     } else if (keyIsCtrl) {
         if (KEY_A === key) {
             for (let k in _tags) {
                 focusTo(_tags[k]), selectTo(getChildFirst(_tags[k]));
-                setClass(_tags[k], c);
+                setClass(_tags[k], n);
+            }
+            exit = true;
+        } else if (KEY_ARROW_LEFT === key) {
+            prevTag && focusTo(prevTag);
+            exit = true;
+        } else if (KEY_ARROW_RIGHT === key) {
+            nextTag && text !== nextTag ? focusTo(nextTag) : picker.focus();
+            exit = true;
+        } else if (KEY_ENTER === key || ' ' === key) {
+            toggleClass($, n);
+            if (hasClass($, n)) {
+                focusTo($), selectTo(getChildFirst($));
+            } else {
+                selectTo(getChildFirst(toObjectValues(_tags).pop()));
             }
             exit = true;
         }
     } else {
-        // letClass($, c);
+        let selection = [];
+        for (let k in _tags) {
+            if (hasClass(_tags[k], n)) {
+                selection.push(k);
+            }
+            if ($ !== _tags[k]) {
+                letClass(_tags[k], n);
+            }
+        }
         if (KEY_BEGIN === key) {
             firstTag = toObjectValues(_tags).shift();
-            firstTag && firstTag.focus(focusOptions);
+            firstTag && focusTo(firstTag);
             exit = true;
         } else if (KEY_END === key) {
             lastTag = toObjectValues(_tags).pop();
-            lastTag && lastTag.focus(focusOptions);
+            lastTag && focusTo(lastTag);
             exit = true;
         } else if (KEY_ENTER === key || ' ' === key) {
-            toggleClass($, c);
-            if (hasClass($, c)) {
+            toggleClass($, n);
+            if (hasClass($, n)) {
                 focusTo($), selectTo(getChildFirst($));
-                _firstTagSelected = $;
             } else {
-                blurFromAll();
+                selectTo(getChildFirst(toObjectValues(_tags).pop()));
             }
             exit = true;
         } else if (KEY_ARROW_LEFT === key) {
-            prevTag && prevTag.focus(focusOptions);
+            prevTag && focusTo(prevTag);
             exit = true;
         } else if (KEY_ARROW_RIGHT === key) {
-            nextTag && text !== nextTag ? nextTag.focus(focusOptions) : picker.focus();
+            nextTag && text !== nextTag ? focusTo(nextTag) : picker.focus();
             exit = true;
         } else if (KEY_DELETE_LEFT === key) {
             picker.let($.title);
+            if (toCount(selection) > 1) {
+                let current;
+                while (current = selection.pop()) {
+                    prevTag = _tags[current] && getPrev(_tags[current]);
+                    picker.let(current);
+                }
+            }
             prevTag ? (focusTo(prevTag), selectTo(getChildFirst(prevTag))) : picker.focus();
             exit = true;
         } else if (KEY_DELETE_RIGHT === key) {
             picker.let($.title);
+            if (toCount(selection) > 1) {
+                let current;
+                while (current = selection.shift()) {
+                    nextTag = _tags[current] && getNext(_tags[current]);
+                    picker.let(current);
+                }
+            }
             nextTag && text !== nextTag ? (focusTo(nextTag), selectTo(getChildFirst(nextTag))) : picker.focus();
             exit = true;
         } else if (KEY_ESCAPE === key || KEY_TAB === key) {
@@ -321,6 +380,22 @@ function onKeyUpTag() {
     _keyIsCtrl = _keyIsShift = false;
 }
 
+// Mobile device(s) usually don’t have the `KeyboardEvent.key` property as complete as desktop device(s), so I have to
+// detect the character being typed by taking it from the character just before the cursor. You will probably see an
+// effect that is a bit unpleasant to look at on mobile device(s), as the character that should only be used to insert a
+// tag (the `,` character by default) appears for a second. This is different on desktop device(s), where the character
+// you are going to type can be identified just before it is actually entered into the text input.
+function onInputTextInput(e) {
+    let $ = this,
+        key = getCharBeforeCaret($),
+        picker = $['_' + name],
+        {state} = picker,
+        escape = state.escape;
+    if (escape.includes(key)) {
+        return picker.set(getText($).slice(0, -1)).focus().text = "", offEventDefault(e);
+    }
+}
+
 function onKeyDownTextInput(e) {
     let $ = this, exit, v,
         key = e.key,
@@ -330,11 +405,11 @@ function onKeyDownTextInput(e) {
         picker = $['_' + name],
         {_mask, _tags, mask, self, state} = picker,
         {hint} = _mask,
-        c = state['class'] + '__tag--focus',
+        n = state.n + '__tag--selected',
         firstTag, lastTag;
         escape = state.escape;
     if (escape.includes(key) || escape.includes(keyCode)) {
-        return picker.set(getText($)), setText($, ""), setText(hint, self.placeholder), picker.focus(), offEventDefault(e);
+        return picker.set(getText($)).focus().text = "", offEventDefault(e);
     }
     delay(() => setText(hint, getText($, false) ? "" : self.placeholder), 1)();
     let caretIsToTheFirst = "" === getCharBeforeCaret($),
@@ -344,8 +419,8 @@ function onKeyDownTextInput(e) {
             if (KEY_ARROW_LEFT === key) {
                 lastTag = toObjectValues(_tags).pop();
                 if (lastTag) {
-                    lastTag && lastTag.focus(focusOptions);
-                    setClass(lastTag, c);
+                    lastTag && (focusTo(lastTag), selectTo(getChildFirst(lastTag)));
+                    setClass(lastTag, n);
                     exit = true;
                 }
             }
@@ -354,20 +429,20 @@ function onKeyDownTextInput(e) {
         if (KEY_A === key && null === getText($, false) && null !== (v = picker.value)) {
             for (let k in _tags) {
                 focusTo(_tags[k]), selectTo(getChildFirst(_tags[k]));
-                setClass(_tags[k], c);
+                setClass(_tags[k], n);
             }
             exit = true;
         } else if (KEY_BEGIN === key) {
             firstTag = toObjectValues(_tags).shift();
-            firstTag && firstTag.focus(focusOptions);
+            firstTag && focusTo(firstTag);
             exit = true;
         } else if (KEY_END === key) {
             lastTag = toObjectValues(_tags).pop();
-            lastTag && lastTag.focus(focusOptions);
+            lastTag && focusTo(lastTag);
             exit = true;
         } else if (KEY_ARROW_LEFT === key) {
             lastTag = toObjectValues(_tags).pop();
-            lastTag && lastTag.focus(focusOptions);
+            lastTag && focusTo(lastTag);
             exit = true;
         } else if (KEY_DELETE_LEFT === key) {
             lastTag = toObjectValues(_tags).pop();
@@ -387,15 +462,15 @@ function onKeyDownTextInput(e) {
         } else if (textIsVoid) {
             if (KEY_BEGIN === key) {
                 firstTag = toObjectValues(_tags).shift();
-                firstTag && firstTag.focus(focusOptions);
+                firstTag && focusTo(firstTag);
                 exit = true;
             } else if (KEY_END === key) {
                 lastTag = toObjectValues(_tags).pop();
-                lastTag && lastTag.focus(focusOptions);
+                lastTag && focusTo(lastTag);
                 exit = true;
             } else if (KEY_ARROW_LEFT === key) {
                 lastTag = toObjectValues(_tags).pop();
-                lastTag && lastTag.focus(focusOptions);
+                lastTag && focusTo(lastTag);
                 exit = true;
             } else if (KEY_DELETE_LEFT === key) {
                 lastTag = toObjectValues(_tags).pop();
@@ -406,7 +481,7 @@ function onKeyDownTextInput(e) {
         } else if (caretIsToTheFirst) {
             if (KEY_ARROW_LEFT === key) {
                 lastTag = toObjectValues(_tags).pop();
-                lastTag && lastTag.focus(focusOptions);
+                lastTag && focusTo(lastTag);
                 exit = true;
             }
         }
@@ -418,50 +493,75 @@ function onKeyUpTextInput() {
     _keyIsCtrl = _keyIsShift = false;
 }
 
-function onPasteTextInput() {
+function onPasteTag(e) {
     let $ = this,
         picker = $['_' + name],
-        {_mask, state} = picker,
+        {_tags, state} = picker,
+        n = state.n + '__tag--selected';
+    let isAllSelected = true,
+        value = (e.clipboardData || W.clipboardData).getData('text') + "";
+    for (let k in _tags) {
+        if (!hasClass(_tags[k], n)) {
+            isAllSelected = false;
+            break;
+        }
+    }
+    // Delete all tag(s) before paste
+    if (isAllSelected) {
+        picker.value.split(state.join).forEach(tag => picker.let(tag));
+    }
+    value.split(state.join).forEach(tag => picker.set(tag)), picker.fire('paste.tag', [e]).focus(), offEventDefault(e);
+}
+
+function onPasteTextInput(e) {
+    let $ = this,
+        picker = $['_' + name],
+        {_mask, self, state} = picker,
         {hint} = _mask;
+    let value = (e.clipboardData || W.clipboardData).getData('text') + "";
+    setValueAtCaret($, value), setText(hint, getText($) ? "" : self.placeholder);
+    picker.fire('paste', [e]);
     delay(() => {
-        let value = getText($);
+        value = getText($);
         if (null !== value) {
             value.split(state.join).forEach(tag => picker.set(tag));
         }
-        setText($, ""), setText(hint, picker.self.placeholder);
+        picker.text = "";
     }, 1)();
+    offEventDefault(e);
 }
 
 function onPointerDownTag(e) {
     let $ = this,
         picker = $['_' + name],
         {_tags, state} = picker,
-        c = state['class'] + '__tag--focus';
-    toggleClass($, c);
+        n = state.n + '__tag--selected';
+    focusTo($), toggleClass($, n);
     if (_keyIsCtrl) {
 
     } else {
-        blurFromAll();
+        selectNone();
         let asContextMenu = 2 === e.button, // Probably a “right-click”
             selection = 0;
         for (let k in _tags) {
-            if (hasClass(_tags[k], c)) {
+            if (hasClass(_tags[k], n)) {
                 ++selection;
             }
             if ($ !== _tags[k] && !asContextMenu) {
-                letClass(_tags[k], c);
+                letClass(_tags[k], n);
             }
         }
         // If it has selection(s) previously, use the event to cancel the other(s)
         if (selection > 0) {
-            setClass($, c); // Then select the current tag
+            setClass($, n); // Then select the current tag
         }
     }
-    if (hasClass($, c)) {
+    if (hasClass($, n)) {
         focusTo($), selectTo(getChildFirst($));
     } else {
-        blurFromAll();
+        selectTo(toObjectValues(_tags).pop());
     }
+    picker.fire('touch.tag', [e]);
     offEventDefault(e);
     offEventPropagation(e);
 }
@@ -477,31 +577,36 @@ function onPointerDownTagX(e) {
     picker.focus(), offEventDefault(e);
 }
 
+function onResetForm() {
+    let $ = this,
+        picker = $['_' + name];
+    picker.let();
+}
+
 $$.attach = function (self, state) {
     let $ = this;
     self = self || $.self;
     state = state || $.state;
-    $._active = true;
+    $._active = !isDisabled(self) && !isReadOnly(self);
     $._tags = {};
     $._value = getValue(self);
     $.self = self;
     $.state = state;
-    let c = state['class'],
-        n = '_' + name;
+    let n = state.n;
     const form = getParentForm(self);
     const mask = setElement('div', {
-        'class': c,
+        'class': n,
         'tabindex': isDisabled(self) ? false : -1
     });
     $.mask = mask;
     const maskTags = setElement('span', {
-        'class': c + '__tags'
+        'class': n + '__tags'
     });
     const text = setElement('span', {
-        'class': c + '__text'
+        'class': n + '__text'
     });
     const textInput = setElement('span', {
-        'contenteditable': isDisabled(self) ? false : 'true',
+        'contenteditable': isDisabled(self) ? false : "",
         'spellcheck': 'false',
         'style': 'white-space:pre;'
     });
@@ -510,17 +615,22 @@ $$.attach = function (self, state) {
     setChildLast(maskTags, text);
     setChildLast(text, textInput);
     setChildLast(text, textInputHint);
-    setClass(self, c + '__self');
+    setClass(self, n + '__self');
     setNext(self, mask);
+    if (form) {
+        form['_' + name] = $;
+        onEvent('reset', form, onResetForm);
+    }
     onEvent('blur', textInput, onBlurTextInput);
     onEvent('focus', self, onFocusSelf);
     onEvent('focus', textInput, onFocusTextInput);
+    onEvent('input', textInput, onInputTextInput);
     onEvent('keydown', textInput, onKeyDownTextInput);
     onEvent('keyup', textInput, onKeyUpTextInput);
     onEvent('paste', textInput, onPasteTextInput);
     self.tabIndex = -1;
-    mask[n] = $;
-    textInput[n] = $;
+    mask['_' + name] = $;
+    textInput['_' + name] = $;
     let _mask = {};
     _mask.hint = textInputHint;
     _mask.input = textInput;
@@ -529,6 +639,8 @@ $$.attach = function (self, state) {
     _mask.tags = maskTags;
     _mask.text = text;
     $._mask = _mask;
+    // Attach the current tag(s)
+    $._value.split(isString(state) ? state : state.join).forEach(tag => $.set(tag, 1));
     // Attach extension(s)
     if (isSet(state) && isArray(state.with)) {
         for (let i = 0, j = toCount(state.with); i < j; ++i) {
@@ -548,25 +660,36 @@ $$.attach = function (self, state) {
             }
         }
     }
+    if (getAttribute(self, 'autofocus')) {
+        return $.focus();
+    }
     return $;
 };
 
 $$.blur = function () {
-    let $ = this;
-};
-
-$$.click = function () {
-    let $ = this;
+    selectNone();
+    let $ = this,
+        {_mask, _tags} = $,
+        {input} = _mask;
+    for (let k in _tags) {
+        _tags[k].blur();
+    }
+    return input.blur(), $.fire('blur');
 };
 
 $$.detach = function () {
     let $ = this,
         {_mask, mask, self, state} = $,
         {input} = _mask;
+    const form = getParentForm(self);
     $._active = false;
+    if (form) {
+        offEvent('reset', form, onResetForm);
+    }
     offEvent('blur', input, onBlurTextInput);
     offEvent('focus', input, onFocusTextInput);
     offEvent('focus', self, onFocusSelf);
+    offEvent('input', input, onInputTextInput);
     offEvent('keydown', input, onKeyDownTextInput);
     offEvent('keyup', input, onKeyUpTextInput);
     offEvent('paste', input, onPasteTextInput);
@@ -584,7 +707,7 @@ $$.detach = function () {
         }
     }
     self.tabIndex = null;
-    letClass(self, state['class'] + '__self');
+    letClass(self, state.n + '__self');
     letElement(mask);
     $._mask = {
         of: self
@@ -597,7 +720,7 @@ $$.focus = function () {
     let $ = this,
         {_mask} = $,
         {input} = _mask;
-    return (input && (focusTo(input), selectTo(input))), $;
+    return (input && (focusTo(input), selectTo(input))), $.fire('focus');
 };
 
 $$.get = function (v) {
@@ -606,6 +729,7 @@ $$.get = function (v) {
     if (!_active) {
         return false;
     }
+    $.fire('get.tag', [v]);
     if (!_tags[v]) {
         return null;
     }
@@ -614,12 +738,20 @@ $$.get = function (v) {
 
 $$.let = function (v) {
     let $ = this,
-        {_active, _tags, self, state} = $;
+        {_active, _tags, _value, self, state} = $;
     if (!_active) {
         return $;
     }
+    // Reset
+    if (!isDefined(v)) {
+        return $.value.split(state.join).forEach(tag => $.let(tag)), _value.split(state.join).forEach(tag => $.set(tag)), $;
+    }
+    if (toObjectCount(_tags) < state.min) {
+        return $.fire('min.tags', [v]);
+    }
+    $.fire('let.tag', [v]);
     if (!_tags[v]) {
-        return false;
+        return $;
     }
     let tag = _tags[v],
         tagText = getChildren(tag, 0),
@@ -633,6 +765,7 @@ $$.let = function (v) {
     offEvent('keyup', tag, onKeyUpTag);
     offEvent('mousedown', tag, onPointerDownTag);
     offEvent('mousedown', tagX, onPointerDownTagX);
+    offEvent('paste', tag, onPasteTag);
     offEvent('touchstart', tag, onPointerDownTag);
     offEvent('touchstart', tagX, onPointerDownTagX);
     letElement(tag);
@@ -640,32 +773,36 @@ $$.let = function (v) {
     return (self.value = toObjectKeys($._tags).join(state.join)), $;
 };
 
-$$.set = function (v) {
+$$.set = function (v, force) {
     let $ = this,
         {_active, _filter, _mask, _tags, self, state} = $,
         {text} = _mask,
         {pattern} = state,
-        c = state['class'];
-    if (!_active) {
+        n = state.n;
+    if (!_active && !force) {
         return $;
+    }
+    if (toObjectCount(_tags) > state.max) {
+        return $.fire('max.tags', [v]);
     }
     if (isFunction(_filter)) {
         v = _filter.call($, v);
     }
-    if (isString(pattern) && toPattern(pattern) && !toPattern(pattern).test(v)) {
-        return false;
+    $.fire('set.tag', [v]);
+    if ("" === v || (isString(pattern) && !toPattern(pattern).test(v))) {
+        return $.fire('not.tag', [v]);
     }
-    if ("" === v || _tags[v]) {
-        return false;
+    if (_tags[v]) {
+        return $.fire('has.tag', [v]);
     }
     const tag = setElement('span', {
-        'class': c += '__tag',
+        'class': n += '__tag',
         'tabindex': -1,
         'title': v
     });
-    const tagText = setElement('span', v);
+    const tagText = setElement('span', fromHTML(v));
     const tagX = setElement('span', {
-        'class': c += '-x',
+        'class': n += '-x',
         'tabindex': -1
     });
     onEvent('blur', tag, onBlurTag);
@@ -677,6 +814,7 @@ $$.set = function (v) {
     onEvent('keyup', tag, onKeyUpTag);
     onEvent('mousedown', tag, onPointerDownTag);
     onEvent('mousedown', tagX, onPointerDownTagX);
+    onEvent('paste', tag, onPasteTag);
     onEvent('touchstart', tag, onPointerDownTag);
     onEvent('touchstart', tagX, onPointerDownTagX);
     tag['_' + name] = $;

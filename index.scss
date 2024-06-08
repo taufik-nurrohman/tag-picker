@@ -17,8 +17,8 @@ $name: 'tag-picker';
   --fill-#{$name}--read-only: #eee;
   --fill-#{$name}: #fff;
   --fill-#{$name}__tag--disabled: #aaa;
-  --fill-#{$name}__tag--focus: #c00;
   --fill-#{$name}__tag--read-only: #f00;
+  --fill-#{$name}__tag--selected: #c00;
   --fill-#{$name}__tag: #f00;
   --font-face-#{$name}: inherit;
   --font-height-#{$name}: 1.5em;
@@ -30,6 +30,7 @@ $name: 'tag-picker';
   --stroke-#{$name}--focus: #00f;
   --stroke-#{$name}--read-only: #666;
   --stroke-#{$name}: #000;
+  --stroke-#{$name}__tag--focus: #000;
   --stroke-#{$name}__tag: transparent;
   --width-#{$name}: 100%;
 }
@@ -122,6 +123,7 @@ $name: 'tag-picker';
 }
 
 %tag {
+  border: 1px solid transparent;
   display: flex;
   height: var(--height-#{$name}); // Same with `min-height` of container
   margin: 0.125em;
@@ -135,7 +137,6 @@ $name: 'tag-picker';
 .#{$name}__tag {
   @extend %tag;
   background: var(--fill-#{$name}__tag);
-  border: 0 solid;
   border: {
     color: var(--stroke-#{$name}__tag);
     radius: var(--arc-#{$name}__tag);
@@ -143,7 +144,7 @@ $name: 'tag-picker';
   box-shadow: var(--shadow-#{$name}__tag);
   color: var(--color-#{$name}__tag);
   cursor: pointer;
-  @each $v in (hover, active) {
+  @each $v in (hover, focus, active) {
     &:#{$v} {
       background: var(--fill-#{$name}__tag--#{$v}, var(--fill-#{$name}__tag));
       border-color: var(--stroke-#{$name}__tag--#{$v}, var(--stroke-#{$name}__tag));
@@ -151,23 +152,21 @@ $name: 'tag-picker';
       color: var(--color-#{$name}__tag--#{$v}, var(--color-#{$name}__tag));
     }
   }
-  &:focus-visible {
-    background: var(--fill-#{$name}__tag--focus, var(--fill-#{$name}__tag));
-    border-color: var(--stroke-#{$name}__tag--focus, var(--stroke-#{$name}__tag));
-    box-shadow: var(--shadow-#{$name}__tag--focus, var(--shadow-#{$name}__tag));
-    color: var(--color-#{$name}__tag--focus, var(--color-#{$name}__tag));
-  }
-  &--focus {
+  &--selected {
     &,
     &:hover,
     &:focus,
-    &:focus-visible,
     &:active {
-      background: var(--fill-#{$name}__tag--focus, var(--fill-#{$name}__tag));
-      border-color: var(--stroke-#{$name}__tag--focus, var(--stroke-#{$name}__tag));
-      box-shadow: var(--shadow-#{$name}__tag--focus, var(--shadow-#{$name}__tag));
-      color: var(--color-#{$name}__tag--focus, var(--color-#{$name}__tag));
+      background: var(--fill-#{$name}__tag--selected, var(--fill-#{$name}__tag--focus, var(--fill-#{$name}__tag)));
+      border-color: var(--stroke-#{$name}__tag--selected, var(--stroke-#{$name}__tag--focus, var(--stroke-#{$name}__tag)));
+      box-shadow: var(--shadow-#{$name}__tag--selected, var(--shadow-#{$name}__tag--focus, var(--shadow-#{$name}__tag)));
+      color: var(--color-#{$name}__tag--selected, var(--color-#{$name}__tag--focus, var(--color-#{$name}__tag)));
     }
+  }
+  // Keep selection (so that the context menu can show the “Copy” command) but hide it visually
+  ::selection {
+    background-color: transparent;
+    color: inherit;
   }
   + .#{$name}__text {
     span {
@@ -218,6 +217,9 @@ $name: 'tag-picker';
     outline: 0;
     position: relative;
     z-index: 1;
+    &::after {
+      content: '\200c';
+    }
     * {
       display: inline; // Remove (hide) line-break in tag editor
     }

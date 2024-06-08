@@ -7,20 +7,20 @@ block state
 
 block script
   script
-    | const picker = new TP(document.querySelector('input'), {
+    | const picker = new TagPicker(document.querySelector('input'), {
     |     max: 5,
     |     pattern: '^[a-z\\d]+(-[a-z\\d]+)*$'
     | });
     |
-    | function setInvalid() {
-    |     picker.self.classList.add(picker.state['class'] + '--invalid');
-    |     setTimeout(() => {
-    |         picker.self.classList.remove(picker.state['class'] + '--invalid');
-    |     }, 2000);
+    | function letInvalid() {
+    |     picker.mask.classList.remove(picker.state.n + '--invalid');
     | }
     |
-    | function letInvalid() {
-    |     picker.self.classList.remove(picker.state['class'] + '--invalid');
+    | function setInvalid() {
+    |     picker.mask.classList.add(picker.state.n + '--invalid');
+    |     setTimeout(() => {
+    |         picker.mask.classList.remove(picker.state.n + '--invalid');
+    |     }, 1000);
     | }
     |
     | picker.on('blur', letInvalid);

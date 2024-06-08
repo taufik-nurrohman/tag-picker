@@ -7,7 +7,7 @@ block state
 
 block script
   script
-    | let picker = new TP(document.querySelector('input'));
+    | const picker = new TagPicker(document.querySelector('input'));
 
 block content
   main
@@ -15,10 +15,10 @@ block content
       p: input(name='tags' readonly type='text' value='foo, bar')
       p
         label
-          input(checked onchange='picker.source.readOnly = this.checked; picker.pop(); picker = new TP(picker.source);' type='checkbox')
+          input(checked onchange='picker.self.readOnly = this.checked; picker.detach().attach();' type='checkbox')
           = ' '
           span Read-Only
       p
         button(type='submit') Submit
         = ' '
-        button(onclick='picker.set(\'baz\')' type='button') Add &ldquo;baz&rdquo; Tag
+        button(onclick='picker.set(\'baz\').focus();' type='button') Add &ldquo;baz&rdquo; Tag

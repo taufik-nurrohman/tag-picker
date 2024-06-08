@@ -7,8 +7,8 @@ block state
 
 block script
   script
-    | const picker = new TP(document.querySelector('input'));
+    | const picker = new TagPicker(document.querySelector('input'));
 
 block content
   main
-    p: input(placeholder!='Placeholder here&hellip;' type='text')
+    p: input(placeholder!='Tags go here&hellip;' type='text')

@@ -7,11 +7,7 @@ block state
 
 block script
   script
-    | let picker = new TP(document.querySelector('input'));
-    |
-    | picker.on('change', function (tag, index) {
-    |     console.log([tag, index, this.tags]);
-    | });
+    | const picker = new TagPicker(document.querySelector('input'));
 
 block content
   main
@@ -19,10 +15,10 @@ block content
       p: input(disabled name='tags' type='text' value='foo, bar')
       p
         label
-          input(onchange='picker.source.disabled = !this.checked; picker.pop(); picker = new TP(picker.source);' type='checkbox')
+          input(onchange='picker.self.disabled = !this.checked; picker.detach().attach();' type='checkbox')
           = ' '
           span Enable
       p
         button(type='submit') Submit
         = ' '
-        button(onclick='picker.set(\'baz\')' type='button') Add &ldquo;baz&rdquo; Tag
+        button(onclick='picker.set(\'baz\').focus();' type='button') Add &ldquo;baz&rdquo; Tag

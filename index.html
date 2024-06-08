@@ -6,66 +6,9 @@
     <meta content="width=device-width" name="viewport">
     <meta content="Better tags input interaction with JavaScript." name="description">
     <title>Tag Picker 4.0.0</title>
+    <link href="../layout/index.min.css" rel="stylesheet">
     <link href="index.min.css" rel="stylesheet">
     <style>
-      * {
-        box-sizing: border-box;
-      }
-      :root {
-        background: #fff;
-        border-top: 4px solid;
-        color: #000;
-        font: normal normal 16px/1.25 serif;
-      }
-      a {
-        color: #009;
-        text-decoration: none;
-      }
-      a,
-      code {
-        word-wrap: break-word;
-      }
-      code {
-        font-family: monospace;
-        font-size: 80%;
-      }
-      footer,
-      header,
-      main,
-      nav {
-        margin: 0 auto;
-        max-width: 700px;
-      }
-      hr {
-        border: 0;
-        border-top: 1px dashed;
-        color: inherit;
-        height: 0;
-      }
-      pre {
-        white-space: pre-wrap;
-        word-wrap: break-word;
-      }
-      pre code {
-        background: #eee;
-        display: block;
-        padding: 1em;
-      }
-      table {
-        width: 100%;
-      }
-      td,
-      th {
-        text-align: left;
-        vertical-align: top;
-      }
-      [role='alert'] {
-        background: #ffa;
-        border: 1px dashed;
-        margin-top: 0;
-        padding: .75em 1em;
-      }
-
       /* Add Bootstrap-like focus ring effect */
       .tag-picker.tag-picker--focus {
         --shadow-tag-picker--focus: 0 0 0 3px rgba(0, 0, 255, .25);
@@ -83,21 +26,12 @@
     <main>
       <p>Tags are comma-separated list of words. This application has support for hooks, so you can listen to events that occur at each interaction to provide additional features. Each tag item can also be selected using the arrow keys and a mouse click to perform actions on the selected tag, for example, to delete the tag.</p>
       <form method="get" target="_blank">
-        <p tabindex="0">Previous tabbable element. Some text to copy: <mark style="user-select:all;" tabindex="-1">foo, bar, baz, qux</mark></p>
+        <p tabindex="0">Previous tabbable element.</p>
         <p><input id="tags" name="tags" placeholder="foo, bar, baz" type="text" value="foo, bar"></p>
-        <p>Test connection with <code>&lt;label&gt;</code> element: <label for="tags" style="cursor:pointer;text-decoration:underline;">click here to focus!</label></p>
-        <p>Test add and remove methods: <a href="javascript:void(picker.set('wow'), picker.focus());">add &ldquo;wow&rdquo;</a> <a href="javascript:void(picker.let('wow'), picker.focus());">remove &ldquo;wow&rdquo;</a></p>
-        <p><button type="submit">Submit</button></p>
+        <p role="group"><button type="submit">Submit</button> <button type="reset">Reset</button></p>
       </form>
-      <h2>Features</h2>
-      <ul>
-        <li>Light-weight, no dependencies.</li>
-        <li>Simple <abbr title="Application Programming Interface">API</abbr>. Easy to master.</li>
-        <li>Care about accessibility. Interacts very well using the keyboard keys. Free from the focus traps.</li>
-      </ul>
-      <h2>Usage</h2>
+      <h2 id="usage"><a href="#usage">#</a> Usage</h2>
       <h3>Browser</h3>
-      <p>With the basic knowledge of accessing the DOM and manipulating it using JavaScript, you can use this application like a pro.</p>
       <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html dir="ltr"&gt;
   &lt;head&gt;
@@ -124,14 +58,14 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <pre><code>import TagPicker from '@taufik-nurrohman/tag-picker';
 
 const picker = new TagPicker(document.querySelector('input'));</code></pre>
-      <h2>Examples</h2>
+      <h2 id="examples"><a href="#examples">#</a> Examples</h2>
       <ul>
         <li><a href="test.html" target="_blank">No Idea?</a></li>
         <li><a href="test/value.html" target="_blank">Set Pre-Defined Value</a></li>
-        <li><a href="test/placeholder.html" target="_blank">Set Placeholder</a></li>
+        <li><a href="test/hint.html" target="_blank">Set Hint/Placeholder</a></li>
         <li><a href="test/focus.html" target="_blank">Focus State</a></li>
         <li><a href="tweak/invalid.html" target="_blank">Invalid State (Custom)</a></li>
-        <li><a href="tweak/focus.placeholder.html" target="_blank">Hide Placeholder on Focus</a></li>
+        <li><a href="tweak/focus.hint.html" target="_blank">Hide Hint/Placeholder on Focus</a></li>
         <li><a href="test/disabled.html" target="_blank">Disabled Input</a></li>
         <li><a href="test/read-only.html" target="_blank">Read-Only Input</a></li>
         <li><a href="test/min.html" target="_blank">Limit Minimum Tags</a></li>
@@ -145,228 +79,73 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
         <li><a href="test/f.html" target="_blank">Filter Characters with <code>picker.f()</code> Method</a></li>
         <li><a href="tweak/path.html" target="_blank">Directory</a> (Experiment)</li>
       </ul>
-      <h2>Settings</h2>
-      <pre><code>let picker = new TagPicker(<var>source</var>, <var>join</var> = ', ');</code></pre>
-      <pre><code>let picker = new TagPicker(<var>source</var>, <var>state</var> = {
-        escape: [','],
-        join: ', ',
-        max: 9999,
-        min: 0,
-        pattern: null
-    });</code></pre>
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>source</code></td>
-            <td>The text input element.</td>
-          </tr>
-          <tr>
-            <td><code>join</code></td>
-            <td>Tags joiner for the output value.</td>
-          </tr>
-          <tr>
-            <td><code>state</code></td>
-            <td>The configuration data.</td>
-          </tr>
-          <tr>
-            <td><code>state.escape</code></td>
-            <td>List of characters used to trigger the tag addition.</td>
-          </tr>
-          <tr>
-            <td><code>state.join</code></td>
-            <td>Tags joiner for the output value.</td>
-          </tr>
-          <tr>
-            <td><code>state.max</code></td>
-            <td>Maximum tags allowed.</td>
-          </tr>
-          <tr>
-            <td><code>state.min</code></td>
-            <td>Minimum tags allowed.</td>
-          </tr>
-          <tr>
-            <td><code>state.pattern</code></td>
-            <td>If defined, tag addition will be performed only if value is matched with pattern.</td>
-          </tr>
-        </tbody>
-      </table>
-      <h2>Methods and Properties</h2>
-      <h3>TagPicker.instances</h3>
-      <p>Return the application instances.</p>
-      <pre><code>for (let key in TagPicker.instances) {
-    console.log(key);
-    console.log(TagPicker.instances[key]);
-}</code></pre>
-      <h3>TagPicker.state</h3>
-      <p>This property stores the initial values of <code>picker.state</code>.</p>
-      <pre><code>const picker = new TagPicker({
-    foo: ['bar', 'baz', 'qux']
-});
-
-console.log([TagPicker.state, picker.state]);</code></pre>
-      <h3>TagPicker.version</h3>
-      <p>Return the application version.</p>
-      <pre><code>let version = TagPicker.version,
-    major = version.split('.')[0];
-
-if (+major &lt; 3) { &hellip; }</code></pre>
-      <h3>picker.blur()</h3>
-      <p>Blur from the content-editable element.</p>
-      <h3>picker.click()</h3>
-      <p>Click the content-editable element.</p>
-      <h3>picker.f(tag)</h3>
-      <p>Set custom tag name filter.</p>
-      <pre><code>// Force lower-case letter(s) and trim white-space(s)
-picker.f = tag =&gt; (tag || "").toLowerCase().trim();</code></pre>
-      <h3>picker.focus()</h3>
-      <p>Focus to the content-editable element.</p>
-      <h3>picker.get(tag)</h3>
-      <p>Check the existence of a tag.</p>
-      <pre><code>if (null !== picker.get('foo')) { &hellip; }</code></pre>
-      <h3>picker.input</h3>
-      <p>Return the content-editable element.</p>
-      <pre><code>picker.input.addEventListener('paste', () =&gt; {
-    // Handle `paste` event here
+      <h2 id="constructor"><a href="#constructor">#</a> Constructor</h2>
+      <pre><code>const picker = new TagPicker(self, join = ', ');</code></pre>
+      <pre><code>const picker = new TagPicker(self, state = {
+    escape: [','],
+    join: ', ',
+    max: 9999,
+    min: 0,
+    pattern: null,
+    with: []
 });</code></pre>
-      <h3>picker.let(tag)</h3>
-      <p>Remove a tag.</p>
-      <pre><code>picker.let('foo'); // Remove `foo` tag
-picker.let(); // Remove all tags</code></pre>
-      <h3>picker.let(tags)</h3>
-      <p>Remove multiple tags at once.</p>
-      <pre><code>picker.let(['foo', 'bar', 'baz']); // Remove `foo`, `bar` and `baz`</code></pre>
-      <h3>picker.output</h3>
-      <p>Alias for <code>picker.source</code> property.</p>
-      <h3>picker.pop()</h3>
-      <p>Convert the tag picker element back to its original <code>&lt;input&gt;</code> element.</p>
-      <h3>picker.self</h3>
-      <p>Return the tag picker element.</p>
-      <pre><code>picker.self.style.borderWidth = '4px';</code></pre>
-      <h3>picker.set(tag, index)</h3>
-      <p>Add a new tag.</p>
-      <pre><code>picker.set('foo'); // Append a `foo` tag
-picker.set('foo', 1); // Insert a `foo` tag exactly at index `1`</code></pre>
-      <h3>picker.set(tags)</h3>
-      <p>Add multiple tags at once.</p>
-      <pre><code>picker.set(['foo', 'bar', 'baz']); // Add `foo`, `bar` and `baz`</code></pre>
-      <h3>picker.source</h3>
-      <p>Return the <code>&lt;input&gt;</code> element.</p>
-      <pre><code>console.log(picker.source);</code></pre>
-      <h3>picker.state</h3>
-      <p>Return the modified tag picker states.</p>
-      <h3>picker.tags</h3>
-      <p>Return the tags data as array.</p>
-      <pre><code>console.log(picker.tags);</code></pre>
-      <h2>Hooks</h2>
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>blur</code></td>
-            <td>Will be triggered after release focus on the tag editor.</td>
-          </tr>
-          <tr>
-            <td><code>blur.tag</code></td>
-            <td>Will be triggered after release focus on a tag item.</td>
-          </tr>
-          <tr>
-            <td><code>change</code></td>
-            <td>Will be triggered on every time the tags data is updated.</td>
-          </tr>
-          <tr>
-            <td><code>click</code></td>
-            <td>Will be triggered after click on the tag editor.</td>
-          </tr>
-          <tr>
-            <td><code>click.tag</code></td>
-            <td>Will be triggered after click on a tag item.</td>
-          </tr>
-          <tr>
-            <td><code>copy</code></td>
-            <td>Will be triggered after copy event.</td>
-          </tr>
-          <tr>
-            <td><code>cut</code></td>
-            <td>Will be triggered after cut event.</td>
-          </tr>
-          <tr>
-            <td><code>focus</code></td>
-            <td>Will be triggered after focus on the tag editor.</td>
-          </tr>
-          <tr>
-            <td><code>focus.tag</code></td>
-            <td>Will be triggered after focus on a tag item.</td>
-          </tr>
-          <tr>
-            <td><code>get.tag</code></td>
-            <td>Will be triggered after <code>picker.get('foo')</code>.</td>
-          </tr>
-          <tr>
-            <td><code>has.tag</code></td>
-            <td>Will be triggered if the tag you want to add already exists.</td>
-          </tr>
-          <tr>
-            <td><code>let.tag</code></td>
-            <td>Will be triggered after <code>picker.let('foo')</code>.</td>
-          </tr>
-          <tr>
-            <td><code>max.tags</code></td>
-            <td>Will be triggered if number of tags you want to submit is greater than the <code>picker.state.max</code> value.</td>
-          </tr>
-          <tr>
-            <td><code>min.tags</code></td>
-            <td>Will be triggered if number of tags you want to submit is less than the <code>picker.state.min</code> value.</td>
-          </tr>
-          <tr>
-            <td><code>not.tag</code></td>
-            <td>Will be triggered if tag value does not match with <code>state.pattern</code>.</td>
-          </tr>
-          <tr>
-            <td><code>paste</code></td>
-            <td>Will be triggered after paste event.</td>
-          </tr>
-          <tr>
-            <td><code>pop</code></td>
-            <td>Will be triggered after <code>picker.pop()</code>.</td>
-          </tr>
-          <tr>
-            <td><code>set.tag</code></td>
-            <td>Will be triggered after <code>picker.set('foo')</code>.</td>
-          </tr>
-        </tbody>
-      </table>
-      <h3>picker.fire(event, data)</h3>
-      <p>Trigger a hook.</p>
-      <pre><code>picker.fire('change', [picker.tags]);</code></pre>
-      <h3>picker.hooks</h3>
-      <p>Return the added hooks.</p>
-      <pre><code>console.log(picker.hooks);</code></pre>
-      <h3>picker.off(event, then)</h3>
-      <p>Remove a hook.</p>
-      <pre><code>picker.off('change');</code></pre>
-      <pre><code>picker.off('change', onChange); // With context</code></pre>
-      <h3>picker.on(event, then)</h3>
-      <p>Add a new hook.</p>
-      <pre><code>picker.on('change', tags =&gt; {
-    console.log(tags);
-});</code></pre>
-      <pre><code>function onChange(tags) {
-    console.log(tags);
+      <h2 id="parameters"><a href="#parameters">#</a> Parameters</h2>
+      <h3><code>self</code></h3>
+      <p>The input element.</p>
+      <h3><code>join</code></h3>
+      <p>The character to join the tags (usually a comma followed by a space).</p>
+      <h3><code>state</code></h3>
+      <p>The configuration data.</p>
+      <h3><code>state.escape</code></h3>
+      <p>List of characters to trigger the tag insertion.</p>
+      <h3><code>state.join</code></h3>
+      <p>The character to join the tags (usually a comma followed by a space).</p>
+      <h3><code>state.max</code></h3>
+      <p>Maximum tags allowed to be inserted.</p>
+      <h3><code>state.min</code></h3>
+      <p>Minimum tags that must be present to be able to be submitted by the form.</p>
+      <h3><code>state.pattern</code></h3>
+      <p>If defined, tag insertion will be performed only if tag name is matched with the pattern.</p>
+      <h3><code>state.with</code></h3>
+      <p>List of callable functions or objects containing an <code>attach()</code> method to be invoked each time the application is initialized. A very simple “plugin” system.</p>
+      <h2 id="methods"><a href="#methods">#</a> Methods</h2>
+      <h3>Instance Methods</h3>
+      <p>Instance methods are methods that are available through the results of a <code>TagPicker</code> construct.</p>
+      <h3>Static Methods</h3>
+      <p>Static methods are methods that are directly available on the <code>TagPicker</code> object.</p>
+      <h2 id="properties"><a href="#properties">#</a> Properties</h2>
+      <h3>Instance Properties</h3>
+      <p>Instance properties are properties that are available through the results of a <code>TextEditor</code> construct.</p>
+      <h3>Static Properties</h3>
+      <p>Static properties are properties that are directly available on the <code>TextEditor</code> object.</p>
+      <h2 id="extensions"><a href="#extensions">#</a> Extensions</h2>
+      <h3>Anatomy of an Extension</h3>
+      <p>Extension as a function:</p>
+      <pre><code>function Extension(self, state = {}) {
+    this.a = 1;
+    this.b = function () {};
+    return this;
 }
 
-picker.on('change', onChange); // With context</code></pre>
-      <h2>License</h2>
+Object.defineProperty(Extension, 'name', {
+    value: 'Extension'
+});</code></pre>
+      <p>Extension as an object:</p>
+      <pre><code>const Extension = {
+    attach: function (self, state = {}) {},
+    detach: function (self, state = {}) {},
+    name: 'Extension'
+};</code></pre>
+      <h3>Usage of an Extension</h3>
+      <p>As a core extension:</p>
+      <pre><code>TagPicker.state.with.push(Extension);</code></pre>
+      <p>As an optional extension:</p>
+      <pre><code>const picker = new TagPicker(document.querySelector('input'), {
+    with: [Extension]
+});</code></pre>
+      <h3>List of Extensions</h3>
+      <p><em>None.</em></p>
+      <h2 id="license"><a href="#license">#</a> License</h2>
       <p>Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to <a href="https://paypal.me/tatautaufik" target="_blank">share a little financial support</a> with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.</p>
       <p>Thank you! ❤️</p>
     </main>
@@ -374,7 +153,7 @@ picker.on('change', onChange); // With context</code></pre>
       <hr>
       <p>&copy; 2024 <a href="/">Taufik Nurrohman</a></p>
     </footer>
-    <script src="index.js"></script>
+    <script src="index.min.js"></script>
     <script>
       const picker = new TagPicker(document.forms[0].tags);
       picker.on('has.tag', tag => {

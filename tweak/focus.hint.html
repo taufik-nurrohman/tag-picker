@@ -7,18 +7,18 @@
     <title>Tag Picker</title>
     <link href="../index.min.css" rel="stylesheet">
     <style>
-      .tag-picker__input span:focus + span {
+      .tag-picker__text span:focus + span {
         visibility: hidden;
       }
     </style>
   </head>
   <body>
     <main>
-      <p><input placeholder="Placeholder here&hellip;" type="text"></p>
+      <p><input placeholder="Tags go here&hellip;" type="text"></p>
     </main>
     <script src="../index.min.js"></script>
     <script>
-      const picker = new TP(document.querySelector('input'));
+      const picker = new TagPicker(document.querySelector('input'));
     </script>
   </body>
 </html>
