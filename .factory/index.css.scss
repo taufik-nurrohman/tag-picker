@@ -115,7 +115,6 @@ $name: 'tag-picker';
   @extend %tag;
   flex: 1;
   span {
-    border: 0 solid transparent;
     flex: 1;
     position: relative;
     z-index: 1;
@@ -130,9 +129,6 @@ $name: 'tag-picker';
       display: none;
     }
     + span {
-      border: {
-        width: inherit;
-      }
       bottom: 0;
       left: 0;
       opacity: 0.5;

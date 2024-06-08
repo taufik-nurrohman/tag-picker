@@ -92,7 +92,6 @@
   flex: 1;
 }
 .tag-picker__text span {
-  border: 0 solid transparent;
   flex: 1;
   position: relative;
   z-index: 1;
@@ -107,7 +106,6 @@
   display: none;
 }
 .tag-picker__text span + span {
-  border-width: inherit;
   bottom: 0;
   left: 0;
   opacity: 0.5;
