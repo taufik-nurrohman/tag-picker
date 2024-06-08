@@ -149,7 +149,7 @@ defineProperty($$, 'value', {
 // <https://www.unicode.org/reports/tr18/tr18-23.html#General_Category_Property>
 $$._filter = function (v) {
     let $ = this, {state} = $;
-    return (v || "").replace(/[^\p{L}\p{N}\p{P}\p{S}]/gu, ' ').split(state.join).join("").trim();
+    return (v || "").replace(/[^\p{L}\p{N}\p{P}\p{S}]/gu, ' ').split(state.join).join("").replace(/\s+/g, ' ').trim();
 };
 
 let _keyIsCtrl = false, _keyIsShift = false;
@@ -215,9 +215,7 @@ function onCutTag(e) {
     let selection = [];
     for (let k in _tags) {
         if (hasClass(_tags[k], n)) {
-            selection.push(k);
-            letElement(_tags[k]);
-            delete _tags[k];
+            selection.push(k), picker.let(k);
         }
     }
     e.clipboardData.setData('text/plain', selection.join(state.join));
@@ -523,10 +521,10 @@ function onPasteTextInput(e) {
     picker.fire('paste', [e]);
     delay(() => {
         value = getText($);
+        picker.text = "";
         if (null !== value) {
             value.split(state.join).forEach(tag => picker.set(tag));
         }
-        picker.text = "";
     }, 1)();
     offEventDefault(e);
 }
