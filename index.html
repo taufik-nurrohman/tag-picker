@@ -9,16 +9,53 @@
     <link href="../layout/index.min.css" rel="stylesheet">
     <link href="index.min.css" rel="stylesheet">
     <style>
+      .tag-picker {
+        border-color: #000;
+        color: #000;
+        flex: 1;
+        line-height: calc(1.5em - 4px);
+      }
+
       .tag-picker,
       .tag-picker__tag,
       .tag-picker__text {
         border-width: 2px;
       }
 
-      /* Add Bootstrap-like focus ring effect */
+      .tag-picker__tag {
+        background: #f00;
+        border-color: transparent;
+        gap: 0.5em;
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+      }
+
+      .tag-picker__text {
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+      }
+
+      .tag-picker__tag:focus {
+        border-color: #000;
+      }
+
+      .tag-picker__tag-x {
+        color: #fff;
+      }
+
+      .tag-picker__tag--selected,
+      .tag-picker__tag--selected:focus {
+        background: #c00;
+      }
+
+      .tag-picker__tags {
+        gap: 2px;
+        padding: 2px;
+      }
+
       .tag-picker.tag-picker--focus {
-        --shadow-tag-picker--focus: 0 0 0 5px rgba(0, 0, 255, 0.25);
-        --shadow-tag-picker: 0 0 0 5px rgba(0, 0, 255, 0.25);
+        border-color: #00f;
+        box-shadow: 0 0 0 4px rgba(0, 0, 255, 0.25);
       }
     </style>
   </head>
@@ -33,8 +70,7 @@
       <p>Tags are comma-separated list of words. This application has support for hooks, so you can listen to events that occur at each interaction to provide additional features. Each tag item can also be selected using the arrow keys and a mouse click to perform actions on the selected tag, for example, to delete the tag.</p>
       <form method="get" target="_blank">
         <p tabindex="0">Previous tabbable element.</p>
-        <p><input id="tags" name="tags" placeholder="foo, bar, baz" type="text" value="foo, bar"></p>
-        <p role="group"><button type="submit">Submit</button> <button type="reset">Reset</button></p>
+        <p role="group"><input id="tags" name="tags" placeholder="foo, bar, baz" type="text" value="foo, bar"> <button type="submit">Submit</button> <button type="reset">Reset</button></p>
       </form>
       <h2 id="usage"><a href="#usage">#</a> Usage</h2>
       <h3>Browser</h3>

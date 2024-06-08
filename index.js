@@ -570,6 +570,17 @@
         letClass(mask, n += '-text');
     }
 
+    function onClickMask(e) {
+        var $ = this,
+            picker = $['_' + name],
+            on = e.target,
+            state = picker.state,
+            n = state.n + '__tag';
+        if (!hasClass(on, n) && !getParent(on, '.' + n)) {
+            picker.focus();
+        }
+    }
+
     function onContextMenuTag(e) {
         var $ = this,
             picker = $['_' + name];
@@ -809,6 +820,7 @@
             keyIsCtrl = _keyIsCtrl = e.ctrlKey,
             keyIsShift = _keyIsShift = e.shiftKey,
             picker = $['_' + name],
+            _active = picker._active,
             _mask = picker._mask,
             _tags = picker._tags;
         picker.mask;
@@ -819,6 +831,9 @@
             firstTag,
             lastTag;
         escape = state.escape;
+        if (!_active) {
+            return offEventDefault(e);
+        }
         if (escape.includes(key) || escape.includes(keyCode)) {
             return picker.set(getText($)).focus().text = "", offEventDefault(e);
         }
@@ -956,9 +971,13 @@
     function onPointerDownTag(e) {
         var $ = this,
             picker = $['_' + name],
+            _active = picker._active,
             _tags = picker._tags,
             state = picker.state,
             n = state.n + '__tag--selected';
+        if (!_active) {
+            return;
+        }
         focusTo($), toggleClass($, n);
         if (_keyIsCtrl);
         else {
@@ -1029,8 +1048,7 @@
         });
         var textInput = setElement('span', {
             'contenteditable': isDisabled(self) ? false : "",
-            'spellcheck': 'false',
-            'style': 'white-space:pre;'
+            'spellcheck': 'false'
         });
         var textInputHint = setElement('span', self.placeholder + "");
         setChildLast(mask, maskTags);
@@ -1044,6 +1062,7 @@
             onEvent('reset', form, onResetForm);
         }
         onEvent('blur', textInput, onBlurTextInput);
+        onEvent('click', mask, onClickMask);
         onEvent('focus', self, onFocusSelf);
         onEvent('focus', textInput, onFocusTextInput);
         onEvent('input', textInput, onInputTextInput);
@@ -1113,6 +1132,7 @@
             offEvent('reset', form, onResetForm);
         }
         offEvent('blur', input, onBlurTextInput);
+        offEvent('click', mask, onClickMask);
         offEvent('focus', input, onFocusTextInput);
         offEvent('focus', self, onFocusSelf);
         offEvent('input', input, onInputTextInput);
@@ -1233,7 +1253,7 @@
         }
         var tag = setElement('span', {
             'class': n += '__tag',
-            'tabindex': -1,
+            'tabindex': _active ? -1 : false,
             'title': v
         });
         var tagText = setElement('span', fromHTML(v));
@@ -1241,19 +1261,21 @@
             'class': n += '-x',
             'tabindex': -1
         });
-        onEvent('blur', tag, onBlurTag);
-        onEvent('contextmenu', tag, onContextMenuTag);
-        onEvent('copy', tag, onCopyTag);
-        onEvent('cut', tag, onCutTag);
-        onEvent('focus', tag, onFocusTag);
-        onEvent('keydown', tag, onKeyDownTag);
-        onEvent('keyup', tag, onKeyUpTag);
-        onEvent('mousedown', tag, onPointerDownTag);
-        onEvent('mousedown', tagX, onPointerDownTagX);
-        onEvent('paste', tag, onPasteTag);
-        onEvent('touchstart', tag, onPointerDownTag);
-        onEvent('touchstart', tagX, onPointerDownTagX);
-        tag['_' + name] = $;
+        if (_active) {
+            onEvent('blur', tag, onBlurTag);
+            onEvent('contextmenu', tag, onContextMenuTag);
+            onEvent('copy', tag, onCopyTag);
+            onEvent('cut', tag, onCutTag);
+            onEvent('focus', tag, onFocusTag);
+            onEvent('keydown', tag, onKeyDownTag);
+            onEvent('keyup', tag, onKeyUpTag);
+            onEvent('mousedown', tag, onPointerDownTag);
+            onEvent('mousedown', tagX, onPointerDownTagX);
+            onEvent('paste', tag, onPasteTag);
+            onEvent('touchstart', tag, onPointerDownTag);
+            onEvent('touchstart', tagX, onPointerDownTagX);
+            tag['_' + name] = $;
+        }
         setChildLast(tag, tagText);
         setChildLast(tag, tagX);
         setPrev(text, tag);

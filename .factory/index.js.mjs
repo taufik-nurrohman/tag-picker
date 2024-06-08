@@ -181,6 +181,17 @@ function onBlurTextInput(e) {
     letClass(mask, n += '-text');
 }
 
+function onClickMask(e) {
+    let $ = this,
+        picker = $['_' + name],
+        on = e.target,
+        {state} = picker,
+        n = state.n + '__tag';
+    if (!hasClass(on, n) && !getParent(on, '.' + n)) {
+        picker.focus();
+    }
+}
+
 function onContextMenuTag(e) {
     let $ = this,
         picker = $['_' + name],
@@ -401,11 +412,14 @@ function onKeyDownTextInput(e) {
         keyIsCtrl = _keyIsCtrl = e.ctrlKey,
         keyIsShift = _keyIsShift = e.shiftKey,
         picker = $['_' + name],
-        {_mask, _tags, mask, self, state} = picker,
+        {_active, _mask, _tags, mask, self, state} = picker,
         {hint} = _mask,
         n = state.n + '__tag--selected',
         firstTag, lastTag;
         escape = state.escape;
+    if (!_active) {
+        return offEventDefault(e);
+    }
     if (escape.includes(key) || escape.includes(keyCode)) {
         return picker.set(getText($)).focus().text = "", offEventDefault(e);
     }
@@ -532,8 +546,11 @@ function onPasteTextInput(e) {
 function onPointerDownTag(e) {
     let $ = this,
         picker = $['_' + name],
-        {_tags, state} = picker,
+        {_active, _tags, state} = picker,
         n = state.n + '__tag--selected';
+    if (!_active) {
+        return;
+    }
     focusTo($), toggleClass($, n);
     if (_keyIsCtrl) {
 
@@ -605,8 +622,7 @@ $$.attach = function (self, state) {
     });
     const textInput = setElement('span', {
         'contenteditable': isDisabled(self) ? false : "",
-        'spellcheck': 'false',
-        'style': 'white-space:pre;'
+        'spellcheck': 'false'
     });
     const textInputHint = setElement('span', self.placeholder + "");
     setChildLast(mask, maskTags);
@@ -620,6 +636,7 @@ $$.attach = function (self, state) {
         onEvent('reset', form, onResetForm);
     }
     onEvent('blur', textInput, onBlurTextInput);
+    onEvent('click', mask, onClickMask);
     onEvent('focus', self, onFocusSelf);
     onEvent('focus', textInput, onFocusTextInput);
     onEvent('input', textInput, onInputTextInput);
@@ -685,6 +702,7 @@ $$.detach = function () {
         offEvent('reset', form, onResetForm);
     }
     offEvent('blur', input, onBlurTextInput);
+    offEvent('click', mask, onClickMask);
     offEvent('focus', input, onFocusTextInput);
     offEvent('focus', self, onFocusSelf);
     offEvent('input', input, onInputTextInput);
@@ -795,7 +813,7 @@ $$.set = function (v, force) {
     }
     const tag = setElement('span', {
         'class': n += '__tag',
-        'tabindex': -1,
+        'tabindex': _active ? -1 : false,
         'title': v
     });
     const tagText = setElement('span', fromHTML(v));
@@ -803,19 +821,21 @@ $$.set = function (v, force) {
         'class': n += '-x',
         'tabindex': -1
     });
-    onEvent('blur', tag, onBlurTag);
-    onEvent('contextmenu', tag, onContextMenuTag);
-    onEvent('copy', tag, onCopyTag);
-    onEvent('cut', tag, onCutTag);
-    onEvent('focus', tag, onFocusTag);
-    onEvent('keydown', tag, onKeyDownTag);
-    onEvent('keyup', tag, onKeyUpTag);
-    onEvent('mousedown', tag, onPointerDownTag);
-    onEvent('mousedown', tagX, onPointerDownTagX);
-    onEvent('paste', tag, onPasteTag);
-    onEvent('touchstart', tag, onPointerDownTag);
-    onEvent('touchstart', tagX, onPointerDownTagX);
-    tag['_' + name] = $;
+    if (_active) {
+        onEvent('blur', tag, onBlurTag);
+        onEvent('contextmenu', tag, onContextMenuTag);
+        onEvent('copy', tag, onCopyTag);
+        onEvent('cut', tag, onCutTag);
+        onEvent('focus', tag, onFocusTag);
+        onEvent('keydown', tag, onKeyDownTag);
+        onEvent('keyup', tag, onKeyUpTag);
+        onEvent('mousedown', tag, onPointerDownTag);
+        onEvent('mousedown', tagX, onPointerDownTagX);
+        onEvent('paste', tag, onPasteTag);
+        onEvent('touchstart', tag, onPointerDownTag);
+        onEvent('touchstart', tagX, onPointerDownTagX);
+        tag['_' + name] = $;
+    }
     setChildLast(tag, tagText);
     setChildLast(tag, tagX);
     setPrev(text, tag);
