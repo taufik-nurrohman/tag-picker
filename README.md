@@ -7,7 +7,7 @@ Tag Picker
 
 ![Tag Picker](https://user-images.githubusercontent.com/1669261/126896222-c4d40a5e-a130-4319-a15a-3ec490b175b3.png)
 
-Tag Picker is a simple JavaScript application that aims to provide better experience for users in adding and removing comma-separated list of words.
+Tag Picker is a JavaScript application designed to simplify the management of comma-separated lists of words, offering a minimalist interface for an enhanced user experience. Users can easily add tags by typing a word and pressing the <kbd>,</kbd> key (by default), or remove tags with a quick click (or by using common keys such as the <kbd>Backspace</kbd> or <kbd>Delete</kbd> keys). Developers can easily integrate and customize this application styles to match the design of their web project.
 
 [Demo and Documentation](https://taufik-nurrohman.github.io/tag-picker "View Demo")
 
@@ -18,7 +18,7 @@ Contribute
  - Install [Git](https://en.wikipedia.org/wiki/Git) and [Node.js](https://en.wikipedia.org/wiki/Node.js)
  - Run `git clone https://github.com/taufik-nurrohman/tag-picker.git`
  - Run `cd tag-picker && npm install --save-dev`
- - Edit the files in the `.github/factory` folder.
+ - Edit the files in the `.factory` folder.
  - Run `npm run pack` to generate the production ready files.
 
 Contributors
