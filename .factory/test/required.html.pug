@@ -8,6 +8,10 @@ block state
 block script
   script
     | const picker = new TagPicker(document.querySelector('input'));
+    |
+    | picker.on('min.tags', function () {
+    |     console.error('The minimum number of tags that must be inserted to be able to submit the form is ' + this.state.min + '.');
+    | });
 
 block style
   style
@@ -18,12 +22,12 @@ block style
 block content
   main
     form(method='get')
-      p: input(name='tags' readonly type='text' value='foo, bar')
+      p: input(name='tags' required type='text' value='foo, bar')
       p
         label
-          input(checked onchange='picker.self.readOnly = this.checked; picker.detach().attach();' type='checkbox')
+          input(checked onchange='picker.self.required = this.checked; picker.detach().attach(picker.self, {min: 0});' type='checkbox')
           = ' '
-          span Read-Only
+          span Required
       p
         button(type='submit') Submit
         = ' '

@@ -9,6 +9,11 @@
     <link href="../layout/index.min.css" rel="stylesheet">
     <link href="index.min.css" rel="stylesheet">
     <style>
+      body {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 60rem;
+      }
       .tag-picker,
       .tag-picker__tag,
       .tag-picker__text {
@@ -64,7 +69,7 @@
         <h1>Tag Picker 4.0.0</h1>
         <p>Tag Picker is a JavaScript application designed to simplify the management of comma-separated lists of words, offering a minimalist interface for an enhanced user experience. Users can easily add tags by typing a word and pressing the <kbd>,</kbd> key (by default), or remove tags with a quick click (or by using common keys such as the <kbd>Backspace</kbd> or <kbd>Delete</kbd> keys). Developers can easily integrate and customize this application styles to match the design of their web project.</p>
       </hgroup>
-      <p>It supports native keyboard interaction as if it were plain text. You should be able to copy, cut, and paste from/to the visual. Click a tag to select it, press the <kbd>Control</kbd> key while clicking the tag to select multiple tags. You can also select the tags using a combination of <kbd>Shift</kbd> and <kbd>ArrowLeft</kbd> or <kbd>ArrowRight</kbd> keys.</p>
+      <p>It supports native keyboard interaction as if it were plain text. You should be able to copy, cut, and paste from/to the mask. Click a tag to select it, press the <kbd>Control</kbd> key while clicking the tag to select multiple tags. You can also select the tags using a combination of <kbd>Shift</kbd> and <kbd>ArrowLeft</kbd> or <kbd>ArrowRight</kbd> keys.</p>
     </header>
     <main>
       <form method="get" target="_blank">
@@ -72,7 +77,7 @@
       </form>
       <h2 id="usage"><a href="#usage">#</a> Usage</h2>
       <div role="note">
-        <p><strong>Note:</strong> CSS variables have been removed since version 4.0.0. From now on, I will only provide a minimal style just to make the interaction decent. Expect it to look ugly by default. The main goal of this application is to be able to integrate it seamlessly into your web design. By providing a minimal style, it is easy to add other styles to adapt it to your web design. Have a look at the source code on this page to see how I adapted the style so that it resembles the default style of the previous version.</p>
+        <p><strong>Note:</strong> CSS variables have been removed since version 4.0.0. From now on, I will only provide a minimal style just to make decent interaction. Expect it to look ugly by default. The main goal of this application is to be able to integrate it seamlessly into your web design. By providing a minimal style, it is easy to add other styles to adapt it to your web design. Have a look at the source code on this page to see how I adapted the style so that it resembles the default style of the previous version.</p>
       </div>
       <h3>Browser</h3>
       <pre><code>&lt;!DOCTYPE html&gt;
@@ -109,6 +114,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <h2 id="tests"><a href="#tests">#</a> Tests</h2>
       <ul>
         <li><a href="test.html" target="_blank">No Idea?</a></li>
+        <li><a href="test/attach,detach.html" target="_blank">Attach, Detach</a></li>
         <li><a href="test/copy,cut,paste.html" target="_blank">Copy, Cut, and Paste Events</a></li>
         <li><a href="test/disabled.html" target="_blank">Disabled Input</a></li>
         <li><a href="test/escape.html" target="_blank">Disable Characters with <code>picker.state.escape</code></a></li>
@@ -121,6 +127,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
         <li><a href="test/min.html" target="_blank">Limit Minimum Tags</a></li>
         <li><a href="test/not.html" target="_blank">Validate Tag Names with <code>picker.state.pattern</code></a></li>
         <li><a href="test/read-only.html" target="_blank">Read-Only Input</a></li>
+        <li><a href="test/required.html" target="_blank">Required Input</a></li>
         <li><a href="test/value.html" target="_blank">Set Input Value</a></li>
       </ul>
       <h2 id="tweaks"><a href="#tweaks">#</a> Tweaks</h2>
@@ -157,7 +164,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <h3><code>state.max</code></h3>
       <p>Maximum tags allowed to be inserted.</p>
       <h3><code>state.min</code></h3>
-      <p>Minimum tags that must be present to be able to be submitted by the form.</p>
+      <p>Minimum tags that must be present to be able to be submitted by the form. If <code>required</code> attribute is present on the input element, then the default value of this state will be <code>1</code>.</p>
       <h3><code>state.pattern</code></h3>
       <p>If defined, tag insertion will be performed only if tag name is matched with the pattern.</p>
       <h3><code>state.with</code></h3>
@@ -214,7 +221,7 @@ picker.on('change', onChange);</code></pre>
       <p>Returns the events data.</p>
       <pre><code>console.log(picker.hooks);</code></pre>
       <h4><code>picker.mask</code></h4>
-      <p>Returns the tag picker’s visual.</p>
+      <p>Returns the tag picker’s mask.</p>
       <pre><code>picker.mask.classList.add(picker.state.n + '--dark');</code></pre>
       <h4><code>picker.self</code></h4>
       <p>Returns the <code>&lt;input&gt;</code> element.</p>

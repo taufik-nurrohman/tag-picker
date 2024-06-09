@@ -14,7 +14,7 @@
   </head>
   <body>
     <main>
-      <form method="get" target="_blank">
+      <form method="get">
         <p><input disabled name="tags" type="text" value="foo, bar"></p>
         <p><label><input onchange="picker.self.disabled = !this.checked; picker.detach().attach();" type="checkbox"> <span>Enable</span></label></p>
         <p><button type="submit">Submit</button> <button onclick="picker.set('baz').focus();" type="button">Add &ldquo;baz&rdquo; Tag</button></p>

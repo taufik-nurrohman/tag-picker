@@ -51,6 +51,10 @@ function isReadOnly(self) {
     return self.readOnly;
 }
 
+function isRequired(self) {
+    return self.required;
+}
+
 function selectNone(node) {
     const selection = D.getSelection();
     if (node) {} else {
@@ -259,6 +263,12 @@ function onFocusSelf() {
     let $ = this,
         picker = $['_' + name];
     picker.focus();
+}
+
+function onInvalidSelf(e) {
+    let $ = this,
+        picker = $['_' + name];
+    picker.fire('min.tags').focus(), offEventDefault(e); // Disable native validation tooltip for required input(s)
 }
 
 function onFocusTag(e) {
@@ -643,7 +653,18 @@ function onSubmitForm(e) {
 $$.attach = function (self, state) {
     let $ = this;
     self = self || $.self;
-    state = state || $.state;
+    if (state && isString(state)) {
+        state = {
+            join: state
+        };
+    }
+    state = fromStates({}, $.state, state || {});
+    if (hasClass(self, state.n + '__self')) {
+        return $;
+    }
+    if (isRequired(self) && !state.min) {
+        state.min = 1; // Force minimum tag(s) to insert to be `1`
+    }
     $._active = !isDisabled(self) && !isReadOnly(self);
     $._tags = {};
     $._value = getValue(self);
@@ -683,6 +704,7 @@ $$.attach = function (self, state) {
     onEvent('focus', self, onFocusSelf);
     onEvent('focus', textInput, onFocusTextInput);
     onEvent('input', textInput, onInputTextInput);
+    onEvent('invalid', self, onInvalidSelf);
     onEvent('keydown', textInput, onKeyDownTextInput);
     onEvent('keyup', textInput, onKeyUpTextInput);
     onEvent('paste', textInput, onPasteTextInput);
@@ -698,7 +720,7 @@ $$.attach = function (self, state) {
     _mask.text = text;
     $._mask = _mask;
     // Attach the current tag(s)
-    $._value.split(isString(state) ? state : state.join).forEach(tag => $.set(tag, 0, 1));
+    $._value.split(state.join).forEach(tag => $.set(tag, 0, 1));
     // Attach extension(s)
     if (isSet(state) && isArray(state.with)) {
         for (let i = 0, j = toCount(state.with); i < j; ++i) {
@@ -736,6 +758,9 @@ $$.detach = function () {
     let $ = this,
         {_mask, mask, self, state} = $,
         {input} = _mask;
+    if (!hasClass(self, state.n + '__self')) {
+        return $;
+    }
     const form = getParentForm(self);
     $._active = false;
     if (form) {
@@ -747,6 +772,7 @@ $$.detach = function () {
     offEvent('focus', input, onFocusTextInput);
     offEvent('focus', self, onFocusSelf);
     offEvent('input', input, onInputTextInput);
+    offEvent('invalid', self, onInvalidSelf);
     offEvent('keydown', input, onKeyDownTextInput);
     offEvent('keyup', input, onKeyUpTextInput);
     offEvent('paste', input, onPasteTextInput);

@@ -26,7 +26,7 @@
           max: 3
       });
       picker.on('max.tags', function (tag) {
-          console.error('Maximum tags allowed to be inserted is ' + picker.state.max + '.');
+          console.error('The maximum number of tags that can be inserted is ' + this.state.max + '.');
           tag && console.info('Last typed tag name is “' + tag + '”');
       });
     </script>

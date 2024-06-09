@@ -446,6 +446,10 @@
         return self.readOnly;
     }
 
+    function isRequired(self) {
+        return self.required;
+    }
+
     function selectNone(node) {
         var selection = D.getSelection();
         {
@@ -665,6 +669,12 @@
         var $ = this,
             picker = $['_' + name];
         picker.focus();
+    }
+
+    function onInvalidSelf(e) {
+        var $ = this,
+            picker = $['_' + name];
+        picker.fire('min.tags').focus(), offEventDefault(e); // Disable native validation tooltip for required input(s)
     }
 
     function onFocusTag(e) {
@@ -1069,7 +1079,18 @@
     $$.attach = function (self, state) {
         var $ = this;
         self = self || $.self;
-        state = state || $.state;
+        if (state && isString(state)) {
+            state = {
+                join: state
+            };
+        }
+        state = fromStates({}, $.state, state || {});
+        if (hasClass(self, state.n + '__self')) {
+            return $;
+        }
+        if (isRequired(self) && !state.min) {
+            state.min = 1; // Force minimum tag(s) to insert to be `1`
+        }
         $._active = !isDisabled(self) && !isReadOnly(self);
         $._tags = {};
         $._value = getValue(self);
@@ -1109,6 +1130,7 @@
         onEvent('focus', self, onFocusSelf);
         onEvent('focus', textInput, onFocusTextInput);
         onEvent('input', textInput, onInputTextInput);
+        onEvent('invalid', self, onInvalidSelf);
         onEvent('keydown', textInput, onKeyDownTextInput);
         onEvent('keyup', textInput, onKeyUpTextInput);
         onEvent('paste', textInput, onPasteTextInput);
@@ -1124,7 +1146,7 @@
         _mask.text = text;
         $._mask = _mask;
         // Attach the current tag(s)
-        $._value.split(isString(state) ? state : state.join).forEach(function (tag) {
+        $._value.split(state.join).forEach(function (tag) {
             return $.set(tag, 0, 1);
         });
         // Attach extension(s)
@@ -1166,6 +1188,9 @@
             self = $.self,
             state = $.state,
             input = _mask.input;
+        if (!hasClass(self, state.n + '__self')) {
+            return $;
+        }
         var form = getParentForm(self);
         $._active = false;
         if (form) {
@@ -1177,6 +1202,7 @@
         offEvent('focus', input, onFocusTextInput);
         offEvent('focus', self, onFocusSelf);
         offEvent('input', input, onInputTextInput);
+        offEvent('invalid', self, onInvalidSelf);
         offEvent('keydown', input, onKeyDownTextInput);
         offEvent('keyup', input, onKeyUpTextInput);
         offEvent('paste', input, onPasteTextInput);
