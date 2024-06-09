@@ -22,7 +22,7 @@ block style
 block content
   main
     form(method='get')
-      p: input(name='tags' required type='text' value='foo, bar')
+      p: input(name='tags' required type='text')
       p
         label
           input(checked onchange='picker.self.required = this.checked; picker.detach().attach(picker.self, {min: 0});' type='checkbox')
