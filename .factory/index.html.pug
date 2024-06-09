@@ -46,6 +46,7 @@ block style
     |
     | .tag-picker__tag:focus {
     |   border-color: #000;
+    |   outline: 0;
     | }
     |
     | .tag-picker__tag-x {
@@ -180,9 +181,9 @@ block content
     h3: code state.join
     p The character to join the tags (usually a comma followed by a space).
     h3: code state.max
-    p Maximum tags allowed to be inserted.
+    p The maximum number of tags that can be inserted.
     h3: code state.min
-    p Minimum tags that must be present to be able to be submitted by the form. If #[code required] attribute is present on the input element, then the default value of this state will be #[code 1].
+    p The minimum number of tags that must be inserted to be able to submit the form. If #[code required] attribute is present on the input element, then the default value of this state will becomes #[code 1].
     h3: code state.pattern
     p If defined, tag insertion will be performed only if tag name is matched with the pattern.
     h3: code state.with
