@@ -22,6 +22,7 @@ block style
 
 block content
   main
-    form(method='get' target='_blank')
+    p Previous versions would do this by default, but #[a(href='https://github.com/taufik-nurrohman/tag-picker/discussions/19' target='_blank') some people] do not want this behavior. Have a look at the source code to see how I restore the old behavior!
+    form(method='get')
       p: input(name='tags' type='text' value='foo, bar, baz')
       p: button(type='submit') Submit

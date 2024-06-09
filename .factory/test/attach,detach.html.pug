@@ -1,0 +1,27 @@
+extends ../_index.pug
+
+block state
+  - const title = 'Tag Picker'
+  - const scripts = ['../index.min.js']
+  - const styles = ['../index.min.css']
+
+block script
+  script
+    | const picker = new TagPicker(document.querySelector('input'));
+
+block style
+  style
+    | .tag-picker {
+    |   width: 100%;
+    | }
+
+block content
+  main
+    form(method='get')
+      p: input(name='tags' type='text' value='foo, bar')
+      p
+        button(onclick='this.disabled = true; this.nextElementSibling.disabled = false; picker.detach(); return false;' type='button') Detach
+        = ' '
+        button(disabled onclick='this.disabled = true; this.previousElementSibling.disabled = false; picker.attach(); return false;' type='button') Attach
+        = ' '
+        button(type='submit') Submit

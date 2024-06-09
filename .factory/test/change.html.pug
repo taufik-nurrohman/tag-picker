@@ -7,12 +7,19 @@ block state
 
 block script
   script
-    | const picker = new TP(document.querySelector('input'));
+    | const picker = new TagPicker(document.querySelector('input'));
     |
-    | picker.on('change', function (tag, index) {
-    |     console.log([tag, index, this.tags]);
+    | picker.on('change', function () {
+    |     null !== this.value && console.log(this.value.split(this.state.join));
     | });
+
+block style
+  style
+    | .tag-picker {
+    |   width: 100%;
+    | }
 
 block content
   main
     p: input(type='text' value='foo, bar')
+    p: button(onclick='picker.value = \'a, b, c, d\';') Set Value to #[code a, b, c, d]

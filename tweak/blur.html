@@ -14,14 +14,18 @@
   </head>
   <body>
     <main>
-      <p><input type="text" value="foo, bar"></p>
-      <p><button onclick="picker.value = 'a, b, c, d';">Set Value to <code>a, b, c, d</code></button></p>
+      <p>Previous versions would do this by default, but <a href="https://github.com/taufik-nurrohman/tag-picker/discussions/19" target="_blank">some people</a> do not want this behavior. Have a look at the source code to see how I restore the old behavior!</p>
+      <form method="get">
+        <p><input name="tags" type="text" value="foo, bar, baz"></p>
+        <p><button type="submit">Submit</button></p>
+      </form>
     </main>
     <script src="../index.min.js"></script>
     <script>
       const picker = new TagPicker(document.querySelector('input'));
-      picker.on('change', function () {
-          null !== this.value && console.log(this.value.split(this.state.join));
+      picker.on('blur', function () {
+          const text = this.text;
+          text && (this.set(text), this.text = ""); // Insert on blur
       });
     </script>
   </body>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <form method="get">
+        <p><input name="tags[]" type="text" value="foo, bar, baz"></p>
+        <p><button type="submit">Submit</button></p>
+      </form>
+    </main>
+    <script src="../index.min.js"></script>
+    <script>
+      const picker = new TagPicker(document.querySelector('input'));
+      const pickerName = picker.self.getAttribute('name');
+      picker.self.removeAttribute('name');
+      picker.tags = [];
+
+      function onChange() {
+          let tag;
+          while (tag = this.tags.shift()) {
+              tag.remove();
+          }
+          for (let k in this._tags) {
+              let input = document.createElement('input');
+              input.name = pickerName;
+              input.type = 'hidden';
+              input.value = k;
+              picker.self.form.append(input);
+              this.tags.push(input);
+          }
+      }
+      onChange.call(picker);
+      picker.on('change', onChange);
+    </script>
+  </body>
+</html>

@@ -23,7 +23,6 @@
 
       .tag-picker.tag-picker--focus {
         border-color: #00f;
-        box-shadow: 0 0 0 4px rgba(0, 0, 255, 0.25);
       }
 
       .tag-picker__tag {
@@ -73,7 +72,7 @@
       </form>
       <h2 id="usage"><a href="#usage">#</a> Usage</h2>
       <div role="note">
-        <p><strong>Note:</strong> CSS variables have been removed since version 4.0.0. From now on, I will provide a minimal style just to make the interaction decent. Expect it to look ugly by default. The main goal of this application is to be able to integrate it seamlessly into your web design. By providing a minimal style, it is easy to add other styles to adapt it to your web design. Have a look at the source code on this page to see how I adapted the style so that it resembles the default style of the previous version.</p>
+        <p><strong>Note:</strong> CSS variables have been removed since version 4.0.0. From now on, I will only provide a minimal style just to make the interaction decent. Expect it to look ugly by default. The main goal of this application is to be able to integrate it seamlessly into your web design. By providing a minimal style, it is easy to add other styles to adapt it to your web design. Have a look at the source code on this page to see how I adapted the style so that it resembles the default style of the previous version.</p>
       </div>
       <h3>Browser</h3>
       <pre><code>&lt;!DOCTYPE html&gt;
@@ -122,13 +121,15 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
         <li><a href="test/min.html" target="_blank">Limit Minimum Tags</a></li>
         <li><a href="test/not.html" target="_blank">Validate Tag Names with <code>picker.state.pattern</code></a></li>
         <li><a href="test/read-only.html" target="_blank">Read-Only Input</a></li>
-        <li><a href="test/value.html" target="_blank">Set Pre-Defined Value</a></li>
+        <li><a href="test/value.html" target="_blank">Set Input Value</a></li>
       </ul>
       <h2 id="tweaks"><a href="#tweaks">#</a> Tweaks</h2>
       <ul>
         <li><a href="tweak/alert.html" target="_blank">Warn for Duplicate Tags with Alert Message</a></li>
+        <li><a href="tweak/array.html" target="_blank">Tags as Array</a></li>
+        <li><a href="tweak/blur.html" target="_blank">Insert Tag Name on Blur</a></li>
+        <li><a href="tweak/description.html" target="_blank">Warn for Duplicate Tags with Description Below the Input</a></li>
         <li><a href="tweak/focus.hint.html" target="_blank">Hide Input Hint on Focus</a></li>
-        <li><a href="tweak/insert.html" target="_blank">Insert Tag Name on Blur</a></li>
         <li><a href="tweak/invalid.html" target="_blank">Invalid State (Custom)</a></li>
         <li><a href="tweak/target.html" target="_blank">Warn for Duplicate Tags with Flash Highlight</a></li>
       </ul>
@@ -164,13 +165,86 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <h2 id="methods"><a href="#methods">#</a> Methods</h2>
       <h3>Instance Methods</h3>
       <p>Instance methods are methods that are available through the results of a <code>TagPicker</code> construct.</p>
+      <h4><code>picker.attach(self, state)</code></h4>
+      <p>Re-initializes the application and its extensions after it has been detached.</p>
+      <pre><code>picker.attach();</code></pre>
+      <h4><code>picker.blur()</code></h4>
+      <p>Blurs from the tag picker’s input.</p>
+      <pre><code>picker.blur();</code></pre>
+      <h4><code>picker.detach()</code></h4>
+      <p>Disables the application methods (except for the <code>attach()</code> method) and executes the <code>detach()</code> method of the extensions, if they are present.</p>
+      <pre><code>picker.detach();</code></pre>
+      <h4><code>picker.fire(name, data)</code></h4>
+      <p>Fires an event.</p>
+      <pre><code>picker.fire('change', []);</code></pre>
+      <h4><code>picker.focus();</code></h4>
+      <p>Focuses to the tag picker’s input.</p>
+      <pre><code>picker.focus();</code></pre>
+      <h4><code>picker.get(name)</code></h4>
+      <p>Checks the existence of a tag by its name.</p>
+      <pre><code>if (null !== picker.get('foo')) { … }</code></pre>
+      <h4><code>picker.let(name)</code></h4>
+      <p>Removes a tag by its name.</p>
+      <pre><code>picker.let('foo'); // Remove “foo” tag
+picker.let(); // Reset to the initial tags</code></pre>
+      <h4><code>picker.off(name, event)</code></h4>
+      <p>Removes an event.</p>
+      <pre><code>picker.off('change'); // Remove all events from the `change` event container
+picker.off('change', onChange); // Remove `onChange` event from the `change` event container</code></pre>
+      <h4><code>picker.on(name, event)</code></h4>
+      <p>Adds a new event.</p>
+      <pre><code>picker.on('change', function () {
+    console.log(this.value.split(this.state.join));
+});</code></pre>
+      <pre><code>function onChange() {
+    console.log(this.value.split(this.state.join));
+}
+
+picker.on('change', onChange);</code></pre>
+      <h4><code>picker.set(name)</code></h4>
+      <p>Adds a new tag with the specified name.</p>
+      <pre><code>picker.set('foo'); // Add (append) “foo” tag</code></pre>
       <h3>Static Methods</h3>
       <p>Static methods are methods that are directly available on the <code>TagPicker</code> object.</p>
+      <p role="status">This application does not have any static methods.</p>
       <h2 id="properties"><a href="#properties">#</a> Properties</h2>
       <h3>Instance Properties</h3>
       <p>Instance properties are properties that are available through the results of a <code>TagPicker</code> construct.</p>
+      <h4><code>picker.hooks</code></h4>
+      <p>Returns the events data.</p>
+      <pre><code>console.log(picker.hooks);</code></pre>
+      <h4><code>picker.mask</code></h4>
+      <p>Returns the tag picker’s visual.</p>
+      <pre><code>picker.mask.classList.add(picker.state.n + '--dark');</code></pre>
+      <h4><code>picker.self</code></h4>
+      <p>Returns the <code>&lt;input&gt;</code> element.</p>
+      <pre><code>console.log(picker.self.getAttribute('name'));</code></pre>
+      <h4><code>picker.state</code></h4>
+      <p>Returns the application states if any.</p>
+      <pre><code>console.log(picker.state);</code></pre>
+      <h4><code>picker.text</code></h4>
+      <p>Gets or sets the current text in the tag picker’s input.</p>
+      <pre><code>console.log(picker.text);</code></pre>
+      <pre><code>picker.text = 'foo, bar, baz';</code></pre>
+      <h4><code>picker.value</code></h4>
+      <p>Proxy that passes to the <code>picker.self.value</code> property, wwith additional actions that are executed while the value is being set.</p>
+      <pre><code>console.log(picker.value);</code></pre>
+      <pre><code>picker.on('change', function () {
+    console.log(this.value);
+});
+
+picker.value = 'foo, bar, baz';</code></pre>
       <h3>Static Properties</h3>
       <p>Static properties are properties that are directly available on the <code>TagPicker</code> object.</p>
+      <h4><code>TagPicker.state</code></h4>
+      <p>Returns the default values of <code>picker.state</code>.</p>
+      <pre><code>const picker = new TagPicker(document.querySelector('input'), {
+    foo: ['bar', 'baz', 'qux']
+});
+
+console.log([TagPicker.state, picker.state]);</code></pre>
+      <h4><code>TagPicker.version</code></h4>
+      <p>Returns the application version.</p>
       <h2 id="extensions"><a href="#extensions">#</a> Extensions</h2>
       <h3>Anatomy of an Extension</h3>
       <p>Extension as a function:</p>
@@ -197,7 +271,11 @@ Object.defineProperty(Extension, 'name', {
     with: [Extension]
 });</code></pre>
       <h3>List of Extensions</h3>
-      <p><em>None.</em></p>
+      <ul>
+        <li><a aria-disabled="true">History Feature</a></li>
+        <li><a aria-disabled="true">Options Feature</a></li>
+        <li><a aria-disabled="true">Sortable Feature</a></li>
+      </ul>
       <h2 id="license"><a href="#license">#</a> License</h2>
       <p>Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to <a href="https://paypal.me/tatautaufik" target="_blank">share a little financial support</a> with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.</p>
       <p>Thank you! ❤️</p>

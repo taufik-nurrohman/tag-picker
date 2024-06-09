@@ -14,18 +14,14 @@
   </head>
   <body>
     <main>
-      <form method="get" target="_blank">
-        <p><input name="tags" type="text" value="foo, bar, baz"></p>
-        <p><button type="submit">Submit</button></p>
+      <form method="get">
+        <p><input name="tags" type="text" value="foo, bar"></p>
+        <p><button onclick="this.disabled = true; this.nextElementSibling.disabled = false; picker.detach(); return false;" type="button">Detach</button> <button disabled onclick="this.disabled = true; this.previousElementSibling.disabled = false; picker.attach(); return false;" type="button">Attach</button> <button type="submit">Submit</button></p>
       </form>
     </main>
     <script src="../index.min.js"></script>
     <script>
       const picker = new TagPicker(document.querySelector('input'));
-      picker.on('blur', function () {
-          const text = this.text;
-          text && (this.set(text), this.text = ""); // Insert on blur
-      });
     </script>
   </body>
 </html>

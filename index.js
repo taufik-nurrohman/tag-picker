@@ -194,6 +194,9 @@
     var getElement = function getElement(query, scope) {
         return (scope || D).querySelector(query);
     };
+    var getElements = function getElements(query, scope) {
+        return (scope || D).querySelectorAll(query);
+    };
     var getName = function getName(node) {
         return toCaseLower(node && node.nodeName || "") || null;
     };
@@ -523,11 +526,16 @@
             return "" === value ? null : value;
         },
         set: function set(value) {
-            var $ = this,
-                state = $.state;
-            value.split(state.join).forEach(function (tag) {
-                return $.set(tag);
+            var $ = this;
+            $._tags;
+            var state = $.state;
+            $.value.split(state.join).forEach(function (tag) {
+                return $.let(tag, 0);
             });
+            value.split(state.join).forEach(function (tag) {
+                return $.set(tag, 0);
+            });
+            $.fire('change');
         }
     });
     // <https://www.unicode.org/reports/tr18/tr18-23.html#General_Category_Property>
@@ -940,12 +948,15 @@
         // Delete all tag(s) before paste
         if (isAllSelected) {
             picker.value.split(state.join).forEach(function (tag) {
-                return picker.let(tag);
+                return picker.let(tag, 0);
             });
         }
-        value.split(state.join).forEach(function (tag) {
-            return picker.set(tag);
-        }), picker.fire('paste', [e, value.split(state.join)]).focus(), offEventDefault(e);
+        var values = value.split(state.join);
+        values.forEach(function (tag) {
+            return picker.set(tag, 0);
+        });
+        picker.fire('paste', [e, values]).focus().fire('change');
+        offEventDefault(e);
     }
 
     function onPasteTextInput(e) {
@@ -957,14 +968,15 @@
             hint = _mask.hint;
         var value = (e.clipboardData || W.clipboardData).getData('text') + "";
         setValueAtCaret($, value), setText(hint, getText($) ? "" : self.placeholder);
-        picker.fire('paste', [e, value.split(state.join)]);
         delay(function () {
             value = getText($);
             picker.text = "";
             if (null !== value) {
-                value.split(state.join).forEach(function (tag) {
-                    return picker.set(tag);
+                var values = value.split(state.join);
+                values.forEach(function (tag) {
+                    return picker.set(tag, 0);
                 });
+                picker.fire('paste', [e, values]).fire('change');
             }
         }, 1)();
         offEventDefault(e);
@@ -974,15 +986,32 @@
         var $ = this,
             picker = $['_' + name],
             _active = picker._active,
+            _mask = picker._mask,
             _tags = picker._tags,
             state = picker.state,
+            text = _mask.text,
             n = state.n + '__tag--selected';
         if (!_active) {
             return;
         }
         focusTo($), toggleClass($, n);
         if (_keyIsCtrl);
-        else {
+        else if (_keyIsShift) {
+            selectNone();
+            var parentTag = getParent($),
+                selectedTags = getElements('.' + n, parentTag),
+                firstTag = selectedTags[0],
+                lastTag = selectedTags[toCount(selectedTags) - 1],
+                nextTag;
+            if (firstTag !== lastTag) {
+                while ((nextTag = getNext(firstTag)) && text !== nextTag) {
+                    if (firstTag === lastTag) {
+                        break;
+                    }
+                    setClass(firstTag = nextTag, n);
+                }
+            }
+        } else {
             selectNone();
             var asContextMenu = 2 === e.button,
                 // Probably a “right-click”
@@ -1021,10 +1050,10 @@
         picker.focus(), offEventDefault(e);
     }
 
-    function onResetForm() {
+    function onResetForm(e) {
         var $ = this,
             picker = $['_' + name];
-        picker.let();
+        picker.let().fire('reset', [e]);
     }
 
     function onSubmitForm(e) {
@@ -1033,8 +1062,9 @@
             _tags = picker._tags,
             state = picker.state;
         if (toObjectCount(_tags) < state.min) {
-            picker.fire('min.tags').focus(), offEventDefault(e);
+            return picker.fire('min.tags').focus(), offEventDefault(e);
         }
+        return picker.fire('submit', [e]);
     }
     $$.attach = function (self, state) {
         var $ = this;
@@ -1095,7 +1125,7 @@
         $._mask = _mask;
         // Attach the current tag(s)
         $._value.split(isString(state) ? state : state.join).forEach(function (tag) {
-            return $.set(tag, 1);
+            return $.set(tag, 0, 1);
         });
         // Attach extension(s)
         if (isSet(state) && isArray(state.with)) {
@@ -1191,7 +1221,10 @@
         }
         return v;
     };
-    $$.let = function (v) {
+    $$.let = function (v, _hookChange) {
+        if (_hookChange === void 0) {
+            _hookChange = true;
+        }
         var $ = this,
             _active = $._active,
             _tags = $._tags,
@@ -1204,10 +1237,10 @@
         // Reset
         if (!isDefined(v)) {
             return $.value.split(state.join).forEach(function (tag) {
-                return $.let(tag);
+                return $.let(tag, 0);
             }), _value.split(state.join).forEach(function (tag) {
-                return $.set(tag);
-            }), $;
+                return $.set(tag, 0);
+            }), $.fire('change');
         }
         if (toObjectCount(_tags) < state.min) {
             return $.fire('min.tags', [v]);
@@ -1232,9 +1265,17 @@
         offEvent('touchstart', tagX, onPointerDownTagX);
         letElement(tag);
         delete $._tags[v];
-        return self.value = toObjectKeys($._tags).join(state.join), $.fire('let.tag', [v]);
+        self.value = toObjectKeys($._tags).join(state.join);
+        $.fire('let.tag', [v]);
+        if (_hookChange) {
+            $.fire('change', [v]);
+        }
+        return $;
     };
-    $$.set = function (v, force) {
+    $$.set = function (v, _hookChange, _attach) {
+        if (_hookChange === void 0) {
+            _hookChange = true;
+        }
         var $ = this,
             _active = $._active,
             _filter = $._filter,
@@ -1245,7 +1286,7 @@
             text = _mask.text,
             pattern = state.pattern,
             n = state.n;
-        if (!_active && !force) {
+        if (!_active && !_attach) {
             return $;
         }
         if (toObjectCount(_tags) >= state.max) {
@@ -1291,7 +1332,12 @@
         setChildLast(tag, tagX);
         setPrev(text, tag);
         $._tags[v] = tag;
-        return self.value = toObjectKeys($._tags).join(state.join), $.fire('set.tag', [v]);
+        self.value = toObjectKeys($._tags).join(state.join);
+        $.fire('set.tag', [v]);
+        if (_hookChange) {
+            $.fire('change', [v]);
+        }
+        return $;
     };
     return TagPicker;
 }));

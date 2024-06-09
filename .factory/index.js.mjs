@@ -1,4 +1,4 @@
-import {D, W, getAttribute, getChildFirst, getChildren, getElement, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
+import {D, W, getAttribute, getChildFirst, getChildren, getElement, getElements, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
 import {delay} from '@taufik-nurrohman/tick';
 import {fromHTML, fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
@@ -143,8 +143,10 @@ defineProperty($$, 'value', {
     },
     set: function (value) {
         let $ = this,
-            {state} = $;
-        value.split(state.join).forEach(tag => $.set(tag));
+            {_tags, state} = $;
+        $.value.split(state.join).forEach(tag => $.let(tag, 0));
+        value.split(state.join).forEach(tag => $.set(tag, 0));
+        $.fire('change');
     }
 });
 
@@ -531,9 +533,12 @@ function onPasteTag(e) {
     }
     // Delete all tag(s) before paste
     if (isAllSelected) {
-        picker.value.split(state.join).forEach(tag => picker.let(tag));
+        picker.value.split(state.join).forEach(tag => picker.let(tag, 0));
     }
-    value.split(state.join).forEach(tag => picker.set(tag)), picker.fire('paste', [e, value.split(state.join)]).focus(), offEventDefault(e);
+    let values = value.split(state.join);
+    values.forEach(tag => picker.set(tag, 0));
+    picker.fire('paste', [e, values]).focus().fire('change');
+    offEventDefault(e);
 }
 
 function onPasteTextInput(e) {
@@ -543,12 +548,13 @@ function onPasteTextInput(e) {
         {hint} = _mask;
     let value = (e.clipboardData || W.clipboardData).getData('text') + "";
     setValueAtCaret($, value), setText(hint, getText($) ? "" : self.placeholder);
-    picker.fire('paste', [e, value.split(state.join)]);
     delay(() => {
         value = getText($);
         picker.text = "";
         if (null !== value) {
-            value.split(state.join).forEach(tag => picker.set(tag));
+            let values = value.split(state.join);
+            values.forEach(tag => picker.set(tag, 0));
+            picker.fire('paste', [e, values]).fire('change');
         }
     }, 1)();
     offEventDefault(e);
@@ -557,14 +563,29 @@ function onPasteTextInput(e) {
 function onPointerDownTag(e) {
     let $ = this,
         picker = $['_' + name],
-        {_active, _tags, state} = picker,
+        {_active, _mask, _tags, state} = picker,
+        {text} = _mask,
         n = state.n + '__tag--selected';
     if (!_active) {
         return;
     }
     focusTo($), toggleClass($, n);
     if (_keyIsCtrl) {
-
+        // ?
+    } else if (_keyIsShift) {
+        selectNone();
+        let parentTag = getParent($),
+            selectedTags = getElements('.' + n, parentTag),
+            firstTag = selectedTags[0],
+            lastTag = selectedTags[toCount(selectedTags) - 1], nextTag;
+        if (firstTag !== lastTag) {
+            while ((nextTag = getNext(firstTag)) && text !== nextTag) {
+                if (firstTag === lastTag) {
+                    break;
+                }
+                setClass(firstTag = nextTag, n);
+            }
+        }
     } else {
         selectNone();
         let asContextMenu = 2 === e.button, // Probably a “right-click”
@@ -603,10 +624,10 @@ function onPointerDownTagX(e) {
     picker.focus(), offEventDefault(e);
 }
 
-function onResetForm() {
+function onResetForm(e) {
     let $ = this,
         picker = $['_' + name];
-    picker.let();
+    picker.let().fire('reset', [e]);
 }
 
 function onSubmitForm(e) {
@@ -614,8 +635,9 @@ function onSubmitForm(e) {
         picker = $['_' + name],
         {_tags, state} = picker;
     if (toObjectCount(_tags) < state.min) {
-        picker.fire('min.tags').focus(), offEventDefault(e);
+        return picker.fire('min.tags').focus(), offEventDefault(e);
     }
+    return picker.fire('submit', [e]);
 }
 
 $$.attach = function (self, state) {
@@ -676,7 +698,7 @@ $$.attach = function (self, state) {
     _mask.text = text;
     $._mask = _mask;
     // Attach the current tag(s)
-    $._value.split(isString(state) ? state : state.join).forEach(tag => $.set(tag, 1));
+    $._value.split(isString(state) ? state : state.join).forEach(tag => $.set(tag, 0, 1));
     // Attach extension(s)
     if (isSet(state) && isArray(state.with)) {
         for (let i = 0, j = toCount(state.with); i < j; ++i) {
@@ -771,7 +793,7 @@ $$.get = function (v) {
     return v;
 };
 
-$$.let = function (v) {
+$$.let = function (v, _hookChange = true) {
     let $ = this,
         {_active, _tags, _value, self, state} = $;
     if (!_active) {
@@ -779,7 +801,7 @@ $$.let = function (v) {
     }
     // Reset
     if (!isDefined(v)) {
-        return $.value.split(state.join).forEach(tag => $.let(tag)), _value.split(state.join).forEach(tag => $.set(tag)), $;
+        return $.value.split(state.join).forEach(tag => $.let(tag, 0)), _value.split(state.join).forEach(tag => $.set(tag, 0)), $.fire('change');
     }
     if (toObjectCount(_tags) < state.min) {
         return $.fire('min.tags', [v]);
@@ -804,16 +826,21 @@ $$.let = function (v) {
     offEvent('touchstart', tagX, onPointerDownTagX);
     letElement(tag);
     delete $._tags[v];
-    return (self.value = toObjectKeys($._tags).join(state.join)), $.fire('let.tag', [v]);
+    self.value = toObjectKeys($._tags).join(state.join);
+    $.fire('let.tag', [v]);
+    if (_hookChange) {
+        $.fire('change', [v]);
+    }
+    return $;
 };
 
-$$.set = function (v, force) {
+$$.set = function (v, _hookChange = true, _attach) {
     let $ = this,
         {_active, _filter, _mask, _tags, self, state} = $,
         {text} = _mask,
         {pattern} = state,
         n = state.n;
-    if (!_active && !force) {
+    if (!_active && !_attach) {
         return $;
     }
     if (toObjectCount(_tags) >= state.max) {
@@ -859,7 +886,12 @@ $$.set = function (v, force) {
     setChildLast(tag, tagX);
     setPrev(text, tag);
     $._tags[v] = tag;
-    return (self.value = toObjectKeys($._tags).join(state.join)), $.fire('set.tag', [v]);
+    self.value = toObjectKeys($._tags).join(state.join);
+    $.fire('set.tag', [v]);
+    if (_hookChange) {
+        $.fire('change', [v]);
+    }
+    return $;
 };
 
 export default TagPicker;

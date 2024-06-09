@@ -1,0 +1,43 @@
+extends ../_index.pug
+
+block state
+  - const title = 'Tag Picker'
+  - const scripts = ['../index.min.js']
+  - const styles = ['../index.min.css']
+
+block script
+  script
+    | const picker = new TagPicker(document.querySelector('input'));
+    | const pickerName = picker.self.getAttribute('name');
+    |
+    | picker.self.removeAttribute('name');
+    | picker.tags = [];
+    |
+    | function onChange() {
+    |     let tag;
+    |     while (tag = this.tags.shift()) {
+    |         tag.remove();
+    |     }
+    |     for (let k in this._tags) {
+    |         let input = document.createElement('input');
+    |         input.name = pickerName;
+    |         input.type = 'hidden';
+    |         input.value = k;
+    |         picker.self.form.append(input);
+    |         this.tags.push(input);
+    |     }
+    | } onChange.call(picker);
+    |
+    | picker.on('change', onChange);
+
+block style
+  style
+    | .tag-picker {
+    |   width: 100%;
+    | }
+
+block content
+  main
+    form(method='get')
+      p: input(name='tags[]' type='text' value='foo, bar, baz')
+      p: button(type='submit') Submit
