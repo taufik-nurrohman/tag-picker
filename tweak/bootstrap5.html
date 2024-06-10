@@ -69,9 +69,9 @@
   <body>
     <main class="container py-3">
       <form class="row g-3" method="get">
-        <div class="col"><input class="form-control" placeholder="Text goes here&hellip;"></div>
-        <div class="col"><input class="form-control" name="tags" placeholder="Tags go here&hellip;" type="text" value="foo, bar, baz"></div>
-        <div class="col"><button class="btn btn-secondary" data-bs-toggle="button" onclick="picker.self.disabled = !picker.self.disabled; picker.detach().attach();" type="button">Disable</button> <button class="btn btn-primary" type="submit">Submit</button></div>
+        <div class="col-lg-4"><input class="form-control" placeholder="Text goes here&hellip;"></div>
+        <div class="col-lg-4"><input class="form-control" name="tags" placeholder="Tags go here&hellip;" type="text" value="foo, bar, baz"></div>
+        <div class="col-lg-4"><button class="btn btn-secondary" data-bs-toggle="button" onclick="picker.self.disabled = !picker.self.disabled; picker.detach().attach();" type="button">Disable</button> <button class="btn btn-danger" onclick="picker.detach();" type="button">Destroy</button> <button class="btn btn-primary" type="submit">Submit</button></div>
       </form>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>

@@ -71,11 +71,13 @@ block style
 block content
   main.container.py-3
     form.row.g-3(method='get')
-     div.col
+     div.col-lg-4
        input.form-control(placeholder!='Text goes here&hellip;')
-     div.col
+     div.col-lg-4
        input.form-control(name='tags' placeholder!='Tags go here&hellip;' type='text' value='foo, bar, baz')
-     div.col
+     div.col-lg-4
        button.btn.btn-secondary(data-bs-toggle='button' onclick='picker.self.disabled = !picker.self.disabled; picker.detach().attach();' type='button') Disable
+       = ' '
+       button.btn.btn-danger(onclick='picker.detach();' type='button') Destroy
        = ' '
        button.btn.btn-primary(type='submit') Submit
