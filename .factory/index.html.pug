@@ -12,6 +12,9 @@ block script
     | picker.on('has.tag', tag => {
     |     alert('Tag “' + tag + '” already exists.');
     | });
+    | picker.on('reset', function () {
+    |     this.focus();
+    | });
 
 block style
   style
@@ -25,17 +28,14 @@ block style
     | .tag-picker__text {
     |   border-width: 2px;
     | }
-    |
     | .tag-picker {
     |   border-color: #000;
     |   color: #000;
     |   flex: 1;
     | }
-    |
     | .tag-picker.tag-picker--focus {
     |   border-color: #00f;
     | }
-    |
     | .tag-picker__tag {
     |   background: #f00;
     |   border-color: transparent;
@@ -43,26 +43,21 @@ block style
     |   padding-left: 0.5em;
     |   padding-right: 0.5em;
     | }
-    |
     | .tag-picker__tag:focus {
     |   border-color: #000;
     |   outline: 0;
     | }
-    |
     | .tag-picker__tag-x {
     |   color: #fff;
     | }
-    |
     | .tag-picker__tag--selected,
     | .tag-picker__tag--selected:focus {
     |   background: #c00;
     | }
-    |
     | .tag-picker__tags {
     |   gap: 2px;
     |   padding: 2px;
     | }
-    |
     | .tag-picker__text {
     |   padding-left: 0.5em;
     |   padding-right: 0.5em;
@@ -74,7 +69,7 @@ block content
     hgroup
       h1= title
       p Tag Picker is a JavaScript application designed to simplify the management of comma-separated lists of words, offering a minimalist interface for an enhanced user experience. Users can easily add tags by typing a word and pressing the #[kbd ,] key (by default), or remove tags with a quick click (or by using common keys such as the #[kbd Backspace] or #[kbd Delete] keys). Developers can easily integrate and customize this application styles to match the design of their web project.
-    p It supports native keyboard interaction as if it were plain text. You should be able to copy, cut, and paste from/to the mask. Click a tag to select it, press the #[kbd Control] key while clicking the tag to select multiple tags. You can also select the tags using a combination of #[kbd Shift] and #[kbd ArrowLeft] or #[kbd ArrowRight] keys.
+    p It supports native keyboard interaction as if it were plain text. You should be able to copy, cut, and paste from/to the mask. Click a tag to select it, press the #[kbd Control] key while clicking the tag to select multiple tags. You can also select the tags using the combination of #[kbd Shift] and #[kbd ArrowLeft] or #[kbd ArrowRight] keys.
   main
     form(method='get' target='_blank')
       p(role='group')
@@ -112,7 +107,7 @@ block content
       |   &lt;/body&gt;
       | &lt;/html&gt;
     h3 Node.js
-    p Functions and methods in this application are mostly native JavaScript and are intended for use by the browser. Node.js doesn&rsquo;t know about the DOM, so this kind of practice will probably be used more often to build new browser packages than to be used directly in the Node.js server.
+    p Functions and methods in this application are mostly native JavaScript and are intended for use by the browser. Node.js doesn’t know about the DOM, so this kind of practice will probably be used more often to build new browser packages than to be used directly in the Node.js server.
     h4 CommonJS
     pre: code
       | const TagPicker = require('@taufik-nurrohman/tag-picker').default;
@@ -130,29 +125,30 @@ block content
       li: a(href='test.html' target='_blank') No Idea?
       li: a(href='test/attach,detach.html' target='_blank') Attach, Detach
       li: a(href='test/copy,cut,paste.html' target='_blank') Copy, Cut, and Paste Events
+      li: a(href='test/escape.html' target='_blank') Disabled Characters
       li: a(href='test/disabled.html' target='_blank') Disabled Input
-      li: a(href='test/escape.html' target='_blank') Disable Characters with #[code picker.state.escape]
-      li: a(href='test/filter.html' target='_blank') Filter Characters with #[code picker._filter()]
+      li: a(href='test/filter.html' target='_blank') Filtered Characters
       li: a(href='test/focus-auto.html' target='_blank') Focus Automatically
       li: a(href='test/focus.html' target='_blank') Focus States
       li: a(href='test/form.html' target='_blank') Form Events
-      li: a(href='test/hint.html' target='_blank') Set Input Hint
       li: a(href='test/max.html' target='_blank') Limit Maximum Tags
       li: a(href='test/min.html' target='_blank') Limit Minimum Tags
-      li: a(href='test/not.html' target='_blank') Validate Tag Names with #[code picker.state.pattern]
       li: a(href='test/read-only.html' target='_blank') Read-Only Input
       li: a(href='test/required.html' target='_blank') Required Input
+      li: a(href='test/hint.html' target='_blank') Set Input Hint
       li: a(href='test/value.html' target='_blank') Set Input Value
+      li: a(href='test/not.html' target='_blank') Validate Tag Name
     h2#tweaks
       a(href='#tweaks') #
       = ' Tweaks'
     ul
-      li: a(href='tweak/alert.html' target='_blank') Warn for Duplicate Tags with Alert Message
-      li: a(href='tweak/array.html' target='_blank') Tags as Array
-      li: a(href='tweak/blur.html' target='_blank') Insert Tag Name on Blur
-      li: a(href='tweak/description.html' target='_blank') Warn for Duplicate Tags with Description Below the Input
+      li: a(href='tweak/bootstrap5.html' target='_blank') Bootstrap v5.3 Style
       li: a(href='tweak/focus.hint.html' target='_blank') Hide Input Hint on Focus
+      li: a(href='tweak/blur.html' target='_blank') Insert Tag Name on Blur
       li: a(href='tweak/invalid.html' target='_blank') Invalid State (Custom)
+      li: a(href='tweak/array.html' target='_blank') Tags as Array
+      li: a(href='tweak/alert.html' target='_blank') Warn for Duplicate Tags with Alert Message
+      li: a(href='tweak/description.html' target='_blank') Warn for Duplicate Tags with Description Below the Input
       li: a(href='tweak/target.html' target='_blank') Warn for Duplicate Tags with Flash Highlight
     h2#constructor
       a(href='#constructor') #
@@ -162,7 +158,7 @@ block content
       | const picker = new TagPicker(self, state = {
       |     escape: [','],
       |     join: ', ',
-      |     max: 9999,
+      |     max: Infinity,
       |     min: 0,
       |     pattern: null,
       |     with: []
@@ -177,13 +173,13 @@ block content
     h3: code state
     p The configuration data.
     h3: code state.escape
-    p List of characters to trigger the tag insertion.
+    p List of characters to trigger the tag insertion. It is #[code='[\',\']'] by default, which means that you cannot have a #[code ','] character in the tag name. You can also add #[code='\'\\n\''] and #[code='\'\\t\''] to the list so that it will insert a tag when you press the #[kbd Tab] or #[kbd Enter] key.
     h3: code state.join
     p The character to join the tags (usually a comma followed by a space).
     h3: code state.max
     p The maximum number of tags that can be inserted.
     h3: code state.min
-    p The minimum number of tags that must be inserted to be able to submit the form. If #[code required] attribute is present on the input element, then the default value of this state will becomes #[code 1].
+    p The minimum number of tags that must be inserted to be able to submit the form. The default value of this state is set to #[code 0], but if the #[code required] attribute is present on the input element, then the default value of this state will be set to #[code 1].
     h3: code state.pattern
     p If defined, tag insertion will be performed only if tag name is matched with the pattern.
     h3: code state.with
@@ -192,7 +188,6 @@ block content
       a(href='#methods') #
       = ' Methods'
     h3 Instance Methods
-    p Instance methods are methods that are available through the results of a #[code TagPicker] construct.
     h4: code picker.attach(self, state)
     p Re-initializes the application and its extensions after it has been detached.
     pre: code
@@ -209,19 +204,21 @@ block content
     p Fires an event.
     pre: code
       | picker.fire('change', []);
-    h4: code picker.focus();
-    p Focuses to the tag picker’s input.
+    h4: code picker.focus(mode = true)
+    p Focuses to the tag picker’s input. If it has a text, it will select the text as well.
     pre: code
-      | picker.focus();
+      | picker.focus(); // Focus and select the text
+      | picker.focus(-1); // Focus and put the caret to the start of the text
+      | picker.focus(+1); // Focus and put the caret to the end of the text
     h4: code picker.get(name)
-    p Checks the existence of a tag by its name.
+    p Returns the tag position in the list, starting from #[code 0].
     pre: code
       | if (null !== picker.get('foo')) { … }
     h4: code picker.let(name)
     p Removes a tag by its name.
     pre: code
       | picker.let('foo'); // Remove “foo” tag
-      | picker.let(); // Reset to the initial tags
+      | picker.let(); // Reset to the initial value
     h4: code picker.off(name, event)
     p Removes an event.
     pre: code
@@ -244,13 +241,11 @@ block content
     pre: code
       | picker.set('foo'); // Add (append) “foo” tag
     h3 Static Methods
-    p Static methods are methods that are directly available on the #[code TagPicker] object.
     p(role='status') This application does not have any static methods.
     h2#properties
      a(href='#properties') #
      = ' Properties'
     h3 Instance Properties
-    p Instance properties are properties that are available through the results of a #[code TagPicker] construct.
     h4: code picker.hooks
     p Returns the events data.
     pre: code
@@ -260,7 +255,7 @@ block content
     pre: code
       | picker.mask.classList.add(picker.state.n + '--dark');
     h4: code picker.self
-    p Returns the #[code &lt;input&gt;] element.
+    p Returns the input element.
     pre: code
       | console.log(picker.self.getAttribute('name'));
     h4: code picker.state
@@ -274,7 +269,7 @@ block content
     pre: code
       | picker.text = 'foo, bar, baz';
     h4: code picker.value
-    p Proxy that passes to the #[code picker.self.value] property, wwith additional actions that are executed while the value is being set.
+    p Proxy that passes to the #[code picker.self.value] property, with additional actions that are executed while the value is being set.
     pre: code
       | console.log(picker.value);
     pre: code
@@ -284,7 +279,6 @@ block content
       |
       | picker.value = 'foo, bar, baz';
     h3 Static Properties
-    p Static properties are properties that are directly available on the #[code TagPicker] object.
     h4: code TagPicker.state
     p Returns the default values of #[code picker.state].
     pre: code
@@ -334,10 +328,10 @@ block content
     h2#license
       a(href='#license') #
       = ' License'
-    p Use it for free, pay if you get paid. So, you&rsquo;ve just benefited financially after using this project? It&rsquo;s a good idea to #[a(href='https://paypal.me/tatautaufik' target='_blank') share a little financial support] with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.
+    p Use it for free, pay if you get paid. So, you’ve just benefited financially after using this project? It’s a good idea to #[a(href='https://paypal.me/tatautaufik' target='_blank') share a little financial support] with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.
     p Thank you! ❤️
   footer
     hr
     p
-      != '&copy; ' + year + ' '
+      != '© ' + year + ' '
       a(href='/') Taufik Nurrohman

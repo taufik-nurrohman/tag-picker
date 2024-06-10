@@ -453,16 +453,24 @@
     function selectNone(node) {
         var selection = D.getSelection();
         {
-            selection.removeAllRanges();
+            // selection.removeAllRanges();
+            if (selection.rangeCount) {
+                selection.removeRange(selection.getRangeAt(0));
+            }
         }
     }
 
-    function selectTo(node) {
+    function selectTo(node, mode) {
         var selection = D.getSelection();
         selectNone();
         var range = D.createRange();
         range.selectNodeContents(node);
         selection.addRange(range);
+        if (1 === mode) {
+            selection.collapseToEnd();
+        } else if (-1 === mode) {
+            selection.collapseToStart();
+        }
     }
 
     function setValueAtCaret(node, value) {
@@ -497,7 +505,7 @@
     TagPicker.state = {
         'escape': [','],
         'join': ', ',
-        'max': 9999,
+        'max': Infinity,
         'min': 0,
         'n': 'tag-picker',
         'pattern': null,
@@ -527,15 +535,17 @@
     defineProperty($$, 'value', {
         get: function get() {
             var value = this.self.value;
-            return "" === value ? null : value;
+            return value || null;
         },
         set: function set(value) {
             var $ = this;
             $._tags;
             var state = $.state;
-            $.value.split(state.join).forEach(function (tag) {
-                return $.let(tag, 0);
-            });
+            if ($.value) {
+                $.value.split(state.join).forEach(function (tag) {
+                    return $.let(tag, 0);
+                });
+            }
             value.split(state.join).forEach(function (tag) {
                 return $.set(tag, 0);
             });
@@ -956,7 +966,7 @@
             }
         }
         // Delete all tag(s) before paste
-        if (isAllSelected) {
+        if (isAllSelected && picker.value) {
             picker.value.split(state.join).forEach(function (tag) {
                 return picker.let(tag, 0);
             });
@@ -981,7 +991,7 @@
         delay(function () {
             value = getText($);
             picker.text = "";
-            if (null !== value) {
+            if (value) {
                 var values = value.split(state.join);
                 values.forEach(function (tag) {
                     return picker.set(tag, 0);
@@ -1093,7 +1103,7 @@
         }
         $._active = !isDisabled(self) && !isReadOnly(self);
         $._tags = {};
-        $._value = getValue(self);
+        $._value = getValue(self) || null;
         $.self = self;
         $.state = state;
         var n = state.n;
@@ -1146,9 +1156,11 @@
         _mask.text = text;
         $._mask = _mask;
         // Attach the current tag(s)
-        $._value.split(state.join).forEach(function (tag) {
-            return $.set(tag, 0, 1);
-        });
+        if ($._value) {
+            $._value.split(state.join).forEach(function (tag) {
+                return $.set(tag, 0, 1);
+            });
+        }
         // Attach extension(s)
         if (isSet(state) && isArray(state.with)) {
             for (var i = 0, j = toCount(state.with); i < j; ++i) {
@@ -1228,11 +1240,11 @@
         $.mask = null;
         return $;
     };
-    $$.focus = function () {
+    $$.focus = function (mode) {
         var $ = this,
             _mask = $._mask,
             input = _mask.input;
-        return input && (focusTo(input), selectTo(input)), $;
+        return input && (focusTo(input), selectTo(input, mode)), $;
     };
     $$.get = function (v) {
         var $ = this,
@@ -1245,7 +1257,7 @@
         if (!_tags[v]) {
             return null;
         }
-        return v;
+        return toObjectKeys(_tags).indexOf(v);
     };
     $$.let = function (v, _hookChange) {
         if (_hookChange === void 0) {
@@ -1262,9 +1274,12 @@
         }
         // Reset
         if (!isDefined(v)) {
-            return $.value.split(state.join).forEach(function (tag) {
-                return $.let(tag, 0);
-            }), _value.split(state.join).forEach(function (tag) {
+            if ($.value) {
+                $.value.split(state.join).forEach(function (tag) {
+                    return $.let(tag, 0);
+                });
+            }
+            return _value.split(state.join).forEach(function (tag) {
                 return $.set(tag, 0);
             }), $.fire('change');
         }

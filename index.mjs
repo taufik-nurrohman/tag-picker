@@ -58,16 +58,24 @@ function isRequired(self) {
 function selectNone(node) {
     const selection = D.getSelection();
     if (node) {} else {
-        selection.removeAllRanges();
+        // selection.removeAllRanges();
+        if (selection.rangeCount) {
+            selection.removeRange(selection.getRangeAt(0));
+        }
     }
 }
 
-function selectTo(node) {
+function selectTo(node, mode) {
     const selection = D.getSelection();
     selectNone();
     const range = D.createRange();
     range.selectNodeContents(node);
     selection.addRange(range);
+    if (1 === mode) {
+        selection.collapseToEnd();
+    } else if (-1 === mode) {
+        selection.collapseToStart();
+    }
 }
 
 function setValueAtCaret(node, value) {
@@ -110,7 +118,7 @@ function TagPicker(self, state) {
 TagPicker.state = {
     'escape': [','],
     'join': ', ',
-    'max': 9999,
+    'max': Infinity,
     'min': 0,
     'n': 'tag-picker',
     'pattern': null,
@@ -143,12 +151,14 @@ defineProperty($$, 'text', {
 defineProperty($$, 'value', {
     get: function () {
         let value = this.self.value;
-        return "" === value ? null : value;
+        return value || null;
     },
     set: function (value) {
         let $ = this,
             {_tags, state} = $;
-        $.value.split(state.join).forEach(tag => $.let(tag, 0));
+        if ($.value) {
+            $.value.split(state.join).forEach(tag => $.let(tag, 0));
+        }
         value.split(state.join).forEach(tag => $.set(tag, 0));
         $.fire('change');
     }
@@ -542,7 +552,7 @@ function onPasteTag(e) {
         }
     }
     // Delete all tag(s) before paste
-    if (isAllSelected) {
+    if (isAllSelected && picker.value) {
         picker.value.split(state.join).forEach(tag => picker.let(tag, 0));
     }
     let values = value.split(state.join);
@@ -561,7 +571,7 @@ function onPasteTextInput(e) {
     delay(() => {
         value = getText($);
         picker.text = "";
-        if (null !== value) {
+        if (value) {
             let values = value.split(state.join);
             values.forEach(tag => picker.set(tag, 0));
             picker.fire('paste', [e, values]).fire('change');
@@ -667,7 +677,7 @@ $$.attach = function (self, state) {
     }
     $._active = !isDisabled(self) && !isReadOnly(self);
     $._tags = {};
-    $._value = getValue(self);
+    $._value = getValue(self) || null;
     $.self = self;
     $.state = state;
     let n = state.n;
@@ -720,7 +730,9 @@ $$.attach = function (self, state) {
     _mask.text = text;
     $._mask = _mask;
     // Attach the current tag(s)
-    $._value.split(state.join).forEach(tag => $.set(tag, 0, 1));
+    if ($._value) {
+        $._value.split(state.join).forEach(tag => $.set(tag, 0, 1));
+    }
     // Attach extension(s)
     if (isSet(state) && isArray(state.with)) {
         for (let i = 0, j = toCount(state.with); i < j; ++i) {
@@ -799,11 +811,11 @@ $$.detach = function () {
     return $;
 };
 
-$$.focus = function () {
+$$.focus = function (mode) {
     let $ = this,
         {_mask} = $,
         {input} = _mask;
-    return (input && (focusTo(input), selectTo(input))), $;
+    return (input && (focusTo(input), selectTo(input, mode))), $;
 };
 
 $$.get = function (v) {
@@ -816,7 +828,7 @@ $$.get = function (v) {
     if (!_tags[v]) {
         return null;
     }
-    return v;
+    return toObjectKeys(_tags).indexOf(v);
 };
 
 $$.let = function (v, _hookChange = true) {
@@ -827,7 +839,10 @@ $$.let = function (v, _hookChange = true) {
     }
     // Reset
     if (!isDefined(v)) {
-        return $.value.split(state.join).forEach(tag => $.let(tag, 0)), _value.split(state.join).forEach(tag => $.set(tag, 0)), $.fire('change');
+        if ($.value) {
+            $.value.split(state.join).forEach(tag => $.let(tag, 0));
+        }
+        return _value.split(state.join).forEach(tag => $.set(tag, 0)), $.fire('change');
     }
     if (toObjectCount(_tags) < state.min) {
         return $.fire('min.tags', [v]);
