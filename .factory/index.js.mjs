@@ -899,13 +899,13 @@ $$.set = function (v, _hookChange = true, _attach) {
     }
     $.fire('is.tag', [v]);
     const tag = setElement('span', {
-        'class': n += '__tag',
+        'class': n + '__tag',
         'tabindex': _active ? -1 : false,
         'title': v
     });
     const tagText = setElement('span', fromHTML(v));
     const tagX = setElement('span', {
-        'class': n += '-x',
+        'class': n + '__x',
         'tabindex': -1
     });
     if (_active) {

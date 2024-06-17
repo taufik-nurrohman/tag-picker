@@ -511,7 +511,7 @@
         'pattern': null,
         'with': []
     };
-    TagPicker.version = '4.0.0';
+    TagPicker.version = '4.0.1';
     defineProperty(TagPicker, 'name', {
         value: name
     });
@@ -1345,13 +1345,13 @@
         }
         $.fire('is.tag', [v]);
         var tag = setElement('span', {
-            'class': n += '__tag',
+            'class': n + '__tag',
             'tabindex': _active ? -1 : false,
             'title': v
         });
         var tagText = setElement('span', fromHTML(v));
         var tagX = setElement('span', {
-            'class': n += '-x',
+            'class': n + '__x',
             'tabindex': -1
         });
         if (_active) {
