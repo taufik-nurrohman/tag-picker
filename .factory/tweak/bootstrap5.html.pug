@@ -17,7 +17,7 @@ block style
     |   border-radius: var(--bs-border-radius);
     |   border: var(--bs-border-width) solid var(--bs-border-color);
     |   color: var(--bs-body-color);
-    |   line-height: 1.5;
+    |   line-height: 1.5em;
     |   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     |   width: 100%;
     | }
@@ -27,24 +27,50 @@ block style
     |   box-shadow: var(--bs-focus-ring-blur, var(--bs-focus-ring-y, var(--bs-focus-ring-x, 0) 0) 0) var(--bs-focus-ring-width) var(--bs-focus-ring-color);
     |   color: var(--bs-body-color);
     | }
+    | .tag-picker__self.form-control-lg + .tag-picker {
+    |   border-radius: var(--bs-border-radius-lg);
+    |   font-size: 1.25rem;
+    | }
+    | .tag-picker__self.form-control-lg + .tag-picker .tag-picker__tag,
+    | .tag-picker__self.form-control-lg + .tag-picker .tag-picker__text {
+    |   gap: 0.5rem;
+    |   padding: 0 calc(0.5rem - 1px);
+    | }
+    | .tag-picker__self.form-control-lg + .tag-picker .tag-picker__tags {
+    |   gap: 0.5rem;
+    |   padding: 0.5rem;
+    | }
+    | .tag-picker__self.form-control-sm + .tag-picker {
+    |   border-radius: var(--bs-border-radius-sm);
+    |   font-size: 0.875rem;
+    | }
+    | .tag-picker__self.form-control-sm + .tag-picker .tag-picker__tag,
+    | .tag-picker__self.form-control-sm + .tag-picker .tag-picker__text {
+    |   gap: 0.25rem;
+    |   padding: 0 calc(0.25rem - 1px);
+    | }
+    | .tag-picker__self.form-control-sm + .tag-picker .tag-picker__tags {
+    |   gap: 0.25rem;
+    |   padding: 0.25rem;
+    | }
     | .tag-picker__self:disabled + .tag-picker,
     | .tag-picker__self:read-only + .tag-picker {
     |   background-color: var(--bs-secondary-bg);
     | }
     | .tag-picker__self:disabled + .tag-picker .tag-picker__tag {
-    |   opacity: 0.5
+    |   opacity: 0.5;
     | }
     | .tag-picker__tag,
     | .tag-picker__text {
-    |   height: 1.5em;
     |   line-height: calc(1.5em - 2px);
-    |   padding: 0 0.375rem;
+    |   padding: 0 calc(0.375rem - 1px);
     | }
     | .tag-picker__tag {
     |   background-color: var(--bs-secondary-bg-subtle);
     |   border-color: var(--bs-secondary-border-subtle);
     |   border-radius: var(--bs-border-radius-sm);
     |   color: var(--bs-secondary-text-emphasis);
+    |   gap: 0.5rem;
     | }
     | .tag-picker__tag:focus {
     |   border-color: var(--bs-secondary-text-emphasis);
@@ -67,6 +93,16 @@ block style
     |   color: var(--bs-secondary-color);
     |   opacity: 1;
     | }
+    | .tag-picker__x {
+    |   height: 0.75em;
+    |   margin-right: 0;
+    |   width: 0.75em;
+    | }
+    | .tag-picker__x::after,
+    | .tag-picker__x::before {
+    |   border-left-width: 0;
+    |   margin-left: -0.5px;
+    | }
 
 block content
   main.container.py-3
@@ -75,7 +111,12 @@ block content
        input.form-control(placeholder!='Text goes here&hellip;')
      div.col-lg-4
        input.form-control(name='tags' placeholder!='Tags go here&hellip;' type='text' value='foo, bar, baz')
-     div.col-lg-4
+     div.align-items-start.col-lg-4.d-flex.gap-2
+       select.form-select(onchange='picker.self.classList.remove(\'form-control-lg\', \'form-control-sm\'); (this.value && picker.self.classList.add(\'form-control-\' + this.value)); picker.detach().attach();')
+         option(value='sm') Small
+         option(selected value="") Medium
+         option(value='lg') Large
+       = ' '
        button.btn.btn-secondary(data-bs-toggle='button' onclick='picker.self.disabled = !picker.self.disabled; picker.detach().attach();' type='button') Disable
        = ' '
        button.btn.btn-danger(onclick='picker.detach();' type='button') Destroy

@@ -203,9 +203,11 @@ picker.off('change', onChange); // Remove `onChange` event from the `change` eve
 }
 
 picker.on('change', onChange);</code></pre>
-      <h4><code>picker.set(name)</code></h4>
-      <p>Adds a new tag with the specified name.</p>
-      <pre><code>picker.set('foo'); // Add (append) “foo” tag</code></pre>
+      <h4><code>picker.set(name, at = -1)</code></h4>
+      <p>Adds a new tag with the given name.</p>
+      <pre><code>picker.set('foo'); // Append “foo” tag
+picker.set('bar', 0); // Prepend “bar” tag
+picker.set('baz', 2); // Insert “baz” tag at index 2 in the list</code></pre>
       <h3>Static Methods</h3>
       <p role="status">This application does not have any static methods.</p>
       <h2 id="properties"><a href="#properties">#</a> Properties</h2>
@@ -271,6 +273,7 @@ Object.defineProperty(Extension, 'name', {
 });</code></pre>
       <h3>List of Extensions</h3>
       <ul>
+        <li><a aria-disabled="true">Clear Feature</a></li>
         <li><a aria-disabled="true">History Feature</a></li>
         <li><a aria-disabled="true">Options Feature</a></li>
         <li><a aria-disabled="true">Sortable Feature</a></li>
@@ -286,6 +289,9 @@ Object.defineProperty(Extension, 'name', {
     <script src="index.min.js"></script>
     <script>
       const picker = new TagPicker(document.forms[0].tags);
+      picker.on('change', function () {
+          console.log(this.value);
+      });
       picker.on('has.tag', tag => {
           alert('Tag “' + tag + '” already exists.');
       });

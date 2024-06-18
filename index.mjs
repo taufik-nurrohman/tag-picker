@@ -3,7 +3,7 @@ import {delay} from '@taufik-nurrohman/tick';
 import {fromHTML, fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
-import {isArray, isDefined, isFunction, isInstance, isObject, isSet, isString} from '@taufik-nurrohman/is';
+import {isArray, isDefined, isFunction, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
 import {offEvent, offEventDefault, offEventPropagation, onEvent} from '@taufik-nurrohman/event';
 import {toCount, toObjectCount, toObjectKeys, toObjectValues} from '@taufik-nurrohman/to';
 import {toPattern} from '@taufik-nurrohman/pattern';
@@ -157,9 +157,9 @@ defineProperty($$, 'value', {
         let $ = this,
             {_tags, state} = $;
         if ($.value) {
-            $.value.split(state.join).forEach(tag => $.let(tag, 0));
+            $.value.split(state.join).forEach(tag => $.let(tag, 1));
         }
-        value.split(state.join).forEach(tag => $.set(tag, 0));
+        value.split(state.join).forEach(tag => $.set(tag, -1, 1));
         $.fire('change');
     }
 });
@@ -245,11 +245,11 @@ function onCutTag(e) {
     let selection = [];
     for (let k in _tags) {
         if (hasClass(_tags[k], n)) {
-            selection.push(k), picker.let(k);
+            selection.push(k), picker.let(k, 1);
         }
     }
     e.clipboardData.setData('text/plain', selection.join(state.join));
-    picker.fire('cut', [e, selection]).focus();
+    picker.fire('cut', [e, selection]).fire('change', [$.title]).focus();
     offEventDefault(e);
 }
 
@@ -302,7 +302,7 @@ function onKeyDownTag(e) {
         prevTag = getPrev($),
         nextTag = getNext($),
         firstTag, lastTag,
-        n = state.n + '__tag--selected';
+        n = state.n + '__tag--selected', v;
     if (keyIsShift) {
         setClass($, n), selectTo(getChildFirst($));
         if (KEY_ARROW_LEFT === key) {
@@ -381,25 +381,27 @@ function onKeyDownTag(e) {
             nextTag && text !== nextTag ? focusTo(nextTag) : picker.focus();
             exit = true;
         } else if (KEY_DELETE_LEFT === key) {
-            picker.let($.title);
+            picker.let(v = $.title, 1);
             if (toCount(selection) > 1) {
                 let current;
                 while (current = selection.pop()) {
                     prevTag = _tags[current] && getPrev(_tags[current]);
-                    picker.let(current);
+                    picker.let(current, 1);
                 }
             }
+            picker.fire('change', [v]);
             prevTag ? (focusTo(prevTag), selectTo(getChildFirst(prevTag))) : picker.focus();
             exit = true;
         } else if (KEY_DELETE_RIGHT === key) {
-            picker.let($.title);
+            picker.let(v = $.title, 1);
             if (toCount(selection) > 1) {
                 let current;
                 while (current = selection.shift()) {
                     nextTag = _tags[current] && getNext(_tags[current]);
-                    picker.let(current);
+                    picker.let(current, 1);
                 }
             }
+            picker.fire('change', [v]);
             nextTag && text !== nextTag ? (focusTo(nextTag), selectTo(getChildFirst(nextTag))) : picker.focus();
             exit = true;
         } else if (KEY_ESCAPE === key || KEY_TAB === key) {
@@ -553,10 +555,10 @@ function onPasteTag(e) {
     }
     // Delete all tag(s) before paste
     if (isAllSelected && picker.value) {
-        picker.value.split(state.join).forEach(tag => picker.let(tag, 0));
+        picker.value.split(state.join).forEach(tag => picker.let(tag, 1));
     }
     let values = value.split(state.join);
-    values.forEach(tag => picker.set(tag, 0));
+    values.forEach(tag => picker.set(tag, -1, 1));
     picker.fire('paste', [e, values]).focus().fire('change');
     offEventDefault(e);
 }
@@ -573,7 +575,7 @@ function onPasteTextInput(e) {
         picker.text = "";
         if (value) {
             let values = value.split(state.join);
-            values.forEach(tag => picker.set(tag, 0));
+            values.forEach(tag => picker.set(tag, -1, 1));
             picker.fire('paste', [e, values]).fire('change');
         }
     }, 1)();
@@ -640,8 +642,7 @@ function onPointerDownTagX(e) {
         {_mask} = picker,
         {input} = _mask;
     offEvent('click', $, onPointerDownTagX);
-    picker.let(tag.title);
-    picker.focus(), offEventDefault(e);
+    picker.let(tag.title).focus(), offEventDefault(e);
 }
 
 function onResetForm(e) {
@@ -731,7 +732,7 @@ $$.attach = function (self, state) {
     $._mask = _mask;
     // Attach the current tag(s)
     if ($._value) {
-        $._value.split(state.join).forEach(tag => $.set(tag, 0, 1));
+        $._value.split(state.join).forEach(tag => $.set(tag, -1, 1, 1));
     }
     // Attach extension(s)
     if (isSet(state) && isArray(state.with)) {
@@ -831,7 +832,7 @@ $$.get = function (v) {
     return toObjectKeys(_tags).indexOf(v);
 };
 
-$$.let = function (v, _hookChange = true) {
+$$.let = function (v, _skipHookChange) {
     let $ = this,
         {_active, _tags, _value, self, state} = $;
     if (!_active) {
@@ -840,9 +841,9 @@ $$.let = function (v, _hookChange = true) {
     // Reset
     if (!isDefined(v)) {
         if ($.value) {
-            $.value.split(state.join).forEach(tag => $.let(tag, 0));
+            $.value.split(state.join).forEach(tag => $.let(tag, 1));
         }
-        return _value.split(state.join).forEach(tag => $.set(tag, 0)), $.fire('change');
+        return _value.split(state.join).forEach(tag => $.set(tag, -1, 1)), $.fire('change');
     }
     if (toObjectCount(_tags) < state.min) {
         return $.fire('min.tags', [v]);
@@ -869,13 +870,13 @@ $$.let = function (v, _hookChange = true) {
     delete $._tags[v];
     self.value = toObjectKeys($._tags).join(state.join);
     $.fire('let.tag', [v]);
-    if (_hookChange) {
+    if (!_skipHookChange) {
         $.fire('change', [v]);
     }
     return $;
 };
 
-$$.set = function (v, _hookChange = true, _attach) {
+$$.set = function (v, at, _skipHookChange, _attach) {
     let $ = this,
         {_active, _filter, _mask, _tags, self, state} = $,
         {text} = _mask,
@@ -925,11 +926,22 @@ $$.set = function (v, _hookChange = true, _attach) {
     }
     setChildLast(tag, tagText);
     setChildLast(tag, tagX);
-    setPrev(text, tag);
-    $._tags[v] = tag;
+    if (isInteger(at) && at >= 0) {
+        let tags = toObjectKeys(_tags);
+        tags.splice(at, 0, v);
+        $._tags = {};
+        _tags[v] = tag;
+        tags.forEach(k => {
+            $._tags[k] = _tags[k];
+            setPrev(text, _tags[k]);
+        });
+    } else {
+        setPrev(text, tag);
+        $._tags[v] = tag;
+    }
     self.value = toObjectKeys($._tags).join(state.join);
     $.fire('set.tag', [v]);
-    if (_hookChange) {
+    if (!_skipHookChange) {
         $.fire('change', [v]);
     }
     return $;

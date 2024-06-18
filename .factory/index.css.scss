@@ -1,5 +1,17 @@
 $name: 'tag-picker';
 
+%tag {
+  align-items: center;
+  border: 1px solid transparent;
+  display: flex;
+  gap: 0.25em;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0 0.25em;
+  position: relative;
+  text-decoration: none;
+}
+
 .#{$name} {
   &,
   & * {
@@ -17,134 +29,117 @@ $name: 'tag-picker';
   flex-wrap: wrap;
   position: relative;
   vertical-align: middle;
-}
-
-.#{$name}__self {
-  left: -9999px;
-  position: fixed;
-  top: -9999px;
-  &:disabled {
-    + .#{$name} {
-      color: rgba(128, 128, 128);
+  &__self {
+    left: -9999px;
+    position: fixed;
+    top: -9999px;
+    &:disabled {
+      + .#{$name} {
+        color: rgba(128, 128, 128);
+      }
+      + .#{$name} {
+        &,
+        & * {
+          cursor: not-allowed;
+        }
+      }
     }
-    + .#{$name} {
-      &,
-      & * {
-        cursor: not-allowed;
+    &:read-only {
+      + .#{$name} {
+        .#{$name}__x {
+          cursor: not-allowed;
+        }
       }
     }
   }
-  &:read-only {
-    + .#{$name} {
-      .#{$name}__x {
-        cursor: not-allowed;
+  &__tag {
+    @extend %tag;
+    border: {
+      color: inherit;
+    }
+    cursor: pointer;
+    &:focus {
+      outline: 2px solid;
+      outline: {
+        offset: -2px;
+      }
+    }
+    &--selected {
+      background: rgba(0, 0, 255, 0.5);
+    }
+    // Keep selection (so that context menu can show the “Copy” command), but hide it visually
+    ::selection {
+      background-color: transparent;
+      color: inherit;
+    }
+    + .#{$name}__text {
+      span {
+        + span {
+          // Hide the placeholder if we have at least one tag
+          display: none;
+        }
       }
     }
   }
-}
-
-%tag {
-  align-items: center;
-  border: 1px solid transparent;
-  display: flex;
-  gap: 0.25em;
-  justify-content: center;
-  overflow: hidden;
-  padding: 0 0.25em;
-  position: relative;
-  text-decoration: none;
-}
-
-.#{$name}__tag {
-  @extend %tag;
-  border: {
-    color: inherit;
+  &__tags {
+    border-color: inherit;
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1;
+    gap: 1px;
+    padding: 1px;
   }
-  cursor: pointer;
-  &:focus {
-    outline: 2px solid;
-    outline: {
-      offset: -2px;
-    }
-  }
-  &--selected {
-    background: rgba(0, 0, 255, 0.5);
-  }
-  // Keep selection (so that context menu can show the “Copy” command), but hide it visually
-  ::selection {
-    background-color: transparent;
-    color: inherit;
-  }
-  + .#{$name}__text {
+  &__text {
+    @extend %tag;
+    flex: 1;
     span {
-      + span {
-        // Hide the placeholder if we have at least one tag
+      flex: 1;
+      position: relative;
+      z-index: 1;
+      // Ensure height even when tag(s) is empty
+      &::after {
+        content: '\200c';
+      }
+      * {
+        display: inline; // Remove (hide) line-break in tag editor
+      }
+      br {
         display: none;
       }
+      + span {
+        bottom: 0;
+        left: 0;
+        opacity: 0.5;
+        padding: inherit;
+        position: absolute;
+        right: 0;
+        top: 0;
+        white-space: nowrap;
+        z-index: 0;
+      }
     }
   }
-}
-
-.#{$name}__tags {
-  border-color: inherit;
-  display: flex;
-  flex-wrap: wrap;
-  flex: 1;
-  gap: 1px;
-  padding: 1px;
-}
-
-.#{$name}__text {
-  @extend %tag;
-  flex: 1;
-  span {
-    flex: 1;
+  &__x {
+    height: 1em;
+    line-height: 0;
+    margin-right: -0.125em;
     position: relative;
-    z-index: 1;
-    // Ensure height even when tag(s) is empty
-    &::after {
-      content: '\200c';
-    }
-    * {
-      display: inline; // Remove (hide) line-break in tag editor
-    }
-    br {
-      display: none;
-    }
-    + span {
+    width: 1em;
+    &::after,
+    &::before {
+      border: 1px solid;
       bottom: 0;
-      left: 0;
-      opacity: 0.5;
-      padding: inherit;
+      content: "";
+      left: 50%;
+      margin-left: -1px;
       position: absolute;
-      right: 0;
       top: 0;
-      white-space: nowrap;
-      z-index: 0;
     }
-  }
-}
-
-.#{$name}__x {
-  height: 1em;
-  line-height: 0;
-  margin-right: -0.125em;
-  position: relative;
-  width: 1em;
-  &::after,
-  &::before {
-    border: 1px solid;
-    bottom: 0;
-    content: "";
-    left: 50%;
-    margin-left: -1px;
-    position: absolute;
-    top: 0;
-  }
-  &::after {
-    transform: rotate(45deg);
-  }
-  &::before {
-    transform: rotate(135deg);
+    &::after {
+      transform: rotate(45deg);
+    }
+    &::before {
+      transform: rotate(135deg);
+    }
   }
 }

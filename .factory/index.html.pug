@@ -9,6 +9,9 @@ block state
 block script
   script
     | const picker = new TagPicker(document.forms[0].tags);
+    | picker.on('change', function () {
+    |     console.log(this.value);
+    | });
     | picker.on('has.tag', tag => {
     |     alert('Tag “' + tag + '” already exists.');
     | });
@@ -236,10 +239,12 @@ block content
       | }
       |
       | picker.on('change', onChange);
-    h4: code picker.set(name)
-    p Adds a new tag with the specified name.
+    h4: code picker.set(name, at = -1)
+    p Adds a new tag with the given name.
     pre: code
-      | picker.set('foo'); // Add (append) “foo” tag
+      | picker.set('foo'); // Append “foo” tag
+      | picker.set('bar', 0); // Prepend “bar” tag
+      | picker.set('baz', 2); // Insert “baz” tag at index 2 in the list
     h3 Static Methods
     p(role='status') This application does not have any static methods.
     h2#properties
@@ -322,6 +327,7 @@ block content
       | });
     h3 List of Extensions
     ul
+      li: a(aria-disabled='true') Clear Feature
       li: a(aria-disabled='true') History Feature
       li: a(aria-disabled='true') Options Feature
       li: a(aria-disabled='true') Sortable Feature
