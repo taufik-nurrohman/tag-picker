@@ -1,4 +1,4 @@
-import {D, W, getAttribute, getChildFirst, getChildren, getElement, getElements, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
+import {D, W, getChildFirst, getChildren, getElement, getElements, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
 import {delay} from '@taufik-nurrohman/tick';
 import {fromHTML, fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
@@ -40,7 +40,7 @@ function getCharBeforeCaret(node) {
 }
 
 function getValue(self) {
-    return (self.value || getAttribute(self, 'value', false) || "").replace(/\r/g, "");
+    return (self.value || "").replace(/\r/g, "");
 }
 
 function isDisabled(self) {
@@ -125,7 +125,7 @@ TagPicker.state = {
     'with': []
 };
 
-TagPicker.version = '4.0.1';
+TagPicker.version = '4.0.2';
 
 defineProperty(TagPicker, 'name', {
     value: name
@@ -164,10 +164,9 @@ defineProperty($$, 'value', {
     }
 });
 
-// <https://www.unicode.org/reports/tr18/tr18-23.html#General_Category_Property>
 $$._filter = function (v) {
     let $ = this, {state} = $;
-    return (v || "").replace(/[^\p{L}\p{N}\p{P}\p{S}]/gu, ' ').split(state.join).join("").replace(/\s+/g, ' ').trim();
+    return (v || "").replace(/[^ -~]/g, ' ').split(state.join).join("").replace(/\s+/g, ' ').trim();
 };
 
 let _keyIsCtrl = false, _keyIsShift = false;
@@ -412,7 +411,25 @@ function onKeyDownTag(e) {
     exit && offEventDefault(e);
 }
 
-function onKeyUpTag() {
+function onKeyUpTag(e) {
+    let $ = this,
+        key = e.key,
+        picker = $['_' + name],
+        {_tags, state} = picker,
+        n = state.n + '__tag--selected';
+    if (_keyIsShift) {
+        if (KEY_ARROW_LEFT === key || KEY_ARROW_RIGHT === key) {} else {
+            let selection = 0;
+            for (let k in _tags) {
+                if (hasClass(_tags[k], n)) {
+                    ++selection;
+                }
+            }
+            if (selection < 2) {
+                letClass($, n);
+            }
+        }
+    }
     _keyIsCtrl = _keyIsShift = false;
 }
 
@@ -776,6 +793,7 @@ $$.detach = function () {
     }
     const form = getParentForm(self);
     $._active = false;
+    $._value = getValue(self) || null; // Update initial value to be the current value
     if (form) {
         offEvent('reset', form, onResetForm);
         offEvent('submit', form, onSubmitForm);
