@@ -1,0 +1,49 @@
+extends ../_index.pug
+
+block state
+  - const title = 'Tag Picker'
+  - const scripts = ['../index.min.js']
+  - const styles = ['../index.min.css']
+
+block script
+  script
+    | const picker = new TagPicker(document.querySelector('input'));
+
+block style
+  style
+    | :root {
+    |   background: #c0c0c0;
+    |   color: #222;
+    | }
+    | .tag-picker {
+    |   background: #fff;
+    |   border-width: 0;
+    |   box-shadow: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+    |   padding: 2px;
+    |   width: 100%;
+    | }
+    | .tag-picker__tag,
+    | .tag-picker__text {
+    |   border-width: 0;
+    |   padding: 2px 5px;
+    | }
+    | .tag-picker__tag {
+    |   background: #c0c0c0;
+    |   box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px grey,inset 2px 2px #fff;
+    | }
+    | .tag-picker__tag:focus {
+    |   outline: 1px dotted;
+    |   outline-offset: -4px;
+    | }
+    | .tag-picker__tag--selected span:first-child {
+    |   background: #000080;
+    |   color: #fff;
+    | }
+    | .tag-picker__tags {
+    |   gap: 0;
+    |   padding: 0;
+    | }
+
+block content
+  main
+    p: input(placeholder!='Tags go here&hellip;' type='text')

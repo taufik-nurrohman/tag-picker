@@ -2,7 +2,8 @@ $name: 'tag-picker';
 
 %tag {
   align-items: center;
-  border: 1px solid transparent;
+  border: 1px solid;
+  border-color: inherit;
   display: flex;
   gap: 0.25em;
   justify-content: center;
@@ -54,9 +55,6 @@ $name: 'tag-picker';
   }
   &__tag {
     @extend %tag;
-    border: {
-      color: inherit;
-    }
     cursor: pointer;
     &:focus {
       outline: 2px solid;
@@ -91,6 +89,7 @@ $name: 'tag-picker';
   }
   &__text {
     @extend %tag;
+    border-color: transparent;
     flex: 1;
     span {
       flex: 1;

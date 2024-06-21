@@ -2,7 +2,8 @@
 .tag-picker__text,
 .tag-picker__tag {
   align-items: center;
-  border: 1px solid transparent;
+  border: 1px solid;
+  border-color: inherit;
   display: flex;
   gap: 0.25em;
   justify-content: center;
@@ -44,7 +45,6 @@
   cursor: not-allowed;
 }
 .tag-picker__tag {
-  border-color: inherit;
   cursor: pointer;
 }
 .tag-picker__tag:focus {
@@ -70,6 +70,7 @@
   padding: 1px;
 }
 .tag-picker__text {
+  border-color: transparent;
   flex: 1;
 }
 .tag-picker__text span {
