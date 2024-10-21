@@ -125,7 +125,7 @@ TagPicker.state = {
     'with': []
 };
 
-TagPicker.version = '4.0.3';
+TagPicker.version = '4.0.4';
 
 defineProperty(TagPicker, 'name', {
     value: name
