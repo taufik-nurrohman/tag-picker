@@ -466,7 +466,7 @@
         'pattern': null,
         'with': []
     };
-    TagPicker.version = '4.0.4';
+    TagPicker.version = '4.0.3';
     defineProperty(TagPicker, 'name', {
         value: name
     });
