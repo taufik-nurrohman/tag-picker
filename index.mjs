@@ -125,7 +125,7 @@ TagPicker.state = {
     'with': []
 };
 
-TagPicker.version = '4.0.2';
+TagPicker.version = '4.0.4';
 
 defineProperty(TagPicker, 'name', {
     value: name
@@ -150,8 +150,8 @@ defineProperty($$, 'text', {
 
 defineProperty($$, 'value', {
     get: function () {
-        let value = this.self.value;
-        return value || null;
+        let value = getValue(this.self);
+        return "" === value ? null : value;
     },
     set: function (value) {
         let $ = this,

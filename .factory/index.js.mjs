@@ -150,8 +150,8 @@ defineProperty($$, 'text', {
 
 defineProperty($$, 'value', {
     get: function () {
-        let value = this.self.value;
-        return value || null;
+        let value = getValue(this.self);
+        return "" === value ? null : value;
     },
     set: function (value) {
         let $ = this,
