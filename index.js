@@ -1052,7 +1052,7 @@
     function onPointerDownTagX(e) {
         var $ = this,
             tag = getParent($),
-            picker = getReference($),
+            picker = getReference(tag),
             _mask = picker._mask;
         _mask.input;
         offEvent('click', $, onPointerDownTagX);

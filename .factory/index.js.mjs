@@ -670,7 +670,7 @@ function onPointerDownTag(e) {
 function onPointerDownTagX(e) {
     let $ = this,
         tag = getParent($),
-        picker = getReference($),
+        picker = getReference(tag),
         {_mask} = picker,
         {input} = _mask;
     offEvent('click', $, onPointerDownTagX);
