@@ -5,7 +5,7 @@
     <meta content="#000" name="theme-color">
     <meta content="width=device-width" name="viewport">
     <meta content="Better tags input interaction with JavaScript." name="description">
-    <title>Tag Picker 4.0.4</title>
+    <title>Tag Picker 4.1.0</title>
     <link href="../layout/index.min.css" rel="stylesheet">
     <link href="index.min.css" rel="stylesheet">
     <style>
@@ -59,7 +59,7 @@
     <p role="alert">Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
       <hgroup>
-        <h1>Tag Picker 4.0.4</h1>
+        <h1>Tag Picker 4.1.0</h1>
         <p>Tag Picker is a JavaScript application designed to simplify the management of comma-separated lists of words, offering a minimalist interface for an enhanced user experience. Users can easily add tags by typing a word and pressing the <kbd>,</kbd> key (by default), or remove tags with a quick click (or by using common keys such as the <kbd>Backspace</kbd> or <kbd>Delete</kbd> keys). Developers can easily integrate and customize this application styles to match the design of their web project.</p>
       </hgroup>
       <p>It supports native keyboard interaction as if it were plain text. You should be able to copy, cut, and paste from/to the mask. Click a tag to select it, press the <kbd>Control</kbd> key while clicking the tag to select multiple tags. You can also select the tags using the combination of <kbd>Shift</kbd> and <kbd>ArrowLeft</kbd> or <kbd>ArrowRight</kbd> keys.</p>
@@ -166,6 +166,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <p>List of callable functions or objects containing an <code>attach()</code> method to be invoked each time the application is initialized. A very simple “plugin” system.</p>
       <h2 id="methods"><a href="#methods">#</a> Methods</h2>
       <h3>Instance Methods</h3>
+      <p>Instance methods are methods that are available through the results of a <code>TagPicker</code> construct.</p>
       <h4><code>picker.attach(self, state)</code></h4>
       <p>Re-initializes the application and its extensions after it has been detached.</p>
       <pre><code>picker.attach();</code></pre>
@@ -210,9 +211,18 @@ picker.on('change', onChange);</code></pre>
 picker.set('bar', 0); // Prepend “bar” tag
 picker.set('baz', 2); // Insert “baz” tag at index 2 in the list</code></pre>
       <h3>Static Methods</h3>
-      <p role="status">This application does not have any static methods.</p>
+      <p>Static methods are methods that are directly available on the <code>TagPicker</code> object.</p>
+      <h4><code>TagPicker.from(self, state)</code></h4>
+      <p>Creates a <code>TagPicker</code> instance.</p>
+      <pre><code>const picker = TagPicker.from(document.querySelector('input'));</code></pre>
+      <h4><code>TagPicker.of(self)</code></h4>
+      <p>Gets <code>TagPicker</code> instance of an element.</p>
+      <pre><code>document.querySelectorAll('input').forEach(self => {
+    const picker = TagPicker.of(self);
+});</code></pre>
       <h2 id="properties"><a href="#properties">#</a> Properties</h2>
       <h3>Instance Properties</h3>
+      <p>Instance properties are properties that are available through the results of a <code>TagPicker</code> construct.</p>
       <h4><code>picker.hooks</code></h4>
       <p>Returns the events data.</p>
       <pre><code>console.log(picker.hooks);</code></pre>
@@ -238,6 +248,7 @@ picker.set('baz', 2); // Insert “baz” tag at index 2 in the list</code></pre
 
 picker.value = 'foo, bar, baz';</code></pre>
       <h3>Static Properties</h3>
+      <p>Static properties are properties that are directly available on the <code>TagPicker</code> object.</p>
       <h4><code>TagPicker.state</code></h4>
       <p>Returns the default values of <code>picker.state</code>.</p>
       <pre><code>const picker = new TagPicker(document.querySelector('input'), {

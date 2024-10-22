@@ -192,6 +192,7 @@ block content
       a(href='#methods') #
       = ' Methods'
     h3 Instance Methods
+    p Instance methods are methods that are available through the results of a #[code TagPicker] construct.
     h4: code picker.attach(self, state)
     p Re-initializes the application and its extensions after it has been detached.
     pre: code
@@ -247,11 +248,22 @@ block content
       | picker.set('bar', 0); // Prepend “bar” tag
       | picker.set('baz', 2); // Insert “baz” tag at index 2 in the list
     h3 Static Methods
-    p(role='status') This application does not have any static methods.
+    p Static methods are methods that are directly available on the #[code TagPicker] object.
+    h4: code TagPicker.from(self, state)
+    p Creates a #[code TagPicker] instance.
+    pre: code
+      | const picker = TagPicker.from(document.querySelector('input'));
+    h4: code TagPicker.of(self)
+    p Gets #[code TagPicker] instance of an element.
+    pre: code
+      | document.querySelectorAll('input').forEach(self => {
+      |     const picker = TagPicker.of(self);
+      | });
     h2#properties
      a(href='#properties') #
      = ' Properties'
     h3 Instance Properties
+    p Instance properties are properties that are available through the results of a #[code TagPicker] construct.
     h4: code picker.hooks
     p Returns the events data.
     pre: code
@@ -285,6 +297,7 @@ block content
       |
       | picker.value = 'foo, bar, baz';
     h3 Static Properties
+    p Static properties are properties that are directly available on the #[code TagPicker] object.
     h4: code TagPicker.state
     p Returns the default values of #[code picker.state].
     pre: code

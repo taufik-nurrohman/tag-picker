@@ -20,6 +20,7 @@ const KEY_ESCAPE = 'Escape';
 const KEY_TAB = 'Tab';
 
 const name = 'TagPicker';
+const references = new WeakMap;
 
 function defineProperty(of, key, state) {
     Object.defineProperty(of, key, state);
@@ -37,6 +38,10 @@ function getCharBeforeCaret(node) {
         range.setStart(node, 0);
         return (range + "").slice(-1);
     }
+}
+
+function getReference(key) {
+    return references.get(key);
 }
 
 function getValue(self) {
@@ -78,6 +83,10 @@ function selectTo(node, mode) {
     }
 }
 
+function setReference(key, value) {
+    return references.set(key, value);
+}
+
 function setValueAtCaret(node, value) {
     let range, selection = W.getSelection();
     if (selection.rangeCount) {
@@ -100,7 +109,7 @@ function TagPicker(self, state) {
         return new TagPicker(self, state);
     }
 
-    self['_' + name] = hook($, TagPicker.prototype);
+    setReference(self, hook($, TagPicker.prototype));
 
     let newState = fromStates({}, TagPicker.state, isString(state) ? {
         join: state
@@ -115,6 +124,12 @@ function TagPicker(self, state) {
 
 }
 
+TagPicker.from = function (self, state) {
+    return new TagPicker(self, state);
+};
+
+TagPicker.of = getReference;
+
 TagPicker.state = {
     'escape': [','],
     'join': ', ',
@@ -125,7 +140,7 @@ TagPicker.state = {
     'with': []
 };
 
-TagPicker.version = '4.0.4';
+TagPicker.version = '4.1.0';
 
 defineProperty(TagPicker, 'name', {
     value: name
@@ -174,7 +189,7 @@ let _keyIsCtrl = false, _keyIsShift = false;
 function onBlurTag() {
     selectNone();
     let $ = this,
-        picker = $['_' + name],
+        picker = getReference($),
         {_mask, _tags, mask, state} = picker,
         n = state.n;
     if (!_keyIsCtrl && !_keyIsShift) {
@@ -189,7 +204,7 @@ function onBlurTag() {
 function onBlurTextInput(e) {
     selectNone();
     let $ = this,
-        picker = $['_' + name],
+        picker = getReference($),
         {_mask, mask, state} = picker,
         {text} = _mask,
         n = state.n;
@@ -201,7 +216,7 @@ function onBlurTextInput(e) {
 
 function onClickMask(e) {
     let $ = this,
-        picker = $['_' + name],
+        picker = getReference($),
         on = e.target,
         {state} = picker,
         n = state.n + '__tag';
@@ -212,7 +227,7 @@ function onClickMask(e) {
 
 function onContextMenuTag(e) {
     let $ = this,
-        picker = $['_' + name],
+        picker = getReference($),
         {_tags, state} = picker,
         n = state.n + '__tag--selected';
     setClass($, n);
@@ -221,7 +236,7 @@ function onContextMenuTag(e) {
 
 function onCopyTag(e) {
     let $ = this,
-        picker = $['_' + name],
+        picker = getReference($),
         {_tags, state} = picker,
         n = state.n + '__tag--selected';
     let selection = [];
@@ -237,7 +252,7 @@ function onCopyTag(e) {
 
 function onCutTag(e) {
     let $ = this,
-        picker = $['_' + name],
+        picker = getReference($),
         {_mask, _tags, state} = picker,
         {input} = _mask,
         n = state.n + '__tag--selected';
@@ -254,7 +269,7 @@ function onCutTag(e) {
 
 function onFocusTextInput(e) {
     let $ = this,
-        picker = $['_' + name],
+        picker = getReference($),
         {_mask, _tags, mask, self, state} = picker,
         {hint, input, text} = _mask,
         n = state.n;
@@ -270,19 +285,19 @@ function onFocusTextInput(e) {
 
 function onFocusSelf() {
     let $ = this,
-        picker = $['_' + name];
+        picker = getReference($);
     picker.focus();
 }
 
 function onInvalidSelf(e) {
     let $ = this,
-        picker = $['_' + name];
+        picker = getReference($);
     picker.fire('min.tags').focus(), offEventDefault(e); // Disable native validation tooltip for required input(s)
 }
 
 function onFocusTag(e) {
     let $ = this,
-        picker = $['_' + name],
+        picker = getReference($),
         {_mask, mask, state} = picker,
         n = state.n;
     setClass(mask, n += '--focus');
@@ -295,7 +310,7 @@ function onKeyDownTag(e) {
         key = e.key,
         keyIsCtrl = _keyIsCtrl = e.ctrlKey,
         keyIsShift = _keyIsShift = e.shiftKey,
-        picker = $['_' + name],
+        picker = getReference($),
         {_mask, _tags, mask, state} = picker,
         {text} = _mask,
         prevTag = getPrev($),
@@ -414,7 +429,7 @@ function onKeyDownTag(e) {
 function onKeyUpTag(e) {
     let $ = this,
         key = e.key,
-        picker = $['_' + name],
+        picker = getReference($),
         {_tags, state} = picker,
         n = state.n + '__tag--selected';
     if (_keyIsShift) {
@@ -441,7 +456,7 @@ function onKeyUpTag(e) {
 function onInputTextInput(e) {
     let $ = this,
         key = getCharBeforeCaret($),
-        picker = $['_' + name],
+        picker = getReference($),
         {state} = picker,
         escape = state.escape;
     if (
@@ -459,7 +474,7 @@ function onKeyDownTextInput(e) {
         keyCode = e.keyCode,
         keyIsCtrl = _keyIsCtrl = e.ctrlKey,
         keyIsShift = _keyIsShift = e.shiftKey,
-        picker = $['_' + name],
+        picker = getReference($),
         {_active, _mask, _tags, mask, self, state} = picker,
         {hint} = _mask,
         n = state.n + '__tag--selected',
@@ -559,7 +574,7 @@ function onKeyUpTextInput() {
 
 function onPasteTag(e) {
     let $ = this,
-        picker = $['_' + name],
+        picker = getReference($),
         {_tags, state} = picker,
         n = state.n + '__tag--selected';
     let isAllSelected = true,
@@ -582,7 +597,7 @@ function onPasteTag(e) {
 
 function onPasteTextInput(e) {
     let $ = this,
-        picker = $['_' + name],
+        picker = getReference($),
         {_mask, self, state} = picker,
         {hint} = _mask;
     let value = (e.clipboardData || W.clipboardData).getData('text') + "";
@@ -601,7 +616,7 @@ function onPasteTextInput(e) {
 
 function onPointerDownTag(e) {
     let $ = this,
-        picker = $['_' + name],
+        picker = getReference($),
         {_active, _mask, _tags, state} = picker,
         {text} = _mask,
         n = state.n + '__tag--selected';
@@ -655,7 +670,7 @@ function onPointerDownTag(e) {
 function onPointerDownTagX(e) {
     let $ = this,
         tag = getParent($),
-        picker = tag['_' + name],
+        picker = getReference($),
         {_mask} = picker,
         {input} = _mask;
     offEvent('click', $, onPointerDownTagX);
@@ -664,13 +679,13 @@ function onPointerDownTagX(e) {
 
 function onResetForm(e) {
     let $ = this,
-        picker = $['_' + name];
+        picker = getReference($);
     picker.let().fire('reset', [e]);
 }
 
 function onSubmitForm(e) {
     let $ = this,
-        picker = $['_' + name],
+        picker = getReference($),
         {_tags, state} = picker;
     if (toObjectCount(_tags) < state.min) {
         return picker.fire('min.tags').focus(), offEventDefault(e);
@@ -723,7 +738,7 @@ $$.attach = function (self, state) {
     setClass(self, n + '__self');
     setNext(self, mask);
     if (form) {
-        form['_' + name] = $;
+        setReference(form, $);
         onEvent('reset', form, onResetForm);
         onEvent('submit', form, onSubmitForm);
     }
@@ -737,8 +752,8 @@ $$.attach = function (self, state) {
     onEvent('keyup', textInput, onKeyUpTextInput);
     onEvent('paste', textInput, onPasteTextInput);
     self.tabIndex = -1;
-    mask['_' + name] = $;
-    textInput['_' + name] = $;
+    setReference(mask, $);
+    setReference(textInput, $);
     let _mask = {};
     _mask.hint = textInputHint;
     _mask.input = textInput;
@@ -940,7 +955,7 @@ $$.set = function (v, at, _skipHookChange, _attach) {
         onEvent('paste', tag, onPasteTag);
         onEvent('touchstart', tag, onPointerDownTag);
         onEvent('touchstart', tagX, onPointerDownTagX);
-        tag['_' + name] = $;
+        setReference(tag, $);
     }
     setChildLast(tag, tagText);
     setChildLast(tag, tagX);
