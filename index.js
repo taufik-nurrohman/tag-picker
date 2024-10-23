@@ -85,7 +85,7 @@
         x = x.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;');
         return x;
     };
-    var fromStates = function fromStates() {
+    var _fromStates = function fromStates() {
         for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
             lot[_key] = arguments[_key];
         }
@@ -107,7 +107,7 @@
                     }
                     // Merge object recursive
                 } else if (isObject(out[k]) && isObject(lot[i][k])) {
-                    out[k] = fromStates({
+                    out[k] = _fromStates({
                         /* Clone! */ }, out[k], lot[i][k]);
                     // Replace value
                 } else {
@@ -117,15 +117,15 @@
         }
         return out;
     };
-    var fromValue = function fromValue(x) {
+    var _fromValue = function fromValue(x) {
         if (isArray(x)) {
             return x.map(function (v) {
-                return fromValue(x);
+                return _fromValue(x);
             });
         }
         if (isObject(x)) {
             for (var k in x) {
-                x[k] = fromValue(x[k]);
+                x[k] = _fromValue(x[k]);
             }
             return x;
         }
@@ -209,7 +209,7 @@
         if (true === value) {
             value = attribute;
         }
-        return node.setAttribute(attribute, fromValue(value)), node;
+        return node.setAttribute(attribute, _fromValue(value)), node;
     };
     var setAttributes = function setAttributes(node, attributes) {
         var value;
@@ -284,51 +284,51 @@
 
     function hook($, $$) {
         $$ = $$ || $;
-        $$.fire = function (event, data, that) {
+        $$.fire = function (name, data) {
             var $ = this,
                 hooks = $.hooks;
-            if (!isSet(hooks[event])) {
+            if (!isSet(hooks[name])) {
                 return $;
             }
-            hooks[event].forEach(function (then) {
-                return then.apply(that || $, data);
+            hooks[name].forEach(function (then) {
+                return then.apply($, data);
             });
             return $;
         };
-        $$.off = function (event, then) {
+        $$.off = function (name, then) {
             var $ = this,
                 hooks = $.hooks;
-            if (!isSet(event)) {
+            if (!isSet(name)) {
                 return hooks = {}, $;
             }
-            if (isSet(hooks[event])) {
+            if (isSet(hooks[name])) {
                 if (isSet(then)) {
-                    var j = hooks[event].length;
+                    var j = hooks[name].length;
                     // Clean-up empty hook(s)
                     if (0 === j) {
-                        delete hooks[event];
+                        delete hooks[name];
                     } else {
                         for (var i = 0; i < j; ++i) {
-                            if (then === hooks[event][i]) {
-                                hooks[event].splice(i, 1);
+                            if (then === hooks[name][i]) {
+                                hooks[name].splice(i, 1);
                                 break;
                             }
                         }
                     }
                 } else {
-                    delete hooks[event];
+                    delete hooks[name];
                 }
             }
             return $;
         };
-        $$.on = function (event, then) {
+        $$.on = function (name, then) {
             var $ = this,
                 hooks = $.hooks;
-            if (!isSet(hooks[event])) {
-                hooks[event] = [];
+            if (!isSet(hooks[name])) {
+                hooks[name] = [];
             }
             if (isSet(then)) {
-                hooks[event].push(then);
+                hooks[name].push(then);
             }
             return $;
         };
@@ -457,7 +457,7 @@
             return new TagPicker(self, state);
         }
         setReference(self, hook($, TagPicker.prototype));
-        var newState = fromStates({}, TagPicker.state, isString(state) ? {
+        var newState = _fromStates({}, TagPicker.state, isString(state) ? {
             join: state
         } : state || {});
         // Special case for `state.escape`: Replace instead of join
@@ -1083,7 +1083,7 @@
                 join: state
             };
         }
-        state = fromStates({}, $.state, state || {});
+        state = _fromStates({}, $.state, state || {});
         if (hasClass(self, state.n + '__self')) {
             return $;
         }

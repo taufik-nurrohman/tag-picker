@@ -159,14 +159,14 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <h3><code>state.max</code></h3>
       <p>The maximum number of tags that can be inserted.</p>
       <h3><code>state.min</code></h3>
-      <p>The minimum number of tags that must be inserted to be able to submit the form. The default value of this state is set to <code>0</code>, but if the <code>required</code> attribute is present on the input element, then the default value of this state will be set to <code>1</code>.</p>
+      <p>The minimum number of tags that must be inserted to be able to submit the form. The default value of this state is set to <code>0</code>, but if the <code>required</code> attribute is present on the <code>&lt;input&gt;</code> element, then the default value of this state will be set to <code>1</code>.</p>
       <h3><code>state.pattern</code></h3>
       <p>If defined, tag insertion will be performed only if tag name is matched with the pattern.</p>
       <h3><code>state.with</code></h3>
       <p>List of callable functions or objects containing an <code>attach()</code> method to be invoked each time the application is initialized. A very simple “plugin” system.</p>
       <h2 id="methods"><a href="#methods">#</a> Methods</h2>
       <h3>Instance Methods</h3>
-      <p>Instance methods are methods that are available through the results of a <code>TagPicker</code> construct.</p>
+      <p>Instance methods are methods available through the results of a <code>TagPicker</code> construct.</p>
       <h4><code>picker.attach(self, state)</code></h4>
       <p>Re-initializes the application and its extensions after it has been detached.</p>
       <pre><code>picker.attach();</code></pre>
@@ -176,7 +176,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <h4><code>picker.detach()</code></h4>
       <p>Disables the application methods (except for the <code>attach()</code> method) and executes the <code>detach()</code> method of the extensions, if they are present.</p>
       <pre><code>picker.detach();</code></pre>
-      <h4><code>picker.fire(name, data)</code></h4>
+      <h4><code>picker.fire(event, data, that)</code></h4>
       <p>Fires an event.</p>
       <pre><code>picker.fire('change', []);</code></pre>
       <h4><code>picker.focus(mode = true)</code></h4>
@@ -191,11 +191,11 @@ picker.focus(+1); // Focus and put the caret to the end of the text</code></pre>
       <p>Removes a tag by its name.</p>
       <pre><code>picker.let('foo'); // Remove “foo” tag
 picker.let(); // Reset to the initial value</code></pre>
-      <h4><code>picker.off(name, event)</code></h4>
+      <h4><code>picker.off(event, then)</code></h4>
       <p>Removes an event.</p>
       <pre><code>picker.off('change'); // Remove all events from the `change` event container
 picker.off('change', onChange); // Remove `onChange` event from the `change` event container</code></pre>
-      <h4><code>picker.on(name, event)</code></h4>
+      <h4><code>picker.on(event, then)</code></h4>
       <p>Adds a new event.</p>
       <pre><code>picker.on('change', function () {
     console.log(this.value.split(this.state.join));
@@ -211,9 +211,9 @@ picker.on('change', onChange);</code></pre>
 picker.set('bar', 0); // Prepend “bar” tag
 picker.set('baz', 2); // Insert “baz” tag at index 2 in the list</code></pre>
       <h3>Static Methods</h3>
-      <p>Static methods are methods that are directly available on the <code>TagPicker</code> object.</p>
+      <p>Static methods are methods available directly on the <code>TagPicker</code> object.</p>
       <h4><code>TagPicker.from(self, state)</code></h4>
-      <p>Creates a <code>TagPicker</code> instance.</p>
+      <p>Creates a new <code>TagPicker</code> instance.</p>
       <pre><code>const picker = TagPicker.from(document.querySelector('input'));</code></pre>
       <h4><code>TagPicker.of(self)</code></h4>
       <p>Gets <code>TagPicker</code> instance of an element.</p>
@@ -222,7 +222,7 @@ picker.set('baz', 2); // Insert “baz” tag at index 2 in the list</code></pre
 });</code></pre>
       <h2 id="properties"><a href="#properties">#</a> Properties</h2>
       <h3>Instance Properties</h3>
-      <p>Instance properties are properties that are available through the results of a <code>TagPicker</code> construct.</p>
+      <p>Instance properties are properties available through the results of a <code>TagPicker</code> construct.</p>
       <h4><code>picker.hooks</code></h4>
       <p>Returns the events data.</p>
       <pre><code>console.log(picker.hooks);</code></pre>
@@ -230,7 +230,7 @@ picker.set('baz', 2); // Insert “baz” tag at index 2 in the list</code></pre
       <p>Returns the tag picker’s mask.</p>
       <pre><code>picker.mask.classList.add(picker.state.n + '--dark');</code></pre>
       <h4><code>picker.self</code></h4>
-      <p>Returns the input element.</p>
+      <p>Returns the <code>&lt;input&gt;</code> element.</p>
       <pre><code>console.log(picker.self.getAttribute('name'));</code></pre>
       <h4><code>picker.state</code></h4>
       <p>Returns the application states if any.</p>
@@ -248,7 +248,7 @@ picker.set('baz', 2); // Insert “baz” tag at index 2 in the list</code></pre
 
 picker.value = 'foo, bar, baz';</code></pre>
       <h3>Static Properties</h3>
-      <p>Static properties are properties that are directly available on the <code>TagPicker</code> object.</p>
+      <p>Static properties are properties available directly on the <code>TagPicker</code> object.</p>
       <h4><code>TagPicker.state</code></h4>
       <p>Returns the default values of <code>picker.state</code>.</p>
       <pre><code>const picker = new TagPicker(document.querySelector('input'), {

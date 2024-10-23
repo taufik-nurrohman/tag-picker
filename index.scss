@@ -36,7 +36,7 @@ $name: 'tag-picker';
     top: -9999px;
     &:disabled {
       + .#{$name} {
-        color: rgba(128, 128, 128);
+        color: rgba(128, 128, 128, 1);
       }
       + .#{$name} {
         &,
