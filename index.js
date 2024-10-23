@@ -27,6 +27,15 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = f() : typeof define === 'function' && define.amd ? define(f) : (g = typeof globalThis !== 'undefined' ? globalThis : g || self, g.TagPicker = f());
 })(this, (function () {
     'use strict';
+
+    function _typeof(o) {
+        "@babel/helpers - typeof";
+        return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+            return typeof o;
+        } : function (o) {
+            return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+        }, _typeof(o);
+    }
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
     };
@@ -51,11 +60,9 @@
     var isNumber = function isNumber(x) {
         return 'number' === typeof x;
     };
-    var isObject = function isObject(x, isPlain) {
-        if (isPlain === void 0) {
-            isPlain = true;
-        }
-        if ('object' !== typeof x) {
+    var isObject = function isObject(x) {
+        var isPlain = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+        if ('object' !== _typeof(x)) {
             return false;
         }
         return isPlain ? isInstance(x, Object) : true;
@@ -177,10 +184,8 @@
     var getPrev = function getPrev(node, anyNode) {
         return node['previous' + ('Element') + 'Sibling'] || null;
     };
-    var getText = function getText(node, trim) {
-        if (trim === void 0) {
-            trim = true;
-        }
+    var getText = function getText(node) {
+        var trim = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
         var state = 'textContent';
         if (!hasState(node, state)) {
             return false;
@@ -243,10 +248,8 @@
         }
         return node;
     };
-    var setHTML = function setHTML(node, content, trim) {
-        if (trim === void 0) {
-            trim = true;
-        }
+    var setHTML = function setHTML(node, content) {
+        var trim = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
         if (null === content) {
             return node;
         }
@@ -259,10 +262,8 @@
     var setPrev = function setPrev(current, node) {
         return getParent(current).insertBefore(node, current), node;
     };
-    var setText = function setText(node, content, trim) {
-        if (trim === void 0) {
-            trim = true;
-        }
+    var setText = function setText(node, content) {
+        var trim = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
         if (null === content) {
             return node;
         }
@@ -284,51 +285,51 @@
 
     function hook($, $$) {
         $$ = $$ || $;
-        $$.fire = function (name, data) {
+        $$.fire = function (event, data, that) {
             var $ = this,
                 hooks = $.hooks;
-            if (!isSet(hooks[name])) {
+            if (!isSet(hooks[event])) {
                 return $;
             }
-            hooks[name].forEach(function (then) {
-                return then.apply($, data);
+            hooks[event].forEach(function (then) {
+                return then.apply(that || $, data);
             });
             return $;
         };
-        $$.off = function (name, then) {
+        $$.off = function (event, then) {
             var $ = this,
                 hooks = $.hooks;
-            if (!isSet(name)) {
+            if (!isSet(event)) {
                 return hooks = {}, $;
             }
-            if (isSet(hooks[name])) {
+            if (isSet(hooks[event])) {
                 if (isSet(then)) {
-                    var j = hooks[name].length;
+                    var j = hooks[event].length;
                     // Clean-up empty hook(s)
                     if (0 === j) {
-                        delete hooks[name];
+                        delete hooks[event];
                     } else {
                         for (var i = 0; i < j; ++i) {
-                            if (then === hooks[name][i]) {
-                                hooks[name].splice(i, 1);
+                            if (then === hooks[event][i]) {
+                                hooks[event].splice(i, 1);
                                 break;
                             }
                         }
                     }
                 } else {
-                    delete hooks[name];
+                    delete hooks[event];
                 }
             }
             return $;
         };
-        $$.on = function (name, then) {
+        $$.on = function (event, then) {
             var $ = this,
                 hooks = $.hooks;
-            if (!isSet(hooks[name])) {
-                hooks[name] = [];
+            if (!isSet(hooks[event])) {
+                hooks[event] = [];
             }
             if (isSet(then)) {
-                hooks[name].push(then);
+                hooks[event].push(then);
             }
             return $;
         };
@@ -343,10 +344,8 @@
     var offEventPropagation = function offEventPropagation(e) {
         return e && e.stopPropagation();
     };
-    var onEvent = function onEvent(name, node, then, options) {
-        if (options === void 0) {
-            options = false;
-        }
+    var onEvent = function onEvent(name, node, then) {
+        var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
         node.addEventListener(name, then, options);
     };
     var isPattern = function isPattern(pattern) {
