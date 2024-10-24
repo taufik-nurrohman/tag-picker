@@ -3,7 +3,7 @@ Tag Picker
 
 ![Code Size](https://img.shields.io/github/languages/code-size/taufik-nurrohman/tag-picker?color=%23444&style=for-the-badge) ![License](https://img.shields.io/github/license/taufik-nurrohman/tag-picker?color=%23444&style=for-the-badge)
 
-> Better tags input interaction with JavaScript.
+Better tags input interaction with JavaScript.
 
 ![Tag Picker](https://user-images.githubusercontent.com/1669261/126896222-c4d40a5e-a130-4319-a15a-3ec490b175b3.png)
 
