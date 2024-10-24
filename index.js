@@ -27,15 +27,6 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = f() : typeof define === 'function' && define.amd ? define(f) : (g = typeof globalThis !== 'undefined' ? globalThis : g || self, g.TagPicker = f());
 })(this, (function () {
     'use strict';
-
-    function _typeof(o) {
-        "@babel/helpers - typeof";
-        return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
-            return typeof o;
-        } : function (o) {
-            return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
-        }, _typeof(o);
-    }
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
     };
@@ -60,9 +51,11 @@
     var isNumber = function isNumber(x) {
         return 'number' === typeof x;
     };
-    var isObject = function isObject(x) {
-        var isPlain = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-        if ('object' !== _typeof(x)) {
+    var isObject = function isObject(x, isPlain) {
+        if (isPlain === void 0) {
+            isPlain = true;
+        }
+        if ('object' !== typeof x) {
             return false;
         }
         return isPlain ? isInstance(x, Object) : true;
@@ -184,8 +177,10 @@
     var getPrev = function getPrev(node, anyNode) {
         return node['previous' + ('Element') + 'Sibling'] || null;
     };
-    var getText = function getText(node) {
-        var trim = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+    var getText = function getText(node, trim) {
+        if (trim === void 0) {
+            trim = true;
+        }
         var state = 'textContent';
         if (!hasState(node, state)) {
             return false;
@@ -248,8 +243,10 @@
         }
         return node;
     };
-    var setHTML = function setHTML(node, content) {
-        var trim = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+    var setHTML = function setHTML(node, content, trim) {
+        if (trim === void 0) {
+            trim = true;
+        }
         if (null === content) {
             return node;
         }
@@ -262,8 +259,10 @@
     var setPrev = function setPrev(current, node) {
         return getParent(current).insertBefore(node, current), node;
     };
-    var setText = function setText(node, content) {
-        var trim = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+    var setText = function setText(node, content, trim) {
+        if (trim === void 0) {
+            trim = true;
+        }
         if (null === content) {
             return node;
         }
@@ -344,8 +343,10 @@
     var offEventPropagation = function offEventPropagation(e) {
         return e && e.stopPropagation();
     };
-    var onEvent = function onEvent(name, node, then) {
-        var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+    var onEvent = function onEvent(name, node, then, options) {
+        if (options === void 0) {
+            options = false;
+        }
         node.addEventListener(name, then, options);
     };
     var isPattern = function isPattern(pattern) {
