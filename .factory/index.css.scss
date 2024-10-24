@@ -106,7 +106,9 @@ $name: 'tag-picker';
         display: none;
       }
       + span {
+        align-items: center;
         bottom: 0;
+        display: flex;
         left: 0;
         opacity: 0.5;
         padding: inherit;
