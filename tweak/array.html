@@ -31,14 +31,14 @@
           while (tag = this.tags.shift()) {
               tag.remove();
           }
-          for (let k in this._tags) {
+          this._tags.forEach((v, k) => {
               let input = document.createElement('input');
               input.name = pickerName;
               input.type = 'hidden';
               input.value = k;
               picker.self.form.append(input);
               this.tags.push(input);
-          }
+          });
       }
       onChange.call(picker);
       picker.on('change', onChange);

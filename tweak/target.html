@@ -24,7 +24,7 @@
     <script>
       const picker = new TagPicker(document.querySelector('input'));
       picker.on('has.tag', function (tag) {
-          const node = this._tags[tag];
+          const node = this._tags.get(tag);
           if (node) {
               node.classList.add(this.state.n + '__tag--target');
               setTimeout(() => {
