@@ -390,7 +390,7 @@
     }
 
     function getReference(key) {
-        return getValueInMap(key, references);
+        return getValueInMap(key, references) || null;
     }
 
     function getValue(self) {
