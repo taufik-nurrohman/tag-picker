@@ -375,7 +375,7 @@
     }
 
     function forEachMap(map, then) {
-        map.forEach(then);
+        forEachArray(map, then);
     }
 
     function getCharBeforeCaret(node) {
