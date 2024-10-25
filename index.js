@@ -72,15 +72,6 @@
     var toCount = function toCount(x) {
         return x.length;
     };
-    var toObjectCount = function toObjectCount(x) {
-        return toCount(toObjectKeys(x));
-    };
-    var toObjectKeys = function toObjectKeys(x) {
-        return Object.keys(x);
-    };
-    var toObjectValues = function toObjectValues(x) {
-        return Object.values(x);
-    };
     var fromHTML = function fromHTML(x, escapeQuote) {
         x = x.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;');
         return x;
@@ -379,6 +370,14 @@
         node.focus();
     }
 
+    function forEachArray(array, then) {
+        array.forEach(then);
+    }
+
+    function forEachMap(map, then) {
+        map.forEach(then);
+    }
+
     function getCharBeforeCaret(node) {
         var range,
             selection = W.getSelection();
@@ -391,11 +390,19 @@
     }
 
     function getReference(key) {
-        return references.get(key);
+        return getValueInMap(key, references);
     }
 
     function getValue(self) {
         return (self.value || "").replace(/\r/g, "");
+    }
+
+    function getValueInMap(k, map) {
+        return map.get(k);
+    }
+
+    function hasKeyInMap(k, map) {
+        return map.has(k);
     }
 
     function isDisabled(self) {
@@ -408,6 +415,10 @@
 
     function isRequired(self) {
         return self.required;
+    }
+
+    function letValueInMap(k, map) {
+        return map.delete(k);
     }
 
     function selectNone(node) {
@@ -434,7 +445,7 @@
     }
 
     function setReference(key, value) {
-        return references.set(key, value);
+        return setValueInMap(key, value, references);
     }
 
     function setValueAtCaret(node, value) {
@@ -445,6 +456,34 @@
             range.deleteContents();
             range.insertNode(D.createTextNode(value));
         }
+    }
+
+    function setValueInMap(k, v, map) {
+        return map.set(k, v);
+    }
+
+    function toKeysFromMap(map) {
+        var out = [];
+        forEachMap(map, function (v, k) {
+            return out.push(k);
+        });
+        return out;
+    }
+
+    function toValueFirstFromMap(map) {
+        return toValuesFromMap(map).shift();
+    }
+
+    function toValueLastFromMap(map) {
+        return toValuesFromMap(map).pop();
+    }
+
+    function toValuesFromMap(map) {
+        var out = [];
+        forEachMap(map, function (v) {
+            return out.push(v);
+        });
+        return out;
     }
 
     function TagPicker(self, state) {
@@ -506,15 +545,14 @@
             return "" === value ? null : value;
         },
         set: function set(value) {
-            var $ = this;
-            $._tags;
-            var state = $.state;
+            var $ = this,
+                state = $.state;
             if ($.value) {
-                $.value.split(state.join).forEach(function (tag) {
+                forEachArray($.value.split(state.join), function (tag) {
                     return $.let(tag, 1);
                 });
             }
-            value.split(state.join).forEach(function (tag) {
+            forEachArray(value.split(state.join), function (tag) {
                 return $.set(tag, -1, 1);
             });
             $.fire('change');
@@ -538,9 +576,9 @@
             state = picker.state,
             n = state.n;
         if (!_keyIsCtrl && !_keyIsShift) {
-            for (var k in _tags) {
-                letClass(_tags[k], n + '__tag--selected');
-            }
+            forEachMap(_tags, function (v) {
+                return letClass(v, n + '__tag--selected');
+            });
         }
         letClass(mask, n += '--focus');
         letClass(mask, n += '-tag');
@@ -574,9 +612,8 @@
 
     function onContextMenuTag(e) {
         var $ = this,
-            picker = getReference($);
-        picker._tags;
-        var state = picker.state,
+            picker = getReference($),
+            state = picker.state,
             n = state.n + '__tag--selected';
         setClass($, n);
         focusTo($), selectTo(getChildFirst($));
@@ -589,11 +626,11 @@
             state = picker.state,
             n = state.n + '__tag--selected';
         var selection = [];
-        for (var k in _tags) {
-            if (hasClass(_tags[k], n)) {
+        forEachMap(_tags, function (v, k) {
+            if (hasClass(v, n)) {
                 selection.push(k);
             }
-        }
+        });
         e.clipboardData.setData('text/plain', selection.join(state.join));
         picker.fire('copy', [e, selection]).focus();
         offEventDefault(e);
@@ -608,11 +645,11 @@
         _mask.input;
         var n = state.n + '__tag--selected';
         var selection = [];
-        for (var k in _tags) {
-            if (hasClass(_tags[k], n)) {
+        forEachMap(_tags, function (v, k) {
+            if (hasClass(v, n)) {
                 selection.push(k), picker.let(k, 1);
             }
-        }
+        });
         e.clipboardData.setData('text/plain', selection.join(state.join));
         picker.fire('cut', [e, selection]).fire('change', [$.title]).focus();
         offEventDefault(e);
@@ -630,9 +667,9 @@
             input = _mask.input,
             text = _mask.text,
             n = state.n;
-        for (var k in _tags) {
-            letClass(_tags[k], n + '__tag--selected');
-        }
+        forEachMap(_tags, function (v) {
+            return letClass(v, n + '__tag--selected');
+        });
         setClass(text, n + '__text--focus');
         setClass(mask, n += '--focus');
         setClass(mask, n += '-text');
@@ -709,10 +746,10 @@
             }
         } else if (keyIsCtrl) {
             if (KEY_A === key) {
-                for (var k in _tags) {
-                    focusTo(_tags[k]), selectTo(getChildFirst(_tags[k]));
-                    setClass(_tags[k], n);
-                }
+                forEachMap(_tags, function (v) {
+                    focusTo(v), selectTo(getChildFirst(v));
+                    setClass(v, n);
+                });
                 exit = true;
             } else if (KEY_ARROW_LEFT === key) {
                 prevTag && focusTo(prevTag);
@@ -725,26 +762,26 @@
                 if (hasClass($, n)) {
                     focusTo($), selectTo(getChildFirst($));
                 } else {
-                    selectTo(getChildFirst(toObjectValues(_tags).pop()));
+                    selectTo(getChildFirst(toValueLastFromMap(_tags)));
                 }
                 exit = true;
             }
         } else {
             var selection = [];
-            for (var _k in _tags) {
-                if (hasClass(_tags[_k], n)) {
-                    selection.push(_k);
+            forEachMap(_tags, function (v, k) {
+                if (hasClass(v, n)) {
+                    selection.push(k);
                 }
-                if ($ !== _tags[_k]) {
-                    letClass(_tags[_k], n);
+                if ($ !== v) {
+                    letClass(v, n);
                 }
-            }
+            });
             if (KEY_BEGIN === key) {
-                firstTag = toObjectValues(_tags).shift();
+                firstTag = toValueFirstFromMap(_tags);
                 firstTag && focusTo(firstTag);
                 exit = true;
             } else if (KEY_END === key) {
-                lastTag = toObjectValues(_tags).pop();
+                lastTag = toValueLastFromMap(_tags);
                 lastTag && focusTo(lastTag);
                 exit = true;
             } else if (KEY_ENTER === key || ' ' === key) {
@@ -752,7 +789,7 @@
                 if (hasClass($, n)) {
                     focusTo($), selectTo(getChildFirst($));
                 } else {
-                    selectTo(getChildFirst(toObjectValues(_tags).pop()));
+                    selectTo(getChildFirst(toValueLastFromMap(_tags)));
                 }
                 exit = true;
             } else if (KEY_ARROW_LEFT === key) {
@@ -764,9 +801,9 @@
             } else if (KEY_DELETE_LEFT === key) {
                 picker.let(v = $.title, 1);
                 if (toCount(selection) > 1) {
-                    var current;
+                    var c, current;
                     while (current = selection.pop()) {
-                        prevTag = _tags[current] && getPrev(_tags[current]);
+                        prevTag = (c = getValueInMap(current, _tags)) && getPrev(c);
                         picker.let(current, 1);
                     }
                 }
@@ -778,7 +815,7 @@
                 if (toCount(selection) > 1) {
                     var _current;
                     while (_current = selection.shift()) {
-                        nextTag = _tags[_current] && getNext(_tags[_current]);
+                        nextTag = (getValueInMap(_current, _tags)) && getNext(_current);
                         picker.let(_current, 1);
                     }
                 }
@@ -788,6 +825,9 @@
             } else if (KEY_ESCAPE === key || KEY_TAB === key) {
                 picker.focus();
                 exit = true;
+            } else {
+                picker.focus();
+                exit = false;
             }
         }
         exit && offEventDefault(e);
@@ -804,11 +844,11 @@
             if (KEY_ARROW_LEFT === key || KEY_ARROW_RIGHT === key);
             else {
                 var selection = 0;
-                for (var k in _tags) {
-                    if (hasClass(_tags[k], n)) {
+                forEachMap(_tags, function (v) {
+                    if (hasClass(v, n)) {
                         ++selection;
                     }
-                }
+                });
                 if (selection < 2) {
                     letClass($, n);
                 }
@@ -865,7 +905,7 @@
         if (keyIsShift) {
             if (textIsVoid || caretIsToTheFirst) {
                 if (KEY_ARROW_LEFT === key) {
-                    lastTag = toObjectValues(_tags).pop();
+                    lastTag = toValueLastFromMap(_tags);
                     if (lastTag) {
                         lastTag && (focusTo(lastTag), selectTo(getChildFirst(lastTag)));
                         setClass(lastTag, n);
@@ -875,25 +915,25 @@
             }
         } else if (keyIsCtrl) {
             if (KEY_A === key && null === getText($, false) && null !== (picker.value)) {
-                for (var k in _tags) {
-                    focusTo(_tags[k]), selectTo(getChildFirst(_tags[k]));
-                    setClass(_tags[k], n);
-                }
+                forEachMap(_tags, function (v) {
+                    focusTo(v), selectTo(getChildFirst(v));
+                    setClass(v, n);
+                });
                 exit = true;
             } else if (KEY_BEGIN === key) {
-                firstTag = toObjectValues(_tags).shift();
+                firstTag = toValueFirstFromMap(_tags);
                 firstTag && focusTo(firstTag);
                 exit = true;
             } else if (KEY_END === key) {
-                lastTag = toObjectValues(_tags).pop();
+                lastTag = toValueLastFromMap(_tags);
                 lastTag && focusTo(lastTag);
                 exit = true;
             } else if (KEY_ARROW_LEFT === key) {
-                lastTag = toObjectValues(_tags).pop();
+                lastTag = toValueLastFromMap(_tags);
                 lastTag && focusTo(lastTag);
                 exit = true;
             } else if (KEY_DELETE_LEFT === key) {
-                lastTag = toObjectValues(_tags).pop();
+                lastTag = toValueLastFromMap(_tags);
                 lastTag && picker.let(lastTag.title);
                 picker.focus();
                 exit = true;
@@ -909,26 +949,26 @@
                 exit = true;
             } else if (textIsVoid) {
                 if (KEY_BEGIN === key) {
-                    firstTag = toObjectValues(_tags).shift();
+                    firstTag = toValueFirstFromMap(_tags);
                     firstTag && focusTo(firstTag);
                     exit = true;
                 } else if (KEY_END === key) {
-                    lastTag = toObjectValues(_tags).pop();
+                    lastTag = toValueLastFromMap(_tags);
                     lastTag && focusTo(lastTag);
                     exit = true;
                 } else if (KEY_ARROW_LEFT === key) {
-                    lastTag = toObjectValues(_tags).pop();
+                    lastTag = toValueLastFromMap(_tags);
                     lastTag && focusTo(lastTag);
                     exit = true;
                 } else if (KEY_DELETE_LEFT === key) {
-                    lastTag = toObjectValues(_tags).pop();
+                    lastTag = toValueLastFromMap(_tags);
                     lastTag && picker.let(lastTag.title);
                     picker.focus();
                     exit = true;
                 }
             } else if (caretIsToTheFirst) {
                 if (KEY_ARROW_LEFT === key) {
-                    lastTag = toObjectValues(_tags).pop();
+                    lastTag = toValueLastFromMap(_tags);
                     lastTag && focusTo(lastTag);
                     exit = true;
                 }
@@ -949,20 +989,22 @@
             n = state.n + '__tag--selected';
         var isAllSelected = true,
             value = (e.clipboardData || W.clipboardData).getData('text') + "";
-        for (var k in _tags) {
-            if (!hasClass(_tags[k], n)) {
-                isAllSelected = false;
-                break;
-            }
-        }
+        try {
+            forEachMap(_tags, function (v) {
+                if (!hasClass(v, n)) {
+                    isAllSelected = false;
+                    throw "";
+                }
+            });
+        } catch (e) {}
         // Delete all tag(s) before paste
         if (isAllSelected && picker.value) {
-            picker.value.split(state.join).forEach(function (tag) {
+            forEachArray(picker.value.split(state.join), function (tag) {
                 return picker.let(tag, 1);
             });
         }
         var values = value.split(state.join);
-        values.forEach(function (tag) {
+        forEachArray(values, function (tag) {
             return picker.set(tag, -1, 1);
         });
         picker.fire('paste', [e, values]).focus().fire('change');
@@ -983,7 +1025,7 @@
             picker.text = "";
             if (value) {
                 var values = value.split(state.join);
-                values.forEach(function (tag) {
+                forEachArray(values, function (tag) {
                     return picker.set(tag, -1, 1);
                 });
                 picker.fire('paste', [e, values]).fire('change');
@@ -1026,14 +1068,14 @@
             var asContextMenu = 2 === e.button,
                 // Probably a “right-click”
                 selection = 0;
-            for (var k in _tags) {
-                if (hasClass(_tags[k], n)) {
+            forEachMap(_tags, function (v) {
+                if (hasClass(v, n)) {
                     ++selection;
                 }
-                if ($ !== _tags[k] && !asContextMenu) {
-                    letClass(_tags[k], n);
+                if ($ !== v && !asContextMenu) {
+                    letClass(v, n);
                 }
-            }
+            });
             // If it has selection(s) previously, use the event to cancel the other(s)
             if (selection > 0) {
                 setClass($, n); // Then select the current tag
@@ -1042,7 +1084,7 @@
         if (hasClass($, n)) {
             focusTo($), selectTo(getChildFirst($));
         } else {
-            selectTo(toObjectValues(_tags).pop());
+            selectTo(toValueLastFromMap(_tags));
         }
         picker.fire('touch.tag', [e]);
         offEventDefault(e);
@@ -1070,7 +1112,7 @@
             picker = getReference($),
             _tags = picker._tags,
             state = picker.state;
-        if (toObjectCount(_tags) < state.min) {
+        if (_tags.size < state.min) {
             return picker.fire('min.tags').focus(), offEventDefault(e);
         }
         return picker.fire('submit', [e]);
@@ -1091,7 +1133,7 @@
             state.min = 1; // Force minimum tag(s) to insert to be `1`
         }
         $._active = !isDisabled(self) && !isReadOnly(self);
-        $._tags = {};
+        $._tags = new Map();
         $._value = getValue(self) || null;
         $.self = self;
         $.state = state;
@@ -1146,7 +1188,7 @@
         $._mask = _mask;
         // Attach the current tag(s)
         if ($._value) {
-            $._value.split(state.join).forEach(function (tag) {
+            forEachArray($._value.split(state.join), function (tag) {
                 return $.set(tag, -1, 1, 1);
             });
         }
@@ -1177,9 +1219,9 @@
             _mask = $._mask,
             _tags = $._tags,
             input = _mask.input;
-        for (var k in _tags) {
-            _tags[k].blur();
-        }
+        forEachMap(_tags, function (v) {
+            return v.blur();
+        });
         return input.blur();
     };
     $$.detach = function () {
@@ -1244,10 +1286,19 @@
             return false;
         }
         $.fire('get.tag', [v]);
-        if (!_tags[v]) {
+        if (!hasKeyInMap(v, _tags)) {
             return null;
         }
-        return toObjectKeys(_tags).indexOf(v);
+        var indexOf = -1;
+        try {
+            forEachMap(_tags, function (value, k) {
+                ++indexOf;
+                if (v === k) {
+                    throw "";
+                }
+            });
+        } catch (e) {}
+        return indexOf;
     };
     $$.let = function (v, _skipHookChange) {
         var $ = this,
@@ -1262,21 +1313,21 @@
         // Reset
         if (!isDefined(v)) {
             if ($.value) {
-                $.value.split(state.join).forEach(function (tag) {
+                forEachArray($.value.split(state.join), function (tag) {
                     return $.let(tag, 1);
                 });
             }
-            return _value.split(state.join).forEach(function (tag) {
+            return forEachArray(_value.split(state.join), function (tag) {
                 return $.set(tag, -1, 1);
             }), $.fire('change');
         }
-        if (toObjectCount(_tags) < state.min) {
+        if (_tags.size < state.min) {
             return $.fire('min.tags', [v]);
         }
-        if (!_tags[v]) {
+        if (!hasKeyInMap(v, _tags)) {
             return $;
         }
-        var tag = _tags[v];
+        var tag = getValueInMap(v, _tags);
         getChildren(tag, 0);
         var tagX = getChildren(tag, 1);
         offEvent('blur', tag, onBlurTag);
@@ -1292,8 +1343,8 @@
         offEvent('touchstart', tag, onPointerDownTag);
         offEvent('touchstart', tagX, onPointerDownTagX);
         letElement(tag);
-        delete $._tags[v];
-        self.value = toObjectKeys($._tags).join(state.join);
+        letValueInMap(v, $._tags);
+        self.value = toKeysFromMap($._tags).join(state.join);
         $.fire('let.tag', [v]);
         if (!_skipHookChange) {
             $.fire('change', [v]);
@@ -1314,7 +1365,7 @@
         if (!_active && !_attach) {
             return $;
         }
-        if (toObjectCount(_tags) >= state.max) {
+        if (_tags.size >= state.max) {
             return $.fire('max.tags', [v]);
         }
         if (isFunction(_filter)) {
@@ -1324,7 +1375,7 @@
         if ("" === v || isString(pattern) && !toPattern(pattern).test(v)) {
             return $.fire('not.tag', [v]);
         }
-        if (_tags[v]) {
+        if (hasKeyInMap(v, _tags)) {
             return $.fire('has.tag', [v]);
         }
         $.fire('is.tag', [v]);
@@ -1356,19 +1407,20 @@
         setChildLast(tag, tagText);
         setChildLast(tag, tagX);
         if (isInteger(at) && at >= 0) {
-            var tags = toObjectKeys(_tags);
+            var tags = toKeysFromMap(_tags);
             tags.splice(at, 0, v);
-            $._tags = {};
-            _tags[v] = tag;
-            tags.forEach(function (k) {
-                $._tags[k] = _tags[k];
-                setPrev(text, _tags[k]);
+            $._tags = new Map();
+            setValueInMap(v, tag, _tags);
+            forEachArray(tags, function (k) {
+                var v;
+                setValueInMap(k, v = getValueInMap(k, _tags), $._tags);
+                setPrev(text, v);
             });
         } else {
             setPrev(text, tag);
-            $._tags[v] = tag;
+            setValueInMap(v, tag, $._tags);
         }
-        self.value = toObjectKeys($._tags).join(state.join);
+        self.value = toKeysFromMap($._tags).join(state.join);
         $.fire('set.tag', [v]);
         if (!_skipHookChange) {
             $.fire('change', [v]);

@@ -5,7 +5,7 @@ import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isDefined, isFunction, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
 import {offEvent, offEventDefault, offEventPropagation, onEvent} from '@taufik-nurrohman/event';
-import {toCount, toObjectCount, toObjectKeys, toObjectValues} from '@taufik-nurrohman/to';
+import {toCount} from '@taufik-nurrohman/to';
 import {toPattern} from '@taufik-nurrohman/pattern';
 
 const KEY_A = 'a';
@@ -30,6 +30,14 @@ function focusTo(node) {
     node.focus();
 }
 
+function forEachArray(array, then) {
+    array.forEach(then);
+}
+
+function forEachMap(map, then) {
+    map.forEach(then);
+}
+
 function getCharBeforeCaret(node) {
     let range, selection = W.getSelection();
     if (selection.rangeCount) {
@@ -41,11 +49,19 @@ function getCharBeforeCaret(node) {
 }
 
 function getReference(key) {
-    return references.get(key);
+    return getValueInMap(key, references);
 }
 
 function getValue(self) {
     return (self.value || "").replace(/\r/g, "");
+}
+
+function getValueInMap(k, map) {
+    return map.get(k);
+}
+
+function hasKeyInMap(k, map) {
+    return map.has(k);
 }
 
 function isDisabled(self) {
@@ -58,6 +74,10 @@ function isReadOnly(self) {
 
 function isRequired(self) {
     return self.required;
+}
+
+function letValueInMap(k, map) {
+    return map.delete(k);
 }
 
 function selectNone(node) {
@@ -84,7 +104,7 @@ function selectTo(node, mode) {
 }
 
 function setReference(key, value) {
-    return references.set(key, value);
+    return setValueInMap(key, value, references);
 }
 
 function setValueAtCaret(node, value) {
@@ -94,6 +114,38 @@ function setValueAtCaret(node, value) {
         range.deleteContents();
         range.insertNode(D.createTextNode(value));
     }
+}
+
+function setValueInMap(k, v, map) {
+    return map.set(k, v);
+}
+
+function toKeyFirstFromMap(map) {
+    return toKeysFromMap(map).shift();
+}
+
+function toKeyLastFromMap(map) {
+    return toKeysFromMap(map).pop();
+}
+
+function toKeysFromMap(map) {
+    let out = [];
+    forEachMap(map, (v, k) => out.push(k));
+    return out;
+}
+
+function toValueFirstFromMap(map) {
+    return toValuesFromMap(map).shift();
+}
+
+function toValueLastFromMap(map) {
+    return toValuesFromMap(map).pop();
+}
+
+function toValuesFromMap(map) {
+    let out = [];
+    forEachMap(map, v => out.push(v));
+    return out;
 }
 
 function TagPicker(self, state) {
@@ -170,11 +222,11 @@ defineProperty($$, 'value', {
     },
     set: function (value) {
         let $ = this,
-            {_tags, state} = $;
+            {state} = $;
         if ($.value) {
-            $.value.split(state.join).forEach(tag => $.let(tag, 1));
+            forEachArray($.value.split(state.join), tag => $.let(tag, 1));
         }
-        value.split(state.join).forEach(tag => $.set(tag, -1, 1));
+        forEachArray(value.split(state.join), tag => $.set(tag, -1, 1));
         $.fire('change');
     }
 });
@@ -193,9 +245,7 @@ function onBlurTag() {
         {_mask, _tags, mask, state} = picker,
         n = state.n;
     if (!_keyIsCtrl && !_keyIsShift) {
-        for (let k in _tags) {
-            letClass(_tags[k], n + '__tag--selected');
-        }
+        forEachMap(_tags, v => letClass(v, n + '__tag--selected'));
     }
     letClass(mask, n += '--focus');
     letClass(mask, n += '-tag');
@@ -228,7 +278,7 @@ function onClickMask(e) {
 function onContextMenuTag(e) {
     let $ = this,
         picker = getReference($),
-        {_tags, state} = picker,
+        {state} = picker,
         n = state.n + '__tag--selected';
     setClass($, n);
     focusTo($), selectTo(getChildFirst($));
@@ -240,11 +290,11 @@ function onCopyTag(e) {
         {_tags, state} = picker,
         n = state.n + '__tag--selected';
     let selection = [];
-    for (let k in _tags) {
-        if (hasClass(_tags[k], n)) {
+    forEachMap(_tags, (v, k) => {
+        if (hasClass(v, n)) {
             selection.push(k);
         }
-    }
+    });
     e.clipboardData.setData('text/plain', selection.join(state.join));
     picker.fire('copy', [e, selection]).focus();
     offEventDefault(e);
@@ -257,11 +307,11 @@ function onCutTag(e) {
         {input} = _mask,
         n = state.n + '__tag--selected';
     let selection = [];
-    for (let k in _tags) {
-        if (hasClass(_tags[k], n)) {
+    forEachMap(_tags, (v, k) => {
+        if (hasClass(v, n)) {
             selection.push(k), picker.let(k, 1);
         }
-    }
+    });
     e.clipboardData.setData('text/plain', selection.join(state.join));
     picker.fire('cut', [e, selection]).fire('change', [$.title]).focus();
     offEventDefault(e);
@@ -273,9 +323,7 @@ function onFocusTextInput(e) {
         {_mask, _tags, mask, self, state} = picker,
         {hint, input, text} = _mask,
         n = state.n;
-    for (let k in _tags) {
-        letClass(_tags[k], n + '__tag--selected');
-    }
+    forEachMap(_tags, v => letClass(v, n + '__tag--selected'));
     setClass(text, n + '__text--focus');
     setClass(mask, n += '--focus');
     setClass(mask, n += '-text');
@@ -342,10 +390,10 @@ function onKeyDownTag(e) {
         }
     } else if (keyIsCtrl) {
         if (KEY_A === key) {
-            for (let k in _tags) {
-                focusTo(_tags[k]), selectTo(getChildFirst(_tags[k]));
-                setClass(_tags[k], n);
-            }
+            forEachMap(_tags, v => {
+                focusTo(v), selectTo(getChildFirst(v));
+                setClass(v, n);
+            });
             exit = true;
         } else if (KEY_ARROW_LEFT === key) {
             prevTag && focusTo(prevTag);
@@ -358,26 +406,26 @@ function onKeyDownTag(e) {
             if (hasClass($, n)) {
                 focusTo($), selectTo(getChildFirst($));
             } else {
-                selectTo(getChildFirst(toObjectValues(_tags).pop()));
+                selectTo(getChildFirst(toValueLastFromMap(_tags)));
             }
             exit = true;
         }
     } else {
         let selection = [];
-        for (let k in _tags) {
-            if (hasClass(_tags[k], n)) {
+        forEachMap(_tags, (v, k) => {
+            if (hasClass(v, n)) {
                 selection.push(k);
             }
-            if ($ !== _tags[k]) {
-                letClass(_tags[k], n);
+            if ($ !== v) {
+                letClass(v, n);
             }
-        }
+        });
         if (KEY_BEGIN === key) {
-            firstTag = toObjectValues(_tags).shift();
+            firstTag = toValueFirstFromMap(_tags);
             firstTag && focusTo(firstTag);
             exit = true;
         } else if (KEY_END === key) {
-            lastTag = toObjectValues(_tags).pop();
+            lastTag = toValueLastFromMap(_tags);
             lastTag && focusTo(lastTag);
             exit = true;
         } else if (KEY_ENTER === key || ' ' === key) {
@@ -385,7 +433,7 @@ function onKeyDownTag(e) {
             if (hasClass($, n)) {
                 focusTo($), selectTo(getChildFirst($));
             } else {
-                selectTo(getChildFirst(toObjectValues(_tags).pop()));
+                selectTo(getChildFirst(toValueLastFromMap(_tags)));
             }
             exit = true;
         } else if (KEY_ARROW_LEFT === key) {
@@ -397,9 +445,9 @@ function onKeyDownTag(e) {
         } else if (KEY_DELETE_LEFT === key) {
             picker.let(v = $.title, 1);
             if (toCount(selection) > 1) {
-                let current;
+                let c, current;
                 while (current = selection.pop()) {
-                    prevTag = _tags[current] && getPrev(_tags[current]);
+                    prevTag = (c = getValueInMap(current, _tags)) && getPrev(c);
                     picker.let(current, 1);
                 }
             }
@@ -409,9 +457,9 @@ function onKeyDownTag(e) {
         } else if (KEY_DELETE_RIGHT === key) {
             picker.let(v = $.title, 1);
             if (toCount(selection) > 1) {
-                let current;
+                let c, current;
                 while (current = selection.shift()) {
-                    nextTag = _tags[current] && getNext(_tags[current]);
+                    nextTag = (c = getValueInMap(current, _tags)) && getNext(current);
                     picker.let(current, 1);
                 }
             }
@@ -421,6 +469,9 @@ function onKeyDownTag(e) {
         } else if (KEY_ESCAPE === key || KEY_TAB === key) {
             picker.focus();
             exit = true;
+        } else {
+            picker.focus();
+            exit = false;
         }
     }
     exit && offEventDefault(e);
@@ -435,11 +486,11 @@ function onKeyUpTag(e) {
     if (_keyIsShift) {
         if (KEY_ARROW_LEFT === key || KEY_ARROW_RIGHT === key) {} else {
             let selection = 0;
-            for (let k in _tags) {
-                if (hasClass(_tags[k], n)) {
+            forEachMap(_tags, v => {
+                if (hasClass(v, n)) {
                     ++selection;
                 }
-            }
+            });
             if (selection < 2) {
                 letClass($, n);
             }
@@ -496,7 +547,7 @@ function onKeyDownTextInput(e) {
     if (keyIsShift) {
         if (textIsVoid || caretIsToTheFirst) {
             if (KEY_ARROW_LEFT === key) {
-                lastTag = toObjectValues(_tags).pop();
+                lastTag = toValueLastFromMap(_tags);
                 if (lastTag) {
                     lastTag && (focusTo(lastTag), selectTo(getChildFirst(lastTag)));
                     setClass(lastTag, n);
@@ -506,25 +557,25 @@ function onKeyDownTextInput(e) {
         }
     } else if (keyIsCtrl) {
         if (KEY_A === key && null === getText($, false) && null !== (v = picker.value)) {
-            for (let k in _tags) {
-                focusTo(_tags[k]), selectTo(getChildFirst(_tags[k]));
-                setClass(_tags[k], n);
-            }
+            forEachMap(_tags, v => {
+                focusTo(v), selectTo(getChildFirst(v));
+                setClass(v, n);
+            });
             exit = true;
         } else if (KEY_BEGIN === key) {
-            firstTag = toObjectValues(_tags).shift();
+            firstTag = toValueFirstFromMap(_tags);
             firstTag && focusTo(firstTag);
             exit = true;
         } else if (KEY_END === key) {
-            lastTag = toObjectValues(_tags).pop();
+            lastTag = toValueLastFromMap(_tags);
             lastTag && focusTo(lastTag);
             exit = true;
         } else if (KEY_ARROW_LEFT === key) {
-            lastTag = toObjectValues(_tags).pop();
+            lastTag = toValueLastFromMap(_tags);
             lastTag && focusTo(lastTag);
             exit = true;
         } else if (KEY_DELETE_LEFT === key) {
-            lastTag = toObjectValues(_tags).pop();
+            lastTag = toValueLastFromMap(_tags);
             lastTag && picker.let(lastTag.title);
             picker.focus();
             exit = true;
@@ -540,26 +591,26 @@ function onKeyDownTextInput(e) {
             exit = true;
         } else if (textIsVoid) {
             if (KEY_BEGIN === key) {
-                firstTag = toObjectValues(_tags).shift();
+                firstTag = toValueFirstFromMap(_tags);
                 firstTag && focusTo(firstTag);
                 exit = true;
             } else if (KEY_END === key) {
-                lastTag = toObjectValues(_tags).pop();
+                lastTag = toValueLastFromMap(_tags);
                 lastTag && focusTo(lastTag);
                 exit = true;
             } else if (KEY_ARROW_LEFT === key) {
-                lastTag = toObjectValues(_tags).pop();
+                lastTag = toValueLastFromMap(_tags);
                 lastTag && focusTo(lastTag);
                 exit = true;
             } else if (KEY_DELETE_LEFT === key) {
-                lastTag = toObjectValues(_tags).pop();
+                lastTag = toValueLastFromMap(_tags);
                 lastTag && picker.let(lastTag.title);
                 picker.focus();
                 exit = true;
             }
         } else if (caretIsToTheFirst) {
             if (KEY_ARROW_LEFT === key) {
-                lastTag = toObjectValues(_tags).pop();
+                lastTag = toValueLastFromMap(_tags);
                 lastTag && focusTo(lastTag);
                 exit = true;
             }
@@ -579,18 +630,20 @@ function onPasteTag(e) {
         n = state.n + '__tag--selected';
     let isAllSelected = true,
         value = (e.clipboardData || W.clipboardData).getData('text') + "";
-    for (let k in _tags) {
-        if (!hasClass(_tags[k], n)) {
-            isAllSelected = false;
-            break;
-        }
-    }
+    try {
+        forEachMap(_tags, v => {
+            if (!hasClass(v, n)) {
+                isAllSelected = false;
+                throw "";
+            }
+        });
+    } catch (e) {}
     // Delete all tag(s) before paste
     if (isAllSelected && picker.value) {
-        picker.value.split(state.join).forEach(tag => picker.let(tag, 1));
+        forEachArray(picker.value.split(state.join), tag => picker.let(tag, 1));
     }
     let values = value.split(state.join);
-    values.forEach(tag => picker.set(tag, -1, 1));
+    forEachArray(values, tag => picker.set(tag, -1, 1));
     picker.fire('paste', [e, values]).focus().fire('change');
     offEventDefault(e);
 }
@@ -607,7 +660,7 @@ function onPasteTextInput(e) {
         picker.text = "";
         if (value) {
             let values = value.split(state.join);
-            values.forEach(tag => picker.set(tag, -1, 1));
+            forEachArray(values, tag => picker.set(tag, -1, 1));
             picker.fire('paste', [e, values]).fire('change');
         }
     }, 1)();
@@ -644,14 +697,14 @@ function onPointerDownTag(e) {
         selectNone();
         let asContextMenu = 2 === e.button, // Probably a “right-click”
             selection = 0;
-        for (let k in _tags) {
-            if (hasClass(_tags[k], n)) {
+        forEachMap(_tags, v => {
+            if (hasClass(v, n)) {
                 ++selection;
             }
-            if ($ !== _tags[k] && !asContextMenu) {
-                letClass(_tags[k], n);
+            if ($ !== v && !asContextMenu) {
+                letClass(v, n);
             }
-        }
+        });
         // If it has selection(s) previously, use the event to cancel the other(s)
         if (selection > 0) {
             setClass($, n); // Then select the current tag
@@ -660,7 +713,7 @@ function onPointerDownTag(e) {
     if (hasClass($, n)) {
         focusTo($), selectTo(getChildFirst($));
     } else {
-        selectTo(toObjectValues(_tags).pop());
+        selectTo(toValueLastFromMap(_tags));
     }
     picker.fire('touch.tag', [e]);
     offEventDefault(e);
@@ -687,7 +740,7 @@ function onSubmitForm(e) {
     let $ = this,
         picker = getReference($),
         {_tags, state} = picker;
-    if (toObjectCount(_tags) < state.min) {
+    if (_tags.size < state.min) {
         return picker.fire('min.tags').focus(), offEventDefault(e);
     }
     return picker.fire('submit', [e]);
@@ -709,7 +762,7 @@ $$.attach = function (self, state) {
         state.min = 1; // Force minimum tag(s) to insert to be `1`
     }
     $._active = !isDisabled(self) && !isReadOnly(self);
-    $._tags = {};
+    $._tags = new Map;
     $._value = getValue(self) || null;
     $.self = self;
     $.state = state;
@@ -764,7 +817,7 @@ $$.attach = function (self, state) {
     $._mask = _mask;
     // Attach the current tag(s)
     if ($._value) {
-        $._value.split(state.join).forEach(tag => $.set(tag, -1, 1, 1));
+        forEachArray($._value.split(state.join), tag => $.set(tag, -1, 1, 1));
     }
     // Attach extension(s)
     if (isSet(state) && isArray(state.with)) {
@@ -793,9 +846,7 @@ $$.blur = function () {
     let $ = this,
         {_mask, _tags} = $,
         {input} = _mask;
-    for (let k in _tags) {
-        _tags[k].blur();
-    }
+    forEachMap(_tags, v => v.blur());
     return input.blur();
 };
 
@@ -859,10 +910,19 @@ $$.get = function (v) {
         return false;
     }
     $.fire('get.tag', [v]);
-    if (!_tags[v]) {
+    if (!hasKeyInMap(v, _tags)) {
         return null;
     }
-    return toObjectKeys(_tags).indexOf(v);
+    let indexOf = -1;
+    try {
+        forEachMap(_tags, (value, k) => {
+            ++indexOf;
+            if (v === k) {
+                throw "";
+            }
+        });
+    } catch (e) {}
+    return indexOf;
 };
 
 $$.let = function (v, _skipHookChange) {
@@ -874,17 +934,17 @@ $$.let = function (v, _skipHookChange) {
     // Reset
     if (!isDefined(v)) {
         if ($.value) {
-            $.value.split(state.join).forEach(tag => $.let(tag, 1));
+            forEachArray($.value.split(state.join), tag => $.let(tag, 1));
         }
-        return _value.split(state.join).forEach(tag => $.set(tag, -1, 1)), $.fire('change');
+        return forEachArray(_value.split(state.join), tag => $.set(tag, -1, 1)), $.fire('change');
     }
-    if (toObjectCount(_tags) < state.min) {
+    if (_tags.size < state.min) {
         return $.fire('min.tags', [v]);
     }
-    if (!_tags[v]) {
+    if (!hasKeyInMap(v, _tags)) {
         return $;
     }
-    let tag = _tags[v],
+    let tag = getValueInMap(v, _tags),
         tagText = getChildren(tag, 0),
         tagX = getChildren(tag, 1);
     offEvent('blur', tag, onBlurTag);
@@ -900,8 +960,8 @@ $$.let = function (v, _skipHookChange) {
     offEvent('touchstart', tag, onPointerDownTag);
     offEvent('touchstart', tagX, onPointerDownTagX);
     letElement(tag);
-    delete $._tags[v];
-    self.value = toObjectKeys($._tags).join(state.join);
+    letValueInMap(v, $._tags);
+    self.value = toKeysFromMap($._tags).join(state.join);
     $.fire('let.tag', [v]);
     if (!_skipHookChange) {
         $.fire('change', [v]);
@@ -918,7 +978,7 @@ $$.set = function (v, at, _skipHookChange, _attach) {
     if (!_active && !_attach) {
         return $;
     }
-    if (toObjectCount(_tags) >= state.max) {
+    if (_tags.size >= state.max) {
         return $.fire('max.tags', [v]);
     }
     if (isFunction(_filter)) {
@@ -928,7 +988,7 @@ $$.set = function (v, at, _skipHookChange, _attach) {
     if ("" === v || (isString(pattern) && !toPattern(pattern).test(v))) {
         return $.fire('not.tag', [v]);
     }
-    if (_tags[v]) {
+    if (hasKeyInMap(v, _tags)) {
         return $.fire('has.tag', [v]);
     }
     $.fire('is.tag', [v]);
@@ -960,19 +1020,20 @@ $$.set = function (v, at, _skipHookChange, _attach) {
     setChildLast(tag, tagText);
     setChildLast(tag, tagX);
     if (isInteger(at) && at >= 0) {
-        let tags = toObjectKeys(_tags);
+        let tags = toKeysFromMap(_tags);
         tags.splice(at, 0, v);
-        $._tags = {};
-        _tags[v] = tag;
-        tags.forEach(k => {
-            $._tags[k] = _tags[k];
-            setPrev(text, _tags[k]);
+        $._tags = new Map;
+        setValueInMap(v, tag, _tags);
+        forEachArray(tags, k => {
+            let v;
+            setValueInMap(k, v = getValueInMap(k, _tags), $._tags);
+            setPrev(text, v);
         });
     } else {
         setPrev(text, tag);
-        $._tags[v] = tag;
+        setValueInMap(v, tag, $._tags);
     }
-    self.value = toObjectKeys($._tags).join(state.join);
+    self.value = toKeysFromMap($._tags).join(state.join);
     $.fire('set.tag', [v]);
     if (!_skipHookChange) {
         $.fire('change', [v]);
