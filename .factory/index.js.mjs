@@ -1,4 +1,4 @@
-import {D, W, getChildFirst, getChildren, getElement, getElements, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
+import {D, W, getChildFirst, getChild, getElement, getElements, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
 import {delay} from '@taufik-nurrohman/tick';
 import {fromHTML, fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
@@ -945,8 +945,8 @@ $$.let = function (v, _skipHookChange) {
         return $;
     }
     let tag = getValueInMap(v, _tags),
-        tagText = getChildren(tag, 0),
-        tagX = getChildren(tag, 1);
+        tagText = getChild(tag, 0),
+        tagX = getChild(tag, 1);
     offEvent('blur', tag, onBlurTag);
     offEvent('contextmenu', tag, onContextMenuTag);
     offEvent('copy', tag, onCopyTag);

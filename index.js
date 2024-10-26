@@ -39,8 +39,14 @@
     var isFunction = function isFunction(x) {
         return 'function' === typeof x;
     };
-    var isInstance = function isInstance(x, of) {
-        return x && isSet(of) && x instanceof of ;
+    var isInstance = function isInstance(x, of, exact) {
+        if (!x || 'object' !== typeof x) {
+            return false;
+        }
+        if (exact) {
+            return isSet(of) && isSet(x.constructor) && of === x.constructor;
+        }
+        return isSet(of) && x instanceof of ;
     };
     var isInteger = function isInteger(x) {
         return isNumber(x) && 0 === x % 1;
@@ -55,10 +61,10 @@
         if (isPlain === void 0) {
             isPlain = true;
         }
-        if ('object' !== typeof x) {
+        if (!x || 'object' !== typeof x) {
             return false;
         }
-        return isPlain ? isInstance(x, Object) : true;
+        return isPlain ? isInstance(x, Object, 1) : true;
     };
     var isSet = function isSet(x) {
         return isDefined(x) && !isNull(x);
@@ -133,12 +139,15 @@
     };
     var D = document;
     var W = window;
+    var getChild = function getChild(parent, index) {
+        return getChildren(parent, index || 0);
+    };
     var getChildFirst = function getChildFirst(parent) {
         return parent.firstElementChild || null;
     };
     var getChildren = function getChildren(parent, index) {
-        var children = parent.children;
-        return isNumber(index) ? children[index] || null : children || [];
+        var children = [].slice.call(parent.children);
+        return isNumber(index) ? children[index] || null : children;
     };
     var getElement = function getElement(query, scope) {
         return (scope || D).querySelector(query);
@@ -1328,8 +1337,8 @@
             return $;
         }
         var tag = getValueInMap(v, _tags);
-        getChildren(tag, 0);
-        var tagX = getChildren(tag, 1);
+        getChild(tag, 0);
+        var tagX = getChild(tag, 1);
         offEvent('blur', tag, onBlurTag);
         offEvent('contextmenu', tag, onContextMenuTag);
         offEvent('copy', tag, onCopyTag);
