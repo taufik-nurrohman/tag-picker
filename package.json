@@ -34,8 +34,8 @@
   },
   "homepage": "https://taufik-nurrohman.js.org/tag-picker",
   "keywords": [
-    "tag",
-    "picker"
+    "picker",
+    "tag"
   ],
   "license": "MIT",
   "main": "index.js",
