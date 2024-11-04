@@ -723,10 +723,9 @@ function onPointerDownTag(e) {
 function onPointerDownTagX(e) {
     let $ = this,
         tag = getParent($),
-        picker = getReference(tag),
-        {_mask} = picker,
-        {input} = _mask;
-    offEvent('click', $, onPointerDownTagX);
+        picker = getReference(tag);
+    offEvent('mousedown', $, onPointerDownTagX);
+    offEvent('touchstart', $, onPointerDownTagX);
     picker.let(tag.title).focus(), offEventDefault(e);
 }
 
@@ -942,8 +941,9 @@ $$.let = function (v, _skipHookChange) {
         return $.fire('min.tags', [v]);
     }
     if (!hasKeyInMap(v, _tags)) {
-        return $;
+        return $.fire('not.tag', [v]);
     }
+    $.fire('is.tag', [v]);
     let tag = getValueInMap(v, _tags),
         tagText = getChild(tag, 0),
         tagX = getChild(tag, 1);
@@ -984,7 +984,6 @@ $$.set = function (v, at, _skipHookChange, _attach) {
     if (isFunction(_filter)) {
         v = _filter.call($, v);
     }
-    $.fire('set.tag', [v]);
     if ("" === v || (isString(pattern) && !toPattern(pattern).test(v))) {
         return $.fire('not.tag', [v]);
     }
