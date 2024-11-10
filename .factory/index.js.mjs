@@ -779,6 +779,7 @@ $$.attach = function (self, state) {
         'class': n + '__text'
     });
     const textInput = setElement('span', {
+        'autocapitalize': 'off',
         'contenteditable': isDisabled(self) ? false : "",
         'spellcheck': 'false'
     });

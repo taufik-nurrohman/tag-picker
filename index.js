@@ -1159,6 +1159,7 @@
             'class': n + '__text'
         });
         var textInput = setElement('span', {
+            'autocapitalize': 'off',
             'contenteditable': isDisabled(self) ? false : "",
             'spellcheck': 'false'
         });
