@@ -1,4 +1,4 @@
-import {D, W, getChildFirst, getChild, getElement, getElements, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
+import {D, W, getChildFirst, getChild, getDatum, getElement, getElements, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
 import {delay} from '@taufik-nurrohman/tick';
 import {fromHTML, fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
@@ -50,6 +50,10 @@ function getCharBeforeCaret(node) {
 
 function getReference(key) {
     return getValueInMap(key, references) || null;
+}
+
+function getTagName(tag) {
+    return getDatum(tag, 'name');
 }
 
 function getValue(self) {
@@ -313,7 +317,7 @@ function onCutTag(e) {
         }
     });
     e.clipboardData.setData('text/plain', selection.join(state.join));
-    picker.fire('cut', [e, selection]).fire('change', [$.title]).focus();
+    picker.fire('cut', [e, selection]).fire('change', [getTagName($)]).focus();
     offEventDefault(e);
 }
 
@@ -443,7 +447,7 @@ function onKeyDownTag(e) {
             nextTag && text !== nextTag ? focusTo(nextTag) : picker.focus();
             exit = true;
         } else if (KEY_DELETE_LEFT === key) {
-            picker.let(v = $.title, 1);
+            picker.let(v = getTagName($), 1);
             if (toCount(selection) > 1) {
                 let c, current;
                 while (current = selection.pop()) {
@@ -455,7 +459,7 @@ function onKeyDownTag(e) {
             prevTag ? (focusTo(prevTag), selectTo(getChildFirst(prevTag))) : picker.focus();
             exit = true;
         } else if (KEY_DELETE_RIGHT === key) {
-            picker.let(v = $.title, 1);
+            picker.let(v = getTagName($), 1);
             if (toCount(selection) > 1) {
                 let c, current;
                 while (current = selection.shift()) {
@@ -576,7 +580,7 @@ function onKeyDownTextInput(e) {
             exit = true;
         } else if (KEY_DELETE_LEFT === key) {
             lastTag = toValueLastFromMap(_tags);
-            lastTag && picker.let(lastTag.title);
+            lastTag && picker.let(getTagName(lastTag));
             picker.focus();
             exit = true;
         }
@@ -604,7 +608,7 @@ function onKeyDownTextInput(e) {
                 exit = true;
             } else if (KEY_DELETE_LEFT === key) {
                 lastTag = toValueLastFromMap(_tags);
-                lastTag && picker.let(lastTag.title);
+                lastTag && picker.let(getTagName(lastTag));
                 picker.focus();
                 exit = true;
             }
@@ -726,7 +730,7 @@ function onPointerDownTagX(e) {
         picker = getReference(tag);
     offEvent('mousedown', $, onPointerDownTagX);
     offEvent('touchstart', $, onPointerDownTagX);
-    picker.let(tag.title).focus(), offEventDefault(e);
+    picker.let(getTagName(tag)).focus(), offEventDefault(e);
 }
 
 function onResetForm(e) {
@@ -994,8 +998,8 @@ $$.set = function (v, at, _skipHookChange, _attach) {
     $.fire('is.tag', [v]);
     const tag = setElement('span', {
         'class': n + '__tag',
-        'tabindex': _active ? -1 : false,
-        'title': v
+        'data-name': v,
+        'tabindex': _active ? -1 : false
     });
     const tagText = setElement('span', fromHTML(v));
     const tagX = setElement('span', {

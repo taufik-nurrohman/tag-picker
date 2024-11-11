@@ -57,6 +57,9 @@
     var isNumber = function isNumber(x) {
         return 'number' === typeof x;
     };
+    var isNumeric = function isNumeric(x) {
+        return /^-?(?:\d*.)?\d+$/.test(x + "");
+    };
     var isObject = function isObject(x, isPlain) {
         if (isPlain === void 0) {
             isPlain = true;
@@ -78,9 +81,48 @@
     var toCount = function toCount(x) {
         return x.length;
     };
+    var toNumber = function toNumber(x, base) {
+        if (base === void 0) {
+            base = 10;
+        }
+        return base ? parseInt(x, base) : parseFloat(x);
+    };
+    var _toValue = function toValue(x) {
+        if (isArray(x)) {
+            return x.map(function (v) {
+                return _toValue(v);
+            });
+        }
+        if (isNumeric(x)) {
+            return toNumber(x);
+        }
+        if (isObject(x)) {
+            for (var k in x) {
+                x[k] = _toValue(x[k]);
+            }
+            return x;
+        }
+        if ('false' === x) {
+            return false;
+        }
+        if ('null' === x) {
+            return null;
+        }
+        if ('true' === x) {
+            return true;
+        }
+        return x;
+    };
     var fromHTML = function fromHTML(x, escapeQuote) {
         x = x.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;');
         return x;
+    };
+    var fromJSON = function fromJSON(x) {
+        var value = null;
+        try {
+            value = JSON.parse(x);
+        } catch (e) {}
+        return value;
     };
     var _fromStates = function fromStates() {
         for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -139,6 +181,16 @@
     };
     var D = document;
     var W = window;
+    var getAttribute = function getAttribute(node, attribute, parseValue) {
+        if (parseValue === void 0) {
+            parseValue = true;
+        }
+        if (!hasAttribute(node, attribute)) {
+            return null;
+        }
+        var value = node.getAttribute(attribute);
+        return parseValue ? _toValue(value) : value;
+    };
     var getChild = function getChild(parent, index) {
         return getChildren(parent, index || 0);
     };
@@ -148,6 +200,17 @@
     var getChildren = function getChildren(parent, index) {
         var children = [].slice.call(parent.children);
         return isNumber(index) ? children[index] || null : children;
+    };
+    var getDatum = function getDatum(node, datum, parseValue) {
+        if (parseValue === void 0) {
+            parseValue = true;
+        }
+        var value = getAttribute(node, 'data-' + datum, parseValue),
+            v = (value + "").trim();
+        if (parseValue && v && ('[' === v[0] && ']' === v.slice(-1) || '{' === v[0] && '}' === v.slice(-1)) && null !== (v = fromJSON(value))) {
+            return v;
+        }
+        return value;
     };
     var getElement = function getElement(query, scope) {
         return (scope || D).querySelector(query);
@@ -188,6 +251,9 @@
         var content = node[state];
         content = trim ? content.trim() : content;
         return "" !== content ? content : null;
+    };
+    var hasAttribute = function hasAttribute(node, attribute) {
+        return node.hasAttribute(attribute);
     };
     var hasClass = function hasClass(node, value) {
         return node.classList.contains(value);
@@ -400,6 +466,10 @@
 
     function getReference(key) {
         return getValueInMap(key, references) || null;
+    }
+
+    function getTagName(tag) {
+        return getDatum(tag, 'name');
     }
 
     function getValue(self) {
@@ -660,7 +730,7 @@
             }
         });
         e.clipboardData.setData('text/plain', selection.join(state.join));
-        picker.fire('cut', [e, selection]).fire('change', [$.title]).focus();
+        picker.fire('cut', [e, selection]).fire('change', [getTagName($)]).focus();
         offEventDefault(e);
     }
 
@@ -808,7 +878,7 @@
                 nextTag && text !== nextTag ? focusTo(nextTag) : picker.focus();
                 exit = true;
             } else if (KEY_DELETE_LEFT === key) {
-                picker.let(v = $.title, 1);
+                picker.let(v = getTagName($), 1);
                 if (toCount(selection) > 1) {
                     var c, current;
                     while (current = selection.pop()) {
@@ -820,7 +890,7 @@
                 prevTag ? (focusTo(prevTag), selectTo(getChildFirst(prevTag))) : picker.focus();
                 exit = true;
             } else if (KEY_DELETE_RIGHT === key) {
-                picker.let(v = $.title, 1);
+                picker.let(v = getTagName($), 1);
                 if (toCount(selection) > 1) {
                     var _current;
                     while (_current = selection.shift()) {
@@ -943,7 +1013,7 @@
                 exit = true;
             } else if (KEY_DELETE_LEFT === key) {
                 lastTag = toValueLastFromMap(_tags);
-                lastTag && picker.let(lastTag.title);
+                lastTag && picker.let(getTagName(lastTag));
                 picker.focus();
                 exit = true;
             }
@@ -971,7 +1041,7 @@
                     exit = true;
                 } else if (KEY_DELETE_LEFT === key) {
                     lastTag = toValueLastFromMap(_tags);
-                    lastTag && picker.let(lastTag.title);
+                    lastTag && picker.let(getTagName(lastTag));
                     picker.focus();
                     exit = true;
                 }
@@ -1106,7 +1176,7 @@
             picker = getReference(tag);
         offEvent('mousedown', $, onPointerDownTagX);
         offEvent('touchstart', $, onPointerDownTagX);
-        picker.let(tag.title).focus(), offEventDefault(e);
+        picker.let(getTagName(tag)).focus(), offEventDefault(e);
     }
 
     function onResetForm(e) {
@@ -1390,8 +1460,8 @@
         $.fire('is.tag', [v]);
         var tag = setElement('span', {
             'class': n + '__tag',
-            'tabindex': _active ? -1 : false,
-            'title': v
+            'data-name': v,
+            'tabindex': _active ? -1 : false
         });
         var tagText = setElement('span', fromHTML(v));
         var tagX = setElement('span', {
