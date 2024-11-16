@@ -11,7 +11,7 @@ block script
     |     max: 3
     | });
     |
-    | picker.on('max.tags', function (tag) {
+    | picker.on('max.tags', function (e, tag) {
     |     console.error('The maximum number of tags that can be inserted is ' + this.state.max + '.');
     |     tag && console.info('Last typed tag name is “' + tag + '”');
     | });

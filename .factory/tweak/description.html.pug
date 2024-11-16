@@ -14,7 +14,7 @@ block script
     | d.style.display = 'block';
     | d.style.marginTop = '0.5em';
     |
-    | picker.on('has.tag', function (tag) {
+    | picker.on('has.tag', function (e, tag) {
     |     d.innerHTML = 'Tag “' + tag + '” already exists.';
     |     picker.self.parentNode.append(d);
     |     setTimeout(() => d.remove(), 1000);

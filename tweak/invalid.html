@@ -28,13 +28,13 @@
       });
 
       function letInvalid() {
-          picker.mask.classList.remove(picker.state.n + '--invalid');
+          this.mask.classList.remove(this.state.n + '--invalid');
       }
 
       function setInvalid() {
-          picker.mask.classList.add(picker.state.n + '--invalid');
+          this.mask.classList.add(this.state.n + '--invalid');
           setTimeout(() => {
-              picker.mask.classList.remove(picker.state.n + '--invalid');
+              this.mask.classList.remove(this.state.n + '--invalid');
           }, 1000);
       }
       picker.on('blur', letInvalid);

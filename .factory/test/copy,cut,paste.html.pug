@@ -21,11 +21,11 @@ block script
     |     console.info('Tags “' + tags.join(this.state.join) + '” are going to be pasted.');
     | });
     |
-    | picker.on('let.tag', function (tag) {
+    | picker.on('let.tag', function (e, tag) {
     |     console.info('Tag “' + tag + '” deleted successfully.');
     | });
     |
-    | picker.on('set.tag', function (tag) {
+    | picker.on('set.tag', function (e, tag) {
     |     console.info('Tag “' + tag + '” inserted successfully.');
     | });
 

@@ -9,7 +9,7 @@ block script
   script
     | const picker = new TagPicker(document.querySelector('input'));
     |
-    | picker.on('has.tag', function (tag) {
+    | picker.on('has.tag', function (e, tag) {
     |     const node = this._tags.get(tag);
     |     if (node) {
     |         node.classList.add(this.state.n + '__tag--target');

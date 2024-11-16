@@ -108,10 +108,10 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <ul>
         <li><a href="test.html" target="_blank">No Idea?</a></li>
         <li><a href="test/attach,detach.html" target="_blank">Attach, Detach</a></li>
+        <li><a href="test/convert.html" target="_blank">Converted Characters</a></li>
         <li><a href="test/copy,cut,paste.html" target="_blank">Copy, Cut, and Paste Events</a></li>
         <li><a href="test/escape.html" target="_blank">Disabled Characters</a></li>
         <li><a href="test/disabled.html" target="_blank">Disabled Input</a></li>
-        <li><a href="test/filter.html" target="_blank">Filtered Characters</a></li>
         <li><a href="test/focus-auto.html" target="_blank">Focus Automatically</a></li>
         <li><a href="test/focus.html" target="_blank">Focus States</a></li>
         <li><a href="test/form.html" target="_blank">Form Events</a></li>
@@ -178,7 +178,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <pre><code>picker.detach();</code></pre>
       <h4><code>picker.fire(event, data, that)</code></h4>
       <p>Fires an event.</p>
-      <pre><code>picker.fire('change', []);</code></pre>
+      <pre><code>picker.fire('change', [picker._event]);</code></pre>
       <h4><code>picker.focus(mode = true)</code></h4>
       <p>Focuses to the tag picker’s input. If it has a text, it will select the text as well.</p>
       <pre><code>picker.focus(); // Focus and select the text
@@ -304,7 +304,7 @@ Object.defineProperty(Extension, 'name', {
       picker.on('change', function () {
           console.log(this.value);
       });
-      picker.on('has.tag', tag => {
+      picker.on('has.tag', (e, tag) => {
           alert('Tag “' + tag + '” already exists.');
       });
       picker.on('reset', function () {

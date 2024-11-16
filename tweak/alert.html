@@ -20,7 +20,7 @@
     <script src="../index.min.js"></script>
     <script>
       const picker = new TagPicker(document.querySelector('input'));
-      picker.on('has.tag', function (tag) {
+      picker.on('has.tag', function (e, tag) {
           alert('Tag “' + tag + '” already exists.');
       });
     </script>

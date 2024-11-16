@@ -12,7 +12,7 @@ block script
     | picker.on('change', function () {
     |     console.log(this.value);
     | });
-    | picker.on('has.tag', tag => {
+    | picker.on('has.tag', (e, tag) => {
     |     alert('Tag “' + tag + '” already exists.');
     | });
     | picker.on('reset', function () {
@@ -127,10 +127,10 @@ block content
     ul
       li: a(href='test.html' target='_blank') No Idea?
       li: a(href='test/attach,detach.html' target='_blank') Attach, Detach
+      li: a(href='test/convert.html' target='_blank') Converted Characters
       li: a(href='test/copy,cut,paste.html' target='_blank') Copy, Cut, and Paste Events
       li: a(href='test/escape.html' target='_blank') Disabled Characters
       li: a(href='test/disabled.html' target='_blank') Disabled Input
-      li: a(href='test/filter.html' target='_blank') Filtered Characters
       li: a(href='test/focus-auto.html' target='_blank') Focus Automatically
       li: a(href='test/focus.html' target='_blank') Focus States
       li: a(href='test/form.html' target='_blank') Form Events
@@ -208,7 +208,7 @@ block content
     h4: code picker.fire(event, data, that)
     p Fires an event.
     pre: code
-      | picker.fire('change', []);
+      | picker.fire('change', [picker._event]);
     h4: code picker.focus(mode = true)
     p Focuses to the tag picker’s input. If it has a text, it will select the text as well.
     pre: code
