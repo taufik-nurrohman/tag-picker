@@ -574,7 +574,7 @@
         if (!isInstance($, TagPicker)) {
             return new TagPicker(self, state);
         }
-        setReference(self, hook($, TagPicker.prototype));
+        setReference(self, hook($, TagPicker._));
         var newState = _fromStates({}, TagPicker.state, isString(state) ? {
             join: state
         } : state || {});
@@ -601,7 +601,7 @@
     defineProperty(TagPicker, 'name', {
         value: name
     });
-    var $$ = TagPicker.prototype;
+    var $$ = TagPicker._ = TagPicker.prototype;
     defineProperty($$, 'text', {
         get: function get() {
             return getText(this._mask.input);

@@ -7,11 +7,11 @@ block state
 
 block script
   script
-    | const picker = new TagPicker(document.querySelector('input'));
-    |
-    | picker._name = name => {
+    | TagPicker._._name = function (name) {
     |     return '@' + (name || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "");
     | };
+    |
+    | const picker = new TagPicker(document.querySelector('input'));
 
 block style
   style

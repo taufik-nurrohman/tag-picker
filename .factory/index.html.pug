@@ -299,6 +299,16 @@ block content
       | picker.value = 'foo, bar, baz';
     h3 Static Properties
     p Static properties are properties available directly on the #[code TagPicker] object.
+    h4: code TagPicker._
+    p Alias for #[code TagPicker.prototype].
+    pre: code
+      | TagPicker._.clear = function () {
+      |     return (this.text = this.value = ""), this;
+      | };
+      |
+      | const picker = new TagPicker(document.querySelector('input'));
+      |
+      | picker.clear();
     h4: code TagPicker.state
     p Returns the default values of #[code picker.state].
     pre: code

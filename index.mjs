@@ -165,7 +165,7 @@ function TagPicker(self, state) {
         return new TagPicker(self, state);
     }
 
-    setReference(self, hook($, TagPicker.prototype));
+    setReference(self, hook($, TagPicker._));
 
     let newState = fromStates({}, TagPicker.state, isString(state) ? {
         join: state
@@ -202,7 +202,7 @@ defineProperty(TagPicker, 'name', {
     value: name
 });
 
-const $$ = TagPicker.prototype;
+const $$ = TagPicker._ = TagPicker.prototype;
 
 defineProperty($$, 'text', {
     get: function () {

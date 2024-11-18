@@ -250,6 +250,15 @@ picker.set('baz', 2); // Insert “baz” tag at index 2 in the list</code></pre
 picker.value = 'foo, bar, baz';</code></pre>
       <h3>Static Properties</h3>
       <p>Static properties are properties available directly on the <code>TagPicker</code> object.</p>
+      <h4><code>TagPicker._</code></h4>
+      <p>Alias for <code>TagPicker.prototype</code>.</p>
+      <pre><code>TagPicker._.clear = function () {
+    return (this.text = this.value = ""), this;
+};
+
+const picker = new TagPicker(document.querySelector('input'));
+
+picker.clear();</code></pre>
       <h4><code>TagPicker.state</code></h4>
       <p>Returns the default values of <code>picker.state</code>.</p>
       <pre><code>const picker = new TagPicker(document.querySelector('input'), {

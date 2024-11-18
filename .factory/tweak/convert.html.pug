@@ -7,7 +7,7 @@ block state
 
 block script
   script
-    | TagPicker.prototype._set = function (tag) {
+    | TagPicker._._set = function (tag) {
     |     let name = tag.getAttribute('data-name'),
     |         views = { cry: '😭', happy: '😄', sad: '☹️', smile: '☺️' };
     |     views[name] && (tag.children[0].textContent = views[name]);
