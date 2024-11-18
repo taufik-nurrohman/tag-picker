@@ -1,0 +1,30 @@
+extends ../_index.pug
+
+block state
+  - const scripts = ['../index.min.js']
+  - const styles = ['../index.min.css']
+  - const title = 'Tag Picker'
+
+block script
+  script
+    | TagPicker.prototype._set = function (tag) {
+    |     let name = tag.getAttribute('data-name'),
+    |         views = { cry: '😭', happy: '😄', sad: '☹️', smile: '☺️' };
+    |     views[name] && (tag.children[0].textContent = views[name]);
+    | };
+    |
+    | const picker = new TagPicker(document.querySelector('input'));
+
+block style
+  style
+    | .tag-picker {
+    |   width: 100%;
+    | }
+
+block content
+  main
+    form(method='get')
+      p Convert tag view based on its value. Try #[mark(style={'user-select': 'all'} tabindex='0') cry], #[mark(style={'user-select': 'all'} tabindex='0') happy], #[mark(style={'user-select': 'all'} tabindex='0') sad], #[mark(style={'user-select': 'all'} tabindex='0') smile].
+      p: input(name='tags' type='text' value='happy, sad')
+      = ' '
+      p: button(type='submit') Submit

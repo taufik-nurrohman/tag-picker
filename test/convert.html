@@ -20,8 +20,8 @@
     <script src="../index.min.js"></script>
     <script>
       const picker = new TagPicker(document.querySelector('input'));
-      picker._convert = text => {
-          return '@' + (text || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "");
+      picker._name = name => {
+          return '@' + (name || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "");
       };
     </script>
   </body>

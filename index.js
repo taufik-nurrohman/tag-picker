@@ -638,11 +638,13 @@
             $.fire('change', [_event]);
         }
     });
-    $$._convert = function (v) {
+    $$._let = function (tag) {};
+    $$._name = function (v) {
         var $ = this,
             state = $.state;
         return (v || "").replace(/[^ -~]/g, ' ').split(state.join).join("").replace(/\s+/g, ' ').trim();
     };
+    $$._set = function (tag) {};
     var _keyIsCtrl = false,
         _keyIsShift = false;
 
@@ -1406,6 +1408,7 @@
         var $ = this,
             _active = $._active,
             _event = $._event,
+            _let = $._let,
             _tags = $._tags,
             _value = $._value,
             self = $.self,
@@ -1434,6 +1437,9 @@
         var tag = getValueInMap(v, _tags);
         getChild(tag, 0);
         var tagX = getChild(tag, 1);
+        if (isFunction(_let)) {
+            _let.call($, tag);
+        }
         offEvent('blur', tag, onBlurTag);
         offEvent('contextmenu', tag, onContextMenuTag);
         offEvent('copy', tag, onCopyTag);
@@ -1459,8 +1465,9 @@
         var $ = this,
             _active = $._active,
             _event = $._event,
-            _convert = $._convert,
             _mask = $._mask,
+            _name = $._name,
+            _set = $._set,
             _tags = $._tags,
             self = $.self,
             state = $.state,
@@ -1473,8 +1480,8 @@
         if (_tags.size >= state.max) {
             return $.fire('max.tags', [_event, v]);
         }
-        if (isFunction(_convert)) {
-            v = _convert.call($, v);
+        if (isFunction(_name)) {
+            v = _name.call($, v);
         }
         if ("" === v || isString(pattern) && !toPattern(pattern).test(v)) {
             return $.fire('not.tag', [_event, v]);
@@ -1515,14 +1522,20 @@
             tags.splice(at, 0, v);
             $._tags = new Map();
             setValueInMap(v, tag, _tags);
+            if (isFunction(_set)) {
+                _set.call($, tag);
+            }
             forEachArray(tags, function (k) {
                 var v;
                 setValueInMap(k, v = getValueInMap(k, _tags), $._tags);
                 setPrev(text, v);
             });
         } else {
-            setPrev(text, tag);
             setValueInMap(v, tag, $._tags);
+            if (isFunction(_set)) {
+                _set.call($, tag);
+            }
+            setPrev(text, tag);
         }
         self.value = toKeysFromMap($._tags).join(state.join);
         $.fire('set.tag', [_event, v]);

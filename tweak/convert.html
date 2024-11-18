@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <form method="get">
+        <p>Convert tag view based on its value. Try <mark style="user-select:all;" tabindex="0">cry</mark>, <mark style="user-select:all;" tabindex="0">happy</mark>, <mark style="user-select:all;" tabindex="0">sad</mark>, <mark style="user-select:all;" tabindex="0">smile</mark>.</p>
+        <p><input name="tags" type="text" value="happy, sad"></p>
+        <p><button type="submit">Submit</button></p>
+      </form>
+    </main>
+    <script src="../index.min.js"></script>
+    <script>
+      TagPicker.prototype._set = function (tag) {
+          let name = tag.getAttribute('data-name'),
+              views = {
+                  cry: '😭',
+                  happy: '😄',
+                  sad: '☹️',
+                  smile: '☺️'
+              };
+          views[name] && (tag.children[0].textContent = views[name]);
+      };
+      const picker = new TagPicker(document.querySelector('input'));
+    </script>
+  </body>
+</html>
