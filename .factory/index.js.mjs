@@ -53,7 +53,7 @@ function getReference(key) {
 }
 
 function getTagName(tag) {
-    return getDatum(tag, 'name');
+    return getDatum(tag, 'name', false);
 }
 
 function getValue(self) {

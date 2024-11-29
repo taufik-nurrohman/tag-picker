@@ -117,13 +117,6 @@
         x = x.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;');
         return x;
     };
-    var fromJSON = function fromJSON(x) {
-        var value = null;
-        try {
-            value = JSON.parse(x);
-        } catch (e) {}
-        return value;
-    };
     var _fromStates = function fromStates() {
         for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
             lot[_key] = arguments[_key];
@@ -202,14 +195,8 @@
         return isNumber(index) ? children[index] || null : children;
     };
     var getDatum = function getDatum(node, datum, parseValue) {
-        if (parseValue === void 0) {
-            parseValue = true;
-        }
-        var value = getAttribute(node, 'data-' + datum, parseValue),
-            v = (value + "").trim();
-        if (parseValue && v && ('[' === v[0] && ']' === v.slice(-1) || '{' === v[0] && '}' === v.slice(-1)) && null !== (v = fromJSON(value))) {
-            return v;
-        }
+        var value = getAttribute(node, 'data-' + datum, parseValue);
+        (value + "").trim();
         return value;
     };
     var getElement = function getElement(query, scope) {
@@ -469,7 +456,7 @@
     }
 
     function getTagName(tag) {
-        return getDatum(tag, 'name');
+        return getDatum(tag, 'name', false);
     }
 
     function getValue(self) {
