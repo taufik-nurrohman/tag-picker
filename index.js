@@ -455,8 +455,8 @@
         return getValueInMap(key, references) || null;
     }
 
-    function getTagName(tag) {
-        return getDatum(tag, 'name', false);
+    function getTagValue(tag) {
+        return getDatum(tag, 'value', false);
     }
 
     function getValue(self) {
@@ -626,12 +626,12 @@
         }
     });
     $$._let = function (tag) {};
-    $$._name = function (v) {
+    $$._set = function (tag) {};
+    $$._valid = function (v) {
         var $ = this,
             state = $.state;
         return (v || "").replace(/[^ -~]/g, ' ').split(state.join).join("").replace(/\s+/g, ' ').trim();
     };
-    $$._set = function (tag) {};
     var _keyIsCtrl = false,
         _keyIsShift = false;
 
@@ -726,7 +726,7 @@
             }
         });
         e.clipboardData.setData('text/plain', selection.join(state.join));
-        picker.fire('cut', [e, selection]).fire('change', [e, getTagName($)]).focus();
+        picker.fire('cut', [e, selection]).fire('change', [e, getTagValue($)]).focus();
         offEventDefault(e);
     }
 
@@ -879,7 +879,7 @@
                 nextTag && text !== nextTag ? focusTo(nextTag) : picker.focus();
                 exit = true;
             } else if (KEY_DELETE_LEFT === key) {
-                picker.let(v = getTagName($), 1);
+                picker.let(v = getTagValue($), 1);
                 if (toCount(selection) > 1) {
                     var c, current;
                     while (current = selection.pop()) {
@@ -891,7 +891,7 @@
                 prevTag ? (focusTo(prevTag), selectTo(getChildFirst(prevTag))) : picker.focus();
                 exit = true;
             } else if (KEY_DELETE_RIGHT === key) {
-                picker.let(v = getTagName($), 1);
+                picker.let(v = getTagValue($), 1);
                 if (toCount(selection) > 1) {
                     var _current;
                     while (_current = selection.shift()) {
@@ -1014,7 +1014,7 @@
                 exit = true;
             } else if (KEY_DELETE_LEFT === key) {
                 lastTag = toValueLastFromMap(_tags);
-                lastTag && picker.let(getTagName(lastTag));
+                lastTag && picker.let(getTagValue(lastTag));
                 picker.focus();
                 exit = true;
             }
@@ -1042,7 +1042,7 @@
                     exit = true;
                 } else if (KEY_DELETE_LEFT === key) {
                     lastTag = toValueLastFromMap(_tags);
-                    lastTag && picker.let(getTagName(lastTag));
+                    lastTag && picker.let(getTagValue(lastTag));
                     picker.focus();
                     exit = true;
                 }
@@ -1184,7 +1184,7 @@
         picker._event = e;
         offEvent('mousedown', $, onPointerDownTagX);
         offEvent('touchstart', $, onPointerDownTagX);
-        picker.let(getTagName(tag)).focus(), offEventDefault(e);
+        picker.let(getTagValue(tag)).focus(), offEventDefault(e);
     }
 
     function onResetForm(e) {
@@ -1453,9 +1453,9 @@
             _active = $._active,
             _event = $._event,
             _mask = $._mask,
-            _name = $._name,
             _set = $._set,
             _tags = $._tags,
+            _valid = $._valid,
             self = $.self,
             state = $.state,
             text = _mask.text,
@@ -1467,8 +1467,8 @@
         if (_tags.size >= state.max) {
             return $.fire('max.tags', [_event, v]);
         }
-        if (isFunction(_name)) {
-            v = _name.call($, v);
+        if (isFunction(_valid)) {
+            v = _valid.call($, v);
         }
         if ("" === v || isString(pattern) && !toPattern(pattern).test(v)) {
             return $.fire('not.tag', [_event, v]);
@@ -1479,7 +1479,7 @@
         $.fire('is.tag', [_event, v]);
         var tag = setElement('span', {
             'class': n + '__tag',
-            'data-name': v,
+            'data-value': v,
             'tabindex': _active ? -1 : false
         });
         var tagText = setElement('span', fromHTML(v));

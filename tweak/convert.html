@@ -23,14 +23,14 @@
     <script src="../index.min.js"></script>
     <script>
       TagPicker._._set = function (tag) {
-          let name = tag.getAttribute('data-name'),
+          let value = tag.getAttribute('data-value'),
               views = {
                   cry: '😭',
                   happy: '😄',
                   sad: '☹️',
                   smile: '☺️'
               };
-          views[name] && (tag.children[0].textContent = views[name]);
+          views[value] && (tag.children[0].textContent = views[value]);
       };
       const picker = new TagPicker(document.querySelector('input'));
     </script>

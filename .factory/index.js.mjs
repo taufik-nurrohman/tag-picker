@@ -52,8 +52,8 @@ function getReference(key) {
     return getValueInMap(key, references) || null;
 }
 
-function getTagName(tag) {
-    return getDatum(tag, 'name', false);
+function getTagValue(tag) {
+    return getDatum(tag, 'value', false);
 }
 
 function getValue(self) {
@@ -237,12 +237,12 @@ defineProperty($$, 'value', {
 
 $$._let = function (tag) {};
 
-$$._name = function (v) {
+$$._set = function (tag) {};
+
+$$._valid = function (v) {
     let $ = this, {state} = $;
     return (v || "").replace(/[^ -~]/g, ' ').split(state.join).join("").replace(/\s+/g, ' ').trim();
 };
-
-$$._set = function (tag) {};
 
 let _keyIsCtrl = false, _keyIsShift = false;
 
@@ -327,7 +327,7 @@ function onCutTag(e) {
         }
     });
     e.clipboardData.setData('text/plain', selection.join(state.join));
-    picker.fire('cut', [e, selection]).fire('change', [e, getTagName($)]).focus();
+    picker.fire('cut', [e, selection]).fire('change', [e, getTagValue($)]).focus();
     offEventDefault(e);
 }
 
@@ -462,7 +462,7 @@ function onKeyDownTag(e) {
             nextTag && text !== nextTag ? focusTo(nextTag) : picker.focus();
             exit = true;
         } else if (KEY_DELETE_LEFT === key) {
-            picker.let(v = getTagName($), 1);
+            picker.let(v = getTagValue($), 1);
             if (toCount(selection) > 1) {
                 let c, current;
                 while (current = selection.pop()) {
@@ -474,7 +474,7 @@ function onKeyDownTag(e) {
             prevTag ? (focusTo(prevTag), selectTo(getChildFirst(prevTag))) : picker.focus();
             exit = true;
         } else if (KEY_DELETE_RIGHT === key) {
-            picker.let(v = getTagName($), 1);
+            picker.let(v = getTagValue($), 1);
             if (toCount(selection) > 1) {
                 let c, current;
                 while (current = selection.shift()) {
@@ -594,7 +594,7 @@ function onKeyDownTextInput(e) {
             exit = true;
         } else if (KEY_DELETE_LEFT === key) {
             lastTag = toValueLastFromMap(_tags);
-            lastTag && picker.let(getTagName(lastTag));
+            lastTag && picker.let(getTagValue(lastTag));
             picker.focus();
             exit = true;
         }
@@ -622,7 +622,7 @@ function onKeyDownTextInput(e) {
                 exit = true;
             } else if (KEY_DELETE_LEFT === key) {
                 lastTag = toValueLastFromMap(_tags);
-                lastTag && picker.let(getTagName(lastTag));
+                lastTag && picker.let(getTagValue(lastTag));
                 picker.focus();
                 exit = true;
             }
@@ -751,7 +751,7 @@ function onPointerDownTagX(e) {
     picker._event = e;
     offEvent('mousedown', $, onPointerDownTagX);
     offEvent('touchstart', $, onPointerDownTagX);
-    picker.let(getTagName(tag)).focus(), offEventDefault(e);
+    picker.let(getTagValue(tag)).focus(), offEventDefault(e);
 }
 
 function onResetForm(e) {
@@ -1003,7 +1003,7 @@ $$.let = function (v, _skipHookChange) {
 
 $$.set = function (v, at, _skipHookChange, _attach) {
     let $ = this,
-        {_active, _event, _mask, _name, _set, _tags, self, state} = $,
+        {_active, _event, _mask, _set, _tags, _valid, self, state} = $,
         {text} = _mask,
         {pattern} = state,
         n = state.n;
@@ -1013,8 +1013,8 @@ $$.set = function (v, at, _skipHookChange, _attach) {
     if (_tags.size >= state.max) {
         return $.fire('max.tags', [_event, v]);
     }
-    if (isFunction(_name)) {
-        v = _name.call($, v);
+    if (isFunction(_valid)) {
+        v = _valid.call($, v);
     }
     if ("" === v || (isString(pattern) && !toPattern(pattern).test(v))) {
         return $.fire('not.tag', [_event, v]);
@@ -1025,7 +1025,7 @@ $$.set = function (v, at, _skipHookChange, _attach) {
     $.fire('is.tag', [_event, v]);
     const tag = setElement('span', {
         'class': n + '__tag',
-        'data-name': v,
+        'data-value': v,
         'tabindex': _active ? -1 : false
     });
     const tagText = setElement('span', fromHTML(v));

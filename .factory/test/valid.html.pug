@@ -7,8 +7,8 @@ block state
 
 block script
   script
-    | TagPicker._._name = function (name) {
-    |     return '@' + (name || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "");
+    | TagPicker._._valid = function (value) {
+    |     return '@' + (value || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "");
     | };
     |
     | const picker = new TagPicker(document.querySelector('input'));
