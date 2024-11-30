@@ -251,7 +251,7 @@ function onBlurTag(e) {
     let $ = this,
         picker = getReference($),
         {_mask, _tags, mask, state} = picker,
-        n = state.n;
+        {n} = state;
     picker._event = e;
     if (!_keyIsCtrl && !_keyIsShift) {
         forEachMap(_tags, v => letClass(v, n + '__tag--selected'));
@@ -266,7 +266,7 @@ function onBlurTextInput(e) {
         picker = getReference($),
         {_mask, mask, state} = picker,
         {text} = _mask,
-        n = state.n;
+        {n} = state;
     picker._event = e;
     letClass(text, n + '__text--focus');
     letClass(mask, n += '--focus');
@@ -336,7 +336,7 @@ function onFocusTextInput(e) {
         picker = getReference($),
         {_mask, _tags, mask, self, state} = picker,
         {hint, input, text} = _mask,
-        n = state.n;
+        {n} = state;
     picker._event = e;
     forEachMap(_tags, v => letClass(v, n + '__tag--selected'));
     setClass(text, n + '__text--focus');
@@ -364,7 +364,7 @@ function onFocusTag(e) {
     let $ = this,
         picker = getReference($),
         {_mask, mask, state} = picker,
-        n = state.n;
+        {n} = state;
     picker._event = e;
     setClass(mask, n += '--focus');
     setClass(mask, n += '-tag');
@@ -793,7 +793,7 @@ $$.attach = function (self, state) {
     $._value = getValue(self) || null;
     $.self = self;
     $.state = state;
-    let n = state.n;
+    let {n} = state;
     const form = getParentForm(self);
     const mask = setElement('div', {
         'class': n,
@@ -1005,8 +1005,7 @@ $$.set = function (v, at, _skipHookChange, _attach) {
     let $ = this,
         {_active, _event, _mask, _set, _tags, _valid, self, state} = $,
         {text} = _mask,
-        {pattern} = state,
-        n = state.n;
+        {n, pattern} = state;
     if (!_active && !_attach) {
         return $;
     }
@@ -1023,16 +1022,16 @@ $$.set = function (v, at, _skipHookChange, _attach) {
         return $.fire('has.tag', [_event, v]);
     }
     $.fire('is.tag', [_event, v]);
-    const tag = setElement('span', {
-        'class': n + '__tag',
-        'data-value': v,
-        'tabindex': _active ? -1 : false
-    });
-    const tagText = setElement('span', fromHTML(v));
-    const tagX = setElement('span', {
-        'class': n + '__x',
-        'tabindex': -1
-    });
+    let tag = setElement('span', {
+            'class': n + '__tag',
+            'data-value': v,
+            'tabindex': _active ? -1 : false
+        }),
+        tagText = setElement('span', fromHTML(v)),
+        tagX = setElement('span', {
+            'class': n + '__x',
+            'tabindex': -1
+        });
     if (_active) {
         onEvent('blur', tag, onBlurTag);
         onEvent('contextmenu', tag, onContextMenuTag);

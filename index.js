@@ -1226,7 +1226,8 @@
         $._value = getValue(self) || null;
         $.self = self;
         $.state = state;
-        var n = state.n;
+        var _state = state,
+            n = _state.n;
         var form = getParentForm(self);
         var mask = setElement('div', {
             'class': n,
@@ -1459,8 +1460,8 @@
             self = $.self,
             state = $.state,
             text = _mask.text,
-            pattern = state.pattern,
-            n = state.n;
+            n = state.n,
+            pattern = state.pattern;
         if (!_active && !_attach) {
             return $;
         }
@@ -1478,15 +1479,15 @@
         }
         $.fire('is.tag', [_event, v]);
         var tag = setElement('span', {
-            'class': n + '__tag',
-            'data-value': v,
-            'tabindex': _active ? -1 : false
-        });
-        var tagText = setElement('span', fromHTML(v));
-        var tagX = setElement('span', {
-            'class': n + '__x',
-            'tabindex': -1
-        });
+                'class': n + '__tag',
+                'data-value': v,
+                'tabindex': _active ? -1 : false
+            }),
+            tagText = setElement('span', fromHTML(v)),
+            tagX = setElement('span', {
+                'class': n + '__x',
+                'tabindex': -1
+            });
         if (_active) {
             onEvent('blur', tag, onBlurTag);
             onEvent('contextmenu', tag, onContextMenuTag);
