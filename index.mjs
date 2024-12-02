@@ -966,14 +966,17 @@ $$.let = function (v, _skipHookChange) {
         }
         return forEachArray(_value.split(state.join), tag => $.set(tag, -1, 1)), $.fire('change', [_event]);
     }
+    if (!isArray(v)) {
+        v = [v, v];
+    }
     if (_tags.size < state.min + 1) {
-        return $.fire('min.tags', [_event, v]);
+        return $.fire('min.tags', [_event, v[0]]);
     }
-    if (!hasKeyInMap(v, _tags)) {
-        return $.fire('not.tag', [_event, v]);
+    if (!hasKeyInMap(v[0], _tags)) {
+        return $.fire('not.tag', [_event, v[0]]);
     }
-    $.fire('is.tag', [_event, v]);
-    let tag = getValueInMap(v, _tags),
+    $.fire('is.tag', [_event, v[0]]);
+    let tag = getValueInMap(v[0], _tags),
         tagText = getChild(tag, 0),
         tagX = getChild(tag, 1);
     if (isFunction(_let)) {
@@ -992,11 +995,11 @@ $$.let = function (v, _skipHookChange) {
     offEvent('touchstart', tag, onPointerDownTag);
     offEvent('touchstart', tagX, onPointerDownTagX);
     letElement(tag);
-    letValueInMap(v, $._tags);
+    letValueInMap(v[0], $._tags);
     self.value = toKeysFromMap($._tags).join(state.join);
-    $.fire('let.tag', [_event, v]);
+    $.fire('let.tag', [_event, v[0]]);
     if (!_skipHookChange) {
-        $.fire('change', [_event, v]);
+        $.fire('change', [_event, v[0]]);
     }
     return $;
 };
