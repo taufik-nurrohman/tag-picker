@@ -1009,25 +1009,28 @@ $$.set = function (v, at, _skipHookChange, _attach) {
     if (!_active && !_attach) {
         return $;
     }
+    if (!isArray(v)) {
+        v = [v, v];
+    }
     if (_tags.size >= state.max) {
-        return $.fire('max.tags', [_event, v]);
+        return $.fire('max.tags', [_event, v[0]]);
     }
     if (isFunction(_valid)) {
-        v = _valid.call($, v);
+        v[0] = _valid.call($, v[0]);
     }
-    if ("" === v || (isString(pattern) && !toPattern(pattern).test(v))) {
-        return $.fire('not.tag', [_event, v]);
+    if ("" === v[0] || (isString(pattern) && !toPattern(pattern).test(v[0]))) {
+        return $.fire('not.tag', [_event, v[0]]);
     }
-    if (hasKeyInMap(v, _tags)) {
-        return $.fire('has.tag', [_event, v]);
+    if (hasKeyInMap(v[0], _tags)) {
+        return $.fire('has.tag', [_event, v[0]]);
     }
-    $.fire('is.tag', [_event, v]);
+    $.fire('is.tag', [_event, v[0]]);
     let tag = setElement('span', {
             'class': n + '__tag',
-            'data-value': v,
+            'data-value': v[0],
             'tabindex': _active ? -1 : false
         }),
-        tagText = setElement('span', fromHTML(v)),
+        tagText = setElement('span', fromHTML(v[1] ?? v[0])),
         tagX = setElement('span', {
             'class': n + '__x',
             'tabindex': -1
@@ -1051,9 +1054,9 @@ $$.set = function (v, at, _skipHookChange, _attach) {
     setChildLast(tag, tagX);
     if (isInteger(at) && at >= 0) {
         let tags = toKeysFromMap(_tags);
-        tags.splice(at, 0, v);
+        tags.splice(at, 0, v[0]);
         $._tags = new Map;
-        setValueInMap(v, tag, _tags);
+        setValueInMap(v[0], tag, _tags);
         if (isFunction(_set)) {
             _set.call($, tag);
         }
@@ -1063,16 +1066,16 @@ $$.set = function (v, at, _skipHookChange, _attach) {
             setPrev(text, v);
         });
     } else {
-        setValueInMap(v, tag, $._tags);
+        setValueInMap(v[0], tag, $._tags);
         if (isFunction(_set)) {
             _set.call($, tag);
         }
         setPrev(text, tag);
     }
     self.value = toKeysFromMap($._tags).join(state.join);
-    $.fire('set.tag', [_event, v]);
+    $.fire('set.tag', [_event, v[0]]);
     if (!_skipHookChange) {
-        $.fire('change', [_event, v]);
+        $.fire('change', [_event, v[0]]);
     }
     return $;
 };

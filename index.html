@@ -207,10 +207,12 @@ picker.off('change', onChange); // Remove `onChange` event from the `change` eve
 
 picker.on('change', onChange);</code></pre>
       <h4><code>picker.set(name, at = -1)</code></h4>
+      <h4><code>picker.set([name, title ?? name], at = -1)</code></h4>
       <p>Adds a new tag with the given name.</p>
       <pre><code>picker.set('foo'); // Append “foo” tag
 picker.set('bar', 0); // Prepend “bar” tag
 picker.set('baz', 2); // Insert “baz” tag at index 2 in the list</code></pre>
+      <pre><code>picker.set(['cry', '😭']); // Append “cry” tag displayed as “😭”</code></pre>
       <h3>Static Methods</h3>
       <p>Static methods are methods available directly on the <code>TagPicker</code> object.</p>
       <h4><code>TagPicker.from(self, state)</code></h4>

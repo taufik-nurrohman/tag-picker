@@ -243,11 +243,14 @@ block content
       |
       | picker.on('change', onChange);
     h4: code picker.set(name, at = -1)
+    h4: code picker.set([name, title ?? name], at = -1)
     p Adds a new tag with the given name.
     pre: code
       | picker.set('foo'); // Append “foo” tag
       | picker.set('bar', 0); // Prepend “bar” tag
       | picker.set('baz', 2); // Insert “baz” tag at index 2 in the list
+    pre: code
+      | picker.set(['cry', '😭']); // Append “cry” tag displayed as “😭”
     h3 Static Methods
     p Static methods are methods available directly on the #[code TagPicker] object.
     h4: code TagPicker.from(self, state)
