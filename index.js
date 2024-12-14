@@ -625,8 +625,8 @@
             $.fire('change', [_event]);
         }
     });
-    $$._let = function (tag) {};
-    $$._set = function (tag) {};
+    $$._let = false;
+    $$._set = false;
     $$._valid = function (v) {
         var $ = this,
             state = $.state;

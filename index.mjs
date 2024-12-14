@@ -235,9 +235,9 @@ defineProperty($$, 'value', {
     }
 });
 
-$$._let = function (tag) {};
+$$._let = false;
 
-$$._set = function (tag) {};
+$$._set = false;
 
 $$._valid = function (v) {
     let $ = this, {state} = $;
