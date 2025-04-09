@@ -43,6 +43,14 @@
 .tag-picker__self:read-only + .tag-picker .tag-picker__x {
   cursor: not-allowed;
 }
+.tag-picker__flex {
+  border-color: inherit;
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+  gap: 1px;
+  padding: 1px;
+}
 .tag-picker__tag {
   cursor: pointer;
 }
@@ -59,14 +67,6 @@
 }
 .tag-picker__tag + .tag-picker__text span + span {
   display: none;
-}
-.tag-picker__tags {
-  border-color: inherit;
-  display: flex;
-  flex-wrap: wrap;
-  flex: 1;
-  gap: 1px;
-  padding: 1px;
 }
 .tag-picker__text {
   border-color: transparent;

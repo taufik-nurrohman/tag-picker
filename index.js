@@ -2,7 +2,7 @@
  *
  * The MIT License (MIT)
  *
- * Copyright © 2024 Taufik Nurrohman <https://github.com/taufik-nurrohman>
+ * Copyright © 2025 Taufik Nurrohman <https://github.com/taufik-nurrohman>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the “Software”), to deal
@@ -27,9 +27,87 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = f() : typeof define === 'function' && define.amd ? define(f) : (g = typeof globalThis !== 'undefined' ? globalThis : g || self, g.TagPicker = f());
 })(this, (function () {
     'use strict';
-    var hasValue = function hasValue(x, data) {
-        return -1 !== data.indexOf(x);
-    };
+
+    function _arrayLikeToArray(r, a) {
+        (null == a || a > r.length) && (a = r.length);
+        for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+        return n;
+    }
+
+    function _arrayWithHoles(r) {
+        if (Array.isArray(r)) return r;
+    }
+
+    function _createForOfIteratorHelperLoose(r, e) {
+        var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+        if (t) return (t = t.call(r)).next.bind(t);
+        if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || r && "number" == typeof r.length) {
+            t && (r = t);
+            var o = 0;
+            return function () {
+                return o >= r.length ? {
+                    done: !0
+                } : {
+                    done: !1,
+                    value: r[o++]
+                };
+            };
+        }
+        throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+    }
+
+    function _iterableToArrayLimit(r, l) {
+        var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
+        if (null != t) {
+            var e,
+                n,
+                i,
+                u,
+                a = [],
+                f = !0,
+                o = !1;
+            try {
+                if (i = (t = t.call(r)).next, 0 === l) {
+                    if (Object(t) !== t) return;
+                    f = !1;
+                } else
+                    for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0);
+            } catch (r) {
+                o = !0, n = r;
+            } finally {
+                try {
+                    if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return;
+                } finally {
+                    if (o) throw n;
+                }
+            }
+            return a;
+        }
+    }
+
+    function _maybeArrayLike(r, a, e) {
+        if (a && !Array.isArray(a) && "number" == typeof a.length) {
+            var y = a.length;
+            return _arrayLikeToArray(a, e < y ? e : y);
+        }
+        return r(a, e);
+    }
+
+    function _nonIterableRest() {
+        throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+    }
+
+    function _slicedToArray(r, e) {
+        return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest();
+    }
+
+    function _unsupportedIterableToArray(r, a) {
+        if (r) {
+            if ("string" == typeof r) return _arrayLikeToArray(r, a);
+            var t = {}.toString.call(r).slice(8, -1);
+            return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
+        }
+    }
     var isArray = function isArray(x) {
         return Array.isArray(x);
     };
@@ -58,7 +136,7 @@
         return 'number' === typeof x;
     };
     var isNumeric = function isNumeric(x) {
-        return /^-?(?:\d*.)?\d+$/.test(x + "");
+        return /^[+-]?(?:\d*\.)?\d+$/.test(x + "");
     };
     var isObject = function isObject(x, isPlain) {
         if (isPlain === void 0) {
@@ -75,43 +153,8 @@
     var isString = function isString(x) {
         return 'string' === typeof x;
     };
-    var toCaseLower = function toCaseLower(x) {
-        return x.toLowerCase();
-    };
-    var toCount = function toCount(x) {
-        return x.length;
-    };
-    var toNumber = function toNumber(x, base) {
-        if (base === void 0) {
-            base = 10;
-        }
-        return base ? parseInt(x, base) : parseFloat(x);
-    };
-    var _toValue = function toValue(x) {
-        if (isArray(x)) {
-            return x.map(function (v) {
-                return _toValue(v);
-            });
-        }
-        if (isNumeric(x)) {
-            return toNumber(x);
-        }
-        if (isObject(x)) {
-            for (var k in x) {
-                x[k] = _toValue(x[k]);
-            }
-            return x;
-        }
-        if ('false' === x) {
-            return false;
-        }
-        if ('null' === x) {
-            return null;
-        }
-        if ('true' === x) {
-            return true;
-        }
-        return x;
+    var hasValue = function hasValue(x, data) {
+        return -1 !== data.indexOf(x);
     };
     var fromHTML = function fromHTML(x, escapeQuote) {
         x = x.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;');
@@ -172,6 +215,151 @@
         }
         return "" + x;
     };
+    var toCaseCamel = function toCaseCamel(x) {
+        return x.replace(/[-_.](\w)/g, function (m0, m1) {
+            return toCaseUpper(m1);
+        });
+    };
+    var toCaseLower = function toCaseLower(x) {
+        return x.toLowerCase();
+    };
+    var toCaseUpper = function toCaseUpper(x) {
+        return x.toUpperCase();
+    };
+    var toCount = function toCount(x) {
+        return x.length;
+    };
+    var toJSON = function toJSON(x) {
+        return JSON.stringify(x);
+    };
+    var toNumber = function toNumber(x, base) {
+        if (base === void 0) {
+            base = 10;
+        }
+        return base ? parseInt(x, base) : parseFloat(x);
+    };
+    var _toValue = function toValue(x) {
+        if (isArray(x)) {
+            return x.map(function (v) {
+                return _toValue(v);
+            });
+        }
+        if (isObject(x)) {
+            for (var k in x) {
+                x[k] = _toValue(x[k]);
+            }
+            return x;
+        }
+        if (isString(x) && isNumeric(x)) {
+            if ('0' === x[0] && -1 === x.indexOf('.')) {
+                return x;
+            }
+            return toNumber(x);
+        }
+        if ('false' === x) {
+            return false;
+        }
+        if ('null' === x) {
+            return null;
+        }
+        if ('true' === x) {
+            return true;
+        }
+        return x;
+    };
+    var forEachArray = function forEachArray(array, at) {
+        for (var i = 0, j = toCount(array), v; i < j; ++i) {
+            v = at(array[i], i);
+            if (-1 === v) {
+                array.splice(i, 1);
+                continue;
+            }
+            if (0 === v) {
+                break;
+            }
+            if (1 === v) {
+                continue;
+            }
+        }
+        return array;
+    };
+    var forEachMap = function forEachMap(map, at) {
+        for (var _iterator = _createForOfIteratorHelperLoose(map), _step; !(_step = _iterator()).done;) {
+            var _step$value = _maybeArrayLike(_slicedToArray, _step.value, 2),
+                k = _step$value[0],
+                v = _step$value[1];
+            v = at(v, k);
+            if (-1 === v) {
+                letValueInMap(k, map);
+                continue;
+            }
+            if (0 === v) {
+                break;
+            }
+            if (1 === v) {
+                continue;
+            }
+        }
+        return map;
+    };
+    var forEachObject = function forEachObject(object, at) {
+        var v;
+        for (var k in object) {
+            v = at(object[k], k);
+            if (-1 === v) {
+                delete object[k];
+                continue;
+            }
+            if (0 === v) {
+                break;
+            }
+            if (1 === v) {
+                continue;
+            }
+        }
+        return object;
+    };
+    var getReference = function getReference(key) {
+        return getValueInMap(key, references) || null;
+    };
+    var getValueInMap = function getValueInMap(k, map) {
+        return map.get(k);
+    };
+    var hasKeyInMap = function hasKeyInMap(k, map) {
+        return map.has(k);
+    };
+    var letValueInMap = function letValueInMap(k, map) {
+        return map.delete(k);
+    };
+    var setReference = function setReference(key, value) {
+        return setValueInMap(key, value, references);
+    };
+    var setValueInMap = function setValueInMap(k, v, map) {
+        return map.set(k, v);
+    };
+    var toKeysFromMap = function toKeysFromMap(map) {
+        var r = [];
+        return forEachMap(map, function (v, k) {
+            r.push(k);
+        }), r;
+    };
+    var toValueFirstFromMap = function toValueFirstFromMap(map) {
+        return toValuesFromMap(map).shift();
+    };
+    var toValueLastFromMap = function toValueLastFromMap(map) {
+        return toValuesFromMap(map).pop();
+    };
+    var toValuesFromMap = function toValuesFromMap(map) {
+        var r = [];
+        return forEachMap(map, function (v) {
+            r.push(v);
+        }), r;
+    };
+    var references = new WeakMap();
+
+    function _toArray(iterable) {
+        return Array.from(iterable);
+    }
     var D = document;
     var W = window;
     var getAttribute = function getAttribute(node, attribute, parseValue) {
@@ -184,14 +372,14 @@
         var value = node.getAttribute(attribute);
         return parseValue ? _toValue(value) : value;
     };
-    var getChild = function getChild(parent, index) {
-        return getChildren(parent, index || 0);
+    var getChild = function getChild(parent, index, anyNode) {
+        return getChildren(parent, index || 0, anyNode);
     };
-    var getChildFirst = function getChildFirst(parent) {
-        return parent.firstElementChild || null;
+    var getChildFirst = function getChildFirst(parent, anyNode) {
+        return parent['first' + (anyNode ? "" : 'Element') + 'Child'] || null;
     };
-    var getChildren = function getChildren(parent, index) {
-        var children = [].slice.call(parent.children);
+    var getChildren = function getChildren(parent, index, anyNode) {
+        var children = _toArray(parent['child' + (anyNode ? 'Nodes' : 'ren')]);
         return isNumber(index) ? children[index] || null : children;
     };
     var getDatum = function getDatum(node, datum, parseValue) {
@@ -203,7 +391,7 @@
         return (scope || D).querySelector(query);
     };
     var getElements = function getElements(query, scope) {
-        return (scope || D).querySelectorAll(query);
+        return _toArray((scope || D).querySelectorAll(query));
     };
     var getName = function getName(node) {
         return toCaseLower(node && node.nodeName || "") || null;
@@ -239,6 +427,14 @@
         content = trim ? content.trim() : content;
         return "" !== content ? content : null;
     };
+    var getType = function getType(node) {
+        return node && node.nodeType || null;
+    };
+    var getValue = function getValue(node, parseValue) {
+        var value = (node.value || "").replace(/\r?\n|\r/g, '\n');
+        value = value;
+        return "" !== value ? value : null;
+    };
     var hasAttribute = function hasAttribute(node, attribute) {
         return node.hasAttribute(attribute);
     };
@@ -248,15 +444,45 @@
     var hasState = function hasState(node, state) {
         return state in node;
     };
+    var isDisabled = function isDisabled(node) {
+        return node.disabled;
+    };
+    var isReadOnly = function isReadOnly(node) {
+        return node.readOnly;
+    };
+    var isRequired = function isRequired(node) {
+        return node.required;
+    };
+    var letAria = function letAria(node, aria) {
+        return letAttribute(node, 'aria-' + aria);
+    };
     var letAttribute = function letAttribute(node, attribute) {
         return node.removeAttribute(attribute), node;
     };
     var letClass = function letClass(node, value) {
         return node.classList.remove(value), node;
     };
+    var letDatum = function letDatum(node, datum) {
+        return letAttribute(node, 'data-' + datum);
+    };
     var letElement = function letElement(node) {
         var parent = getParent(node);
         return node.remove(), parent;
+    };
+    var letHTML = function letHTML(node) {
+        var state = 'innerHTML';
+        return hasState(node, state) && (node[state] = ""), node;
+    };
+    var letStyle = function letStyle(node, style) {
+        return node.style[toCaseCamel(style)] = null, node;
+    };
+    var setAria = function setAria(node, aria, value) {
+        return setAttribute(node, 'aria-' + aria, true === value ? 'true' : value);
+    };
+    var setArias = function setArias(node, data) {
+        return forEachObject(data, function (v, k) {
+            v || "" === v || 0 === v ? setAria(node, k, v) : letAria(node, k);
+        }), node;
     };
     var setAttribute = function setAttribute(node, attribute, value) {
         if (true === value) {
@@ -265,16 +491,21 @@
         return node.setAttribute(attribute, _fromValue(value)), node;
     };
     var setAttributes = function setAttributes(node, attributes) {
-        var value;
-        for (var attribute in attributes) {
-            value = attributes[attribute];
-            if (value || "" === value || 0 === value) {
-                setAttribute(node, attribute, value);
-            } else {
-                letAttribute(node, attribute);
+        return forEachObject(attributes, function (v, k) {
+            if ('aria' === k && isObject(v)) {
+                return setArias(node, v), 1;
             }
-        }
-        return node;
+            if ('class' === k) {
+                return setClasses(node, v), 1;
+            }
+            if ('data' === k && isObject(v)) {
+                return setData(node, v), 1;
+            }
+            if ('style' === k && isObject(v)) {
+                return setStyles(node, v), 1;
+            }
+            v || "" === v || 0 === v ? setAttribute(node, k, v) : letAttribute(node, k);
+        }), node;
     };
     var setChildLast = function setChildLast(parent, node) {
         return parent.append(node), node;
@@ -282,9 +513,40 @@
     var setClass = function setClass(node, value) {
         return node.classList.add(value), node;
     };
-    var setElement = function setElement(node, content, attributes) {
-        node = isString(node) ? D.createElement(node) : node;
-        if (isObject(content)) {
+    var setClasses = function setClasses(node, classes) {
+        if (isArray(classes)) {
+            return forEachArray(classes, function (k) {
+                return setClass(node, k);
+            }), node;
+        }
+        if (isObject(classes)) {
+            return forEachObject(classes, function (v, k) {
+                return v ? setClass(node, k) : letClass(node, k);
+            }), node;
+        }
+        return node.className = classes, node;
+    };
+    var setData = function setData(node, data) {
+        return forEachObject(data, function (v, k) {
+            v || "" === v || 0 === v ? setDatum(node, k, v) : letDatum(node, k);
+        }), node;
+    };
+    var setDatum = function setDatum(node, datum, value) {
+        if (isArray(value) || isObject(value)) {
+            value = toJSON(value);
+        }
+        return setAttribute(node, 'data-' + datum, true === value ? 'true' : value);
+    };
+    var setElement = function setElement(node, content, attributes, options) {
+        node = isString(node) ? D.createElement(node, isString(options) ? {
+            is: options
+        } : options) : node;
+        if (isArray(content) && toCount(content)) {
+            letHTML(node);
+            forEachArray(content, function (v) {
+                return setChildLast(isString(v) ? setElementText(v) : v);
+            });
+        } else if (isObject(content)) {
             attributes = content;
             content = false;
         }
@@ -292,9 +554,12 @@
             setHTML(node, content);
         }
         if (isObject(attributes)) {
-            setAttributes(node, attributes);
+            return setAttributes(node, attributes), node;
         }
         return node;
+    };
+    var setElementText = function setElementText(text) {
+        return isString(text) ? text = D.createTextNode(text) : text, text;
     };
     var setHTML = function setHTML(node, content, trim) {
         if (trim === void 0) {
@@ -311,6 +576,17 @@
     };
     var setPrev = function setPrev(current, node) {
         return getParent(current).insertBefore(node, current), node;
+    };
+    var setStyle = function setStyle(node, style, value) {
+        if (isNumber(value)) {
+            value += 'px';
+        }
+        return node.style[toCaseCamel(style)] = _fromValue(value), node;
+    };
+    var setStyles = function setStyles(node, styles) {
+        return forEachObject(styles, function (v, k) {
+            v || "" === v || 0 === v ? setStyle(node, k, v) : letStyle(node, k);
+        }), node;
     };
     var setText = function setText(node, content, trim) {
         if (trim === void 0) {
@@ -343,26 +619,25 @@
             if (!isSet(hooks[event])) {
                 return $;
             }
-            hooks[event].forEach(function (then) {
-                return then.apply(that || $, data);
-            });
-            return $;
+            return forEachArray(hooks[event], function (v) {
+                v.apply(that || $, data);
+            }), $;
         };
-        $$.off = function (event, then) {
+        $$.off = function (event, task) {
             var $ = this,
                 hooks = $.hooks;
             if (!isSet(event)) {
                 return hooks = {}, $;
             }
             if (isSet(hooks[event])) {
-                if (isSet(then)) {
-                    var j = hooks[event].length;
+                if (isSet(task)) {
+                    var j = toCount(hooks[event]);
                     // Clean-up empty hook(s)
                     if (0 === j) {
                         delete hooks[event];
                     } else {
                         for (var i = 0; i < j; ++i) {
-                            if (then === hooks[event][i]) {
+                            if (task === hooks[event][i]) {
                                 hooks[event].splice(i, 1);
                                 break;
                             }
@@ -374,14 +649,14 @@
             }
             return $;
         };
-        $$.on = function (event, then) {
+        $$.on = function (event, task) {
             var $ = this,
                 hooks = $.hooks;
             if (!isSet(hooks[event])) {
                 hooks[event] = [];
             }
-            if (isSet(then)) {
-                hooks[event].push(then);
+            if (isSet(task)) {
+                hooks[event].push(task);
             }
             return $;
         };
@@ -401,6 +676,109 @@
             options = false;
         }
         node.addEventListener(name, then, options);
+    };
+    var _getSelection = function _getSelection() {
+        return D.getSelection();
+    };
+    var _setRange = function _setRange() {
+        return D.createRange();
+    };
+    // <https://stackoverflow.com/a/6691294/1163000>
+    // The `node` parameter is currently not in use
+    var insertAtSelection = function insertAtSelection(node, content, mode, selection) {
+        selection = selection || _getSelection();
+        var from, range, to;
+        if (selection.rangeCount) {
+            range = selection.getRangeAt(0);
+            range.deleteContents();
+            to = D.createDocumentFragment();
+            var nodeCurrent, nodeFirst, nodeLast;
+            if (isString(content)) {
+                from = setElement('div');
+                setHTML(from, content);
+                while (nodeCurrent = getChildFirst(from, 1)) {
+                    nodeLast = setChildLast(to, nodeCurrent);
+                }
+            } else if (isArray(content)) {
+                forEachArray(content, function (v) {
+                    return nodeLast = setChildLast(to, v);
+                });
+            } else {
+                nodeLast = setChildLast(to, content);
+            }
+            nodeFirst = getChildFirst(to, 1);
+            range.insertNode(to);
+            if (nodeLast) {
+                range = range.cloneRange();
+                range.setStartAfter(nodeLast);
+                range.setStartBefore(nodeFirst);
+                setSelection(node, range, selectToNone(selection));
+            }
+        }
+        return selection;
+    };
+    // The `node` parameter is currently not in use
+    var letSelection = function letSelection(node, selection) {
+        selection = selection || _getSelection();
+        return selection.empty(), selection;
+    };
+    // <https://stackoverflow.com/a/13950376/1163000>
+    var restoreSelection = function restoreSelection(node, store, selection) {
+        var index = 0,
+            range = _setRange();
+        range.setStart(node, 0);
+        range.collapse(true);
+        var exit,
+            hasStart,
+            nodeCurrent,
+            nodeStack = [node];
+        while (!exit && (nodeCurrent = nodeStack.pop())) {
+            if (3 === getType(nodeCurrent)) {
+                var indexNext = index + toCount(nodeCurrent);
+                if (!hasStart && store[0] >= index && store[0] <= indexNext) {
+                    range.setStart(nodeCurrent, store[0] - index);
+                    hasStart = true;
+                }
+                if (hasStart && store[1] >= index && store[1] <= indexNext) {
+                    exit = true;
+                    range.setEnd(nodeCurrent, store[1] - index);
+                }
+                index = indexNext;
+            } else {
+                forEachArray(getChildren(nodeCurrent, null, 1), function (v) {
+                    return nodeStack.push(v);
+                });
+            }
+        }
+        return setSelection(node, range, letSelection(node, selection));
+    };
+    var selectTo = function selectTo(node, mode, selection) {
+        selection = selection || _getSelection();
+        letSelection(node, selection);
+        var range = _setRange();
+        range.selectNodeContents(node);
+        selection = setSelection(node, range, selection);
+        if (1 === mode) {
+            selection.collapseToEnd();
+        } else if (-1 === mode) {
+            selection.collapseToStart();
+        } else;
+    };
+    var selectToNone = function selectToNone(selection) {
+        selection = selection || _getSelection();
+        // selection.removeAllRanges();
+        if (selection.rangeCount) {
+            selection.removeRange(selection.getRangeAt(0));
+        }
+        return selection;
+    };
+    // The `node` parameter is currently not in use
+    var setSelection = function setSelection(node, range, selection) {
+        selection = selection || _getSelection();
+        if (isArray(range)) {
+            return restoreSelection(node, range, selection);
+        }
+        return selection.addRange(range), selection;
     };
     var isPattern = function isPattern(pattern) {
         return isInstance(pattern, RegExp);
@@ -422,7 +800,6 @@
     var KEY_ESCAPE = 'Escape';
     var KEY_TAB = 'Tab';
     var name = 'TagPicker';
-    var references = new WeakMap();
 
     function defineProperty(of, key, state) {
         Object.defineProperty(of, key, state);
@@ -430,14 +807,6 @@
 
     function focusTo(node) {
         node.focus();
-    }
-
-    function forEachArray(array, then) {
-        array.forEach(then);
-    }
-
-    function forEachMap(map, then) {
-        forEachArray(map, then);
     }
 
     function getCharBeforeCaret(node) {
@@ -451,105 +820,8 @@
         }
     }
 
-    function getReference(key) {
-        return getValueInMap(key, references) || null;
-    }
-
     function getTagValue(tag) {
         return getDatum(tag, 'value', false);
-    }
-
-    function getValue(self) {
-        return (self.value || "").replace(/\r/g, "");
-    }
-
-    function getValueInMap(k, map) {
-        return map.get(k);
-    }
-
-    function hasKeyInMap(k, map) {
-        return map.has(k);
-    }
-
-    function isDisabled(self) {
-        return self.disabled;
-    }
-
-    function isReadOnly(self) {
-        return self.readOnly;
-    }
-
-    function isRequired(self) {
-        return self.required;
-    }
-
-    function letValueInMap(k, map) {
-        return map.delete(k);
-    }
-
-    function selectNone(node) {
-        var selection = D.getSelection();
-        {
-            // selection.removeAllRanges();
-            if (selection.rangeCount) {
-                selection.removeRange(selection.getRangeAt(0));
-            }
-        }
-    }
-
-    function selectTo(node, mode) {
-        var selection = D.getSelection();
-        selectNone();
-        var range = D.createRange();
-        range.selectNodeContents(node);
-        selection.addRange(range);
-        if (1 === mode) {
-            selection.collapseToEnd();
-        } else if (-1 === mode) {
-            selection.collapseToStart();
-        }
-    }
-
-    function setReference(key, value) {
-        return setValueInMap(key, value, references);
-    }
-
-    function setValueAtCaret(node, value) {
-        var range,
-            selection = W.getSelection();
-        if (selection.rangeCount) {
-            range = selection.getRangeAt(0);
-            range.deleteContents();
-            range.insertNode(D.createTextNode(value));
-        }
-    }
-
-    function setValueInMap(k, v, map) {
-        return map.set(k, v);
-    }
-
-    function toKeysFromMap(map) {
-        var out = [];
-        forEachMap(map, function (v, k) {
-            return out.push(k);
-        });
-        return out;
-    }
-
-    function toValueFirstFromMap(map) {
-        return toValuesFromMap(map).shift();
-    }
-
-    function toValueLastFromMap(map) {
-        return toValuesFromMap(map).pop();
-    }
-
-    function toValuesFromMap(map) {
-        var out = [];
-        forEachMap(map, function (v) {
-            return out.push(v);
-        });
-        return out;
     }
 
     function TagPicker(self, state) {
@@ -636,7 +908,7 @@
         _keyIsShift = false;
 
     function onBlurTag(e) {
-        selectNone();
+        selectToNone();
         var $ = this,
             picker = getReference($);
         picker._mask;
@@ -655,7 +927,7 @@
     }
 
     function onBlurTextInput(e) {
-        selectNone();
+        selectToNone();
         var $ = this,
             picker = getReference($),
             _mask = picker._mask,
@@ -1104,7 +1376,7 @@
             hint = _mask.hint;
         var value = (e.clipboardData || W.clipboardData).getData('text') + "";
         picker._event = e;
-        setValueAtCaret($, value), setText(hint, getText($) ? "" : self.placeholder);
+        insertAtSelection($, value), setText(hint, getText($) ? "" : self.placeholder);
         delay(function () {
             value = getText($);
             picker.text = "";
@@ -1135,7 +1407,7 @@
         focusTo($), toggleClass($, n);
         if (_keyIsCtrl);
         else if (_keyIsShift) {
-            selectNone();
+            selectToNone();
             var parentTag = getParent($),
                 selectedTags = getElements('.' + n, parentTag),
                 firstTag = selectedTags[0],
@@ -1150,7 +1422,7 @@
                 }
             }
         } else {
-            selectNone();
+            selectToNone();
             var asContextMenu = 2 === e.button,
                 // Probably a “right-click”
                 selection = 0;
@@ -1234,8 +1506,8 @@
             'tabindex': isDisabled(self) ? false : -1
         });
         $.mask = mask;
-        var maskTags = setElement('span', {
-            'class': n + '__tags'
+        var maskFlex = setElement('span', {
+            'class': n + '__flex'
         });
         var text = setElement('span', {
             'class': n + '__text'
@@ -1246,8 +1518,8 @@
             'spellcheck': 'false'
         });
         var textInputHint = setElement('span', self.placeholder + "");
-        setChildLast(mask, maskTags);
-        setChildLast(maskTags, text);
+        setChildLast(mask, maskFlex);
+        setChildLast(maskFlex, text);
         setChildLast(text, textInput);
         setChildLast(text, textInputHint);
         setClass(self, n + '__self');
@@ -1270,11 +1542,11 @@
         setReference(mask, $);
         setReference(textInput, $);
         var _mask = {};
+        _mask.flex = maskFlex;
         _mask.hint = textInputHint;
         _mask.input = textInput;
         _mask.of = self;
         _mask.self = mask;
-        _mask.tags = maskTags;
         _mask.text = text;
         $._mask = _mask;
         // Attach the current tag(s)
@@ -1305,7 +1577,7 @@
         return $;
     };
     $$.blur = function () {
-        selectNone();
+        selectToNone();
         var $ = this,
             _mask = $._mask,
             _tags = $._tags,

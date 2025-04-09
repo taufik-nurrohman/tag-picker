@@ -39,6 +39,10 @@ block style
     | .tag-picker--focus {
     |   border-color: #00f;
     | }
+    | .tag-picker__flex {
+    |   gap: 2px;
+    |   padding: 2px;
+    | }
     | .tag-picker__tag {
     |   background: #f00;
     |   border-color: transparent;
@@ -53,10 +57,6 @@ block style
     | .tag-picker__tag--selected,
     | .tag-picker__tag--selected:focus {
     |   background: #c00;
-    | }
-    | .tag-picker__tags {
-    |   gap: 2px;
-    |   padding: 2px;
     | }
     | .tag-picker__text {
     |   padding-left: 0.5em;
@@ -145,7 +145,6 @@ block content
       a(href='#tweaks') #
       = ' Tweaks'
     ul
-      li: a(href='tweak/bootstrap5.html' target='_blank') Bootstrap v5.3 Style
       li: a(href='tweak/convert.html' target='_blank') Converted Tag Display
       li: a(href='tweak/focus.hint.html' target='_blank') Hide Input Hint on Focus
       li: a(href='tweak/blur.html' target='_blank') Insert Tag Name on Blur
@@ -154,7 +153,6 @@ block content
       li: a(href='tweak/alert.html' target='_blank') Warn for Duplicate Tags with Alert Message
       li: a(href='tweak/description.html' target='_blank') Warn for Duplicate Tags with Description Below the Input
       li: a(href='tweak/target.html' target='_blank') Warn for Duplicate Tags with Flash Highlight
-      li: a(href='tweak/windows98.html' target='_blank') Windows 98 Style
     h2#constructor
       a(href='#constructor') #
       = ' Constructor'

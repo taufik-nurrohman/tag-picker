@@ -5,17 +5,19 @@
   "dependencies": {
     "@taufik-nurrohman/document": "*",
     "@taufik-nurrohman/event": "*",
+    "@taufik-nurrohman/f": "*",
     "@taufik-nurrohman/from": "*",
     "@taufik-nurrohman/has": "*",
     "@taufik-nurrohman/hook": "*",
     "@taufik-nurrohman/is": "*",
     "@taufik-nurrohman/pattern": "*",
+    "@taufik-nurrohman/selection": "*",
     "@taufik-nurrohman/tick": "*",
     "@taufik-nurrohman/to": "*"
   },
   "description": "Better tags input interaction with JavaScript.",
   "devDependencies": {
-    "@taufik-nurrohman/factory": "*"
+    "@taufik-nurrohman/factory": "^2.2.4"
   },
   "exports": {
     "import": "./index.mjs",

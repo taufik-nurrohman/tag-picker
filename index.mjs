@@ -1,10 +1,12 @@
-import {D, W, getChildFirst, getChild, getDatum, getElement, getElements, getNext, getParent, getPrev, getParentForm, getText, hasClass, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, toggleClass} from '@taufik-nurrohman/document';
+import {D, W, getChildFirst, getChild, getDatum, getElement, getElements, getNext, getParent, getPrev, getParentForm, getText, getValue, hasClass, isDisabled, isReadOnly, isRequired, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, setValue, toggleClass} from '@taufik-nurrohman/document';
 import {delay} from '@taufik-nurrohman/tick';
+import {forEachArray, forEachMap, getReference, getValueInMap, hasKeyInMap, letReference, letValueInMap, setReference, setValueInMap, toKeysFromMap, toValueFirstFromMap, toValueLastFromMap} from '@taufik-nurrohman/f';
 import {fromHTML, fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isDefined, isFunction, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
 import {offEvent, offEventDefault, offEventPropagation, onEvent} from '@taufik-nurrohman/event';
+import {insertAtSelection, selectTo, selectToNone} from '@taufik-nurrohman/selection';
 import {toCount} from '@taufik-nurrohman/to';
 import {toPattern} from '@taufik-nurrohman/pattern';
 
@@ -20,7 +22,6 @@ const KEY_ESCAPE = 'Escape';
 const KEY_TAB = 'Tab';
 
 const name = 'TagPicker';
-const references = new WeakMap;
 
 function defineProperty(of, key, state) {
     Object.defineProperty(of, key, state);
@@ -28,14 +29,6 @@ function defineProperty(of, key, state) {
 
 function focusTo(node) {
     node.focus();
-}
-
-function forEachArray(array, then) {
-    array.forEach(then);
-}
-
-function forEachMap(map, then) {
-    forEachArray(map, then);
 }
 
 function getCharBeforeCaret(node) {
@@ -48,108 +41,8 @@ function getCharBeforeCaret(node) {
     }
 }
 
-function getReference(key) {
-    return getValueInMap(key, references) || null;
-}
-
 function getTagValue(tag) {
     return getDatum(tag, 'value', false);
-}
-
-function getValue(self) {
-    return (self.value || "").replace(/\r/g, "");
-}
-
-function getValueInMap(k, map) {
-    return map.get(k);
-}
-
-function hasKeyInMap(k, map) {
-    return map.has(k);
-}
-
-function isDisabled(self) {
-    return self.disabled;
-}
-
-function isReadOnly(self) {
-    return self.readOnly;
-}
-
-function isRequired(self) {
-    return self.required;
-}
-
-function letValueInMap(k, map) {
-    return map.delete(k);
-}
-
-function selectNone(node) {
-    const selection = D.getSelection();
-    if (node) {} else {
-        // selection.removeAllRanges();
-        if (selection.rangeCount) {
-            selection.removeRange(selection.getRangeAt(0));
-        }
-    }
-}
-
-function selectTo(node, mode) {
-    const selection = D.getSelection();
-    selectNone();
-    const range = D.createRange();
-    range.selectNodeContents(node);
-    selection.addRange(range);
-    if (1 === mode) {
-        selection.collapseToEnd();
-    } else if (-1 === mode) {
-        selection.collapseToStart();
-    }
-}
-
-function setReference(key, value) {
-    return setValueInMap(key, value, references);
-}
-
-function setValueAtCaret(node, value) {
-    let range, selection = W.getSelection();
-    if (selection.rangeCount) {
-        range = selection.getRangeAt(0);
-        range.deleteContents();
-        range.insertNode(D.createTextNode(value));
-    }
-}
-
-function setValueInMap(k, v, map) {
-    return map.set(k, v);
-}
-
-function toKeyFirstFromMap(map) {
-    return toKeysFromMap(map).shift();
-}
-
-function toKeyLastFromMap(map) {
-    return toKeysFromMap(map).pop();
-}
-
-function toKeysFromMap(map) {
-    let out = [];
-    forEachMap(map, (v, k) => out.push(k));
-    return out;
-}
-
-function toValueFirstFromMap(map) {
-    return toValuesFromMap(map).shift();
-}
-
-function toValueLastFromMap(map) {
-    return toValuesFromMap(map).pop();
-}
-
-function toValuesFromMap(map) {
-    let out = [];
-    forEachMap(map, v => out.push(v));
-    return out;
 }
 
 function TagPicker(self, state) {
@@ -247,7 +140,7 @@ $$._valid = function (v) {
 let _keyIsCtrl = false, _keyIsShift = false;
 
 function onBlurTag(e) {
-    selectNone();
+    selectToNone();
     let $ = this,
         picker = getReference($),
         {_mask, _tags, mask, state} = picker,
@@ -261,7 +154,7 @@ function onBlurTag(e) {
 }
 
 function onBlurTextInput(e) {
-    selectNone();
+    selectToNone();
     let $ = this,
         picker = getReference($),
         {_mask, mask, state} = picker,
@@ -677,7 +570,7 @@ function onPasteTextInput(e) {
         {hint} = _mask;
     let value = (e.clipboardData || W.clipboardData).getData('text') + "";
     picker._event = e;
-    setValueAtCaret($, value), setText(hint, getText($) ? "" : self.placeholder);
+    insertAtSelection($, value), setText(hint, getText($) ? "" : self.placeholder);
     delay(() => {
         value = getText($);
         picker.text = "";
@@ -704,7 +597,7 @@ function onPointerDownTag(e) {
     if (_keyIsCtrl) {
         // ?
     } else if (_keyIsShift) {
-        selectNone();
+        selectToNone();
         let parentTag = getParent($),
             selectedTags = getElements('.' + n, parentTag),
             firstTag = selectedTags[0],
@@ -718,7 +611,7 @@ function onPointerDownTag(e) {
             }
         }
     } else {
-        selectNone();
+        selectToNone();
         let asContextMenu = 2 === e.button, // Probably a “right-click”
             selection = 0;
         forEachMap(_tags, v => {
@@ -800,8 +693,8 @@ $$.attach = function (self, state) {
         'tabindex': isDisabled(self) ? false : -1
     });
     $.mask = mask;
-    const maskTags = setElement('span', {
-        'class': n + '__tags'
+    const maskFlex = setElement('span', {
+        'class': n + '__flex'
     });
     const text = setElement('span', {
         'class': n + '__text'
@@ -812,8 +705,8 @@ $$.attach = function (self, state) {
         'spellcheck': 'false'
     });
     const textInputHint = setElement('span', self.placeholder + "");
-    setChildLast(mask, maskTags);
-    setChildLast(maskTags, text);
+    setChildLast(mask, maskFlex);
+    setChildLast(maskFlex, text);
     setChildLast(text, textInput);
     setChildLast(text, textInputHint);
     setClass(self, n + '__self');
@@ -836,11 +729,11 @@ $$.attach = function (self, state) {
     setReference(mask, $);
     setReference(textInput, $);
     let _mask = {};
+    _mask.flex = maskFlex;
     _mask.hint = textInputHint;
     _mask.input = textInput;
     _mask.of = self;
     _mask.self = mask;
-    _mask.tags = maskTags;
     _mask.text = text;
     $._mask = _mask;
     // Attach the current tag(s)
@@ -870,7 +763,7 @@ $$.attach = function (self, state) {
 };
 
 $$.blur = function () {
-    selectNone();
+    selectToNone();
     let $ = this,
         {_mask, _tags} = $,
         {input} = _mask;

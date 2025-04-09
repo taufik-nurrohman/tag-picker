@@ -53,6 +53,14 @@ $name: 'tag-picker';
       }
     }
   }
+  &__flex {
+    border-color: inherit;
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1;
+    gap: 1px;
+    padding: 1px;
+  }
   &__tag {
     @extend %tag;
     cursor: pointer;
@@ -78,14 +86,6 @@ $name: 'tag-picker';
         }
       }
     }
-  }
-  &__tags {
-    border-color: inherit;
-    display: flex;
-    flex-wrap: wrap;
-    flex: 1;
-    gap: 1px;
-    padding: 1px;
   }
   &__text {
     @extend %tag;
