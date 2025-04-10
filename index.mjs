@@ -1,12 +1,12 @@
-import {D, W, getChildFirst, getChild, getDatum, getElement, getElements, getNext, getParent, getPrev, getParentForm, getText, getValue, hasClass, isDisabled, isReadOnly, isRequired, letClass, letElement, setChildLast, setClass, setElement, setNext, setPrev, setText, setValue, toggleClass} from '@taufik-nurrohman/document';
+import {D, W, getAria, getChildFirst, getChild, getDatum, getElement, getElements, getID, getNext, getParent, getPrev, getParentForm, getText, getValue, hasClass, isDisabled, isReadOnly, isRequired, letAria, letClass, letElement, setAria, setChildLast, setClass, setElement, setID, setNext, setPrev, setText, setValue, toggleClass} from '@taufik-nurrohman/document';
 import {delay} from '@taufik-nurrohman/tick';
-import {forEachArray, forEachMap, getReference, getValueInMap, hasKeyInMap, letReference, letValueInMap, setReference, setValueInMap, toKeysFromMap, toValueFirstFromMap, toValueLastFromMap} from '@taufik-nurrohman/f';
+import {forEachArray, forEachMap, forEachSet, getPrototype, getReference, getValueInMap, hasKeyInMap, letReference, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap, toKeysFromMap, toValueFirstFromMap, toValueLastFromMap} from '@taufik-nurrohman/f';
 import {fromHTML, fromStates} from '@taufik-nurrohman/from';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isDefined, isFunction, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
 import {offEvent, offEventDefault, offEventPropagation, onEvent} from '@taufik-nurrohman/event';
-import {insertAtSelection, selectTo, selectToNone} from '@taufik-nurrohman/selection';
+import {/* focusTo, */insertAtSelection, selectTo, selectToNone} from '@taufik-nurrohman/selection';
 import {toCount} from '@taufik-nurrohman/to';
 import {toPattern} from '@taufik-nurrohman/pattern';
 
@@ -23,12 +23,8 @@ const KEY_TAB = 'Tab';
 
 const name = 'TagPicker';
 
-function defineProperty(of, key, state) {
-    Object.defineProperty(of, key, state);
-}
-
 function focusTo(node) {
-    node.focus();
+    return node.focus(), node;
 }
 
 function getCharBeforeCaret(node) {
@@ -44,98 +40,6 @@ function getCharBeforeCaret(node) {
 function getTagValue(tag) {
     return getDatum(tag, 'value', false);
 }
-
-function TagPicker(self, state) {
-
-    const $ = this;
-
-    if (!self) {
-        return $;
-    }
-
-    // Return new instance if `TagPicker` was called without the `new` operator
-    if (!isInstance($, TagPicker)) {
-        return new TagPicker(self, state);
-    }
-
-    setReference(self, hook($, TagPicker._));
-
-    let newState = fromStates({}, TagPicker.state, isString(state) ? {
-        join: state
-    } : (state || {}));
-
-    // Special case for `state.escape`: Replace instead of join
-    if (isObject(state) && state.escape) {
-        newState.escape = state.escape;
-    }
-
-    return $.attach(self, newState);
-
-}
-
-TagPicker.from = function (self, state) {
-    return new TagPicker(self, state);
-};
-
-TagPicker.of = getReference;
-
-TagPicker.state = {
-    'escape': [','],
-    'join': ', ',
-    'max': Infinity,
-    'min': 0,
-    'n': 'tag-picker',
-    'pattern': null,
-    'with': []
-};
-
-TagPicker.version = '4.1.0';
-
-defineProperty(TagPicker, 'name', {
-    value: name
-});
-
-const $$ = TagPicker._ = TagPicker.prototype;
-
-defineProperty($$, 'text', {
-    get: function () {
-        return getText(this._mask.input);
-    },
-    set: function (text) {
-        let $ = this,
-            {_mask, self} = $,
-            {hint, input} = _mask;
-        text = text + "";
-        setText(hint, "" === text ? self.placeholder : "");
-        setText(input, text);
-        selectTo(input);
-    }
-});
-
-defineProperty($$, 'value', {
-    get: function () {
-        let value = getValue(this.self);
-        return "" === value ? null : value;
-    },
-    set: function (value) {
-        let $ = this,
-            {_event, state} = $;
-        if ($.value) {
-            forEachArray($.value.split(state.join), tag => $.let(tag, 1));
-        }
-        forEachArray(value.split(state.join), tag => $.set(tag, -1, 1));
-        $.fire('change', [_event]);
-    }
-});
-
-$$._let = false;
-
-$$._set = false;
-
-$$._valid = function (v) {
-    let $ = this, {state} = $;
-    return (v || "").replace(/[^ -~]/g, ' ').split(state.join).join("").replace(/\s+/g, ' ').trim();
-};
 
 let _keyIsCtrl = false, _keyIsShift = false;
 
@@ -558,7 +462,7 @@ function onPasteTag(e) {
         forEachArray(picker.value.split(state.join), tag => picker.let(tag, 1));
     }
     let values = value.split(state.join);
-    forEachArray(values, tag => picker.set(tag, -1, 1));
+    forEachArray(values, tag => picker.set(tag, 1));
     picker.fire('paste', [e, values]).focus().fire('change', [e]);
     offEventDefault(e);
 }
@@ -576,7 +480,7 @@ function onPasteTextInput(e) {
         picker.text = "";
         if (value) {
             let values = value.split(state.join);
-            forEachArray(values, tag => picker.set(tag, -1, 1));
+            forEachArray(values, tag => picker.set(tag, 1));
             picker.fire('paste', [e, values]).fire('change', [e]);
         }
     }, 1)();
@@ -665,315 +569,519 @@ function onSubmitForm(e) {
     return picker.fire('submit', [e]);
 }
 
-$$.attach = function (self, state) {
-    let $ = this;
-    self = self || $.self;
-    if (state && isString(state)) {
-        state = {
-            join: state
+TagPicker._ = setObjectMethods(TagPicker, {
+    attach: function (self, state) {
+        let $ = this;
+        self = self || $.self;
+        if (state && isString(state)) {
+            state = {
+                join: state
+            };
+        }
+        state = fromStates({}, $.state, state || {});
+        $._event = null;
+        $._tags = new TagPickerTags($);
+        $._value = null;
+        $.self = self;
+        $.state = state;
+        let {max, min, n} = state,
+            isDisabledSelf = isDisabled(self),
+            isReadOnlySelf = isReadOnly(self),
+            isRequiredSelf = isRequired(self),
+            theInputPlaceholder = self.placeholder,
+            theInputValue = getValue(self);
+        $._active = !isDisabledSelf && !isReadOnlySelf;
+        $._fix = isReadOnlySelf;
+        if (isRequiredSelf && min < 1) {
+            state.min = min = 1; // Force minimum tag(s) to insert to be `1`
+        }
+        const form = getParentForm(self);
+        const mask = setElement('div', {
+            'aria': {
+                'disabled': isDisabledSelf ? 'true' : false,
+                'multiselectable': 'true',
+                'readonly': isReadOnlySelf ? 'true' : false
+            },
+            'class': n,
+            'role': 'combobox'
+        });
+        $.mask = mask;
+        const maskFlex = setElement('span', {
+            'class': n + '__flex',
+            'role': 'group'
+        });
+        const text = setElement('span', {
+            'class': n + '__text',
+            'tabindex': 0
+        });
+        const textInput = setElement('span', {
+            'aria': {
+                'disabled': isDisabledSelf ? 'true' : false,
+                'multiline': 'false',
+                'placeholder': theInputPlaceholder,
+                'readonly': isReadOnlySelf ? 'true' : false,
+            },
+            'autocapitalize': 'off',
+            'contenteditable': isDisabledSelf || isReadOnlySelf ? false : "",
+            'role': 'textbox',
+            'spellcheck': 'false',
+            'tabindex': isReadOnlySelf ? 0 : false
+        });
+        const textInputHint = setElement('span', theInputPlaceholder + "", {
+            'role': 'none'
+        });
+        setChildLast(mask, maskFlex);
+        setChildLast(maskFlex, text);
+        setChildLast(text, textInput);
+        setChildLast(text, textInputHint);
+        setReference(textInput, $);
+        onEvent('beforeinput', textInput, onBeforeInputTextInput);
+        onEvent('blur', textInput, onBlurTextInput);
+        onEvent('cut', textInput, onCutTextInput);
+        onEvent('focus', textInput, onFocusTextInput);
+        onEvent('keydown', textInput, onKeyDownTextInput);
+        onEvent('mousedown', mask, onPointerDownMask);
+        onEvent('paste', textInput, onPasteTextInput);
+        onEvent('touchstart', mask, onPointerDownMask);
+        setClass(self, n + '__self');
+        setNext(self, mask);
+        onEvent('focus', self, onFocusSelf);
+        onEvent('invalid', self, onInvalidSelf);
+        if (form) {
+            onEvent('reset', form, onResetForm);
+            onEvent('submit', form, onSubmitForm);
+            setID(form);
+            setReference(form, $);
+        }
+        self.tabIndex = -1;
+        setReference(mask, $);
+        let _mask = {};
+        _mask.flex = maskFlex;
+        _mask.hint = textInputHint;
+        _mask.input = textInput;
+        _mask.of = self;
+        _mask.self = mask;
+        _mask.values = new Set;
+        _mask.text = text;
+        $._mask = _mask;
+        // Re-assign some state value(s) using the setter to either normalize or reject the initial value
+        // $.max = isMultipleSelect ? (max ?? Infinity) : 1;
+        // $.min = isInputSelf ? 0 : (min ?? 1);
+        let {_active} = $,
+            {tags} = state, values;
+        // Force the `this._active` value to `true` to set the initial value
+        $._active = true;
+        // Attach the current tag(s)
+        if (tags) {
+            values = createTagsFrom(of, tags, of._mask.flex);
+        } else if (theInputValue) {
+            values = createTagsFrom(of, theInputValue.split(state.join), of._mask.flex);
+        }
+        $._value = values.join(state.join);
+        // After the initial value has been set, restore the previous `this._active` value
+        $._active = _active;
+        // Force `id` attribute(s)
+        setAria(self, 'hidden', true);
+        setAria(textInput, 'controls', getID(maskFlex));
+        setID(mask);
+        setID(maskFlex);
+        setID(self);
+        setID(textInput);
+        setID(textInputHint);
+        // Attach extension(s)
+        if (isSet(state) && isArray(state.with)) {
+            forEachArray(state.with, (v, k) => {
+                if (isString(v)) {
+                    v = OptionPicker[v];
+                }
+                // `const Extension = function (self, state = {}) {}`
+                if (isFunction(v)) {
+                    v.call($, self, state);
+                // `const Extension = {attach: function (self, state = {}) {}, detach: function (self, state = {}) {}}`
+                } else if (isObject(v) && isFunction(v.attach)) {
+                    v.attach.call($, self, state);
+                }
+            });
+        }
+        return $;
+    },
+    blur: function () {
+        selectToNone();
+        let $ = this,
+            {_mask} = $,
+            {input, values} = _mask;
+        forEachSet(values, v => v.blur());
+        return input.blur();
+    },
+    detach: function () {
+        let $ = this,
+            {_mask, mask, self, state} = $,
+            {input} = _mask;
+        const form = getParentForm(self);
+        $._active = false;
+        $._tags = new TagPickerTags($);
+        $._value = null;
+        if (form) {
+            offEvent('reset', form, onResetForm);
+            offEvent('submit', form, onSubmitForm);
+        }
+        offEvent('beforeinput', input, onBeforeInputTextInput);
+        offEvent('blur', input, onBlurTextInput);
+        offEvent('cut', input, onCutTextInput);
+        offEvent('focus', input, onFocusTextInput);
+        offEvent('focus', self, onFocusSelf);
+        offEvent('invalid', self, onInvalidSelf);
+        offEvent('keydown', input, onKeyDownTextInput);
+        offEvent('keyup', input, onKeyUpTextInput);
+        offEvent('mousedown', mask, onPointerDownMask);
+        offEvent('paste', input, onPasteTextInput);
+        offEvent('touchstart', mask, onPointerDownMask);
+        // Detach extension(s)
+        if (isArray(state.with)) {
+            forEachArray(state.with, (v, k) => {
+                if (isString(v)) {
+                    v = OptionPicker[v];
+                }
+                if (isObject(v) && isFunction(v.detach)) {
+                    v.detach.call($, self, state);
+                }
+            });
+        }
+        self.tabIndex = null;
+        letAria(self, 'hidden');
+        letClass(self, state.n + '__self');
+        letElement(mask);
+        $._mask = {
+            of: self
         };
+        $.mask = null;
+        return $;
+    },
+    focus: function (mode) {
+        let $ = this,
+            {_mask} = $,
+            {input} = _mask;
+        return focusTo(input), selectTo(input, mode), $;
+    },
+    reset: function (focus, mode) {
+        // let $ = this,
+        //     {_active, _value, _values, max} = $;
+        // if (!_active) {
+        //     return $;
+        // }
+        // if (max > 1) {
+        //     $.values = _values;
+        // } else {
+        //     $.value = _value;
+        // }
+        // return focus ? $.focus(mode) : $;
     }
-    state = fromStates({}, $.state, state || {});
-    if (hasClass(self, state.n + '__self')) {
+});
+
+
+
+
+function TagPicker(self, state) {
+    const $ = this;
+    if (!self) {
         return $;
     }
-    if (isRequired(self) && !state.min) {
-        state.min = 1; // Force minimum tag(s) to insert to be `1`
+    // Return new instance if `TagPicker` was called without the `new` operator
+    if (!isInstance($, TagPicker)) {
+        return new TagPicker(self, state);
     }
-    $._active = !isDisabled(self) && !isReadOnly(self);
-    $._event = null;
-    $._tags = new Map;
-    $._value = getValue(self) || null;
-    $.self = self;
-    $.state = state;
-    let {n} = state;
-    const form = getParentForm(self);
-    const mask = setElement('div', {
-        'class': n,
-        'tabindex': isDisabled(self) ? false : -1
-    });
-    $.mask = mask;
-    const maskFlex = setElement('span', {
-        'class': n + '__flex'
-    });
-    const text = setElement('span', {
-        'class': n + '__text'
-    });
-    const textInput = setElement('span', {
-        'autocapitalize': 'off',
-        'contenteditable': isDisabled(self) ? false : "",
-        'spellcheck': 'false'
-    });
-    const textInputHint = setElement('span', self.placeholder + "");
-    setChildLast(mask, maskFlex);
-    setChildLast(maskFlex, text);
-    setChildLast(text, textInput);
-    setChildLast(text, textInputHint);
-    setClass(self, n + '__self');
-    setNext(self, mask);
-    if (form) {
-        setReference(form, $);
-        onEvent('reset', form, onResetForm);
-        onEvent('submit', form, onSubmitForm);
+    setReference(self, hook($, TagPicker._));
+    let newState = fromStates({}, TagPicker.state, isString(state) ? {
+        join: state
+    } : (state || {}));
+    // Special case for `state.escape`: replace instead of join the value(s)
+    if (isObject(state) && state.escape) {
+        newState.escape = state.escape;
     }
-    onEvent('beforeinput', textInput, onBeforeInputTextInput);
-    onEvent('blur', textInput, onBlurTextInput);
-    onEvent('click', mask, onClickMask);
-    onEvent('focus', self, onFocusSelf);
-    onEvent('focus', textInput, onFocusTextInput);
-    onEvent('invalid', self, onInvalidSelf);
-    onEvent('keydown', textInput, onKeyDownTextInput);
-    onEvent('keyup', textInput, onKeyUpTextInput);
-    onEvent('paste', textInput, onPasteTextInput);
-    self.tabIndex = -1;
-    setReference(mask, $);
-    setReference(textInput, $);
-    let _mask = {};
-    _mask.flex = maskFlex;
-    _mask.hint = textInputHint;
-    _mask.input = textInput;
-    _mask.of = self;
-    _mask.self = mask;
-    _mask.text = text;
-    $._mask = _mask;
-    // Attach the current tag(s)
-    if ($._value) {
-        forEachArray($._value.split(state.join), tag => $.set(tag, -1, 1, 1));
+    return $.attach(self, newState);
+}
+
+function TagPickerTags(of, tags) {
+    const $ = this;
+    // Return new instance if `TagPickerTags` was called without the `new` operator
+    if (!isInstance($, TagPickerTags)) {
+        return new TagPickerTags(of, tags);
     }
-    // Attach extension(s)
-    if (isSet(state) && isArray(state.with)) {
-        for (let i = 0, j = toCount(state.with); i < j; ++i) {
-            let value = state.with[i];
-            if (isString(value)) {
-                value = TagPicker[value];
-            }
-            // `const Extension = function (self, state = {}) {}`
-            if (isFunction(value)) {
-                value.call($, self, state);
-                continue;
-            }
-            // `const Extension = {attach: function (self, state = {}) {}, detach: function (self, state = {}) {}}`
-            if (isObject(value) && isFunction(value.attach)) {
-                value.attach.call($, self, state);
-                continue;
-            }
-        }
+    $.of = of;
+    $.values = new Map;
+    if (tags) {
+        createTagsFrom(of, tags, of._mask.flex);
     }
     return $;
+}
+
+TagPicker.from = function (self, state) {
+    return new TagPicker(self, state);
 };
 
-$$.blur = function () {
-    selectToNone();
-    let $ = this,
-        {_mask, _tags} = $,
-        {input} = _mask;
-    forEachMap(_tags, v => v.blur());
-    return input.blur();
+TagPicker.of = getReference;
+
+TagPicker.state = {
+    'escape': [','],
+    'join': ', ',
+    'max': Infinity,
+    'min': 0,
+    'n': 'tag-picker',
+    'pattern': null,
+    'tags': null,
+    'with': []
 };
 
-$$.detach = function () {
-    let $ = this,
-        {_mask, mask, self, state} = $,
-        {input} = _mask;
-    if (!hasClass(self, state.n + '__self')) {
+TagPicker.version = '4.1.0';
+
+setObjectAttributes(TagPicker, {
+    name: {
+        value: name
+    }
+}, 1);
+
+setObjectAttributes(TagPicker, {
+    active: {
+        get: function () {
+            return this._active;
+        },
+        set: function (value) {
+            return $;
+        }
+    },
+    fix: {
+        get: function () {
+            return this._fix;
+        },
+        set: function (value) {
+            return $;
+        }
+    },
+    max: {
+        get: function () {
+        },
+        set: function (value) {
+            return $;
+        }
+    },
+    min: {
+        get: function () {
+        },
+        set: function (value) {
+            return $;
+        }
+    },
+    tags: {
+        get: function () {
+            return this._tags;
+        },
+        set: function (options) {
+            let values = [];
+            forEachMap($._tags, v => values.push(getTagValue(v[2])));
+            return $.fire('set.tags', [values]);
+        }
+    },
+    text: {
+        get: function () {
+            return getText(this._mask.input);
+        },
+        set: function (value) {
+            let $ = this,
+                {_active, _mask} = $,
+                {hint, input} = _mask, v;
+            if (!_active) {
+                return $;
+            }
+            setText(input, v = fromValue(value));
+            return (v ? setStyle(hint, 'color', 'transparent') : letStyle(hint, 'color')), $;
+        }
+    },
+    value: {
+        get: function () {
+            let value = getValue(this.self);
+            return "" !== value ? value : null;
+        },
+        set: function (value) {
+            let $ = this,
+                {state} = $;
+            if ($.value) {
+                forEachArray($.value.split(state.join), v => $.let(v, 0));
+            }
+            forEachArray(value.split(state.join), v => $.set(v, 0));
+            return $;
+        }
+    }
+});
+
+
+
+
+
+
+setObjectAttributes(TagPickerTags, {
+    name: {
+        value: name + 'Tags'
+    }
+}, 1);
+
+setObjectMethods(TagPickerTags, {
+    _valid: function (v) {
+        let $ = this, {state} = $;
+        return (v || "").replace(/[^ -~]/g, ' ').split(state.join).join("").replace(/\s+/g, ' ').trim();
+    },
+    at: function (key) {
+        return getValueInMap(toValue(key), this.values);
+    },
+    count: function () {
+        return toMapCount(this.values);
+    },
+    delete: function (key, _fireValue = 1, _fireHook = 1) {
+        let $ = this,
+            {_active, _event, _let, _tags, _value, self, state} = $;
+        if (!_active) {
+            return $;
+        }
+        // Reset
+        if (!isDefined(v)) {
+            if ($.value) {
+                forEachArray($.value.split(state.join), tag => $.let(tag, 1));
+            }
+            return forEachArray(_value.split(state.join), tag => $.set(tag, 1)), $.fire('change', [_event]);
+        }
+        if (!isArray(v)) {
+            v = [v, v];
+        }
+        if (_tags.size < state.min + 1) {
+            return $.fire('min.tags', [_event, v[0]]);
+        }
+        if (!hasKeyInMap(v[0], _tags)) {
+            return $.fire('not.tag', [_event, v[0]]);
+        }
+        $.fire('is.tag', [_event, v[0]]);
+        let tag = getValueInMap(v[0], _tags),
+            tagText = getChild(tag, 0),
+            tagX = getChild(tag, 1);
+        if (isFunction(_let)) {
+            _let.call($, tag);
+        }
+        offEvent('blur', tag, onBlurTag);
+        offEvent('contextmenu', tag, onContextMenuTag);
+        offEvent('copy', tag, onCopyTag);
+        offEvent('cut', tag, onCutTag);
+        offEvent('focus', tag, onFocusTag);
+        offEvent('keydown', tag, onKeyDownTag);
+        offEvent('keyup', tag, onKeyUpTag);
+        offEvent('mousedown', tag, onPointerDownTag);
+        offEvent('mousedown', tagX, onPointerDownTagX);
+        offEvent('paste', tag, onPasteTag);
+        offEvent('touchstart', tag, onPointerDownTag);
+        offEvent('touchstart', tagX, onPointerDownTagX);
+        letElement(tag);
+        letValueInMap(v[0], $._tags);
+        self.value = toKeysFromMap($._tags).join(state.join);
+        $.fire('let.tag', [_event, v[0]]);
+        if (!_skipHookChange) {
+            $.fire('change', [_event, v[0]]);
+        }
+        return $;
+    },
+    get: function (key) {
+        let $ = this,
+            {values} = $,
+            value = getValueInMap(toValue(key), values);
+        return value ? getElementIndex(value[2]) : -1;
+    },
+    has: function (key) {
+        return hasKeyInMap(toValue(key), this.values);
+    },
+    let: function (key, _fireHook = 1) {
+        return this.delete(key, 1, _fireHook);
+    },
+    set: function (key, value, _fireHook = 1) {
+        let $ = this,
+            {_active, _event, _mask, _set, _tags, _valid, self, state} = $,
+            {text} = _mask,
+            {n, pattern} = state;
+        if (!_active && !_attach) {
+            return $;
+        }
+        if (!isArray(v)) {
+            v = [v, v];
+        }
+        if (_tags.size >= state.max) {
+            return $.fire('max.tags', [_event, v[0]]);
+        }
+        if (isFunction(_valid)) {
+            v[0] = _valid.call($, v[0]);
+        }
+        if ("" === v[0] || (isString(pattern) && !toPattern(pattern).test(v[0]))) {
+            return $.fire('not.tag', [_event, v[0]]);
+        }
+        if (hasKeyInMap(v[0], _tags)) {
+            return $.fire('has.tag', [_event, v[0]]);
+        }
+        $.fire('is.tag', [_event, v[0]]);
+        let tag = setElement('span', {
+                'class': n + '__tag',
+                'data-value': v[0],
+                'tabindex': _active ? -1 : false
+            }),
+            tagText = setElement('span', fromHTML(v[1] ?? v[0])),
+            tagX = setElement('span', {
+                'class': n + '__x',
+                'tabindex': -1
+            });
+        if (_active) {
+            onEvent('blur', tag, onBlurTag);
+            onEvent('contextmenu', tag, onContextMenuTag);
+            onEvent('copy', tag, onCopyTag);
+            onEvent('cut', tag, onCutTag);
+            onEvent('focus', tag, onFocusTag);
+            onEvent('keydown', tag, onKeyDownTag);
+            onEvent('keyup', tag, onKeyUpTag);
+            onEvent('mousedown', tag, onPointerDownTag);
+            onEvent('mousedown', tagX, onPointerDownTagX);
+            onEvent('paste', tag, onPasteTag);
+            onEvent('touchstart', tag, onPointerDownTag);
+            onEvent('touchstart', tagX, onPointerDownTagX);
+            setReference(tag, $);
+        }
+        setChildLast(tag, tagText);
+        setChildLast(tag, tagX);
+        if (isInteger(at) && at >= 0) {
+            let tags = toKeysFromMap(_tags);
+            tags.splice(at, 0, v[0]);
+            $._tags = new Map;
+            setValueInMap(v[0], tag, _tags);
+            if (isFunction(_set)) {
+                _set.call($, tag);
+            }
+            forEachArray(tags, k => {
+                let v;
+                setValueInMap(k, v = getValueInMap(k, _tags), $._tags);
+                setPrev(text, v);
+            });
+        } else {
+            setValueInMap(v[0], tag, $._tags);
+            if (isFunction(_set)) {
+                _set.call($, tag);
+            }
+            setPrev(text, tag);
+        }
+        self.value = toKeysFromMap($._tags).join(state.join);
+        $.fire('set.tag', [_event, v[0]]);
+        if (!_skipHookChange) {
+            $.fire('change', [_event, v[0]]);
+        }
         return $;
     }
-    const form = getParentForm(self);
-    $._active = false;
-    $._value = getValue(self) || null; // Update initial value to be the current value
-    if (form) {
-        offEvent('reset', form, onResetForm);
-        offEvent('submit', form, onSubmitForm);
-    }
-    offEvent('beforeinput', input, onBeforeInputTextInput);
-    offEvent('blur', input, onBlurTextInput);
-    offEvent('click', mask, onClickMask);
-    offEvent('focus', input, onFocusTextInput);
-    offEvent('focus', self, onFocusSelf);
-    offEvent('invalid', self, onInvalidSelf);
-    offEvent('keydown', input, onKeyDownTextInput);
-    offEvent('keyup', input, onKeyUpTextInput);
-    offEvent('paste', input, onPasteTextInput);
-    // Detach extension(s)
-    if (isArray(state.with)) {
-        for (let i = 0, j = toCount(state.with); i < j; ++i) {
-            let value = state.with[i];
-            if (isString(value)) {
-                value = TagPicker[value];
-            }
-            if (isObject(value) && isFunction(value.detach)) {
-                value.detach.call($, self, state);
-                continue;
-            }
-        }
-    }
-    self.tabIndex = null;
-    letClass(self, state.n + '__self');
-    letElement(mask);
-    $._mask = {
-        of: self
-    };
-    $.mask = null;
-    return $;
+});
+
+// In order for an object to be iterable, it must have a `Symbol.iterator` key
+getPrototype(TagPickerTags)[Symbol.iterator] = function () {
+    return this.values[Symbol.iterator]();
 };
 
-$$.focus = function (mode) {
-    let $ = this,
-        {_mask} = $,
-        {input} = _mask;
-    return (input && (focusTo(input), selectTo(input, mode))), $;
-};
-
-$$.get = function (v) {
-    let $ = this,
-        {_active, _event, _tags} = $;
-    if (!_active) {
-        return false;
-    }
-    $.fire('get.tag', [_event, v]);
-    if (!hasKeyInMap(v, _tags)) {
-        return null;
-    }
-    let indexOf = -1;
-    try {
-        forEachMap(_tags, (value, k) => {
-            ++indexOf;
-            if (v === k) {
-                throw "";
-            }
-        });
-    } catch (e) {}
-    return indexOf;
-};
-
-$$.let = function (v, _skipHookChange) {
-    let $ = this,
-        {_active, _event, _let, _tags, _value, self, state} = $;
-    if (!_active) {
-        return $;
-    }
-    // Reset
-    if (!isDefined(v)) {
-        if ($.value) {
-            forEachArray($.value.split(state.join), tag => $.let(tag, 1));
-        }
-        return forEachArray(_value.split(state.join), tag => $.set(tag, -1, 1)), $.fire('change', [_event]);
-    }
-    if (!isArray(v)) {
-        v = [v, v];
-    }
-    if (_tags.size < state.min + 1) {
-        return $.fire('min.tags', [_event, v[0]]);
-    }
-    if (!hasKeyInMap(v[0], _tags)) {
-        return $.fire('not.tag', [_event, v[0]]);
-    }
-    $.fire('is.tag', [_event, v[0]]);
-    let tag = getValueInMap(v[0], _tags),
-        tagText = getChild(tag, 0),
-        tagX = getChild(tag, 1);
-    if (isFunction(_let)) {
-        _let.call($, tag);
-    }
-    offEvent('blur', tag, onBlurTag);
-    offEvent('contextmenu', tag, onContextMenuTag);
-    offEvent('copy', tag, onCopyTag);
-    offEvent('cut', tag, onCutTag);
-    offEvent('focus', tag, onFocusTag);
-    offEvent('keydown', tag, onKeyDownTag);
-    offEvent('keyup', tag, onKeyUpTag);
-    offEvent('mousedown', tag, onPointerDownTag);
-    offEvent('mousedown', tagX, onPointerDownTagX);
-    offEvent('paste', tag, onPasteTag);
-    offEvent('touchstart', tag, onPointerDownTag);
-    offEvent('touchstart', tagX, onPointerDownTagX);
-    letElement(tag);
-    letValueInMap(v[0], $._tags);
-    self.value = toKeysFromMap($._tags).join(state.join);
-    $.fire('let.tag', [_event, v[0]]);
-    if (!_skipHookChange) {
-        $.fire('change', [_event, v[0]]);
-    }
-    return $;
-};
-
-$$.set = function (v, at, _skipHookChange, _attach) {
-    let $ = this,
-        {_active, _event, _mask, _set, _tags, _valid, self, state} = $,
-        {text} = _mask,
-        {n, pattern} = state;
-    if (!_active && !_attach) {
-        return $;
-    }
-    if (!isArray(v)) {
-        v = [v, v];
-    }
-    if (_tags.size >= state.max) {
-        return $.fire('max.tags', [_event, v[0]]);
-    }
-    if (isFunction(_valid)) {
-        v[0] = _valid.call($, v[0]);
-    }
-    if ("" === v[0] || (isString(pattern) && !toPattern(pattern).test(v[0]))) {
-        return $.fire('not.tag', [_event, v[0]]);
-    }
-    if (hasKeyInMap(v[0], _tags)) {
-        return $.fire('has.tag', [_event, v[0]]);
-    }
-    $.fire('is.tag', [_event, v[0]]);
-    let tag = setElement('span', {
-            'class': n + '__tag',
-            'data-value': v[0],
-            'tabindex': _active ? -1 : false
-        }),
-        tagText = setElement('span', fromHTML(v[1] ?? v[0])),
-        tagX = setElement('span', {
-            'class': n + '__x',
-            'tabindex': -1
-        });
-    if (_active) {
-        onEvent('blur', tag, onBlurTag);
-        onEvent('contextmenu', tag, onContextMenuTag);
-        onEvent('copy', tag, onCopyTag);
-        onEvent('cut', tag, onCutTag);
-        onEvent('focus', tag, onFocusTag);
-        onEvent('keydown', tag, onKeyDownTag);
-        onEvent('keyup', tag, onKeyUpTag);
-        onEvent('mousedown', tag, onPointerDownTag);
-        onEvent('mousedown', tagX, onPointerDownTagX);
-        onEvent('paste', tag, onPasteTag);
-        onEvent('touchstart', tag, onPointerDownTag);
-        onEvent('touchstart', tagX, onPointerDownTagX);
-        setReference(tag, $);
-    }
-    setChildLast(tag, tagText);
-    setChildLast(tag, tagX);
-    if (isInteger(at) && at >= 0) {
-        let tags = toKeysFromMap(_tags);
-        tags.splice(at, 0, v[0]);
-        $._tags = new Map;
-        setValueInMap(v[0], tag, _tags);
-        if (isFunction(_set)) {
-            _set.call($, tag);
-        }
-        forEachArray(tags, k => {
-            let v;
-            setValueInMap(k, v = getValueInMap(k, _tags), $._tags);
-            setPrev(text, v);
-        });
-    } else {
-        setValueInMap(v[0], tag, $._tags);
-        if (isFunction(_set)) {
-            _set.call($, tag);
-        }
-        setPrev(text, tag);
-    }
-    self.value = toKeysFromMap($._tags).join(state.join);
-    $.fire('set.tag', [_event, v[0]]);
-    if (!_skipHookChange) {
-        $.fire('change', [_event, v[0]]);
-    }
-    return $;
-};
+TagPicker.Tags = TagPickerTags;
 
 export default TagPicker;

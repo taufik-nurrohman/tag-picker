@@ -238,6 +238,9 @@
         }
         return base ? parseInt(x, base) : parseFloat(x);
     };
+    var toString = function toString(x, base) {
+        return isNumber(x) ? x.toString(base) : "" + x;
+    };
     var _toValue = function toValue(x) {
         if (isArray(x)) {
             return x.map(function (v) {
@@ -319,6 +322,28 @@
         }
         return object;
     };
+    var forEachSet = function forEachSet(set, at) {
+        for (var _iterator2 = _createForOfIteratorHelperLoose(set.entries()), _step2; !(_step2 = _iterator2()).done;) {
+            var _step2$value = _maybeArrayLike(_slicedToArray, _step2.value, 2),
+                k = _step2$value[0],
+                v = _step2$value[1];
+            v = at(v, k);
+            if (-1 === v) {
+                letValueInMap(k, set);
+                continue;
+            }
+            if (0 === v) {
+                break;
+            }
+            if (1 === v) {
+                continue;
+            }
+        }
+        return set;
+    };
+    var getPrototype = function getPrototype(of) {
+        return of.prototype;
+    };
     var getReference = function getReference(key) {
         return getValueInMap(key, references) || null;
     };
@@ -330,6 +355,22 @@
     };
     var letValueInMap = function letValueInMap(k, map) {
         return map.delete(k);
+    };
+    var setObjectAttributes = function setObjectAttributes(of, attributes, asStaticAttributes) {
+        if (!asStaticAttributes) {
+            of = getPrototype(of);
+        }
+        return forEachObject(attributes, function (v, k) {
+            Object.defineProperty(of, k, v);
+        }), of;
+    };
+    var setObjectMethods = function setObjectMethods(of, methods, asStaticMethods) {
+        {
+            of = getPrototype(of);
+        }
+        return forEachObject(methods, function (v, k) {
+            of [k] = v;
+        }), of;
     };
     var setReference = function setReference(key, value) {
         return setValueInMap(key, value, references);
@@ -393,6 +434,18 @@
     var getElements = function getElements(query, scope) {
         return _toArray((scope || D).querySelectorAll(query));
     };
+    var getID = function getID(node, batch) {
+        if (batch === void 0) {
+            batch = 'e:';
+        }
+        if (hasID(node)) {
+            return getAttribute(node, 'id');
+        }
+        if (!isSet(theID[batch])) {
+            theID[batch] = 0;
+        }
+        return batch + toString(Date.now() + (theID[batch] += 1), 16);
+    };
     var getName = function getName(node) {
         return toCaseLower(node && node.nodeName || "") || null;
     };
@@ -441,6 +494,9 @@
     var hasClass = function hasClass(node, value) {
         return node.classList.contains(value);
     };
+    var hasID = function hasID(node) {
+        return hasAttribute(node, 'id');
+    };
     var hasState = function hasState(node, state) {
         return state in node;
     };
@@ -473,7 +529,7 @@
         var state = 'innerHTML';
         return hasState(node, state) && (node[state] = ""), node;
     };
-    var letStyle = function letStyle(node, style) {
+    var letStyle$1 = function letStyle(node, style) {
         return node.style[toCaseCamel(style)] = null, node;
     };
     var setAria = function setAria(node, aria, value) {
@@ -571,13 +627,19 @@
         var state = 'innerHTML';
         return hasState(node, state) && (node[state] = trim ? content.trim() : content), node;
     };
+    var setID = function setID(node, value, batch) {
+        if (batch === void 0) {
+            batch = 'e:';
+        }
+        return setAttribute(node, 'id', isSet(value) ? value : getID(node, batch));
+    };
     var setNext = function setNext(current, node) {
         return getParent(current).insertBefore(node, getNext(current, true)), node;
     };
     var setPrev = function setPrev(current, node) {
         return getParent(current).insertBefore(node, current), node;
     };
-    var setStyle = function setStyle(node, style, value) {
+    var setStyle$1 = function setStyle(node, style, value) {
         if (isNumber(value)) {
             value += 'px';
         }
@@ -585,7 +647,7 @@
     };
     var setStyles = function setStyles(node, styles) {
         return forEachObject(styles, function (v, k) {
-            v || "" === v || 0 === v ? setStyle(node, k, v) : letStyle(node, k);
+            v || "" === v || 0 === v ? setStyle$1(node, k, v) : letStyle$1(node, k);
         }), node;
     };
     var setText = function setText(node, content, trim) {
@@ -601,6 +663,7 @@
     var toggleClass = function toggleClass(node, name, force) {
         return node.classList.toggle(name, force), node;
     };
+    var theID = {};
     var delay = function delay(then, time) {
         return function () {
             var _arguments2 = arguments,
@@ -801,12 +864,8 @@
     var KEY_TAB = 'Tab';
     var name = 'TagPicker';
 
-    function defineProperty(of, key, state) {
-        Object.defineProperty(of, key, state);
-    }
-
     function focusTo(node) {
-        node.focus();
+        return node.focus(), node;
     }
 
     function getCharBeforeCaret(node) {
@@ -823,87 +882,6 @@
     function getTagValue(tag) {
         return getDatum(tag, 'value', false);
     }
-
-    function TagPicker(self, state) {
-        var $ = this;
-        if (!self) {
-            return $;
-        }
-        // Return new instance if `TagPicker` was called without the `new` operator
-        if (!isInstance($, TagPicker)) {
-            return new TagPicker(self, state);
-        }
-        setReference(self, hook($, TagPicker._));
-        var newState = _fromStates({}, TagPicker.state, isString(state) ? {
-            join: state
-        } : state || {});
-        // Special case for `state.escape`: Replace instead of join
-        if (isObject(state) && state.escape) {
-            newState.escape = state.escape;
-        }
-        return $.attach(self, newState);
-    }
-    TagPicker.from = function (self, state) {
-        return new TagPicker(self, state);
-    };
-    TagPicker.of = getReference;
-    TagPicker.state = {
-        'escape': [','],
-        'join': ', ',
-        'max': Infinity,
-        'min': 0,
-        'n': 'tag-picker',
-        'pattern': null,
-        'with': []
-    };
-    TagPicker.version = '4.1.0';
-    defineProperty(TagPicker, 'name', {
-        value: name
-    });
-    var $$ = TagPicker._ = TagPicker.prototype;
-    defineProperty($$, 'text', {
-        get: function get() {
-            return getText(this._mask.input);
-        },
-        set: function set(text) {
-            var $ = this,
-                _mask = $._mask,
-                self = $.self,
-                hint = _mask.hint,
-                input = _mask.input;
-            text = text + "";
-            setText(hint, "" === text ? self.placeholder : "");
-            setText(input, text);
-            selectTo(input);
-        }
-    });
-    defineProperty($$, 'value', {
-        get: function get() {
-            var value = getValue(this.self);
-            return "" === value ? null : value;
-        },
-        set: function set(value) {
-            var $ = this,
-                _event = $._event,
-                state = $.state;
-            if ($.value) {
-                forEachArray($.value.split(state.join), function (tag) {
-                    return $.let(tag, 1);
-                });
-            }
-            forEachArray(value.split(state.join), function (tag) {
-                return $.set(tag, -1, 1);
-            });
-            $.fire('change', [_event]);
-        }
-    });
-    $$._let = false;
-    $$._set = false;
-    $$._valid = function (v) {
-        var $ = this,
-            state = $.state;
-        return (v || "").replace(/[^ -~]/g, ' ').split(state.join).join("").replace(/\s+/g, ' ').trim();
-    };
     var _keyIsCtrl = false,
         _keyIsShift = false;
 
@@ -940,18 +918,6 @@
         letClass(mask, n += '--focus');
         letClass(mask, n += '-text');
         picker.fire('blur', [e]);
-    }
-
-    function onClickMask(e) {
-        var $ = this,
-            picker = getReference($),
-            on = e.target,
-            state = picker.state,
-            n = state.n + '__tag';
-        picker._event = e;
-        if (!hasClass(on, n) && !getParent(on, '.' + n)) {
-            picker.focus();
-        }
     }
 
     function onContextMenuTag(e) {
@@ -1361,7 +1327,7 @@
         }
         var values = value.split(state.join);
         forEachArray(values, function (tag) {
-            return picker.set(tag, -1, 1);
+            return picker.set(tag, 1);
         });
         picker.fire('paste', [e, values]).focus().fire('change', [e]);
         offEventDefault(e);
@@ -1383,7 +1349,7 @@
             if (value) {
                 var values = value.split(state.join);
                 forEachArray(values, function (tag) {
-                    return picker.set(tag, -1, 1);
+                    return picker.set(tag, 1);
                 });
                 picker.fire('paste', [e, values]).fire('change', [e]);
             }
@@ -1477,339 +1443,542 @@
         }
         return picker.fire('submit', [e]);
     }
-    $$.attach = function (self, state) {
-        var $ = this;
-        self = self || $.self;
-        if (state && isString(state)) {
-            state = {
-                join: state
-            };
-        }
-        state = _fromStates({}, $.state, state || {});
-        if (hasClass(self, state.n + '__self')) {
-            return $;
-        }
-        if (isRequired(self) && !state.min) {
-            state.min = 1; // Force minimum tag(s) to insert to be `1`
-        }
-        $._active = !isDisabled(self) && !isReadOnly(self);
-        $._event = null;
-        $._tags = new Map();
-        $._value = getValue(self) || null;
-        $.self = self;
-        $.state = state;
-        var _state = state,
-            n = _state.n;
-        var form = getParentForm(self);
-        var mask = setElement('div', {
-            'class': n,
-            'tabindex': isDisabled(self) ? false : -1
-        });
-        $.mask = mask;
-        var maskFlex = setElement('span', {
-            'class': n + '__flex'
-        });
-        var text = setElement('span', {
-            'class': n + '__text'
-        });
-        var textInput = setElement('span', {
-            'autocapitalize': 'off',
-            'contenteditable': isDisabled(self) ? false : "",
-            'spellcheck': 'false'
-        });
-        var textInputHint = setElement('span', self.placeholder + "");
-        setChildLast(mask, maskFlex);
-        setChildLast(maskFlex, text);
-        setChildLast(text, textInput);
-        setChildLast(text, textInputHint);
-        setClass(self, n + '__self');
-        setNext(self, mask);
-        if (form) {
-            setReference(form, $);
-            onEvent('reset', form, onResetForm);
-            onEvent('submit', form, onSubmitForm);
-        }
-        onEvent('beforeinput', textInput, onBeforeInputTextInput);
-        onEvent('blur', textInput, onBlurTextInput);
-        onEvent('click', mask, onClickMask);
-        onEvent('focus', self, onFocusSelf);
-        onEvent('focus', textInput, onFocusTextInput);
-        onEvent('invalid', self, onInvalidSelf);
-        onEvent('keydown', textInput, onKeyDownTextInput);
-        onEvent('keyup', textInput, onKeyUpTextInput);
-        onEvent('paste', textInput, onPasteTextInput);
-        self.tabIndex = -1;
-        setReference(mask, $);
-        setReference(textInput, $);
-        var _mask = {};
-        _mask.flex = maskFlex;
-        _mask.hint = textInputHint;
-        _mask.input = textInput;
-        _mask.of = self;
-        _mask.self = mask;
-        _mask.text = text;
-        $._mask = _mask;
-        // Attach the current tag(s)
-        if ($._value) {
-            forEachArray($._value.split(state.join), function (tag) {
-                return $.set(tag, -1, 1, 1);
-            });
-        }
-        // Attach extension(s)
-        if (isSet(state) && isArray(state.with)) {
-            for (var i = 0, j = toCount(state.with); i < j; ++i) {
-                var value = state.with[i];
-                if (isString(value)) {
-                    value = TagPicker[value];
-                }
-                // `const Extension = function (self, state = {}) {}`
-                if (isFunction(value)) {
-                    value.call($, self, state);
-                    continue;
-                }
-                // `const Extension = {attach: function (self, state = {}) {}, detach: function (self, state = {}) {}}`
-                if (isObject(value) && isFunction(value.attach)) {
-                    value.attach.call($, self, state);
-                    continue;
-                }
+    TagPicker._ = setObjectMethods(TagPicker, {
+        attach: function attach(self, state) {
+            var $ = this;
+            self = self || $.self;
+            if (state && isString(state)) {
+                state = {
+                    join: state
+                };
             }
-        }
-        return $;
-    };
-    $$.blur = function () {
-        selectToNone();
-        var $ = this,
-            _mask = $._mask,
-            _tags = $._tags,
-            input = _mask.input;
-        forEachMap(_tags, function (v) {
-            return v.blur();
-        });
-        return input.blur();
-    };
-    $$.detach = function () {
-        var $ = this,
-            _mask = $._mask,
-            mask = $.mask,
-            self = $.self,
-            state = $.state,
-            input = _mask.input;
-        if (!hasClass(self, state.n + '__self')) {
-            return $;
-        }
-        var form = getParentForm(self);
-        $._active = false;
-        $._value = getValue(self) || null; // Update initial value to be the current value
-        if (form) {
-            offEvent('reset', form, onResetForm);
-            offEvent('submit', form, onSubmitForm);
-        }
-        offEvent('beforeinput', input, onBeforeInputTextInput);
-        offEvent('blur', input, onBlurTextInput);
-        offEvent('click', mask, onClickMask);
-        offEvent('focus', input, onFocusTextInput);
-        offEvent('focus', self, onFocusSelf);
-        offEvent('invalid', self, onInvalidSelf);
-        offEvent('keydown', input, onKeyDownTextInput);
-        offEvent('keyup', input, onKeyUpTextInput);
-        offEvent('paste', input, onPasteTextInput);
-        // Detach extension(s)
-        if (isArray(state.with)) {
-            for (var i = 0, j = toCount(state.with); i < j; ++i) {
-                var value = state.with[i];
-                if (isString(value)) {
-                    value = TagPicker[value];
-                }
-                if (isObject(value) && isFunction(value.detach)) {
-                    value.detach.call($, self, state);
-                    continue;
-                }
+            state = _fromStates({}, $.state, state || {});
+            $._event = null;
+            $._tags = new TagPickerTags($);
+            $._value = null;
+            $.self = self;
+            $.state = state;
+            var _state = state;
+            _state.max;
+            var min = _state.min,
+                n = _state.n,
+                isDisabledSelf = isDisabled(self),
+                isReadOnlySelf = isReadOnly(self),
+                isRequiredSelf = isRequired(self),
+                theInputPlaceholder = self.placeholder,
+                theInputValue = getValue(self);
+            $._active = !isDisabledSelf && !isReadOnlySelf;
+            $._fix = isReadOnlySelf;
+            if (isRequiredSelf && min < 1) {
+                state.min = min = 1; // Force minimum tag(s) to insert to be `1`
             }
-        }
-        self.tabIndex = null;
-        letClass(self, state.n + '__self');
-        letElement(mask);
-        $._mask = {
-            of: self
-        };
-        $.mask = null;
-        return $;
-    };
-    $$.focus = function (mode) {
-        var $ = this,
-            _mask = $._mask,
-            input = _mask.input;
-        return input && (focusTo(input), selectTo(input, mode)), $;
-    };
-    $$.get = function (v) {
-        var $ = this,
-            _active = $._active,
-            _event = $._event,
-            _tags = $._tags;
-        if (!_active) {
-            return false;
-        }
-        $.fire('get.tag', [_event, v]);
-        if (!hasKeyInMap(v, _tags)) {
-            return null;
-        }
-        var indexOf = -1;
-        try {
-            forEachMap(_tags, function (value, k) {
-                ++indexOf;
-                if (v === k) {
-                    throw "";
-                }
+            var form = getParentForm(self);
+            var mask = setElement('div', {
+                'aria': {
+                    'disabled': isDisabledSelf ? 'true' : false,
+                    'multiselectable': 'true',
+                    'readonly': isReadOnlySelf ? 'true' : false
+                },
+                'class': n,
+                'role': 'combobox'
             });
-        } catch (e) {}
-        return indexOf;
-    };
-    $$.let = function (v, _skipHookChange) {
-        var $ = this,
-            _active = $._active,
-            _event = $._event,
-            _let = $._let,
-            _tags = $._tags,
-            _value = $._value,
-            self = $.self,
-            state = $.state;
-        if (!_active) {
-            return $;
-        }
-        // Reset
-        if (!isDefined(v)) {
-            if ($.value) {
-                forEachArray($.value.split(state.join), function (tag) {
-                    return $.let(tag, 1);
+            $.mask = mask;
+            var maskFlex = setElement('span', {
+                'class': n + '__flex',
+                'role': 'group'
+            });
+            var text = setElement('span', {
+                'class': n + '__text',
+                'tabindex': 0
+            });
+            var textInput = setElement('span', {
+                'aria': {
+                    'disabled': isDisabledSelf ? 'true' : false,
+                    'multiline': 'false',
+                    'placeholder': theInputPlaceholder,
+                    'readonly': isReadOnlySelf ? 'true' : false
+                },
+                'autocapitalize': 'off',
+                'contenteditable': isDisabledSelf || isReadOnlySelf ? false : "",
+                'role': 'textbox',
+                'spellcheck': 'false',
+                'tabindex': isReadOnlySelf ? 0 : false
+            });
+            var textInputHint = setElement('span', theInputPlaceholder + "", {
+                'role': 'none'
+            });
+            setChildLast(mask, maskFlex);
+            setChildLast(maskFlex, text);
+            setChildLast(text, textInput);
+            setChildLast(text, textInputHint);
+            setReference(textInput, $);
+            onEvent('beforeinput', textInput, onBeforeInputTextInput);
+            onEvent('blur', textInput, onBlurTextInput);
+            onEvent('cut', textInput, onCutTextInput);
+            onEvent('focus', textInput, onFocusTextInput);
+            onEvent('keydown', textInput, onKeyDownTextInput);
+            onEvent('mousedown', mask, onPointerDownMask);
+            onEvent('paste', textInput, onPasteTextInput);
+            onEvent('touchstart', mask, onPointerDownMask);
+            setClass(self, n + '__self');
+            setNext(self, mask);
+            onEvent('focus', self, onFocusSelf);
+            onEvent('invalid', self, onInvalidSelf);
+            if (form) {
+                onEvent('reset', form, onResetForm);
+                onEvent('submit', form, onSubmitForm);
+                setID(form);
+                setReference(form, $);
+            }
+            self.tabIndex = -1;
+            setReference(mask, $);
+            var _mask = {};
+            _mask.flex = maskFlex;
+            _mask.hint = textInputHint;
+            _mask.input = textInput;
+            _mask.of = self;
+            _mask.self = mask;
+            _mask.values = new Set();
+            _mask.text = text;
+            $._mask = _mask;
+            // Re-assign some state value(s) using the setter to either normalize or reject the initial value
+            // $.max = isMultipleSelect ? (max ?? Infinity) : 1;
+            // $.min = isInputSelf ? 0 : (min ?? 1);
+            var _active = $._active,
+                _state2 = state,
+                tags = _state2.tags,
+                values;
+            // Force the `this._active` value to `true` to set the initial value
+            $._active = true;
+            // Attach the current tag(s)
+            if (tags) {
+                values = createTagsFrom(of, tags, of._mask.flex);
+            } else if (theInputValue) {
+                values = createTagsFrom(of, theInputValue.split(state.join), of._mask.flex);
+            }
+            $._value = values.join(state.join);
+            // After the initial value has been set, restore the previous `this._active` value
+            $._active = _active;
+            // Force `id` attribute(s)
+            setAria(self, 'hidden', true);
+            setAria(textInput, 'controls', getID(maskFlex));
+            setID(mask);
+            setID(maskFlex);
+            setID(self);
+            setID(textInput);
+            setID(textInputHint);
+            // Attach extension(s)
+            if (isSet(state) && isArray(state.with)) {
+                forEachArray(state.with, function (v, k) {
+                    if (isString(v)) {
+                        v = OptionPicker[v];
+                    }
+                    // `const Extension = function (self, state = {}) {}`
+                    if (isFunction(v)) {
+                        v.call($, self, state);
+                        // `const Extension = {attach: function (self, state = {}) {}, detach: function (self, state = {}) {}}`
+                    } else if (isObject(v) && isFunction(v.attach)) {
+                        v.attach.call($, self, state);
+                    }
                 });
             }
-            return forEachArray(_value.split(state.join), function (tag) {
-                return $.set(tag, -1, 1);
-            }), $.fire('change', [_event]);
+            return $;
+        },
+        blur: function blur() {
+            selectToNone();
+            var $ = this,
+                _mask = $._mask,
+                input = _mask.input,
+                values = _mask.values;
+            forEachSet(values, function (v) {
+                return v.blur();
+            });
+            return input.blur();
+        },
+        detach: function detach() {
+            var $ = this,
+                _mask = $._mask,
+                mask = $.mask,
+                self = $.self,
+                state = $.state,
+                input = _mask.input;
+            var form = getParentForm(self);
+            $._active = false;
+            $._tags = new TagPickerTags($);
+            $._value = null;
+            if (form) {
+                offEvent('reset', form, onResetForm);
+                offEvent('submit', form, onSubmitForm);
+            }
+            offEvent('beforeinput', input, onBeforeInputTextInput);
+            offEvent('blur', input, onBlurTextInput);
+            offEvent('cut', input, onCutTextInput);
+            offEvent('focus', input, onFocusTextInput);
+            offEvent('focus', self, onFocusSelf);
+            offEvent('invalid', self, onInvalidSelf);
+            offEvent('keydown', input, onKeyDownTextInput);
+            offEvent('keyup', input, onKeyUpTextInput);
+            offEvent('mousedown', mask, onPointerDownMask);
+            offEvent('paste', input, onPasteTextInput);
+            offEvent('touchstart', mask, onPointerDownMask);
+            // Detach extension(s)
+            if (isArray(state.with)) {
+                forEachArray(state.with, function (v, k) {
+                    if (isString(v)) {
+                        v = OptionPicker[v];
+                    }
+                    if (isObject(v) && isFunction(v.detach)) {
+                        v.detach.call($, self, state);
+                    }
+                });
+            }
+            self.tabIndex = null;
+            letAria(self, 'hidden');
+            letClass(self, state.n + '__self');
+            letElement(mask);
+            $._mask = {
+                of: self
+            };
+            $.mask = null;
+            return $;
+        },
+        focus: function focus(mode) {
+            var $ = this,
+                _mask = $._mask,
+                input = _mask.input;
+            return focusTo(input), selectTo(input, mode), $;
+        },
+        reset: function reset(focus, mode) {
+            // let $ = this,
+            //     {_active, _value, _values, max} = $;
+            // if (!_active) {
+            //     return $;
+            // }
+            // if (max > 1) {
+            //     $.values = _values;
+            // } else {
+            //     $.value = _value;
+            // }
+            // return focus ? $.focus(mode) : $;
         }
-        if (!isArray(v)) {
-            v = [v, v];
-        }
-        if (_tags.size < state.min + 1) {
-            return $.fire('min.tags', [_event, v[0]]);
-        }
-        if (!hasKeyInMap(v[0], _tags)) {
-            return $.fire('not.tag', [_event, v[0]]);
-        }
-        $.fire('is.tag', [_event, v[0]]);
-        var tag = getValueInMap(v[0], _tags);
-        getChild(tag, 0);
-        var tagX = getChild(tag, 1);
-        if (isFunction(_let)) {
-            _let.call($, tag);
-        }
-        offEvent('blur', tag, onBlurTag);
-        offEvent('contextmenu', tag, onContextMenuTag);
-        offEvent('copy', tag, onCopyTag);
-        offEvent('cut', tag, onCutTag);
-        offEvent('focus', tag, onFocusTag);
-        offEvent('keydown', tag, onKeyDownTag);
-        offEvent('keyup', tag, onKeyUpTag);
-        offEvent('mousedown', tag, onPointerDownTag);
-        offEvent('mousedown', tagX, onPointerDownTagX);
-        offEvent('paste', tag, onPasteTag);
-        offEvent('touchstart', tag, onPointerDownTag);
-        offEvent('touchstart', tagX, onPointerDownTagX);
-        letElement(tag);
-        letValueInMap(v[0], $._tags);
-        self.value = toKeysFromMap($._tags).join(state.join);
-        $.fire('let.tag', [_event, v[0]]);
-        if (!_skipHookChange) {
-            $.fire('change', [_event, v[0]]);
-        }
-        return $;
-    };
-    $$.set = function (v, at, _skipHookChange, _attach) {
-        var _v$;
-        var $ = this,
-            _active = $._active,
-            _event = $._event,
-            _mask = $._mask,
-            _set = $._set,
-            _tags = $._tags,
-            _valid = $._valid,
-            self = $.self,
-            state = $.state,
-            text = _mask.text,
-            n = state.n,
-            pattern = state.pattern;
-        if (!_active && !_attach) {
+    });
+
+    function TagPicker(self, state) {
+        var $ = this;
+        if (!self) {
             return $;
         }
-        if (!isArray(v)) {
-            v = [v, v];
+        // Return new instance if `TagPicker` was called without the `new` operator
+        if (!isInstance($, TagPicker)) {
+            return new TagPicker(self, state);
         }
-        if (_tags.size >= state.max) {
-            return $.fire('max.tags', [_event, v[0]]);
+        setReference(self, hook($, TagPicker._));
+        var newState = _fromStates({}, TagPicker.state, isString(state) ? {
+            join: state
+        } : state || {});
+        // Special case for `state.escape`: replace instead of join the value(s)
+        if (isObject(state) && state.escape) {
+            newState.escape = state.escape;
         }
-        if (isFunction(_valid)) {
-            v[0] = _valid.call($, v[0]);
+        return $.attach(self, newState);
+    }
+
+    function TagPickerTags(of, tags) {
+        var $ = this;
+        // Return new instance if `TagPickerTags` was called without the `new` operator
+        if (!isInstance($, TagPickerTags)) {
+            return new TagPickerTags(of, tags);
         }
-        if ("" === v[0] || isString(pattern) && !toPattern(pattern).test(v[0])) {
-            return $.fire('not.tag', [_event, v[0]]);
-        }
-        if (hasKeyInMap(v[0], _tags)) {
-            return $.fire('has.tag', [_event, v[0]]);
-        }
-        $.fire('is.tag', [_event, v[0]]);
-        var tag = setElement('span', {
-                'class': n + '__tag',
-                'data-value': v[0],
-                'tabindex': _active ? -1 : false
-            }),
-            tagText = setElement('span', fromHTML((_v$ = v[1]) != null ? _v$ : v[0])),
-            tagX = setElement('span', {
-                'class': n + '__x',
-                'tabindex': -1
-            });
-        if (_active) {
-            onEvent('blur', tag, onBlurTag);
-            onEvent('contextmenu', tag, onContextMenuTag);
-            onEvent('copy', tag, onCopyTag);
-            onEvent('cut', tag, onCutTag);
-            onEvent('focus', tag, onFocusTag);
-            onEvent('keydown', tag, onKeyDownTag);
-            onEvent('keyup', tag, onKeyUpTag);
-            onEvent('mousedown', tag, onPointerDownTag);
-            onEvent('mousedown', tagX, onPointerDownTagX);
-            onEvent('paste', tag, onPasteTag);
-            onEvent('touchstart', tag, onPointerDownTag);
-            onEvent('touchstart', tagX, onPointerDownTagX);
-            setReference(tag, $);
-        }
-        setChildLast(tag, tagText);
-        setChildLast(tag, tagX);
-        if (isInteger(at) && at >= 0) {
-            var tags = toKeysFromMap(_tags);
-            tags.splice(at, 0, v[0]);
-            $._tags = new Map();
-            setValueInMap(v[0], tag, _tags);
-            if (isFunction(_set)) {
-                _set.call($, tag);
-            }
-            forEachArray(tags, function (k) {
-                var v;
-                setValueInMap(k, v = getValueInMap(k, _tags), $._tags);
-                setPrev(text, v);
-            });
-        } else {
-            setValueInMap(v[0], tag, $._tags);
-            if (isFunction(_set)) {
-                _set.call($, tag);
-            }
-            setPrev(text, tag);
-        }
-        self.value = toKeysFromMap($._tags).join(state.join);
-        $.fire('set.tag', [_event, v[0]]);
-        if (!_skipHookChange) {
-            $.fire('change', [_event, v[0]]);
+        $.of = of;
+        $.values = new Map();
+        if (tags) {
+            createTagsFrom(of, tags, of._mask.flex);
         }
         return $;
+    }
+    TagPicker.from = function (self, state) {
+        return new TagPicker(self, state);
     };
+    TagPicker.of = getReference;
+    TagPicker.state = {
+        'escape': [','],
+        'join': ', ',
+        'max': Infinity,
+        'min': 0,
+        'n': 'tag-picker',
+        'pattern': null,
+        'tags': null,
+        'with': []
+    };
+    TagPicker.version = '4.1.0';
+    setObjectAttributes(TagPicker, {
+        name: {
+            value: name
+        }
+    }, 1);
+    setObjectAttributes(TagPicker, {
+        active: {
+            get: function get() {
+                return this._active;
+            },
+            set: function set(value) {
+                return $;
+            }
+        },
+        fix: {
+            get: function get() {
+                return this._fix;
+            },
+            set: function set(value) {
+                return $;
+            }
+        },
+        max: {
+            get: function get() {},
+            set: function set(value) {
+                return $;
+            }
+        },
+        min: {
+            get: function get() {},
+            set: function set(value) {
+                return $;
+            }
+        },
+        tags: {
+            get: function get() {
+                return this._tags;
+            },
+            set: function set(options) {
+                var values = [];
+                forEachMap($._tags, function (v) {
+                    return values.push(getTagValue(v[2]));
+                });
+                return $.fire('set.tags', [values]);
+            }
+        },
+        text: {
+            get: function get() {
+                return getText(this._mask.input);
+            },
+            set: function set(value) {
+                var $ = this,
+                    _active = $._active,
+                    _mask = $._mask,
+                    hint = _mask.hint,
+                    input = _mask.input,
+                    v;
+                if (!_active) {
+                    return $;
+                }
+                setText(input, v = fromValue(value));
+                return v ? setStyle(hint, 'color', 'transparent') : letStyle(hint, 'color'), $;
+            }
+        },
+        value: {
+            get: function get() {
+                var value = getValue(this.self);
+                return "" !== value ? value : null;
+            },
+            set: function set(value) {
+                var $ = this,
+                    state = $.state;
+                if ($.value) {
+                    forEachArray($.value.split(state.join), function (v) {
+                        return $.let(v, 0);
+                    });
+                }
+                forEachArray(value.split(state.join), function (v) {
+                    return $.set(v, 0);
+                });
+                return $;
+            }
+        }
+    });
+    setObjectAttributes(TagPickerTags, {
+        name: {
+            value: name + 'Tags'
+        }
+    }, 1);
+    setObjectMethods(TagPickerTags, {
+        _valid: function _valid(v) {
+            var $ = this,
+                state = $.state;
+            return (v || "").replace(/[^ -~]/g, ' ').split(state.join).join("").replace(/\s+/g, ' ').trim();
+        },
+        at: function at(key) {
+            return getValueInMap(toValue(key), this.values);
+        },
+        count: function count() {
+            return toMapCount(this.values);
+        },
+        delete: function _delete(key, _fireValue, _fireHook) {
+            var $ = this,
+                _active = $._active,
+                _event = $._event,
+                _let = $._let,
+                _tags = $._tags,
+                _value = $._value,
+                self = $.self,
+                state = $.state;
+            if (!_active) {
+                return $;
+            }
+            // Reset
+            if (!isDefined(v)) {
+                if ($.value) {
+                    forEachArray($.value.split(state.join), function (tag) {
+                        return $.let(tag, 1);
+                    });
+                }
+                return forEachArray(_value.split(state.join), function (tag) {
+                    return $.set(tag, 1);
+                }), $.fire('change', [_event]);
+            }
+            if (!isArray(v)) {
+                v = [v, v];
+            }
+            if (_tags.size < state.min + 1) {
+                return $.fire('min.tags', [_event, v[0]]);
+            }
+            if (!hasKeyInMap(v[0], _tags)) {
+                return $.fire('not.tag', [_event, v[0]]);
+            }
+            $.fire('is.tag', [_event, v[0]]);
+            var tag = getValueInMap(v[0], _tags);
+            getChild(tag, 0);
+            var tagX = getChild(tag, 1);
+            if (isFunction(_let)) {
+                _let.call($, tag);
+            }
+            offEvent('blur', tag, onBlurTag);
+            offEvent('contextmenu', tag, onContextMenuTag);
+            offEvent('copy', tag, onCopyTag);
+            offEvent('cut', tag, onCutTag);
+            offEvent('focus', tag, onFocusTag);
+            offEvent('keydown', tag, onKeyDownTag);
+            offEvent('keyup', tag, onKeyUpTag);
+            offEvent('mousedown', tag, onPointerDownTag);
+            offEvent('mousedown', tagX, onPointerDownTagX);
+            offEvent('paste', tag, onPasteTag);
+            offEvent('touchstart', tag, onPointerDownTag);
+            offEvent('touchstart', tagX, onPointerDownTagX);
+            letElement(tag);
+            letValueInMap(v[0], $._tags);
+            self.value = toKeysFromMap($._tags).join(state.join);
+            $.fire('let.tag', [_event, v[0]]);
+            if (!_skipHookChange) {
+                $.fire('change', [_event, v[0]]);
+            }
+            return $;
+        },
+        get: function get(key) {
+            var $ = this,
+                values = $.values,
+                value = getValueInMap(toValue(key), values);
+            return value ? getElementIndex(value[2]) : -1;
+        },
+        has: function has(key) {
+            return hasKeyInMap(toValue(key), this.values);
+        },
+        let: function _let(key, _fireHook) {
+            if (_fireHook === void 0) {
+                _fireHook = 1;
+            }
+            return this.delete(key, 1, _fireHook);
+        },
+        set: function set(key, value, _fireHook) {
+            var _v$;
+            var $ = this,
+                _active = $._active,
+                _event = $._event,
+                _mask = $._mask,
+                _set = $._set,
+                _tags = $._tags,
+                _valid = $._valid,
+                self = $.self,
+                state = $.state,
+                text = _mask.text,
+                n = state.n,
+                pattern = state.pattern;
+            if (!_active && !_attach) {
+                return $;
+            }
+            if (!isArray(v)) {
+                v = [v, v];
+            }
+            if (_tags.size >= state.max) {
+                return $.fire('max.tags', [_event, v[0]]);
+            }
+            if (isFunction(_valid)) {
+                v[0] = _valid.call($, v[0]);
+            }
+            if ("" === v[0] || isString(pattern) && !toPattern(pattern).test(v[0])) {
+                return $.fire('not.tag', [_event, v[0]]);
+            }
+            if (hasKeyInMap(v[0], _tags)) {
+                return $.fire('has.tag', [_event, v[0]]);
+            }
+            $.fire('is.tag', [_event, v[0]]);
+            var tag = setElement('span', {
+                    'class': n + '__tag',
+                    'data-value': v[0],
+                    'tabindex': _active ? -1 : false
+                }),
+                tagText = setElement('span', fromHTML((_v$ = v[1]) != null ? _v$ : v[0])),
+                tagX = setElement('span', {
+                    'class': n + '__x',
+                    'tabindex': -1
+                });
+            if (_active) {
+                onEvent('blur', tag, onBlurTag);
+                onEvent('contextmenu', tag, onContextMenuTag);
+                onEvent('copy', tag, onCopyTag);
+                onEvent('cut', tag, onCutTag);
+                onEvent('focus', tag, onFocusTag);
+                onEvent('keydown', tag, onKeyDownTag);
+                onEvent('keyup', tag, onKeyUpTag);
+                onEvent('mousedown', tag, onPointerDownTag);
+                onEvent('mousedown', tagX, onPointerDownTagX);
+                onEvent('paste', tag, onPasteTag);
+                onEvent('touchstart', tag, onPointerDownTag);
+                onEvent('touchstart', tagX, onPointerDownTagX);
+                setReference(tag, $);
+            }
+            setChildLast(tag, tagText);
+            setChildLast(tag, tagX);
+            if (isInteger(at) && at >= 0) {
+                var tags = toKeysFromMap(_tags);
+                tags.splice(at, 0, v[0]);
+                $._tags = new Map();
+                setValueInMap(v[0], tag, _tags);
+                if (isFunction(_set)) {
+                    _set.call($, tag);
+                }
+                forEachArray(tags, function (k) {
+                    var v;
+                    setValueInMap(k, v = getValueInMap(k, _tags), $._tags);
+                    setPrev(text, v);
+                });
+            } else {
+                setValueInMap(v[0], tag, $._tags);
+                if (isFunction(_set)) {
+                    _set.call($, tag);
+                }
+                setPrev(text, tag);
+            }
+            self.value = toKeysFromMap($._tags).join(state.join);
+            $.fire('set.tag', [_event, v[0]]);
+            if (!_skipHookChange) {
+                $.fire('change', [_event, v[0]]);
+            }
+            return $;
+        }
+    });
+    // In order for an object to be iterable, it must have a `Symbol.iterator` key
+    getPrototype(TagPickerTags)[Symbol.iterator] = function () {
+        return this.values[Symbol.iterator]();
+    };
+    TagPicker.Tags = TagPickerTags;
     return TagPicker;
 }));
