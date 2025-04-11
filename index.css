@@ -46,17 +46,22 @@
   flex: 1;
 }
 .tag-picker__self {
-  background: #000;
+  background: 0 0;
+  border-radius: 0;
   border: 0;
   bottom: 0;
+  box-shadow: none;
+  color: transparent;
   font: 0/0 a;
   height: 1px;
   left: 0;
   margin: 0;
+  opacity: 0;
   outline: 0;
   overflow: hidden;
   padding: 0;
   position: absolute;
+  text-shadow: none;
   width: 1px;
 }
 .tag-picker__tag,
