@@ -17,7 +17,7 @@
   },
   "description": "Better tags input interaction with JavaScript.",
   "devDependencies": {
-    "@taufik-nurrohman/factory": "^2.2.4"
+    "@taufik-nurrohman/factory": "*"
   },
   "exports": {
     "import": "./index.mjs",

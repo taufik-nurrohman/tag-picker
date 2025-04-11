@@ -1,7 +1,7 @@
 extends ../_index.pug
 
 block state
-  - const scripts = ['../index.min.js']
+  - const scripts = ['../index.js']
   - const styles = ['../index.min.css']
   - const title = 'Tag Picker'
 
@@ -12,17 +12,7 @@ block script
 block style
   style
     | .tag-picker {
-    |  border-width: 2px;
-    |  width: 100%;
-    | }
-    | .tag-picker.tag-picker--focus {
-    |   border-color: #f00;
-    | }
-    | .tag-picker.tag-picker--focus-tag {
-    |   background: #0f0;
-    | }
-    | .tag-picker.tag-picker--focus-text {
-    |   background: #ff0;
+    |   width: 100%;
     | }
 
 block content

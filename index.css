@@ -1,15 +1,19 @@
-.tag-picker__text,
-.tag-picker__tag {
+.tag-picker__tag,
+.tag-picker__text {
   align-items: center;
   border: 1px solid;
   border-color: inherit;
   display: flex;
   gap: 0.25em;
-  justify-content: center;
-  overflow: hidden;
   padding: 0 0.25em;
-  position: relative;
-  text-decoration: none;
+}
+
+.tag-picker__flex {
+  border-color: inherit;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  padding: 1px;
 }
 
 .tag-picker,
@@ -28,38 +32,41 @@
   position: relative;
   vertical-align: middle;
 }
+.tag-picker[aria-disabled=true] {
+  color: rgb(128, 128, 128);
+  cursor: not-allowed;
+}
+.tag-picker[aria-disabled=true] * {
+  pointer-events: none;
+}
+.tag-picker[aria-disabled=true] .tag-picker__tag[aria-selected=true] {
+  background: rgba(0, 0, 255, 0.25);
+}
+.tag-picker__flex {
+  flex: 1;
+}
 .tag-picker__self {
   left: -9999px;
   position: fixed;
   top: -9999px;
 }
-.tag-picker__self:disabled + .tag-picker {
-  color: rgb(128, 128, 128);
-}
-.tag-picker__self:disabled + .tag-picker,
-.tag-picker__self:disabled + .tag-picker * {
-  cursor: not-allowed;
-}
-.tag-picker__self:read-only + .tag-picker .tag-picker__x {
-  cursor: not-allowed;
-}
-.tag-picker__flex {
-  border-color: inherit;
-  display: flex;
-  flex-wrap: wrap;
-  flex: 1;
-  gap: 1px;
-  padding: 1px;
+.tag-picker__tag,
+.tag-picker__text {
+  overflow: hidden;
+  position: relative;
 }
 .tag-picker__tag {
-  cursor: pointer;
+  user-select: none;
+}
+.tag-picker__tag[aria-selected=true] {
+  background: rgba(0, 0, 255, 0.5);
+}
+.tag-picker__tag[aria-selected=true][aria-disabled=true] {
+  background: rgba(0, 0, 255, 0.25);
 }
 .tag-picker__tag:focus {
-  outline: 2px solid;
+  outline: 1px solid;
   outline-offset: -2px;
-}
-.tag-picker__tag--selected {
-  background: rgba(0, 0, 255, 0.5);
 }
 .tag-picker__tag ::selection {
   background-color: transparent;

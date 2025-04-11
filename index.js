@@ -114,9 +114,6 @@
     var isDefined = function isDefined(x) {
         return 'undefined' !== typeof x;
     };
-    var isFunction = function isFunction(x) {
-        return 'function' === typeof x;
-    };
     var isInstance = function isInstance(x, of, exact) {
         if (!x || 'object' !== typeof x) {
             return false;
@@ -125,9 +122,6 @@
             return isSet(of) && isSet(x.constructor) && of === x.constructor;
         }
         return isSet(of) && x instanceof of ;
-    };
-    var isInteger = function isInteger(x) {
-        return isNumber(x) && 0 === x % 1;
     };
     var isNull = function isNull(x) {
         return null === x;
@@ -155,10 +149,6 @@
     };
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
-    };
-    var fromHTML = function fromHTML(x, escapeQuote) {
-        x = x.replace(/&/g, '&amp;').replace(/>/g, '&gt;').replace(/</g, '&lt;');
-        return x;
     };
     var _fromStates = function fromStates() {
         for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -322,25 +312,6 @@
         }
         return object;
     };
-    var forEachSet = function forEachSet(set, at) {
-        for (var _iterator2 = _createForOfIteratorHelperLoose(set.entries()), _step2; !(_step2 = _iterator2()).done;) {
-            var _step2$value = _maybeArrayLike(_slicedToArray, _step2.value, 2),
-                k = _step2$value[0],
-                v = _step2$value[1];
-            v = at(v, k);
-            if (-1 === v) {
-                letValueInMap(k, set);
-                continue;
-            }
-            if (0 === v) {
-                break;
-            }
-            if (1 === v) {
-                continue;
-            }
-        }
-        return set;
-    };
     var getPrototype = function getPrototype(of) {
         return of.prototype;
     };
@@ -349,9 +320,6 @@
     };
     var getValueInMap = function getValueInMap(k, map) {
         return map.get(k);
-    };
-    var hasKeyInMap = function hasKeyInMap(k, map) {
-        return map.has(k);
     };
     var letValueInMap = function letValueInMap(k, map) {
         return map.delete(k);
@@ -378,31 +346,8 @@
     var setValueInMap = function setValueInMap(k, v, map) {
         return map.set(k, v);
     };
-    var toKeysFromMap = function toKeysFromMap(map) {
-        var r = [];
-        return forEachMap(map, function (v, k) {
-            r.push(k);
-        }), r;
-    };
-    var toValueFirstFromMap = function toValueFirstFromMap(map) {
-        return toValuesFromMap(map).shift();
-    };
-    var toValueLastFromMap = function toValueLastFromMap(map) {
-        return toValuesFromMap(map).pop();
-    };
-    var toValuesFromMap = function toValuesFromMap(map) {
-        var r = [];
-        return forEachMap(map, function (v) {
-            r.push(v);
-        }), r;
-    };
     var references = new WeakMap();
-
-    function _toArray(iterable) {
-        return Array.from(iterable);
-    }
     var D = document;
-    var W = window;
     var getAttribute = function getAttribute(node, attribute, parseValue) {
         if (parseValue === void 0) {
             parseValue = true;
@@ -412,27 +357,6 @@
         }
         var value = node.getAttribute(attribute);
         return parseValue ? _toValue(value) : value;
-    };
-    var getChild = function getChild(parent, index, anyNode) {
-        return getChildren(parent, index || 0, anyNode);
-    };
-    var getChildFirst = function getChildFirst(parent, anyNode) {
-        return parent['first' + (anyNode ? "" : 'Element') + 'Child'] || null;
-    };
-    var getChildren = function getChildren(parent, index, anyNode) {
-        var children = _toArray(parent['child' + (anyNode ? 'Nodes' : 'ren')]);
-        return isNumber(index) ? children[index] || null : children;
-    };
-    var getDatum = function getDatum(node, datum, parseValue) {
-        var value = getAttribute(node, 'data-' + datum, parseValue);
-        (value + "").trim();
-        return value;
-    };
-    var getElement = function getElement(query, scope) {
-        return (scope || D).querySelector(query);
-    };
-    var getElements = function getElements(query, scope) {
-        return _toArray((scope || D).querySelectorAll(query));
     };
     var getID = function getID(node, batch) {
         if (batch === void 0) {
@@ -465,9 +389,6 @@
         }
         return getParent(node, state);
     };
-    var getPrev = function getPrev(node, anyNode) {
-        return node['previous' + ('Element') + 'Sibling'] || null;
-    };
     var getText = function getText(node, trim) {
         if (trim === void 0) {
             trim = true;
@@ -480,9 +401,6 @@
         content = trim ? content.trim() : content;
         return "" !== content ? content : null;
     };
-    var getType = function getType(node) {
-        return node && node.nodeType || null;
-    };
     var getValue = function getValue(node, parseValue) {
         var value = (node.value || "").replace(/\r?\n|\r/g, '\n');
         value = value;
@@ -490,9 +408,6 @@
     };
     var hasAttribute = function hasAttribute(node, attribute) {
         return node.hasAttribute(attribute);
-    };
-    var hasClass = function hasClass(node, value) {
-        return node.classList.contains(value);
     };
     var hasID = function hasID(node) {
         return hasAttribute(node, 'id');
@@ -521,15 +436,11 @@
     var letDatum = function letDatum(node, datum) {
         return letAttribute(node, 'data-' + datum);
     };
-    var letElement = function letElement(node) {
-        var parent = getParent(node);
-        return node.remove(), parent;
-    };
     var letHTML = function letHTML(node) {
         var state = 'innerHTML';
         return hasState(node, state) && (node[state] = ""), node;
     };
-    var letStyle$1 = function letStyle(node, style) {
+    var letStyle = function letStyle(node, style) {
         return node.style[toCaseCamel(style)] = null, node;
     };
     var setAria = function setAria(node, aria, value) {
@@ -636,10 +547,7 @@
     var setNext = function setNext(current, node) {
         return getParent(current).insertBefore(node, getNext(current, true)), node;
     };
-    var setPrev = function setPrev(current, node) {
-        return getParent(current).insertBefore(node, current), node;
-    };
-    var setStyle$1 = function setStyle(node, style, value) {
+    var setStyle = function setStyle(node, style, value) {
         if (isNumber(value)) {
             value += 'px';
         }
@@ -647,7 +555,7 @@
     };
     var setStyles = function setStyles(node, styles) {
         return forEachObject(styles, function (v, k) {
-            v || "" === v || 0 === v ? setStyle$1(node, k, v) : letStyle$1(node, k);
+            v || "" === v || 0 === v ? setStyle(node, k, v) : letStyle(node, k);
         }), node;
     };
     var setText = function setText(node, content, trim) {
@@ -660,19 +568,7 @@
         var state = 'textContent';
         return hasState(node, state) && (node[state] = trim ? content.trim() : content), node;
     };
-    var toggleClass = function toggleClass(node, name, force) {
-        return node.classList.toggle(name, force), node;
-    };
     var theID = {};
-    var delay = function delay(then, time) {
-        return function () {
-            var _arguments2 = arguments,
-                _this2 = this;
-            setTimeout(function () {
-                return then.apply(_this2, _arguments2);
-            }, time);
-        };
-    };
 
     function hook($, $$) {
         $$ = $$ || $;
@@ -725,724 +621,158 @@
         };
         return $.hooks = {}, $;
     }
-    var offEvent = function offEvent(name, node, then) {
-        node.removeEventListener(name, then);
-    };
-    var offEventDefault = function offEventDefault(e) {
-        return e && e.preventDefault();
-    };
-    var offEventPropagation = function offEventPropagation(e) {
-        return e && e.stopPropagation();
-    };
-    var onEvent = function onEvent(name, node, then, options) {
-        if (options === void 0) {
-            options = false;
-        }
-        node.addEventListener(name, then, options);
-    };
-    var _getSelection = function _getSelection() {
-        return D.getSelection();
-    };
-    var _setRange = function _setRange() {
-        return D.createRange();
-    };
-    // <https://stackoverflow.com/a/6691294/1163000>
-    // The `node` parameter is currently not in use
-    var insertAtSelection = function insertAtSelection(node, content, mode, selection) {
-        selection = selection || _getSelection();
-        var from, range, to;
-        if (selection.rangeCount) {
-            range = selection.getRangeAt(0);
-            range.deleteContents();
-            to = D.createDocumentFragment();
-            var nodeCurrent, nodeFirst, nodeLast;
-            if (isString(content)) {
-                from = setElement('div');
-                setHTML(from, content);
-                while (nodeCurrent = getChildFirst(from, 1)) {
-                    nodeLast = setChildLast(to, nodeCurrent);
-                }
-            } else if (isArray(content)) {
-                forEachArray(content, function (v) {
-                    return nodeLast = setChildLast(to, v);
-                });
-            } else {
-                nodeLast = setChildLast(to, content);
-            }
-            nodeFirst = getChildFirst(to, 1);
-            range.insertNode(to);
-            if (nodeLast) {
-                range = range.cloneRange();
-                range.setStartAfter(nodeLast);
-                range.setStartBefore(nodeFirst);
-                setSelection(node, range, selectToNone(selection));
-            }
-        }
-        return selection;
-    };
-    // The `node` parameter is currently not in use
-    var letSelection = function letSelection(node, selection) {
-        selection = selection || _getSelection();
-        return selection.empty(), selection;
-    };
-    // <https://stackoverflow.com/a/13950376/1163000>
-    var restoreSelection = function restoreSelection(node, store, selection) {
-        var index = 0,
-            range = _setRange();
-        range.setStart(node, 0);
-        range.collapse(true);
-        var exit,
-            hasStart,
-            nodeCurrent,
-            nodeStack = [node];
-        while (!exit && (nodeCurrent = nodeStack.pop())) {
-            if (3 === getType(nodeCurrent)) {
-                var indexNext = index + toCount(nodeCurrent);
-                if (!hasStart && store[0] >= index && store[0] <= indexNext) {
-                    range.setStart(nodeCurrent, store[0] - index);
-                    hasStart = true;
-                }
-                if (hasStart && store[1] >= index && store[1] <= indexNext) {
-                    exit = true;
-                    range.setEnd(nodeCurrent, store[1] - index);
-                }
-                index = indexNext;
-            } else {
-                forEachArray(getChildren(nodeCurrent, null, 1), function (v) {
-                    return nodeStack.push(v);
-                });
-            }
-        }
-        return setSelection(node, range, letSelection(node, selection));
-    };
-    var selectTo = function selectTo(node, mode, selection) {
-        selection = selection || _getSelection();
-        letSelection(node, selection);
-        var range = _setRange();
-        range.selectNodeContents(node);
-        selection = setSelection(node, range, selection);
-        if (1 === mode) {
-            selection.collapseToEnd();
-        } else if (-1 === mode) {
-            selection.collapseToStart();
-        } else;
-    };
-    var selectToNone = function selectToNone(selection) {
-        selection = selection || _getSelection();
-        // selection.removeAllRanges();
-        if (selection.rangeCount) {
-            selection.removeRange(selection.getRangeAt(0));
-        }
-        return selection;
-    };
-    // The `node` parameter is currently not in use
-    var setSelection = function setSelection(node, range, selection) {
-        selection = selection || _getSelection();
-        if (isArray(range)) {
-            return restoreSelection(node, range, selection);
-        }
-        return selection.addRange(range), selection;
-    };
-    var isPattern = function isPattern(pattern) {
-        return isInstance(pattern, RegExp);
-    };
-    var toPattern = function toPattern(pattern, opt) {
-        if (isPattern(pattern)) {
-            return pattern;
-        }
-        return new RegExp(pattern, isSet(opt) ? opt : 'g');
-    };
-    var KEY_A = 'a';
-    var KEY_ARROW_LEFT = 'ArrowLeft';
-    var KEY_ARROW_RIGHT = 'ArrowRight';
-    var KEY_BEGIN = 'Home';
-    var KEY_DELETE_LEFT = 'Backspace';
-    var KEY_DELETE_RIGHT = 'Delete';
-    var KEY_END = 'End';
-    var KEY_ENTER = 'Enter';
-    var KEY_ESCAPE = 'Escape';
-    var KEY_TAB = 'Tab';
     var name = 'TagPicker';
 
-    function focusTo(node) {
-        return node.focus(), node;
-    }
-
-    function getCharBeforeCaret(node) {
-        var range,
-            selection = W.getSelection();
-        if (selection.rangeCount) {
-            range = selection.getRangeAt(0).cloneRange();
-            range.collapse(true);
-            range.setStart(node, 0);
-            return (range + "").slice(-1);
-        }
+    function createTagsFrom() {
+        return [];
     }
 
     function getTagValue(tag) {
         return getDatum(tag, 'value', false);
     }
-    var _keyIsCtrl = false,
-        _keyIsShift = false;
 
-    function onBlurTag(e) {
-        selectToNone();
-        var $ = this,
-            picker = getReference($);
-        picker._mask;
-        var _tags = picker._tags,
-            mask = picker.mask,
-            state = picker.state,
-            n = state.n;
-        picker._event = e;
-        if (!_keyIsCtrl && !_keyIsShift) {
-            forEachMap(_tags, function (v) {
-                return letClass(v, n + '__tag--selected');
-            });
+    function TagPicker(self, state) {
+        var $ = this;
+        if (!self) {
+            return $;
         }
-        letClass(mask, n += '--focus');
-        letClass(mask, n += '-tag');
+        // Return new instance if `TagPicker` was called without the `new` operator
+        if (!isInstance($, TagPicker)) {
+            return new TagPicker(self, state);
+        }
+        setReference(self, hook($, TagPicker._));
+        var newState = _fromStates({}, TagPicker.state, isString(state) ? {
+            join: state
+        } : state || {});
+        // Special case for `state.escape`: replace instead of join the value(s)
+        if (isObject(state) && state.escape) {
+            newState.escape = state.escape;
+        }
+        return $.attach(self, newState);
     }
 
-    function onBlurTextInput(e) {
-        selectToNone();
-        var $ = this,
-            picker = getReference($),
-            _mask = picker._mask,
-            mask = picker.mask,
-            state = picker.state,
-            text = _mask.text,
-            n = state.n;
-        picker._event = e;
-        letClass(text, n + '__text--focus');
-        letClass(mask, n += '--focus');
-        letClass(mask, n += '-text');
-        picker.fire('blur', [e]);
+    function TagPickerTags(of, tags) {
+        var $ = this;
+        // Return new instance if `TagPickerTags` was called without the `new` operator
+        if (!isInstance($, TagPickerTags)) {
+            return new TagPickerTags(of, tags);
+        }
+        $.of = of;
+        $.values = new Map();
+        if (tags) {
+            createTagsFrom(of, tags, of._mask.flex);
+        }
+        return $;
     }
-
-    function onContextMenuTag(e) {
-        var $ = this,
-            picker = getReference($),
-            state = picker.state,
-            n = state.n + '__tag--selected';
-        picker._event = e;
-        setClass($, n);
-        focusTo($), selectTo(getChildFirst($));
-    }
-
-    function onCopyTag(e) {
-        var $ = this,
-            picker = getReference($),
-            _tags = picker._tags,
-            state = picker.state,
-            n = state.n + '__tag--selected';
-        var selection = [];
-        picker._event = e;
-        forEachMap(_tags, function (v, k) {
-            if (hasClass(v, n)) {
-                selection.push(k);
+    TagPicker.from = function (self, state) {
+        return new TagPicker(self, state);
+    };
+    TagPicker.of = getReference;
+    TagPicker.state = {
+        'escape': [','],
+        'join': ', ',
+        'max': Infinity,
+        'min': 0,
+        'n': 'tag-picker',
+        'pattern': null,
+        'tags': null,
+        'with': []
+    };
+    TagPicker.version = '4.1.0';
+    setObjectAttributes(TagPicker, {
+        name: {
+            value: name
+        }
+    }, 1);
+    setObjectAttributes(TagPicker, {
+        active: {
+            get: function get() {
+                return this._active;
+            },
+            set: function set(value) {
+                var $ = this;
+                return $;
             }
-        });
-        e.clipboardData.setData('text/plain', selection.join(state.join));
-        picker.fire('copy', [e, selection]).focus();
-        offEventDefault(e);
-    }
-
-    function onCutTag(e) {
-        var $ = this,
-            picker = getReference($),
-            _mask = picker._mask,
-            _tags = picker._tags,
-            state = picker.state;
-        _mask.input;
-        var n = state.n + '__tag--selected';
-        var selection = [];
-        picker._event = e;
-        forEachMap(_tags, function (v, k) {
-            if (hasClass(v, n)) {
-                selection.push(k), picker.let(k, 1);
+        },
+        fix: {
+            get: function get() {
+                return this._fix;
+            },
+            set: function set(value) {
+                var $ = this;
+                return $;
             }
-        });
-        e.clipboardData.setData('text/plain', selection.join(state.join));
-        picker.fire('cut', [e, selection]).fire('change', [e, getTagValue($)]).focus();
-        offEventDefault(e);
-    }
-
-    function onFocusTextInput(e) {
-        var $ = this,
-            picker = getReference($),
-            _mask = picker._mask,
-            _tags = picker._tags,
-            mask = picker.mask,
-            self = picker.self,
-            state = picker.state,
-            hint = _mask.hint,
-            input = _mask.input,
-            text = _mask.text,
-            n = state.n;
-        picker._event = e;
-        forEachMap(_tags, function (v) {
-            return letClass(v, n + '__tag--selected');
-        });
-        setClass(text, n + '__text--focus');
-        setClass(mask, n += '--focus');
-        setClass(mask, n += '-text');
-        delay(function () {
-            return setText(hint, getText(input, false) ? "" : self.placeholder);
-        }, 1)();
-        picker.focus().fire('focus', [e]);
-    }
-
-    function onFocusSelf(e) {
-        var $ = this,
-            picker = getReference($);
-        picker._event = e;
-        picker.focus();
-    }
-
-    function onInvalidSelf(e) {
-        var $ = this,
-            picker = getReference($);
-        picker._event = e;
-        picker.fire('min.tags', [e]).focus(), offEventDefault(e); // Disable native validation tooltip for required input(s)
-    }
-
-    function onFocusTag(e) {
-        var $ = this,
-            picker = getReference($);
-        picker._mask;
-        var mask = picker.mask,
-            state = picker.state,
-            n = state.n;
-        picker._event = e;
-        setClass(mask, n += '--focus');
-        setClass(mask, n += '-tag');
-        picker.fire('focus.tag', [e]);
-    }
-
-    function onKeyDownTag(e) {
-        var $ = this,
-            exit,
-            key = e.key,
-            keyIsCtrl = _keyIsCtrl = e.ctrlKey,
-            keyIsShift = _keyIsShift = e.shiftKey,
-            picker = getReference($),
-            _mask = picker._mask,
-            _tags = picker._tags;
-        picker.mask;
-        var state = picker.state,
-            text = _mask.text,
-            prevTag = getPrev($),
-            nextTag = getNext($),
-            firstTag,
-            lastTag,
-            n = state.n + '__tag--selected',
-            v;
-        picker._event = e;
-        if (keyIsShift) {
-            setClass($, n), selectTo(getChildFirst($));
-            if (KEY_ARROW_LEFT === key) {
-                if (prevTag) {
-                    if (hasClass(prevTag, n)) {
-                        letClass($, n);
-                    } else {
-                        setClass(prevTag, n);
-                    }
-                    focusTo(prevTag), selectTo(getChildFirst(prevTag));
-                }
-                exit = true;
-            } else if (KEY_ARROW_RIGHT === key) {
-                if (nextTag && text !== nextTag) {
-                    if (hasClass(nextTag, n)) {
-                        letClass($, n);
-                    } else {
-                        setClass(nextTag, n);
-                    }
-                    focusTo(nextTag), selectTo(getChildFirst(nextTag));
-                }
-                exit = true;
+        },
+        max: {
+            get: function get() {},
+            set: function set(value) {
+                var $ = this;
+                return $;
             }
-        } else if (keyIsCtrl) {
-            if (KEY_A === key) {
-                forEachMap(_tags, function (v) {
-                    focusTo(v), selectTo(getChildFirst(v));
-                    setClass(v, n);
+        },
+        min: {
+            get: function get() {},
+            set: function set(value) {
+                var $ = this;
+                return $;
+            }
+        },
+        tags: {
+            get: function get() {
+                return this._tags;
+            },
+            set: function set(options) {
+                var $ = this,
+                    values = [];
+                forEachMap($._tags, function (v) {
+                    return values.push(getTagValue(v[2]));
                 });
-                exit = true;
-            } else if (KEY_ARROW_LEFT === key) {
-                prevTag && focusTo(prevTag);
-                exit = true;
-            } else if (KEY_ARROW_RIGHT === key) {
-                nextTag && text !== nextTag ? focusTo(nextTag) : picker.focus();
-                exit = true;
-            } else if (KEY_ENTER === key || ' ' === key) {
-                toggleClass($, n);
-                if (hasClass($, n)) {
-                    focusTo($), selectTo(getChildFirst($));
-                } else {
-                    selectTo(getChildFirst(toValueLastFromMap(_tags)));
-                }
-                exit = true;
+                return $.fire('set.tags', [values]);
             }
-        } else {
-            var selection = [];
-            forEachMap(_tags, function (v, k) {
-                if (hasClass(v, n)) {
-                    selection.push(k);
+        },
+        text: {
+            get: function get() {
+                return getText(this._mask.input);
+            },
+            set: function set(value) {
+                var $ = this,
+                    _active = $._active,
+                    _mask = $._mask,
+                    hint = _mask.hint,
+                    input = _mask.input,
+                    v;
+                if (!_active) {
+                    return $;
                 }
-                if ($ !== v) {
-                    letClass(v, n);
-                }
-            });
-            if (KEY_BEGIN === key) {
-                firstTag = toValueFirstFromMap(_tags);
-                firstTag && focusTo(firstTag);
-                exit = true;
-            } else if (KEY_END === key) {
-                lastTag = toValueLastFromMap(_tags);
-                lastTag && focusTo(lastTag);
-                exit = true;
-            } else if (KEY_ENTER === key || ' ' === key) {
-                toggleClass($, n);
-                if (hasClass($, n)) {
-                    focusTo($), selectTo(getChildFirst($));
-                } else {
-                    selectTo(getChildFirst(toValueLastFromMap(_tags)));
-                }
-                exit = true;
-            } else if (KEY_ARROW_LEFT === key) {
-                prevTag && focusTo(prevTag);
-                exit = true;
-            } else if (KEY_ARROW_RIGHT === key) {
-                nextTag && text !== nextTag ? focusTo(nextTag) : picker.focus();
-                exit = true;
-            } else if (KEY_DELETE_LEFT === key) {
-                picker.let(v = getTagValue($), 1);
-                if (toCount(selection) > 1) {
-                    var c, current;
-                    while (current = selection.pop()) {
-                        prevTag = (c = getValueInMap(current, _tags)) && getPrev(c);
-                        picker.let(current, 1);
-                    }
-                }
-                picker.fire('change', [e, v]);
-                prevTag ? (focusTo(prevTag), selectTo(getChildFirst(prevTag))) : picker.focus();
-                exit = true;
-            } else if (KEY_DELETE_RIGHT === key) {
-                picker.let(v = getTagValue($), 1);
-                if (toCount(selection) > 1) {
-                    var _current;
-                    while (_current = selection.shift()) {
-                        nextTag = (getValueInMap(_current, _tags)) && getNext(_current);
-                        picker.let(_current, 1);
-                    }
-                }
-                picker.fire('change', [e, v]);
-                nextTag && text !== nextTag ? (focusTo(nextTag), selectTo(getChildFirst(nextTag))) : picker.focus();
-                exit = true;
-            } else if (KEY_ESCAPE === key || KEY_TAB === key) {
-                picker.focus();
-                exit = true;
-            } else {
-                picker.focus();
-                exit = false;
+                setText(input, v = _fromValue(value));
+                return v ? setStyle(hint, 'color', 'transparent') : letStyle(hint, 'color'), $;
             }
-        }
-        exit && offEventDefault(e);
-    }
-
-    function onKeyUpTag(e) {
-        var $ = this,
-            key = e.key,
-            picker = getReference($),
-            _tags = picker._tags,
-            state = picker.state,
-            n = state.n + '__tag--selected';
-        picker._event = e;
-        if (_keyIsShift) {
-            if (KEY_ARROW_LEFT === key || KEY_ARROW_RIGHT === key);
-            else {
-                var selection = 0;
-                forEachMap(_tags, function (v) {
-                    if (hasClass(v, n)) {
-                        ++selection;
-                    }
+        },
+        value: {
+            get: function get() {
+                var value = getValue(this.self);
+                return "" !== value ? value : null;
+            },
+            set: function set(value) {
+                var $ = this,
+                    state = $.state;
+                if ($.value) {
+                    forEachArray($.value.split(state.join), function (v) {
+                        return $.let(v, 0);
+                    });
+                }
+                forEachArray(value.split(state.join), function (v) {
+                    return $.set(v, 0);
                 });
-                if (selection < 2) {
-                    letClass($, n);
-                }
+                return $;
             }
         }
-        _keyIsCtrl = _keyIsShift = false;
-    }
-
-    function onBeforeInputTextInput(e) {
-        var $ = this,
-            data = e.data,
-            picker = getReference($),
-            state = picker.state,
-            escape = state.escape;
-        var key = isString(data) && 1 === toCount(data) ? data : 0;
-        picker._event = e;
-        if ('\n' === key && (hasValue('\n', escape) || hasValue(13, escape)) || '\t' === key && (hasValue('\t', escape) || hasValue(9, escape)) || hasValue(key, escape)) {
-            return picker.set(getText($)).focus().text = "", offEventDefault(e);
+    });
+    setObjectAttributes(TagPickerTags, {
+        name: {
+            value: name + 'Tags'
         }
-    }
-
-    function onKeyDownTextInput(e) {
-        var $ = this,
-            exit,
-            key = e.key,
-            keyCode = e.keyCode,
-            keyIsCtrl = _keyIsCtrl = e.ctrlKey,
-            keyIsShift = _keyIsShift = e.shiftKey,
-            picker = getReference($),
-            _active = picker._active,
-            _mask = picker._mask,
-            _tags = picker._tags;
-        picker.mask;
-        var self = picker.self,
-            state = picker.state,
-            hint = _mask.hint,
-            n = state.n + '__tag--selected',
-            firstTag,
-            lastTag;
-        escape = state.escape;
-        if (!_active) {
-            return offEventDefault(e);
-        }
-        picker._event = e;
-        if (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape)) || KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape)) || hasValue(key, escape) || hasValue(keyCode, escape)) {
-            return picker.set(getText($)).focus().text = "", offEventDefault(e);
-        }
-        delay(function () {
-            return setText(hint, getText($, false) ? "" : self.placeholder);
-        }, 1)();
-        var caretIsToTheFirst = "" === getCharBeforeCaret($),
-            textIsVoid = null === getText($, false);
-        if (keyIsShift) {
-            if (textIsVoid || caretIsToTheFirst) {
-                if (KEY_ARROW_LEFT === key) {
-                    lastTag = toValueLastFromMap(_tags);
-                    if (lastTag) {
-                        lastTag && (focusTo(lastTag), selectTo(getChildFirst(lastTag)));
-                        setClass(lastTag, n);
-                        exit = true;
-                    }
-                }
-            }
-        } else if (keyIsCtrl) {
-            if (KEY_A === key && null === getText($, false) && null !== (picker.value)) {
-                forEachMap(_tags, function (v) {
-                    focusTo(v), selectTo(getChildFirst(v));
-                    setClass(v, n);
-                });
-                exit = true;
-            } else if (KEY_BEGIN === key) {
-                firstTag = toValueFirstFromMap(_tags);
-                firstTag && focusTo(firstTag);
-                exit = true;
-            } else if (KEY_END === key) {
-                lastTag = toValueLastFromMap(_tags);
-                lastTag && focusTo(lastTag);
-                exit = true;
-            } else if (KEY_ARROW_LEFT === key) {
-                lastTag = toValueLastFromMap(_tags);
-                lastTag && focusTo(lastTag);
-                exit = true;
-            } else if (KEY_DELETE_LEFT === key) {
-                lastTag = toValueLastFromMap(_tags);
-                lastTag && picker.let(getTagValue(lastTag));
-                picker.focus();
-                exit = true;
-            }
-        } else {
-            if (KEY_ENTER === key) {
-                var form = getParentForm(self);
-                if (form && isFunction(form.requestSubmit)) {
-                    // <https://developer.mozilla.org/en-US/docs/Glossary/Submit_button>
-                    var submit = getElement('button:not([type]),button[type=submit],input[type=image],input[type=submit]', form);
-                    submit ? form.requestSubmit(submit) : form.requestSubmit();
-                }
-                exit = true;
-            } else if (textIsVoid) {
-                if (KEY_BEGIN === key) {
-                    firstTag = toValueFirstFromMap(_tags);
-                    firstTag && focusTo(firstTag);
-                    exit = true;
-                } else if (KEY_END === key) {
-                    lastTag = toValueLastFromMap(_tags);
-                    lastTag && focusTo(lastTag);
-                    exit = true;
-                } else if (KEY_ARROW_LEFT === key) {
-                    lastTag = toValueLastFromMap(_tags);
-                    lastTag && focusTo(lastTag);
-                    exit = true;
-                } else if (KEY_DELETE_LEFT === key) {
-                    lastTag = toValueLastFromMap(_tags);
-                    lastTag && picker.let(getTagValue(lastTag));
-                    picker.focus();
-                    exit = true;
-                }
-            } else if (caretIsToTheFirst) {
-                if (KEY_ARROW_LEFT === key) {
-                    lastTag = toValueLastFromMap(_tags);
-                    lastTag && focusTo(lastTag);
-                    exit = true;
-                }
-            }
-        }
-        exit && offEventDefault(e);
-    }
-
-    function onKeyUpTextInput(e) {
-        var $ = this,
-            picker = getReference($);
-        picker._event = e;
-        _keyIsCtrl = _keyIsShift = false;
-    }
-
-    function onPasteTag(e) {
-        var $ = this,
-            picker = getReference($),
-            _tags = picker._tags,
-            state = picker.state,
-            n = state.n + '__tag--selected';
-        var isAllSelected = true,
-            value = (e.clipboardData || W.clipboardData).getData('text') + "";
-        picker._event = e;
-        try {
-            forEachMap(_tags, function (v) {
-                if (!hasClass(v, n)) {
-                    isAllSelected = false;
-                    throw "";
-                }
-            });
-        } catch (e) {}
-        // Delete all tag(s) before paste
-        if (isAllSelected && picker.value) {
-            forEachArray(picker.value.split(state.join), function (tag) {
-                return picker.let(tag, 1);
-            });
-        }
-        var values = value.split(state.join);
-        forEachArray(values, function (tag) {
-            return picker.set(tag, 1);
-        });
-        picker.fire('paste', [e, values]).focus().fire('change', [e]);
-        offEventDefault(e);
-    }
-
-    function onPasteTextInput(e) {
-        var $ = this,
-            picker = getReference($),
-            _mask = picker._mask,
-            self = picker.self,
-            state = picker.state,
-            hint = _mask.hint;
-        var value = (e.clipboardData || W.clipboardData).getData('text') + "";
-        picker._event = e;
-        insertAtSelection($, value), setText(hint, getText($) ? "" : self.placeholder);
-        delay(function () {
-            value = getText($);
-            picker.text = "";
-            if (value) {
-                var values = value.split(state.join);
-                forEachArray(values, function (tag) {
-                    return picker.set(tag, 1);
-                });
-                picker.fire('paste', [e, values]).fire('change', [e]);
-            }
-        }, 1)();
-        offEventDefault(e);
-    }
-
-    function onPointerDownTag(e) {
-        var $ = this,
-            picker = getReference($),
-            _active = picker._active,
-            _mask = picker._mask,
-            _tags = picker._tags,
-            state = picker.state,
-            text = _mask.text,
-            n = state.n + '__tag--selected';
-        if (!_active) {
-            return;
-        }
-        picker._event = e;
-        focusTo($), toggleClass($, n);
-        if (_keyIsCtrl);
-        else if (_keyIsShift) {
-            selectToNone();
-            var parentTag = getParent($),
-                selectedTags = getElements('.' + n, parentTag),
-                firstTag = selectedTags[0],
-                lastTag = selectedTags[toCount(selectedTags) - 1],
-                nextTag;
-            if (firstTag !== lastTag) {
-                while ((nextTag = getNext(firstTag)) && text !== nextTag) {
-                    if (firstTag === lastTag) {
-                        break;
-                    }
-                    setClass(firstTag = nextTag, n);
-                }
-            }
-        } else {
-            selectToNone();
-            var asContextMenu = 2 === e.button,
-                // Probably a “right-click”
-                selection = 0;
-            forEachMap(_tags, function (v) {
-                if (hasClass(v, n)) {
-                    ++selection;
-                }
-                if ($ !== v && !asContextMenu) {
-                    letClass(v, n);
-                }
-            });
-            // If it has selection(s) previously, use the event to cancel the other(s)
-            if (selection > 0) {
-                setClass($, n); // Then select the current tag
-            }
-        }
-        if (hasClass($, n)) {
-            focusTo($), selectTo(getChildFirst($));
-        } else {
-            selectTo(toValueLastFromMap(_tags));
-        }
-        picker.fire('touch.tag', [e]);
-        offEventDefault(e);
-        offEventPropagation(e);
-    }
-
-    function onPointerDownTagX(e) {
-        var $ = this,
-            tag = getParent($),
-            picker = getReference(tag);
-        picker._event = e;
-        offEvent('mousedown', $, onPointerDownTagX);
-        offEvent('touchstart', $, onPointerDownTagX);
-        picker.let(getTagValue(tag)).focus(), offEventDefault(e);
-    }
-
-    function onResetForm(e) {
-        var $ = this,
-            picker = getReference($);
-        picker._event = e;
-        picker.let().fire('reset', [e]);
-    }
-
-    function onSubmitForm(e) {
-        var $ = this,
-            picker = getReference($),
-            _tags = picker._tags,
-            state = picker.state;
-        picker._event = e;
-        if (_tags.size < state.min) {
-            return picker.fire('min.tags', [e]).focus(), offEventDefault(e);
-        }
-        return picker.fire('submit', [e]);
-    }
+    }, 1);
     TagPicker._ = setObjectMethods(TagPicker, {
         attach: function attach(self, state) {
             var $ = this;
@@ -1512,21 +842,9 @@
             setChildLast(text, textInput);
             setChildLast(text, textInputHint);
             setReference(textInput, $);
-            onEvent('beforeinput', textInput, onBeforeInputTextInput);
-            onEvent('blur', textInput, onBlurTextInput);
-            onEvent('cut', textInput, onCutTextInput);
-            onEvent('focus', textInput, onFocusTextInput);
-            onEvent('keydown', textInput, onKeyDownTextInput);
-            onEvent('mousedown', mask, onPointerDownMask);
-            onEvent('paste', textInput, onPasteTextInput);
-            onEvent('touchstart', mask, onPointerDownMask);
             setClass(self, n + '__self');
             setNext(self, mask);
-            onEvent('focus', self, onFocusSelf);
-            onEvent('invalid', self, onInvalidSelf);
             if (form) {
-                onEvent('reset', form, onResetForm);
-                onEvent('submit', form, onSubmitForm);
                 setID(form);
                 setReference(form, $);
             }
@@ -1547,14 +865,14 @@
             var _active = $._active,
                 _state2 = state,
                 tags = _state2.tags,
-                values;
+                values = [];
             // Force the `this._active` value to `true` to set the initial value
             $._active = true;
             // Attach the current tag(s)
             if (tags) {
-                values = createTagsFrom(of, tags, of._mask.flex);
+                values = createTagsFrom();
             } else if (theInputValue) {
-                values = createTagsFrom(of, theInputValue.split(state.join), of._mask.flex);
+                values = createTagsFrom($, theInputValue.split(state.join));
             }
             $._value = values.join(state.join);
             // After the initial value has been set, restore the previous `this._active` value
@@ -1581,396 +899,6 @@
                         v.attach.call($, self, state);
                     }
                 });
-            }
-            return $;
-        },
-        blur: function blur() {
-            selectToNone();
-            var $ = this,
-                _mask = $._mask,
-                input = _mask.input,
-                values = _mask.values;
-            forEachSet(values, function (v) {
-                return v.blur();
-            });
-            return input.blur();
-        },
-        detach: function detach() {
-            var $ = this,
-                _mask = $._mask,
-                mask = $.mask,
-                self = $.self,
-                state = $.state,
-                input = _mask.input;
-            var form = getParentForm(self);
-            $._active = false;
-            $._tags = new TagPickerTags($);
-            $._value = null;
-            if (form) {
-                offEvent('reset', form, onResetForm);
-                offEvent('submit', form, onSubmitForm);
-            }
-            offEvent('beforeinput', input, onBeforeInputTextInput);
-            offEvent('blur', input, onBlurTextInput);
-            offEvent('cut', input, onCutTextInput);
-            offEvent('focus', input, onFocusTextInput);
-            offEvent('focus', self, onFocusSelf);
-            offEvent('invalid', self, onInvalidSelf);
-            offEvent('keydown', input, onKeyDownTextInput);
-            offEvent('keyup', input, onKeyUpTextInput);
-            offEvent('mousedown', mask, onPointerDownMask);
-            offEvent('paste', input, onPasteTextInput);
-            offEvent('touchstart', mask, onPointerDownMask);
-            // Detach extension(s)
-            if (isArray(state.with)) {
-                forEachArray(state.with, function (v, k) {
-                    if (isString(v)) {
-                        v = OptionPicker[v];
-                    }
-                    if (isObject(v) && isFunction(v.detach)) {
-                        v.detach.call($, self, state);
-                    }
-                });
-            }
-            self.tabIndex = null;
-            letAria(self, 'hidden');
-            letClass(self, state.n + '__self');
-            letElement(mask);
-            $._mask = {
-                of: self
-            };
-            $.mask = null;
-            return $;
-        },
-        focus: function focus(mode) {
-            var $ = this,
-                _mask = $._mask,
-                input = _mask.input;
-            return focusTo(input), selectTo(input, mode), $;
-        },
-        reset: function reset(focus, mode) {
-            // let $ = this,
-            //     {_active, _value, _values, max} = $;
-            // if (!_active) {
-            //     return $;
-            // }
-            // if (max > 1) {
-            //     $.values = _values;
-            // } else {
-            //     $.value = _value;
-            // }
-            // return focus ? $.focus(mode) : $;
-        }
-    });
-
-    function TagPicker(self, state) {
-        var $ = this;
-        if (!self) {
-            return $;
-        }
-        // Return new instance if `TagPicker` was called without the `new` operator
-        if (!isInstance($, TagPicker)) {
-            return new TagPicker(self, state);
-        }
-        setReference(self, hook($, TagPicker._));
-        var newState = _fromStates({}, TagPicker.state, isString(state) ? {
-            join: state
-        } : state || {});
-        // Special case for `state.escape`: replace instead of join the value(s)
-        if (isObject(state) && state.escape) {
-            newState.escape = state.escape;
-        }
-        return $.attach(self, newState);
-    }
-
-    function TagPickerTags(of, tags) {
-        var $ = this;
-        // Return new instance if `TagPickerTags` was called without the `new` operator
-        if (!isInstance($, TagPickerTags)) {
-            return new TagPickerTags(of, tags);
-        }
-        $.of = of;
-        $.values = new Map();
-        if (tags) {
-            createTagsFrom(of, tags, of._mask.flex);
-        }
-        return $;
-    }
-    TagPicker.from = function (self, state) {
-        return new TagPicker(self, state);
-    };
-    TagPicker.of = getReference;
-    TagPicker.state = {
-        'escape': [','],
-        'join': ', ',
-        'max': Infinity,
-        'min': 0,
-        'n': 'tag-picker',
-        'pattern': null,
-        'tags': null,
-        'with': []
-    };
-    TagPicker.version = '4.1.0';
-    setObjectAttributes(TagPicker, {
-        name: {
-            value: name
-        }
-    }, 1);
-    setObjectAttributes(TagPicker, {
-        active: {
-            get: function get() {
-                return this._active;
-            },
-            set: function set(value) {
-                return $;
-            }
-        },
-        fix: {
-            get: function get() {
-                return this._fix;
-            },
-            set: function set(value) {
-                return $;
-            }
-        },
-        max: {
-            get: function get() {},
-            set: function set(value) {
-                return $;
-            }
-        },
-        min: {
-            get: function get() {},
-            set: function set(value) {
-                return $;
-            }
-        },
-        tags: {
-            get: function get() {
-                return this._tags;
-            },
-            set: function set(options) {
-                var values = [];
-                forEachMap($._tags, function (v) {
-                    return values.push(getTagValue(v[2]));
-                });
-                return $.fire('set.tags', [values]);
-            }
-        },
-        text: {
-            get: function get() {
-                return getText(this._mask.input);
-            },
-            set: function set(value) {
-                var $ = this,
-                    _active = $._active,
-                    _mask = $._mask,
-                    hint = _mask.hint,
-                    input = _mask.input,
-                    v;
-                if (!_active) {
-                    return $;
-                }
-                setText(input, v = fromValue(value));
-                return v ? setStyle(hint, 'color', 'transparent') : letStyle(hint, 'color'), $;
-            }
-        },
-        value: {
-            get: function get() {
-                var value = getValue(this.self);
-                return "" !== value ? value : null;
-            },
-            set: function set(value) {
-                var $ = this,
-                    state = $.state;
-                if ($.value) {
-                    forEachArray($.value.split(state.join), function (v) {
-                        return $.let(v, 0);
-                    });
-                }
-                forEachArray(value.split(state.join), function (v) {
-                    return $.set(v, 0);
-                });
-                return $;
-            }
-        }
-    });
-    setObjectAttributes(TagPickerTags, {
-        name: {
-            value: name + 'Tags'
-        }
-    }, 1);
-    setObjectMethods(TagPickerTags, {
-        _valid: function _valid(v) {
-            var $ = this,
-                state = $.state;
-            return (v || "").replace(/[^ -~]/g, ' ').split(state.join).join("").replace(/\s+/g, ' ').trim();
-        },
-        at: function at(key) {
-            return getValueInMap(toValue(key), this.values);
-        },
-        count: function count() {
-            return toMapCount(this.values);
-        },
-        delete: function _delete(key, _fireValue, _fireHook) {
-            var $ = this,
-                _active = $._active,
-                _event = $._event,
-                _let = $._let,
-                _tags = $._tags,
-                _value = $._value,
-                self = $.self,
-                state = $.state;
-            if (!_active) {
-                return $;
-            }
-            // Reset
-            if (!isDefined(v)) {
-                if ($.value) {
-                    forEachArray($.value.split(state.join), function (tag) {
-                        return $.let(tag, 1);
-                    });
-                }
-                return forEachArray(_value.split(state.join), function (tag) {
-                    return $.set(tag, 1);
-                }), $.fire('change', [_event]);
-            }
-            if (!isArray(v)) {
-                v = [v, v];
-            }
-            if (_tags.size < state.min + 1) {
-                return $.fire('min.tags', [_event, v[0]]);
-            }
-            if (!hasKeyInMap(v[0], _tags)) {
-                return $.fire('not.tag', [_event, v[0]]);
-            }
-            $.fire('is.tag', [_event, v[0]]);
-            var tag = getValueInMap(v[0], _tags);
-            getChild(tag, 0);
-            var tagX = getChild(tag, 1);
-            if (isFunction(_let)) {
-                _let.call($, tag);
-            }
-            offEvent('blur', tag, onBlurTag);
-            offEvent('contextmenu', tag, onContextMenuTag);
-            offEvent('copy', tag, onCopyTag);
-            offEvent('cut', tag, onCutTag);
-            offEvent('focus', tag, onFocusTag);
-            offEvent('keydown', tag, onKeyDownTag);
-            offEvent('keyup', tag, onKeyUpTag);
-            offEvent('mousedown', tag, onPointerDownTag);
-            offEvent('mousedown', tagX, onPointerDownTagX);
-            offEvent('paste', tag, onPasteTag);
-            offEvent('touchstart', tag, onPointerDownTag);
-            offEvent('touchstart', tagX, onPointerDownTagX);
-            letElement(tag);
-            letValueInMap(v[0], $._tags);
-            self.value = toKeysFromMap($._tags).join(state.join);
-            $.fire('let.tag', [_event, v[0]]);
-            if (!_skipHookChange) {
-                $.fire('change', [_event, v[0]]);
-            }
-            return $;
-        },
-        get: function get(key) {
-            var $ = this,
-                values = $.values,
-                value = getValueInMap(toValue(key), values);
-            return value ? getElementIndex(value[2]) : -1;
-        },
-        has: function has(key) {
-            return hasKeyInMap(toValue(key), this.values);
-        },
-        let: function _let(key, _fireHook) {
-            if (_fireHook === void 0) {
-                _fireHook = 1;
-            }
-            return this.delete(key, 1, _fireHook);
-        },
-        set: function set(key, value, _fireHook) {
-            var _v$;
-            var $ = this,
-                _active = $._active,
-                _event = $._event,
-                _mask = $._mask,
-                _set = $._set,
-                _tags = $._tags,
-                _valid = $._valid,
-                self = $.self,
-                state = $.state,
-                text = _mask.text,
-                n = state.n,
-                pattern = state.pattern;
-            if (!_active && !_attach) {
-                return $;
-            }
-            if (!isArray(v)) {
-                v = [v, v];
-            }
-            if (_tags.size >= state.max) {
-                return $.fire('max.tags', [_event, v[0]]);
-            }
-            if (isFunction(_valid)) {
-                v[0] = _valid.call($, v[0]);
-            }
-            if ("" === v[0] || isString(pattern) && !toPattern(pattern).test(v[0])) {
-                return $.fire('not.tag', [_event, v[0]]);
-            }
-            if (hasKeyInMap(v[0], _tags)) {
-                return $.fire('has.tag', [_event, v[0]]);
-            }
-            $.fire('is.tag', [_event, v[0]]);
-            var tag = setElement('span', {
-                    'class': n + '__tag',
-                    'data-value': v[0],
-                    'tabindex': _active ? -1 : false
-                }),
-                tagText = setElement('span', fromHTML((_v$ = v[1]) != null ? _v$ : v[0])),
-                tagX = setElement('span', {
-                    'class': n + '__x',
-                    'tabindex': -1
-                });
-            if (_active) {
-                onEvent('blur', tag, onBlurTag);
-                onEvent('contextmenu', tag, onContextMenuTag);
-                onEvent('copy', tag, onCopyTag);
-                onEvent('cut', tag, onCutTag);
-                onEvent('focus', tag, onFocusTag);
-                onEvent('keydown', tag, onKeyDownTag);
-                onEvent('keyup', tag, onKeyUpTag);
-                onEvent('mousedown', tag, onPointerDownTag);
-                onEvent('mousedown', tagX, onPointerDownTagX);
-                onEvent('paste', tag, onPasteTag);
-                onEvent('touchstart', tag, onPointerDownTag);
-                onEvent('touchstart', tagX, onPointerDownTagX);
-                setReference(tag, $);
-            }
-            setChildLast(tag, tagText);
-            setChildLast(tag, tagX);
-            if (isInteger(at) && at >= 0) {
-                var tags = toKeysFromMap(_tags);
-                tags.splice(at, 0, v[0]);
-                $._tags = new Map();
-                setValueInMap(v[0], tag, _tags);
-                if (isFunction(_set)) {
-                    _set.call($, tag);
-                }
-                forEachArray(tags, function (k) {
-                    var v;
-                    setValueInMap(k, v = getValueInMap(k, _tags), $._tags);
-                    setPrev(text, v);
-                });
-            } else {
-                setValueInMap(v[0], tag, $._tags);
-                if (isFunction(_set)) {
-                    _set.call($, tag);
-                }
-                setPrev(text, tag);
-            }
-            self.value = toKeysFromMap($._tags).join(state.join);
-            $.fire('set.tag', [_event, v[0]]);
-            if (!_skipHookChange) {
-                $.fire('change', [_event, v[0]]);
             }
             return $;
         }
