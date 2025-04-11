@@ -818,13 +818,13 @@
         picker._active;
         var _mask = picker._mask,
             state = picker.state,
-            tags = picker.tags,
-            hint = _mask.hint,
-            escape = state.escape,
+            tags = picker.tags;
+        _mask.hint;
+        var escape = state.escape,
             exit,
             key;
+        key = isString(data) && 1 === toCount(data) ? data : 0;
         picker._event = e;
-        (key = isString(data) && 1 === toCount(data) ? data : 0) ? setStyle(hint, 'visibility', 'hidden'): letStyle(hint, 'visibility');
         if (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape)) || KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape)) || hasValue(key, escape)) {
             exit = true;
             setValueInMap(_toValue(v = getText($)), v, tags);
