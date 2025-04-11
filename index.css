@@ -44,6 +44,7 @@
 }
 .tag-picker__flex {
   flex: 1;
+  overflow: hidden;
 }
 .tag-picker__self {
   background: 0 0;

@@ -60,6 +60,7 @@ $name: 'tag-picker';
   &__flex {
     @extend %items;
     flex: 1;
+    overflow: hidden;
   }
   &__self {
     background: 0 0;

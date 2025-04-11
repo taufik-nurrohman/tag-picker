@@ -1024,8 +1024,7 @@
                 'role': 'group'
             });
             var text = setElement('span', {
-                'class': n + '__text',
-                'tabindex': 0
+                'class': n + '__text'
             });
             var textInput = setElement('span', {
                 'aria': {

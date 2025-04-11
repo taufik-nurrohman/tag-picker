@@ -265,8 +265,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
             'role': 'group'
         });
         const text = setElement('span', {
-            'class': n + '__text',
-            'tabindex': 0
+            'class': n + '__text'
         });
         const textInput = setElement('span', {
             'aria': {
