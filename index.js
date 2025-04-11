@@ -823,11 +823,8 @@
             escape = state.escape,
             exit,
             key;
-        key = isString(data) && 1 === toCount(data) ? data : 0;
         picker._event = e;
-        delay(function () {
-            return getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility');
-        }, 1)();
+        (key = isString(data) && 1 === toCount(data) ? data : 0) ? setStyle(hint, 'visibility', 'hidden'): letStyle(hint, 'visibility');
         if (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape)) || KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape)) || hasValue(key, escape)) {
             exit = true;
             setValueInMap(_toValue(v = getText($)), v, tags);
@@ -1102,7 +1099,9 @@
                 'tabindex': isReadOnlySelf ? 0 : false
             });
             var textInputHint = setElement('span', theInputPlaceholder + "", {
-                'role': 'none'
+                'aria': {
+                    'hidden': 'true'
+                }
             });
             setChildLast(mask, maskFlex);
             setChildLast(maskFlex, text);

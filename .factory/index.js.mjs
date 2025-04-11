@@ -45,9 +45,8 @@ function onBeforeInputTextInput(e) {
         {_active, _mask, state, tags} = picker,
         {hint} = _mask,
         {escape} = state, exit, key;
-    key = isString(data) && 1 === toCount(data) ? data : 0;
     picker._event = e;
-    delay(() => getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility'), 1)();
+    (key = isString(data) && 1 === toCount(data) ? data : 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility');
     if (
         (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape))) ||
         (KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape))) ||
@@ -315,7 +314,9 @@ TagPicker._ = setObjectMethods(TagPicker, {
             'tabindex': isReadOnlySelf ? 0 : false
         });
         const textInputHint = setElement('span', theInputPlaceholder + "", {
-            'role': 'none'
+            'aria': {
+                'hidden': 'true'
+            }
         });
         setChildLast(mask, maskFlex);
         setChildLast(maskFlex, text);
