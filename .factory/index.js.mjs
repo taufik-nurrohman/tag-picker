@@ -1,8 +1,12 @@
-import {forEachArray, forEachMap, getPrototype, getReference, setObjectAttributes, setObjectMethods, setReference} from '@taufik-nurrohman/f';
+import {/* focusTo, */insertAtSelection, selectTo, selectToNone} from '@taufik-nurrohman/selection';
+import {delay} from '@taufik-nurrohman/tick';
+import {forEachArray, forEachMap, getPrototype, getReference, hasKeyInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap} from '@taufik-nurrohman/f';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
-import {getAria, getID, getParentForm, getText, getValue, isDisabled, isReadOnly, isRequired, letStyle, setAria, setChildLast, setClass, setElement, setID, setNext, setStyle, setText, setValue} from '@taufik-nurrohman/document';
+import {getAria, getDatum, getID, getParentForm, getText, getValue, isDisabled, isReadOnly, isRequired, letStyle, setAria, setChildLast, setClass, setElement, setID, setNext, setStyle, setText, setValue} from '@taufik-nurrohman/document';
+import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
-import {isArray, isInstance, isObject, isSet, isString} from '@taufik-nurrohman/is';
+import {isArray, isFloat, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
+import {offEvent, offEventDefault, onEvent} from '@taufik-nurrohman/event';
 import {toValue} from '@taufik-nurrohman/to';
 
 const KEY_A = 'a';
@@ -32,6 +36,55 @@ function focusTo(node) {
 
 function getTagValue(tag) {
     return getDatum(tag, 'value', false);
+}
+
+function onCutTextInput() {
+    let $ = this,
+        picker = getReference($),
+        {_mask} = picker,
+        {hint} = _mask;
+    delay(() => getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility'), 1)();
+}
+
+function onFocusSelf() {
+    getReference(this).focus();
+}
+
+function onKeyDownTextInput(e) {
+    let $ = this,
+        key = e.key,
+        keyCode = e.keyCode,
+        keyIsCtrl = e.ctrlKey,
+        keyIsShift = e.shiftKey,
+        picker = getReference($),
+        {_active, _mask, _tags, state} = picker,
+        {hint} = _mask,
+        {escape} = state, exit, v;
+    if (!_active) {
+        return offEventDefault(e);
+    }
+    picker._event = e;
+    delay(() => getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility'), 1)();
+    if (
+        (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape))) ||
+        (KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape))) ||
+        (hasValue(key, escape) || hasValue(keyCode, escape))
+    ) {
+        exit = true;
+        setValueInMap(toValue(v = getText($)), v, _tags);
+        picker.focus().text = "";
+    }
+    exit && offEventDefault(e);
+}
+
+function onPasteTextInput(e) {
+    offEventDefault(e);
+    let $ = this,
+        picker = getReference($),
+        {_mask} = picker,
+        {hint} = _mask;
+    delay(() => getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility'), 1)();
+    insertAtSelection($, e.clipboardData.getData('text/plain'));
 }
 
 function TagPicker(self, state) {
@@ -150,7 +203,7 @@ setObjectAttributes(TagPicker, {
                 return $;
             }
             setText(input, v = fromValue(value));
-            return (v ? setStyle(hint, 'color', 'transparent') : letStyle(hint, 'color')), $;
+            return (v ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility')), $;
         }
     },
     value: {
@@ -169,12 +222,6 @@ setObjectAttributes(TagPicker, {
         }
     }
 });
-
-setObjectAttributes(TagPickerTags, {
-    name: {
-        value: name + 'Tags'
-    }
-}, 1);
 
 TagPicker._ = setObjectMethods(TagPicker, {
     attach: function (self, state) {
@@ -244,10 +291,15 @@ TagPicker._ = setObjectMethods(TagPicker, {
         setReference(textInput, $);
         setClass(self, n + '__self');
         setNext(self, mask);
+        setChildLast(mask, self);
         if (form) {
             setID(form);
             setReference(form, $);
         }
+        onEvent('cut', textInput, onCutTextInput);
+        onEvent('focus', self, onFocusSelf);
+        onEvent('keydown', textInput, onKeyDownTextInput);
+        onEvent('paste', textInput, onPasteTextInput);
         self.tabIndex = -1;
         setReference(mask, $);
         let _mask = {};
@@ -299,13 +351,68 @@ TagPicker._ = setObjectMethods(TagPicker, {
             });
         }
         return $;
+    },
+    focus: function (mode) {
+        let $ = this,
+            {_mask} = $,
+            {input} = _mask;
+        return focusTo(input), selectTo(input, mode), $;
     }
 });
 
-// In order for an object to be iterable, it must have a `Symbol.iterator` key
-getPrototype(TagPickerTags)[Symbol.iterator] = function () {
-    return this.values[Symbol.iterator]();
-};
+setObjectAttributes(TagPickerTags, {
+    name: {
+        value: name + 'Options'
+    }
+}, 1);
+
+setObjectMethods(TagPickerTags, {
+    at: function (key) {
+        return getValueInMap(toValue(key), this.values);
+    },
+    count: function () {
+        return toMapCount(this.values);
+    },
+    delete: function (key, _fireValue = 1, _fireHook = 1) {
+    },
+    get: function (key) {
+        let $ = this,
+            {values} = $,
+            value = getValueInMap(toValue(key), values), parent;
+        if (value && (parent = getParent(value[2])) && 'group' === getRole(parent)) {
+            return [getElementIndex(value[2]), getElementIndex(parent)];
+        }
+        return value ? getElementIndex(value[2]) : -1;
+    },
+    has: function (key) {
+        return hasKeyInMap(toValue(key), this.values);
+    },
+    let: function (key, _fireHook = 1) {
+    },
+    set: function (key, value, _fireHook = 1) {
+        let $ = this,
+            {of, values} = $,
+            {_active} = of;
+        if (!_active) {
+            return false;
+        }
+        if ($.has(key = toValue(key))) {
+            return (_fireHook && of.fire('has.tag', [key])), false;
+        }
+        let {_mask, self, state} = of,
+            {n} = state;
+        n += '__tag';
+        // `picker.tags.set('asdf')`
+        if (!isSet(value)) {
+            value = [key, {}];
+        // `picker.tags.set('asdf', 'asdf')`
+        } else if (isFloat(value) || isInteger(value) || isString(value)) {
+            value = [value, {}];
+        // `picker.tags.set('asdf', [ … ])`
+        } else {}
+        setValueInMap(key, value, values);
+    }
+});
 
 TagPicker.Tags = TagPickerTags;
 

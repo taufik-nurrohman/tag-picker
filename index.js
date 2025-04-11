@@ -114,6 +114,9 @@
     var isDefined = function isDefined(x) {
         return 'undefined' !== typeof x;
     };
+    var isFloat = function isFloat(x) {
+        return isNumber(x) && 0 !== x % 1;
+    };
     var isInstance = function isInstance(x, of, exact) {
         if (!x || 'object' !== typeof x) {
             return false;
@@ -122,6 +125,9 @@
             return isSet(of) && isSet(x.constructor) && of === x.constructor;
         }
         return isSet(of) && x instanceof of ;
+    };
+    var isInteger = function isInteger(x) {
+        return isNumber(x) && 0 === x % 1;
     };
     var isNull = function isNull(x) {
         return null === x;
@@ -316,10 +322,13 @@
         return of.prototype;
     };
     var getReference = function getReference(key) {
-        return getValueInMap(key, references) || null;
+        return getValueInMap$1(key, references) || null;
     };
-    var getValueInMap = function getValueInMap(k, map) {
+    var getValueInMap$1 = function getValueInMap(k, map) {
         return map.get(k);
+    };
+    var hasKeyInMap = function hasKeyInMap(k, map) {
+        return map.has(k);
     };
     var letValueInMap = function letValueInMap(k, map) {
         return map.delete(k);
@@ -347,6 +356,10 @@
         return map.set(k, v);
     };
     var references = new WeakMap();
+
+    function _toArray(iterable) {
+        return Array.from(iterable);
+    }
     var D = document;
     var getAttribute = function getAttribute(node, attribute, parseValue) {
         if (parseValue === void 0) {
@@ -357,6 +370,18 @@
         }
         var value = node.getAttribute(attribute);
         return parseValue ? _toValue(value) : value;
+    };
+    var getChildFirst = function getChildFirst(parent, anyNode) {
+        return parent['first' + (anyNode ? "" : 'Element') + 'Child'] || null;
+    };
+    var getChildren = function getChildren(parent, index, anyNode) {
+        var children = _toArray(parent['child' + ('Nodes')]);
+        return isNumber(index) ? children[index] || null : children;
+    };
+    var getDatum = function getDatum(node, datum, parseValue) {
+        var value = getAttribute(node, 'data-' + datum, parseValue);
+        (value + "").trim();
+        return value;
     };
     var getID = function getID(node, batch) {
         if (batch === void 0) {
@@ -376,7 +401,7 @@
     var getNext = function getNext(node, anyNode) {
         return node['next' + (anyNode ? "" : 'Element') + 'Sibling'] || null;
     };
-    var getParent = function getParent(node, query) {
+    var getParent$1 = function getParent(node, query) {
         if (query) {
             return node.closest(query) || null;
         }
@@ -387,7 +412,7 @@
         if (hasState(node, state) && state === getName(node[state])) {
             return node[state];
         }
-        return getParent(node, state);
+        return getParent$1(node, state);
     };
     var getText = function getText(node, trim) {
         if (trim === void 0) {
@@ -400,6 +425,9 @@
         var content = node[state];
         content = trim ? content.trim() : content;
         return "" !== content ? content : null;
+    };
+    var getType = function getType(node) {
+        return node && node.nodeType || null;
     };
     var getValue = function getValue(node, parseValue) {
         var value = (node.value || "").replace(/\r?\n|\r/g, '\n');
@@ -545,7 +573,7 @@
         return setAttribute(node, 'id', isSet(value) ? value : getID(node, batch));
     };
     var setNext = function setNext(current, node) {
-        return getParent(current).insertBefore(node, getNext(current, true)), node;
+        return getParent$1(current).insertBefore(node, getNext(current, true)), node;
     };
     var setStyle = function setStyle(node, style, value) {
         if (isNumber(value)) {
@@ -569,6 +597,118 @@
         return hasState(node, state) && (node[state] = trim ? content.trim() : content), node;
     };
     var theID = {};
+    var _getSelection = function _getSelection() {
+        return D.getSelection();
+    };
+    var _setRange = function _setRange() {
+        return D.createRange();
+    };
+    // <https://stackoverflow.com/a/6691294/1163000>
+    // The `node` parameter is currently not in use
+    var insertAtSelection = function insertAtSelection(node, content, mode, selection) {
+        selection = selection || _getSelection();
+        var from, range, to;
+        if (selection.rangeCount) {
+            range = selection.getRangeAt(0);
+            range.deleteContents();
+            to = D.createDocumentFragment();
+            var nodeCurrent, nodeFirst, nodeLast;
+            if (isString(content)) {
+                from = setElement('div');
+                setHTML(from, content);
+                while (nodeCurrent = getChildFirst(from, 1)) {
+                    nodeLast = setChildLast(to, nodeCurrent);
+                }
+            } else if (isArray(content)) {
+                forEachArray(content, function (v) {
+                    return nodeLast = setChildLast(to, v);
+                });
+            } else {
+                nodeLast = setChildLast(to, content);
+            }
+            nodeFirst = getChildFirst(to, 1);
+            range.insertNode(to);
+            if (nodeLast) {
+                range = range.cloneRange();
+                range.setStartAfter(nodeLast);
+                range.setStartBefore(nodeFirst);
+                setSelection(node, range, selectToNone(selection));
+            }
+        }
+        return selection;
+    };
+    // The `node` parameter is currently not in use
+    var letSelection = function letSelection(node, selection) {
+        selection = selection || _getSelection();
+        return selection.empty(), selection;
+    };
+    // <https://stackoverflow.com/a/13950376/1163000>
+    var restoreSelection = function restoreSelection(node, store, selection) {
+        var index = 0,
+            range = _setRange();
+        range.setStart(node, 0);
+        range.collapse(true);
+        var exit,
+            hasStart,
+            nodeCurrent,
+            nodeStack = [node];
+        while (!exit && (nodeCurrent = nodeStack.pop())) {
+            if (3 === getType(nodeCurrent)) {
+                var indexNext = index + toCount(nodeCurrent);
+                if (!hasStart && store[0] >= index && store[0] <= indexNext) {
+                    range.setStart(nodeCurrent, store[0] - index);
+                    hasStart = true;
+                }
+                if (hasStart && store[1] >= index && store[1] <= indexNext) {
+                    exit = true;
+                    range.setEnd(nodeCurrent, store[1] - index);
+                }
+                index = indexNext;
+            } else {
+                forEachArray(getChildren(nodeCurrent, null), function (v) {
+                    return nodeStack.push(v);
+                });
+            }
+        }
+        return setSelection(node, range, letSelection(node, selection));
+    };
+    var selectTo = function selectTo(node, mode, selection) {
+        selection = selection || _getSelection();
+        letSelection(node, selection);
+        var range = _setRange();
+        range.selectNodeContents(node);
+        selection = setSelection(node, range, selection);
+        if (1 === mode) {
+            selection.collapseToEnd();
+        } else if (-1 === mode) {
+            selection.collapseToStart();
+        } else;
+    };
+    var selectToNone = function selectToNone(selection) {
+        selection = selection || _getSelection();
+        // selection.removeAllRanges();
+        if (selection.rangeCount) {
+            selection.removeRange(selection.getRangeAt(0));
+        }
+        return selection;
+    };
+    // The `node` parameter is currently not in use
+    var setSelection = function setSelection(node, range, selection) {
+        selection = selection || _getSelection();
+        if (isArray(range)) {
+            return restoreSelection(node, range, selection);
+        }
+        return selection.addRange(range), selection;
+    };
+    var delay = function delay(then, time) {
+        return function () {
+            var _arguments2 = arguments,
+                _this2 = this;
+            setTimeout(function () {
+                return then.apply(_this2, _arguments2);
+            }, time);
+        };
+    };
 
     function hook($, $$) {
         $$ = $$ || $;
@@ -621,14 +761,85 @@
         };
         return $.hooks = {}, $;
     }
+    var offEventDefault = function offEventDefault(e) {
+        return e && e.preventDefault();
+    };
+    var onEvent = function onEvent(name, node, then, options) {
+        if (options === void 0) {
+            options = false;
+        }
+        node.addEventListener(name, then, options);
+    };
+    var KEY_ENTER = 'Enter';
+    var KEY_TAB = 'Tab';
     var name = 'TagPicker';
 
     function createTagsFrom() {
         return [];
     }
 
+    function focusTo(node) {
+        return node.focus(), node;
+    }
+
     function getTagValue(tag) {
         return getDatum(tag, 'value', false);
+    }
+
+    function onCutTextInput() {
+        var $ = this,
+            picker = getReference($),
+            _mask = picker._mask,
+            hint = _mask.hint;
+        delay(function () {
+            return getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility');
+        }, 1)();
+    }
+
+    function onFocusSelf() {
+        getReference(this).focus();
+    }
+
+    function onKeyDownTextInput(e) {
+        var $ = this,
+            key = e.key,
+            keyCode = e.keyCode;
+        e.ctrlKey;
+        e.shiftKey;
+        var picker = getReference($),
+            _active = picker._active,
+            _mask = picker._mask,
+            _tags = picker._tags,
+            state = picker.state,
+            hint = _mask.hint,
+            escape = state.escape,
+            exit,
+            v;
+        if (!_active) {
+            return offEventDefault(e);
+        }
+        picker._event = e;
+        delay(function () {
+            return getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility');
+        }, 1)();
+        if (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape)) || KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape)) || hasValue(key, escape) || hasValue(keyCode, escape)) {
+            exit = true;
+            setValueInMap(_toValue(v = getText($)), v, _tags);
+            picker.focus().text = "";
+        }
+        exit && offEventDefault(e);
+    }
+
+    function onPasteTextInput(e) {
+        offEventDefault(e);
+        var $ = this,
+            picker = getReference($),
+            _mask = picker._mask,
+            hint = _mask.hint;
+        delay(function () {
+            return getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility');
+        }, 1)();
+        insertAtSelection($, e.clipboardData.getData('text/plain'));
     }
 
     function TagPicker(self, state) {
@@ -745,7 +956,7 @@
                     return $;
                 }
                 setText(input, v = _fromValue(value));
-                return v ? setStyle(hint, 'color', 'transparent') : letStyle(hint, 'color'), $;
+                return v ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility'), $;
             }
         },
         value: {
@@ -768,11 +979,6 @@
             }
         }
     });
-    setObjectAttributes(TagPickerTags, {
-        name: {
-            value: name + 'Tags'
-        }
-    }, 1);
     TagPicker._ = setObjectMethods(TagPicker, {
         attach: function attach(self, state) {
             var $ = this;
@@ -844,10 +1050,15 @@
             setReference(textInput, $);
             setClass(self, n + '__self');
             setNext(self, mask);
+            setChildLast(mask, self);
             if (form) {
                 setID(form);
                 setReference(form, $);
             }
+            onEvent('cut', textInput, onCutTextInput);
+            onEvent('focus', self, onFocusSelf);
+            onEvent('keydown', textInput, onKeyDownTextInput);
+            onEvent('paste', textInput, onPasteTextInput);
             self.tabIndex = -1;
             setReference(mask, $);
             var _mask = {};
@@ -901,12 +1112,70 @@
                 });
             }
             return $;
+        },
+        focus: function focus(mode) {
+            var $ = this,
+                _mask = $._mask,
+                input = _mask.input;
+            return focusTo(input), selectTo(input, mode), $;
         }
     });
-    // In order for an object to be iterable, it must have a `Symbol.iterator` key
-    getPrototype(TagPickerTags)[Symbol.iterator] = function () {
-        return this.values[Symbol.iterator]();
-    };
+    setObjectAttributes(TagPickerTags, {
+        name: {
+            value: name + 'Options'
+        }
+    }, 1);
+    setObjectMethods(TagPickerTags, {
+        at: function at(key) {
+            return getValueInMap(_toValue(key), this.values);
+        },
+        count: function count() {
+            return toMapCount(this.values);
+        },
+        delete: function _delete(key, _fireValue, _fireHook) {},
+        get: function get(key) {
+            var $ = this,
+                values = $.values,
+                value = getValueInMap(_toValue(key), values),
+                parent;
+            if (value && (parent = getParent(value[2])) && 'group' === getRole(parent)) {
+                return [getElementIndex(value[2]), getElementIndex(parent)];
+            }
+            return value ? getElementIndex(value[2]) : -1;
+        },
+        has: function has(key) {
+            return hasKeyInMap(_toValue(key), this.values);
+        },
+        let: function _let(key, _fireHook) {},
+        set: function set(key, value, _fireHook) {
+            if (_fireHook === void 0) {
+                _fireHook = 1;
+            }
+            var $ = this,
+                of = $.of,
+                values = $.values,
+                _active = of._active;
+            if (!_active) {
+                return false;
+            }
+            if ($.has(key = _toValue(key))) {
+                return _fireHook && of.fire('has.tag', [key]), false;
+            }
+            of._mask;
+            of.self;
+            var state = of.state;
+            state.n;
+            // `picker.tags.set('asdf')`
+            if (!isSet(value)) {
+                value = [key, {}];
+                // `picker.tags.set('asdf', 'asdf')`
+            } else if (isFloat(value) || isInteger(value) || isString(value)) {
+                value = [value, {}];
+                // `picker.tags.set('asdf', [ … ])`
+            } else;
+            setValueInMap(key, value, values);
+        }
+    });
     TagPicker.Tags = TagPickerTags;
     return TagPicker;
 }));

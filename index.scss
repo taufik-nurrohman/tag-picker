@@ -62,9 +62,18 @@ $name: 'tag-picker';
     flex: 1;
   }
   &__self {
-    left: -9999px;
-    position: fixed;
-    top: -9999px;
+    background: #000;
+    border: 0;
+    bottom: 0;
+    font: 0/0 a;
+    height: 1px;
+    left: 0;
+    margin: 0;
+    outline: 0;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
   }
   &__tag,
   &__text {
