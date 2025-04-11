@@ -71,6 +71,7 @@
   position: relative;
 }
 .tag-picker__tag {
+  cursor: pointer;
   user-select: none;
 }
 .tag-picker__tag[aria-selected=true] {
