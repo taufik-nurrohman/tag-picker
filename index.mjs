@@ -509,7 +509,10 @@ setObjectMethods(TagPickerTags, {
             'tabindex': disabled ? false : -1,
             'title': getState(value[1], 'title') ?? false
         });
-        tagText = setElement('span', fromValue(value[0]));
+        tagText = value[2] ? getElement('.' + n + '__tag-text', value[2]) : setElement('span', fromValue(value[0]), {
+            'class': n + '__tag-text',
+            'role': 'none'
+        });
         n += '__x';
         tagX = value[2] ? getElement('.' + n, value[2]) : setElement('span', {
             'class': n,

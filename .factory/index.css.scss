@@ -90,11 +90,13 @@ $name: 'tag-picker';
   &__tag {
     cursor: pointer;
     user-select: none;
-    &[aria-selected='true'] {
-      background: rgba(0, 0, 255, 0.5);
-      &[aria-disabled='true'] {
+    &[aria-disabled='true'] {
+      &[aria-selected='true'] {
         background: rgba(0, 0, 255, 0.25);
       }
+    }
+    &[aria-selected='true'] {
+      background: rgba(0, 0, 255, 0.5);
     }
     &:focus {
       outline: 1px solid;

@@ -1367,7 +1367,10 @@
                 'tabindex': disabled ? false : -1,
                 'title': (_getState = getState(value[1], 'title')) != null ? _getState : false
             });
-            tagText = setElement('span', _fromValue(value[0]));
+            tagText = value[2] ? getElement('.' + n + '__tag-text', value[2]) : setElement('span', _fromValue(value[0]), {
+                'class': n + '__tag-text',
+                'role': 'none'
+            });
             n += '__x';
             tagX = value[2] ? getElement('.' + n, value[2]) : setElement('span', {
                 'class': n,

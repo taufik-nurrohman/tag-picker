@@ -24,7 +24,8 @@
         color: #000;
         flex: 1;
       }
-      .tag-picker--focus {
+      .tag-picker:focus,
+      .tag-picker:focus-within {
         border-color: #00f;
       }
       .tag-picker__flex {
@@ -42,8 +43,8 @@
         border-color: #000;
         outline: 0;
       }
-      .tag-picker__tag--selected,
-      .tag-picker__tag--selected:focus {
+      .tag-picker__tag[aria-selected='true'],
+      .tag-picker__tag[aria-selected='true']:focus {
         background: #c00;
       }
       .tag-picker__text {

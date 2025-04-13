@@ -74,11 +74,11 @@
   cursor: pointer;
   user-select: none;
 }
+.tag-picker__tag[aria-disabled=true][aria-selected=true] {
+  background: rgba(0, 0, 255, 0.25);
+}
 .tag-picker__tag[aria-selected=true] {
   background: rgba(0, 0, 255, 0.5);
-}
-.tag-picker__tag[aria-selected=true][aria-disabled=true] {
-  background: rgba(0, 0, 255, 0.25);
 }
 .tag-picker__tag:focus {
   outline: 1px solid;
