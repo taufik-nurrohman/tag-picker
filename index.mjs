@@ -1,13 +1,13 @@
 import {/* focusTo, */insertAtSelection, selectTo, selectToNone} from '@taufik-nurrohman/selection';
 import {delay} from '@taufik-nurrohman/tick';
-import {forEachArray, forEachMap, getPrototype, getReference, hasKeyInMap, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap} from '@taufik-nurrohman/f';
+import {forEachArray, forEachMap, getPrototype, getReference, getValueInMap, hasKeyInMap, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap} from '@taufik-nurrohman/f';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
-import {getAria, getElement, getElementIndex, getDatum, getID, getParent, getParentForm, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letStyle, setAria, setAttribute, setChildLast, setClass, setClasses, setElement, setID, setNext, setPrev, setStyle, setStyles, setText, setValue} from '@taufik-nurrohman/document';
+import {getAria, getElement, getElementIndex, getDatum, getID, getParent, getParentForm, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setClasses, setElement, setID, setNext, setPrev, setStyle, setStyles, setText, setValue} from '@taufik-nurrohman/document';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isFloat, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
 import {offEvent, offEventDefault, onEvent} from '@taufik-nurrohman/event';
-import {toCount, toValue} from '@taufik-nurrohman/to';
+import {toCount, toMapCount, toValue} from '@taufik-nurrohman/to';
 
 const KEY_A = 'a';
 const KEY_ARROW_LEFT = 'ArrowLeft';
@@ -22,20 +22,51 @@ const KEY_TAB = 'Tab';
 
 const name = 'TagPicker';
 
-function createTags() {
-    return [];
-}
-
-function createTagsFrom() {
-    return [];
+function createTags($, tags) {
+    const map = isInstance(tags, Map) ? tags : new Map;
+    if (isArray(tags)) {
+        forEachArray(tags, tag => {
+            if (isArray(tag)) {
+                tag[0] = tag[0] ?? "";
+                tag[1] = tag[1] ?? {};
+                setValueInMap(toValue(tag[1].value ?? tag[0]), tag, map);
+            } else {
+                setValueInMap(toValue(tag), [tag, {}], map);
+            }
+        });
+    } else if (isObject(tags, 0)) {
+        forEachObject(tags, (v, k) => {
+            if (isArray(v)) {
+                tags[k][0] = v[0] ?? "";
+                tags[k][1] = v[1] ?? {};
+                setValueInMap(toValue(v[1].value ?? k), v, map);
+            } else {
+                setValueInMap(toValue(k), [v, {}], map);
+            }
+        });
+    }
+    let {_tags, self, state} = $,
+        {n} = state,
+        key, r = [], value = getValue(self);
+    // Reset the tag(s) data, but do not fire the `let.tags` hook
+    _tags.delete(null, 0);
+    forEachMap(map, (v, k) => {
+        if (isArray(v) && v[1] && !v[1].disabled) {
+            r.push(toValue(v[1].value ?? k));
+        }
+        // Set the tag data, but do not fire the `set.tag` hook
+        _tags.set(toValue(isArray(v) && v[1] ? (v[1].value ?? k) : k), v, 0);
+    });
+    state.tags = map;
+    return r;
 }
 
 function focusTo(node) {
     return node.focus(), node;
 }
 
-function getTagValue(tag) {
-    return getDatum(tag, 'value', false);
+function getTagValue(tag, parseValue) {
+    return getDatum(tag, 'value', parseValue);
 }
 
 function onBeforeInputTextInput(e) {
@@ -116,7 +147,7 @@ function onPointerDownTagX(e) {
     picker._event = e;
     offEvent('mousedown', $, onPointerDownTagX);
     offEvent('touchstart', $, onPointerDownTagX);
-    letValueInMap(toValue(getTagValue(tag)), tags);
+    letValueInMap(getTagValue(tag, 1), tags);
     picker.focus(), offEventDefault(e);
 }
 
@@ -149,7 +180,7 @@ function TagPickerTags(of, tags) {
     $.of = of;
     $.values = new Map;
     if (tags) {
-        createTagsFrom(of, tags, of._mask.flex);
+        createTags(of, tags);
     }
     return $;
 }
@@ -248,9 +279,9 @@ setObjectAttributes(TagPicker, {
             let $ = this,
                 {state} = $;
             if ($.value) {
-                forEachArray($.value.split(state.join), v => $.let(v, 0));
+                forEachArray($.value.split(state.join), v => $.tags.let(v, 0));
             }
-            forEachArray(value.split(state.join), v => $.set(v, 0));
+            forEachArray(value.split(state.join), v => $.tags.set(v, 0));
             return $;
         }
     }
@@ -354,7 +385,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
         // Force the `this._active` value to `true` to set the initial value
         $._active = true;
         // Attach the current tag(s)
-        values = createTagsFrom($, tags || theInputValue.split(join), maskFlex);
+        values = createTags($, tags || theInputValue.split(join));
         $._value = values.join(join);
         // After the initial value has been set, restore the previous `this._active` value
         $._active = _active;
@@ -403,23 +434,43 @@ setObjectMethods(TagPickerTags, {
     count: function () {
         return toMapCount(this.values);
     },
-    delete: function (key, _fireValue = 1, _fireHook = 1) {
-        console.log('delete ' + key);
+    delete: function (key, _fireHook = 1) {
+        let $ = this,
+            {of, values} = $,
+            {_active, _mask, self, state} = of,
+            {join, n} = state, r, tagsValues = [];
+        if (!_active) {
+            return false;
+        }
+        if (!isSet(key)) {
+            forEachMap(values, (v, k) => $.delete(k, 0));
+            return _fireHook && of.fire('let.tags', [[]]) && 0 === $.count();
+        }
+        if (!(r = getValueInMap(key = toValue(key), values))) {
+            return (_fireHook && of.fire('not.tag', [key])), false;
+        }
+        let tag = r[2],
+            tagX = getElement('.' + n + '__x', tag);
+        offEvent('mousedown', tagX, onPointerDownTagX);
+        offEvent('touchstart', tagX, onPointerDownTagX);
+        letElement(tag);
+        r = letValueInMap(key, values);
+        state.tags = values;
+        forEachMap(values, (v, k) => tagsValues.push(fromValue(k)));
+        setValue(self, tagsValues = tagsValues.join(join));
+        return (_fireHook && of.fire('let.tag', [key]).fire('change', ["" !== tagsValues ? tagsValues : null])), r;
     },
     get: function (key) {
         let $ = this,
             {values} = $,
-            value = getValueInMap(toValue(key), values), parent;
-        if (value && (parent = getParent(value[2])) && 'group' === getRole(parent)) {
-            return [getElementIndex(value[2]), getElementIndex(parent)];
-        }
+            value = getValueInMap(toValue(key), values);
         return value ? getElementIndex(value[2]) : -1;
     },
     has: function (key) {
         return hasKeyInMap(toValue(key), this.values);
     },
     let: function (key, _fireHook = 1) {
-        return this.delete(key, 1, _fireHook);
+        return this.delete(key, _fireHook);
     },
     set: function (key, value, _fireHook = 1) {
         let $ = this,
@@ -431,10 +482,10 @@ setObjectMethods(TagPickerTags, {
         if ($.has(key = toValue(key))) {
             return (_fireHook && of.fire('has.tag', [key])), false;
         }
-        let {_mask, state} = of,
+        let {_mask, self, state} = of,
             {text} = _mask,
-            {n} = state,
-            classes, styles, tag, tagText, tagX;
+            {join, n} = state,
+            classes, styles, tag, tagText, tagX, tagsValues = [];
         // `picker.tags.set('asdf')`
         if (!isSet(value)) {
             value = [key, {}];
@@ -494,7 +545,9 @@ setObjectMethods(TagPickerTags, {
         value[2] = tag;
         setValueInMap(key, value, values);
         state.tags = values;
-        return (_fireHook && of.fire('set.tag', [key])), true;
+        forEachMap(values, (v, k) => tagsValues.push(fromValue(k)));
+        setValue(self, tagsValues = tagsValues.join(join));
+        return (_fireHook && of.fire('set.tag', [key]).fire('change', ["" !== tagsValues ? tagsValues : null])), true;
     }
 });
 

@@ -156,6 +156,13 @@
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
     };
+    var fromJSON = function fromJSON(x) {
+        var value = null;
+        try {
+            value = JSON.parse(x);
+        } catch (e) {}
+        return value;
+    };
     var _fromStates = function fromStates() {
         for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
             lot[_key] = arguments[_key];
@@ -227,6 +234,9 @@
     };
     var toJSON = function toJSON(x) {
         return JSON.stringify(x);
+    };
+    var toMapCount = function toMapCount(x) {
+        return x.size;
     };
     var toNumber = function toNumber(x, base) {
         if (base === void 0) {
@@ -301,7 +311,7 @@
         }
         return map;
     };
-    var forEachObject = function forEachObject(object, at) {
+    var forEachObject$1 = function forEachObject(object, at) {
         var v;
         for (var k in object) {
             v = at(object[k], k);
@@ -322,9 +332,9 @@
         return of.prototype;
     };
     var getReference = function getReference(key) {
-        return getValueInMap$1(key, references) || null;
+        return getValueInMap(key, references) || null;
     };
-    var getValueInMap$1 = function getValueInMap(k, map) {
+    var getValueInMap = function getValueInMap(k, map) {
         return map.get(k);
     };
     var hasKeyInMap = function hasKeyInMap(k, map) {
@@ -337,7 +347,7 @@
         if (!asStaticAttributes) {
             of = getPrototype(of);
         }
-        return forEachObject(attributes, function (v, k) {
+        return forEachObject$1(attributes, function (v, k) {
             Object.defineProperty(of, k, v);
         }), of;
     };
@@ -345,7 +355,7 @@
         {
             of = getPrototype(of);
         }
-        return forEachObject(methods, function (v, k) {
+        return forEachObject$1(methods, function (v, k) {
             of [k] = v;
         }), of;
     };
@@ -379,8 +389,14 @@
         return isNumber(index) ? children[index] || null : children;
     };
     var getDatum = function getDatum(node, datum, parseValue) {
-        var value = getAttribute(node, 'data-' + datum, parseValue);
-        (value + "").trim();
+        if (parseValue === void 0) {
+            parseValue = true;
+        }
+        var value = getAttribute(node, 'data-' + datum, parseValue),
+            v = (value + "").trim();
+        if (parseValue && v && ('[' === v[0] && ']' === v.slice(-1) || '{' === v[0] && '}' === v.slice(-1)) && null !== (v = fromJSON(value))) {
+            return v;
+        }
         return value;
     };
     var getElement = function getElement(query, scope) {
@@ -483,6 +499,10 @@
     var letDatum = function letDatum(node, datum) {
         return letAttribute(node, 'data-' + datum);
     };
+    var letElement = function letElement(node) {
+        var parent = getParent(node);
+        return node.remove(), parent;
+    };
     var letHTML = function letHTML(node) {
         var state = 'innerHTML';
         return hasState(node, state) && (node[state] = ""), node;
@@ -494,7 +514,7 @@
         return setAttribute(node, 'aria-' + aria, true === value ? 'true' : value);
     };
     var setArias = function setArias(node, data) {
-        return forEachObject(data, function (v, k) {
+        return forEachObject$1(data, function (v, k) {
             v || "" === v || 0 === v ? setAria(node, k, v) : letAria(node, k);
         }), node;
     };
@@ -505,7 +525,7 @@
         return node.setAttribute(attribute, _fromValue(value)), node;
     };
     var setAttributes = function setAttributes(node, attributes) {
-        return forEachObject(attributes, function (v, k) {
+        return forEachObject$1(attributes, function (v, k) {
             if ('aria' === k && isObject(v)) {
                 return setArias(node, v), 1;
             }
@@ -534,14 +554,14 @@
             }), node;
         }
         if (isObject(classes)) {
-            return forEachObject(classes, function (v, k) {
+            return forEachObject$1(classes, function (v, k) {
                 return v ? setClass(node, k) : letClass(node, k);
             }), node;
         }
         return node.className = classes, node;
     };
     var setData = function setData(node, data) {
-        return forEachObject(data, function (v, k) {
+        return forEachObject$1(data, function (v, k) {
             v || "" === v || 0 === v ? setDatum(node, k, v) : letDatum(node, k);
         }), node;
     };
@@ -604,7 +624,7 @@
         return node.style[toCaseCamel(style)] = _fromValue(value), node;
     };
     var setStyles = function setStyles(node, styles) {
-        return forEachObject(styles, function (v, k) {
+        return forEachObject$1(styles, function (v, k) {
             v || "" === v || 0 === v ? setStyle(node, k, v) : letStyle(node, k);
         }), node;
     };
@@ -617,6 +637,12 @@
         }
         var state = 'textContent';
         return hasState(node, state) && (node[state] = trim ? content.trim() : content), node;
+    };
+    var setValue = function setValue(node, value) {
+        if (null === value) {
+            return letAttribute(node, 'value');
+        }
+        return node.value = _fromValue(value), node;
     };
     var theID = {};
     var _getSelection = function _getSelection() {
@@ -799,16 +825,58 @@
     var KEY_TAB = 'Tab';
     var name = 'TagPicker';
 
-    function createTagsFrom() {
-        return [];
+    function createTags($, tags) {
+        var map = isInstance(tags, Map) ? tags : new Map();
+        if (isArray(tags)) {
+            forEachArray(tags, function (tag) {
+                if (isArray(tag)) {
+                    var _tag$, _tag$2, _tag$1$value;
+                    tag[0] = (_tag$ = tag[0]) != null ? _tag$ : "";
+                    tag[1] = (_tag$2 = tag[1]) != null ? _tag$2 : {};
+                    setValueInMap(_toValue((_tag$1$value = tag[1].value) != null ? _tag$1$value : tag[0]), tag, map);
+                } else {
+                    setValueInMap(_toValue(tag), [tag, {}], map);
+                }
+            });
+        } else if (isObject(tags, 0)) {
+            forEachObject(tags, function (v, k) {
+                if (isArray(v)) {
+                    var _v$, _v$2, _v$1$value;
+                    tags[k][0] = (_v$ = v[0]) != null ? _v$ : "";
+                    tags[k][1] = (_v$2 = v[1]) != null ? _v$2 : {};
+                    setValueInMap(_toValue((_v$1$value = v[1].value) != null ? _v$1$value : k), v, map);
+                } else {
+                    setValueInMap(_toValue(k), [v, {}], map);
+                }
+            });
+        }
+        var _tags = $._tags,
+            self = $.self,
+            state = $.state;
+        state.n;
+        var r = [];
+        getValue(self);
+        // Reset the tag(s) data, but do not fire the `let.tags` hook
+        _tags.delete(null, 0);
+        forEachMap(map, function (v, k) {
+            var _v$1$value3;
+            if (isArray(v) && v[1] && !v[1].disabled) {
+                var _v$1$value2;
+                r.push(_toValue((_v$1$value2 = v[1].value) != null ? _v$1$value2 : k));
+            }
+            // Set the tag data, but do not fire the `set.tag` hook
+            _tags.set(_toValue(isArray(v) && v[1] ? (_v$1$value3 = v[1].value) != null ? _v$1$value3 : k : k), v, 0);
+        });
+        state.tags = map;
+        return r;
     }
 
     function focusTo(node) {
         return node.focus(), node;
     }
 
-    function getTagValue(tag) {
-        return getDatum(tag, 'value', false);
+    function getTagValue(tag, parseValue) {
+        return getDatum(tag, 'value', parseValue);
     }
 
     function onBeforeInputTextInput(e) {
@@ -897,7 +965,7 @@
         picker._event = e;
         offEvent('mousedown', $, onPointerDownTagX);
         offEvent('touchstart', $, onPointerDownTagX);
-        letValueInMap(_toValue(getTagValue(tag)), tags);
+        letValueInMap(getTagValue(tag, 1), tags);
         picker.focus(), offEventDefault(e);
     }
 
@@ -930,7 +998,7 @@
         $.of = of;
         $.values = new Map();
         if (tags) {
-            createTagsFrom(of, tags, of._mask.flex);
+            createTags(of, tags);
         }
         return $;
     }
@@ -1028,11 +1096,11 @@
                     state = $.state;
                 if ($.value) {
                     forEachArray($.value.split(state.join), function (v) {
-                        return $.let(v, 0);
+                        return $.tags.let(v, 0);
                     });
                 }
                 forEachArray(value.split(state.join), function (v) {
-                    return $.set(v, 0);
+                    return $.tags.set(v, 0);
                 });
                 return $;
             }
@@ -1142,7 +1210,7 @@
             // Force the `this._active` value to `true` to set the initial value
             $._active = true;
             // Attach the current tag(s)
-            values = createTagsFrom($, tags || theInputValue.split(join));
+            values = createTags($, tags || theInputValue.split(join));
             $._value = values.join(join);
             // After the initial value has been set, restore the previous `this._active` value
             $._active = _active;
@@ -1189,17 +1257,52 @@
         count: function count() {
             return toMapCount(this.values);
         },
-        delete: function _delete(key, _fireValue, _fireHook) {
-            console.log('delete ' + key);
+        delete: function _delete(key, _fireHook) {
+            if (_fireHook === void 0) {
+                _fireHook = 1;
+            }
+            var $ = this,
+                of = $.of,
+                values = $.values,
+                _active = of._active;
+            of._mask;
+            var self = of.self,
+                state = of.state,
+                join = state.join,
+                n = state.n,
+                r,
+                tagsValues = [];
+            if (!_active) {
+                return false;
+            }
+            if (!isSet(key)) {
+                forEachMap(values, function (v, k) {
+                    return $.delete(k, 0);
+                });
+                return _fireHook && of.fire('let.tags', [
+                    []
+                ]) && 0 === $.count();
+            }
+            if (!(r = getValueInMap(key = _toValue(key), values))) {
+                return _fireHook && of.fire('not.tag', [key]), false;
+            }
+            var tag = r[2],
+                tagX = getElement('.' + n + '__x', tag);
+            offEvent('mousedown', tagX, onPointerDownTagX);
+            offEvent('touchstart', tagX, onPointerDownTagX);
+            letElement(tag);
+            r = letValueInMap(key, values);
+            state.tags = values;
+            forEachMap(values, function (v, k) {
+                return tagsValues.push(_fromValue(k));
+            });
+            setValue(self, tagsValues = tagsValues.join(join));
+            return _fireHook && of.fire('let.tag', [key]).fire('change', ["" !== tagsValues ? tagsValues : null]), r;
         },
         get: function get(key) {
             var $ = this,
                 values = $.values,
-                value = getValueInMap(_toValue(key), values),
-                parent;
-            if (value && (parent = getParent(value[2])) && 'group' === getRole(parent)) {
-                return [getElementIndex(value[2]), getElementIndex(parent)];
-            }
+                value = getValueInMap(_toValue(key), values);
             return value ? getElementIndex(value[2]) : -1;
         },
         has: function has(key) {
@@ -1209,7 +1312,7 @@
             if (_fireHook === void 0) {
                 _fireHook = 1;
             }
-            return this.delete(key, 1, _fireHook);
+            return this.delete(key, _fireHook);
         },
         set: function set(key, value, _fireHook) {
             var _getState;
@@ -1227,14 +1330,17 @@
                 return _fireHook && of.fire('has.tag', [key]), false;
             }
             var _mask = of._mask,
+                self = of.self,
                 state = of.state,
                 text = _mask.text,
+                join = state.join,
                 n = state.n,
                 classes,
                 styles,
                 tag,
                 tagText,
-                tagX;
+                tagX,
+                tagsValues = [];
             // `picker.tags.set('asdf')`
             if (!isSet(value)) {
                 value = [key, {}];
@@ -1297,7 +1403,11 @@
             value[2] = tag;
             setValueInMap(key, value, values);
             state.tags = values;
-            return _fireHook && of.fire('set.tag', [key]), true;
+            forEachMap(values, function (v, k) {
+                return tagsValues.push(_fromValue(k));
+            });
+            setValue(self, tagsValues = tagsValues.join(join));
+            return _fireHook && of.fire('set.tag', [key]).fire('change', ["" !== tagsValues ? tagsValues : null]), true;
         }
     });
     TagPicker.Tags = TagPickerTags;

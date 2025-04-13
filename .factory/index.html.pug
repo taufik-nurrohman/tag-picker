@@ -12,7 +12,7 @@ block script
     | picker.on('change', function () {
     |     console.log(this.value);
     | });
-    | picker.on('has.tag', (e, tag) => {
+    | picker.on('has.tag', tag => {
     |     alert('Tag “' + tag + '” already exists.');
     | });
     | picker.on('reset', function () {
@@ -76,7 +76,7 @@ block content
   main
     form(method='get' target='_blank')
       p(role='group')
-        input(id='tags' name='tags' placeholder='foo, bar, baz' type='text' value='foo, bar')
+        input(name='tags' placeholder='foo, bar, baz' type='text' value='foo, bar')
         = ' '
         button(type='submit') Submit
         = ' '

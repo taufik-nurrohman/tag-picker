@@ -66,7 +66,7 @@
     </header>
     <main>
       <form method="get" target="_blank">
-        <p role="group"><input id="tags" name="tags" placeholder="foo, bar, baz" type="text" value="foo, bar"> <button type="submit">Submit</button> <button type="reset">Reset</button></p>
+        <p role="group"><input name="tags" placeholder="foo, bar, baz" type="text" value="foo, bar"> <button type="submit">Submit</button> <button type="reset">Reset</button></p>
       </form>
       <h2 id="usage"><a href="#usage">#</a> Usage</h2>
       <div role="note">
@@ -314,7 +314,7 @@ Object.defineProperty(Extension, 'name', {
       picker.on('change', function () {
           console.log(this.value);
       });
-      picker.on('has.tag', (e, tag) => {
+      picker.on('has.tag', tag => {
           alert('Tag “' + tag + '” already exists.');
       });
       picker.on('reset', function () {
