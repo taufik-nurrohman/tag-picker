@@ -1,8 +1,8 @@
-import {/* focusTo, */insertAtSelection, selectTo, selectToNone} from '@taufik-nurrohman/selection';
+import {/* focusTo, */getCharBeforeCaret, insertAtSelection, selectTo, selectToNone} from '@taufik-nurrohman/selection';
 import {delay} from '@taufik-nurrohman/tick';
-import {forEachArray, forEachMap, getPrototype, getReference, getValueInMap, hasKeyInMap, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap} from '@taufik-nurrohman/f';
+import {forEachArray, forEachMap, getPrototype, getReference, getValueInMap, hasKeyInMap, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap, toValueFirstFromMap, toValueLastFromMap} from '@taufik-nurrohman/f';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
-import {getAria, getElement, getElementIndex, getDatum, getID, getParent, getParentForm, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setClasses, setElement, setID, setNext, setPrev, setStyle, setStyles, setText, setValue} from '@taufik-nurrohman/document';
+import {getAria, getElement, getElementIndex, getDatum, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setClasses, setElement, setID, setNext, setPrev, setStyle, setStyles, setText, setValue} from '@taufik-nurrohman/document';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isFloat, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
@@ -21,6 +21,8 @@ const KEY_ESCAPE = 'Escape';
 const KEY_TAB = 'Tab';
 
 const name = 'TagPicker';
+
+let _keyIsCtrl, _keyIsShift;
 
 function createTags($, tags) {
     const map = isInstance(tags, Map) ? tags : new Map;
@@ -51,7 +53,7 @@ function createTags($, tags) {
     // Reset the tag(s) data, but do not fire the `let.tags` hook
     _tags.delete(null, 0);
     forEachMap(map, (v, k) => {
-        if (isArray(v) && v[1] && !v[1].disabled) {
+        if (isArray(v) && v[1]) {
             r.push(toValue(v[1].value ?? k));
         }
         // Set the tag data, but do not fire the `set.tag` hook
@@ -85,9 +87,18 @@ function onBeforeInputTextInput(e) {
     ) {
         exit = true;
         setValueInMap(toValue(v = getText($)), v, tags);
-        picker.focus().text = "";
+        focusTo(picker).text = "";
     }
     exit && offEventDefault(e);
+}
+
+function onBlurTag() {
+    let $ = this,
+        picker = getReference($),
+        {tags} = picker;
+    if (!_keyIsCtrl && !_keyIsShift) {
+        forEachMap(tags, v => letAria(v[2], 'selected'));
+    }
 }
 
 function onCutTextInput() {
@@ -99,34 +110,139 @@ function onCutTextInput() {
 }
 
 function onFocusSelf() {
-    getReference(this).focus();
+    focusTo(getReference(this));
+}
+
+function onKeyDownTag(e) {
+    let $ = this,
+        key = e.key,
+        keyCode = e.keyCode,
+        keyIsCtrl = _keyIsCtrl = e.ctrlKey,
+        keyIsShift = _keyIsShift = e.shiftKey,
+        picker = getReference($),
+        {_active} = picker;
+    if (!_active) {
+        return offEventDefault(e);
+    }
+    picker._event = e;
+    let {_mask, tags} = picker,
+        {text} = _mask,
+        exit, tagPrev, tagNext;
+    if (keyIsShift) {
+        setAria($, 'selected', true);
+    } else if (keyIsCtrl) {
+        if (KEY_A === key) {
+            exit = true;
+            forEachMap(tags, v => (setAria(v[2], 'selected', true), focusTo(v[2]), selectTo(v[2])));
+        }
+    } else {
+        if (KEY_ARROW_LEFT === key) {
+            exit = true;
+            if (tagPrev = getPrev($)) {
+                focusTo(tagPrev);
+            }
+        } else if (KEY_ARROW_RIGHT === key) {
+            exit = true;
+            focusTo((tagNext = getNext($)) && tagNext !== text ? tagNext : picker);
+        } else if (KEY_DELETE_LEFT === key) {
+            exit = true;
+            tagPrev = getPrev($);
+            tags.let(getTagValue($, 1), 0);
+            forEachMap(tags, v => {
+                if (getAria(v[2], 'selected')) {
+                    tagPrev = getPrev(v[2]);
+                    tags.let(getTagValue(v[2], 1), 0);
+                }
+            });
+            focusTo(tagPrev || picker), picker.fire('change', [picker.value]);
+        } else if (KEY_DELETE_RIGHT === key) {
+            exit = true;
+            tagNext = getNext($);
+            tags.let(getTagValue($, 1), 0);
+            forEachMap(tags, v => {
+                if (getAria(v[2], 'selected')) {
+                    tagNext = getNext(v[2]);
+                    tags.let(getTagValue(v[2], 1), 0);
+                }
+            });
+            focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker.value]);
+        }
+    }
+    exit && offEventDefault(e);
 }
 
 function onKeyDownTextInput(e) {
     let $ = this,
         key = e.key,
         keyCode = e.keyCode,
-        keyIsCtrl = e.ctrlKey,
-        keyIsShift = e.shiftKey,
+        keyIsCtrl = _keyIsCtrl = e.ctrlKey,
+        keyIsShift = _keyIsShift = e.shiftKey,
         picker = getReference($),
-        {_active, _mask, state, tags} = picker,
-        {hint} = _mask,
-        {escape} = state, exit, v;
+        {_active} = picker;
     if (!_active) {
         return offEventDefault(e);
     }
     picker._event = e;
-    delay(() => getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility'), 1)();
+    let {_mask, state, tags} = picker,
+        {hint} = _mask,
+        {escape} = state, exit, v;
     if (
         (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape))) ||
         (KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape))) ||
         (hasValue(key, escape) || hasValue(keyCode, escape))
     ) {
-        exit = true;
         setValueInMap(toValue(v = getText($)), v, tags);
-        picker.focus().text = "";
+        return (picker.focus().text = ""), offEventDefault(e);
+    }
+    delay(() => getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility'), 1)();
+    let caretIsToTheFirst = "" === getCharBeforeCaret($),
+        tagFirst, tagLast,
+        textIsVoid = null === getText($, 0);
+    if (keyIsShift) {
+
+    } else if (keyIsCtrl) {
+        if (KEY_A === key && textIsVoid && tags.count()) {
+            exit = true;
+            forEachMap(tags, v => (setAria(v[2], 'selected', true), focusTo(v[2]), selectTo(v[2])));
+        }
+    } else {
+        if (KEY_ENTER === key) {
+
+        } else if (textIsVoid) {
+            if (KEY_ARROW_LEFT === key) {
+                exit = true;
+                tagLast = toValueLastFromMap(tags);
+                tagLast && focusTo(tagLast[2]);
+            } else if (KEY_DELETE_LEFT === key) {
+                exit = true;
+                tagLast = toValueLastFromMap(tags);
+                tagLast && letValueInMap(getTagValue(tagLast[2], 1), tags);
+                picker.focus();
+            }
+        }
     }
     exit && offEventDefault(e);
+}
+
+function onKeyUpTag(e) {
+    let $ = this,
+        keyIsCtrl = _keyIsCtrl = e.ctrlKey,
+        keyIsShift = _keyIsShift = e.shiftKey,
+        picker = getReference($),
+        {tags} = picker, selected = 0;
+    forEachMap(tags, v => {
+        if (getAria(v[2], 'selected')) {
+            ++selected;
+        }
+    });
+    if (selected < 2) {
+        letAria($, 'selected');
+    }
+}
+
+function onKeyUpTextInput(e) {
+    _keyIsCtrl = e.ctrlKey;
+    _keyIsShift = e.shiftKey;
 }
 
 function onPasteTextInput(e) {
@@ -137,6 +253,21 @@ function onPasteTextInput(e) {
         {hint} = _mask;
     delay(() => getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility'), 1)();
     insertAtSelection($, e.clipboardData.getData('text/plain'));
+}
+
+function onPointerDownMask(e) {
+    let {target} = e;
+    if ('option' === getRole(target) || getParent(target, '[role=option]')) {} else {
+        focusTo(getReference(this)), offEventDefault(e);
+    }
+}
+
+function onPointerDownTag(e) {
+    offEventDefault(e);
+    let $ = this,
+        picker = getReference($),
+        {tags} = picker;
+    focusTo($), forEachMap(tags, v => letAria(v[2], 'selected'));
 }
 
 function onPointerDownTagX(e) {
@@ -321,15 +452,16 @@ TagPicker._ = setObjectMethods(TagPicker, {
                 'readonly': isReadOnlySelf ? 'true' : false
             },
             'class': n,
-            'role': 'combobox'
+            'role': 'listbox'
         });
         $.mask = mask;
         const maskFlex = setElement('span', {
             'class': n + '__flex',
-            'role': 'group'
+            'role': 'none'
         });
         const text = setElement('span', {
-            'class': n + '__text'
+            'class': n + '__text',
+            'role': 'none'
         });
         const textInput = setElement('span', {
             'aria': {
@@ -353,8 +485,9 @@ TagPicker._ = setObjectMethods(TagPicker, {
         setChildLast(maskFlex, text);
         setChildLast(text, textInput);
         setChildLast(text, textInputHint);
-        setReference(textInput, $);
+        setAria(self, 'hidden', true);
         setClass(self, n + '__self');
+        setReference(textInput, $);
         setNext(self, mask);
         setChildLast(mask, self);
         if (form) {
@@ -365,7 +498,10 @@ TagPicker._ = setObjectMethods(TagPicker, {
         onEvent('cut', textInput, onCutTextInput);
         onEvent('focus', self, onFocusSelf);
         onEvent('keydown', textInput, onKeyDownTextInput);
+        onEvent('keyup', textInput, onKeyUpTextInput);
+        onEvent('mousedown', mask, onPointerDownMask);
         onEvent('paste', textInput, onPasteTextInput);
+        onEvent('touchstart', mask, onPointerDownMask);
         self.tabIndex = -1;
         setReference(mask, $);
         $._mask = {
@@ -385,12 +521,11 @@ TagPicker._ = setObjectMethods(TagPicker, {
         // Force the `this._active` value to `true` to set the initial value
         $._active = true;
         // Attach the current tag(s)
-        values = createTags($, tags || theInputValue.split(join));
+        values = createTags($, tags || (theInputValue ? theInputValue.split(join) : []));
         $._value = values.join(join);
         // After the initial value has been set, restore the previous `this._active` value
         $._active = _active;
         // Force `id` attribute(s)
-        setAria(self, 'hidden', true);
         setAria(textInput, 'controls', getID(setID(maskFlex)));
         setID(mask);
         setID(self);
@@ -427,7 +562,7 @@ setObjectAttributes(TagPickerTags, {
     }
 }, 1);
 
-setObjectMethods(TagPickerTags, {
+TagPickerTags._ = setObjectMethods(TagPickerTags, {
     at: function (key) {
         return getValueInMap(toValue(key), this.values);
     },
@@ -451,9 +586,14 @@ setObjectMethods(TagPickerTags, {
         }
         let tag = r[2],
             tagX = getElement('.' + n + '__x', tag);
+        offEvent('blur', tag, onBlurTag);
+        offEvent('keydown', tag, onKeyDownTag);
+        offEvent('keyup', tag, onKeyUpTag);
+        offEvent('mousedown', tag, onPointerDownTag);
         offEvent('mousedown', tagX, onPointerDownTagX);
+        offEvent('touchstart', tag, onPointerDownTag);
         offEvent('touchstart', tagX, onPointerDownTagX);
-        letElement(tag);
+        letElement(tagX), letElement(tag);
         r = letValueInMap(key, values);
         state.tags = values;
         forEachMap(values, (v, k) => tagsValues.push(fromValue(k)));
@@ -494,30 +634,28 @@ setObjectMethods(TagPickerTags, {
             value = [value, {}];
         // `picker.tags.set('asdf', [ … ])`
         } else {}
-        let {disabled, selected, value: v} = value[1];
+        let {value: v} = value[1];
         v = fromValue(v || key);
         tag = value[2] || setElement('span', {
-            'aria': {
-                'disabled': disabled ? 'true' : false,
-                'selected': selected ? 'true' : false
-            },
             'class': n + '__tag',
             'data': {
                 'value': v
             },
             'role': 'option',
-            'tabindex': disabled ? false : -1,
+            'tabindex': -1,
             'title': getState(value[1], 'title') ?? false
         });
-        tagText = value[2] ? getElement('.' + n + '__tag-text', value[2]) : setElement('span', fromValue(value[0]), {
-            'class': n + '__tag-text',
+        tagText = value[2] ? getElement('.' + n + '__v', value[2]) : setElement('span', fromValue(value[0]), {
+            'class': n + '__v',
             'role': 'none'
         });
         n += '__x';
         tagX = value[2] ? getElement('.' + n, value[2]) : setElement('span', {
+            'aria': {
+                'hidden': 'true'
+            },
             'class': n,
-            'role': 'none',
-            'tabindex': disabled ? false : -1
+            'tabindex': -1
         });
         if (classes = getState(value[1], 'class')) {
             setClasses(tag, classes);
@@ -531,14 +669,13 @@ setObjectMethods(TagPickerTags, {
         setID(tagText);
         setID(tagX);
         setAria(tagX, 'controls', getID(setID(tag)));
-        if (!disabled && !value[2]) {
-            // onEvent('focus', option, onFocusOption);
-            // onEvent('keydown', option, onKeyDownOption);
-            // onEvent('mousedown', option, onPointerDownOption);
-            // onEvent('mouseup', option, onPointerUpOption);
-            // onEvent('touchend', option, onPointerUpOption);
-            // onEvent('touchstart', option, onPointerDownOption);
+        if (!value[2]) {
+            onEvent('blur', tag, onBlurTag);
+            onEvent('keydown', tag, onKeyDownTag);
+            onEvent('keyup', tag, onKeyUpTag);
+            onEvent('mousedown', tag, onPointerDownTag);
             onEvent('mousedown', tagX, onPointerDownTagX);
+            onEvent('touchstart', tag, onPointerDownTag);
             onEvent('touchstart', tagX, onPointerDownTagX);
         }
         setChildLast(tag, tagText);
@@ -553,6 +690,11 @@ setObjectMethods(TagPickerTags, {
         return (_fireHook && of.fire('set.tag', [key]).fire('change', ["" !== tagsValues ? tagsValues : null])), true;
     }
 });
+
+// In order for an object to be iterable, it must have a `Symbol.iterator` key
+getPrototype(TagPickerTags)[Symbol.iterator] = function () {
+    return this.values[Symbol.iterator]();
+};
 
 TagPicker.Tags = TagPickerTags;
 
