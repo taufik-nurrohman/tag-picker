@@ -1,8 +1,8 @@
-import {/* focusTo, */getCharBeforeCaret, insertAtSelection, selectTo, selectToNone} from '@taufik-nurrohman/selection';
+import {/* focusTo, */getCharBeforeCaret, getSelection, insertAtSelection, selectTo, selectToNone} from '@taufik-nurrohman/selection';
 import {delay} from '@taufik-nurrohman/tick';
 import {forEachArray, forEachMap, getPrototype, getReference, getValueInMap, hasKeyInMap, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap, toValueFirstFromMap, toValueLastFromMap} from '@taufik-nurrohman/f';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
-import {getAria, getElement, getElementIndex, getDatum, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setClasses, setElement, setID, setNext, setPrev, setStyle, setStyles, setText, setValue} from '@taufik-nurrohman/document';
+import {getAria, getElement, getElementIndex, getHTML, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setClasses, setElement, setID, setNext, setPrev, setStyle, setStyles, setText, setValue} from '@taufik-nurrohman/document';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isFloat, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
@@ -200,22 +200,22 @@ function onKeyDownTag(e) {
         } else if (KEY_DELETE_LEFT === key) {
             exit = true;
             tagPrev = getPrev($);
-            _tags.let(getTagValue($, 1), 0);
+            _tags.let(getTagValue($), 0);
             forEachMap(_tags, v => {
                 if (getAria(v[2], 'selected')) {
                     tagPrev = getPrev(v[2]);
-                    _tags.let(getTagValue(v[2], 1), 0);
+                    _tags.let(getTagValue(v[2]), 0);
                 }
             });
             focusTo(tagPrev || picker), picker.fire('change', [picker.value]);
         } else if (KEY_DELETE_RIGHT === key) {
             exit = true;
             tagNext = getNext($);
-            _tags.let(getTagValue($, 1), 0);
+            _tags.let(getTagValue($), 0);
             forEachMap(_tags, v => {
                 if (getAria(v[2], 'selected')) {
                     tagNext = getNext(v[2]);
-                    _tags.let(getTagValue(v[2], 1), 0);
+                    _tags.let(getTagValue(v[2]), 0);
                 }
             });
             focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker.value]);
@@ -223,7 +223,12 @@ function onKeyDownTag(e) {
             exit = true;
             selectToNone(), focusTo(picker);
         } else {
-            selectToNone(), focusTo(picker);
+            forEachMap(_tags, v => {
+                if (getAria(v[2], 'selected')) {
+                    _tags.let(getTagValue(v[2]), 0);
+                }
+            })
+            selectToNone(), focusTo(picker).fire('change', [picker.value]);
         }
     }
     exit && offEventDefault(e);
@@ -276,8 +281,12 @@ function onKeyDownTextInput(e) {
                 tagLast && focusTo(tagLast[2]);
             } else if (KEY_DELETE_LEFT === key) {
                 if (tagLast = toValueLastFromMap(_tags)) {
-                    exit = true;
-                    letValueInMap(getTagValue(tagLast[2], 1), _tags), picker.focus(-1);
+                    if (!textIsVoid && getHTML($) === getSelection($)) {
+                        // Text was all selected
+                    } else {
+                        exit = true;
+                        letValueInMap(getTagValue(tagLast[2]), _tags);
+                    }
                 }
             }
         }
@@ -369,7 +378,7 @@ function onPointerDownTagX(e) {
         {_tags} = picker;
     offEvent('mousedown', $, onPointerDownTagX);
     offEvent('touchstart', $, onPointerDownTagX);
-    letValueInMap(getTagValue(tag, 1), _tags);
+    letValueInMap(getTagValue(tag), _tags);
     focusTo(picker), offEventDefault(e);
 }
 
