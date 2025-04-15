@@ -1013,9 +1013,9 @@
             tagPrev,
             tagNext;
         if (keyIsShift) {
+            exit = true;
             setAria($, 'selected', true);
             if (KEY_ARROW_LEFT === key) {
-                exit = true;
                 if (tagPrev = getPrev($)) {
                     if (getAria(tagPrev, 'selected')) {
                         letAria($, 'selected');
@@ -1025,7 +1025,6 @@
                     focusTo(tagPrev);
                 }
             } else if (KEY_ARROW_RIGHT === key) {
-                exit = true;
                 if ((tagNext = getNext($)) && tagNext !== text) {
                     if (getAria(tagNext, 'selected')) {
                         letAria($, 'selected');
@@ -1038,9 +1037,9 @@
                 selectToNone();
             }
         } else if (keyIsCtrl) {
+            exit = true;
             setAria($, 'selected', true);
             if (KEY_A === key) {
-                exit = true;
                 forEachMap(_tags, function (v) {
                     return setAria(v[2], 'selected', true), focusTo(v[2]), selectTo(v[2]);
                 });

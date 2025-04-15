@@ -158,9 +158,9 @@ function onKeyDownTag(e) {
         {text} = _mask,
         exit, tagPrev, tagNext;
     if (keyIsShift) {
+        exit = true;
         setAria($, 'selected', true);
         if (KEY_ARROW_LEFT === key) {
-            exit = true;
             if (tagPrev = getPrev($)) {
                 if (getAria(tagPrev, 'selected')) {
                     letAria($, 'selected');
@@ -170,7 +170,6 @@ function onKeyDownTag(e) {
                 focusTo(tagPrev);
             }
         } else if (KEY_ARROW_RIGHT === key) {
-            exit = true;
             if ((tagNext = getNext($)) && tagNext !== text) {
                 if (getAria(tagNext, 'selected')) {
                     letAria($, 'selected');
@@ -183,9 +182,9 @@ function onKeyDownTag(e) {
             selectToNone();
         }
     } else if (keyIsCtrl) {
+        exit = true;
         setAria($, 'selected', true);
         if (KEY_A === key) {
-            exit = true;
             forEachMap(_tags, v => (setAria(v[2], 'selected', true), focusTo(v[2]), selectTo(v[2])));
         }
     } else {
