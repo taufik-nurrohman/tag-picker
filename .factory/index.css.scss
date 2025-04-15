@@ -89,7 +89,7 @@ $name: 'tag-picker';
   }
   &__tag {
     cursor: pointer;
-    user-select: none;
+    user-select: all;
     &[aria-disabled='true'] {
       &[aria-selected='true'] {
         background: rgba(0, 0, 255, 0.25);
@@ -102,7 +102,7 @@ $name: 'tag-picker';
       outline: 1px solid;
       outline-offset: -2px;
     }
-    // Keep selection (so that context menu can show the “Copy” command), but hide it visually!
+    // Keep selection (so that context menu can show the “Copy”, “Cut”, and “Paste” command), but hide it visually!
     ::selection {
       background-color: transparent;
       color: inherit;

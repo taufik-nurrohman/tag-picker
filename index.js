@@ -156,13 +156,6 @@
     var hasValue = function hasValue(x, data) {
         return -1 !== data.indexOf(x);
     };
-    var fromJSON = function fromJSON(x) {
-        var value = null;
-        try {
-            value = JSON.parse(x);
-        } catch (e) {}
-        return value;
-    };
     var _fromStates = function fromStates() {
         for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
             lot[_key] = arguments[_key];
@@ -403,17 +396,6 @@
         var children = _toArray(parent['child' + ('Nodes')]);
         return isNumber(index) ? children[index] || null : children;
     };
-    var getDatum = function getDatum(node, datum, parseValue) {
-        if (parseValue === void 0) {
-            parseValue = true;
-        }
-        var value = getAttribute(node, 'data-' + datum, parseValue),
-            v = (value + "").trim();
-        if (parseValue && v && ('[' === v[0] && ']' === v.slice(-1) || '{' === v[0] && '}' === v.slice(-1)) && null !== (v = fromJSON(value))) {
-            return v;
-        }
-        return value;
-    };
     var getElement = function getElement(query, scope) {
         return (scope || D).querySelector(query);
     };
@@ -484,7 +466,7 @@
     };
     var getValue = function getValue(node, parseValue) {
         var value = (node.value || "").replace(/\r?\n|\r/g, '\n');
-        value = value;
+        value = parseValue ? _toValue(value) : value;
         return "" !== value ? value : null;
     };
     var hasAttribute = function hasAttribute(node, attribute) {
@@ -855,7 +837,10 @@
     var KEY_DELETE_LEFT = 'Backspace';
     var KEY_DELETE_RIGHT = 'Delete';
     var KEY_ENTER = 'Enter';
+    var KEY_ESCAPE = 'Escape';
     var KEY_TAB = 'Tab';
+    var TOKEN_FALSE = 'false';
+    var TOKEN_TRUE = 'true';
     var name = 'TagPicker';
     var _keyIsCtrl, _keyIsShift;
 
@@ -885,18 +870,15 @@
             });
         }
         var _tags = $._tags,
-            self = $.self,
-            state = $.state;
-        state.n;
-        var r = [];
-        getValue(self);
+            state = $.state,
+            r = [];
         // Reset the tag(s) data, but do not fire the `let.tags` hook
-        _tags.delete(null, 0);
+        _tags.let(null, 0);
         forEachMap(map, function (v, k) {
             var _v$1$value3;
             if (isArray(v) && v[1]) {
                 var _v$1$value2;
-                r.push(_toValue((_v$1$value2 = v[1].value) != null ? _v$1$value2 : k));
+                r.push((_v$1$value2 = v[1].value) != null ? _v$1$value2 : k);
             }
             // Set the tag data, but do not fire the `set.tag` hook
             _tags.set(_toValue(isArray(v) && v[1] ? (_v$1$value3 = v[1].value) != null ? _v$1$value3 : k : k), v, 0);
@@ -910,7 +892,11 @@
     }
 
     function getTagValue(tag, parseValue) {
-        return getDatum(tag, 'value', parseValue);
+        return getValue(tag, parseValue);
+    }
+    // Do not allow user(s) to edit the tag text
+    function onBeforeInputTag(e) {
+        offEventDefault(e);
     }
 
     function onBeforeInputTextInput(e) {
@@ -919,17 +905,16 @@
             picker = getReference($);
         picker._active;
         var _mask = picker._mask,
-            state = picker.state,
-            tags = picker.tags;
+            _tags = picker._tags,
+            state = picker.state;
         _mask.hint;
         var escape = state.escape,
             exit,
             key;
         key = isString(data) && 1 === toCount(data) ? data : 0;
-        picker._event = e;
         if (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape)) || KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape)) || hasValue(key, escape)) {
             exit = true;
-            setValueInMap(_toValue(v = getText($)), v, tags);
+            setValueInMap(_toValue(v = getText($)), v, _tags);
             focusTo(picker).text = "";
         }
         exit && offEventDefault(e);
@@ -938,12 +923,30 @@
     function onBlurTag() {
         var $ = this,
             picker = getReference($),
-            tags = picker.tags;
+            _tags = picker._tags;
         if (!_keyIsCtrl && !_keyIsShift) {
-            forEachMap(tags, function (v) {
+            forEachMap(_tags, function (v) {
                 return letAria(v[2], 'selected');
             });
         }
+    }
+
+    function onCutTag(e) {
+        offEventDefault(e);
+        var $ = this,
+            picker = getReference($),
+            _tags = picker._tags,
+            state = picker.state,
+            join = state.join,
+            selected = [];
+        setAria($, 'selected', true);
+        forEachMap(_tags, function (v) {
+            if (getAria(v[2], 'selected')) {
+                selected.push(v = getTagValue(v[2]));
+                _tags.let(v, 0);
+            }
+        });
+        e.clipboardData.setData('text/plain', selected.join(join)), focusTo(picker.fire('change', [picker.value]));
     }
 
     function onCutTextInput() {
@@ -959,6 +962,14 @@
     function onFocusSelf() {
         focusTo(getReference(this));
     }
+    // Select the tag text on focus to hide the text cursor
+    function onFocusTag() {
+        selectTo(this);
+    }
+
+    function onFocusTextInput() {
+        selectTo(this);
+    }
 
     function onKeyDownTag(e) {
         var $ = this,
@@ -971,19 +982,42 @@
         if (!_active) {
             return offEventDefault(e);
         }
-        picker._event = e;
         var _mask = picker._mask,
-            tags = picker.tags,
+            _tags = picker._tags,
             text = _mask.text,
             exit,
             tagPrev,
             tagNext;
         if (keyIsShift) {
             setAria($, 'selected', true);
+            if (KEY_ARROW_LEFT === key) {
+                exit = true;
+                if (tagPrev = getPrev($)) {
+                    if (getAria(tagPrev, 'selected')) {
+                        letAria($, 'selected');
+                    } else {
+                        setAria(tagPrev, 'selected', true);
+                    }
+                    focusTo(tagPrev);
+                }
+            } else if (KEY_ARROW_RIGHT === key) {
+                exit = true;
+                if ((tagNext = getNext($)) && tagNext !== text) {
+                    if (getAria(tagNext, 'selected')) {
+                        letAria($, 'selected');
+                    } else {
+                        setAria(tagNext, 'selected', true);
+                    }
+                    focusTo(tagNext);
+                }
+            } else if (KEY_TAB === key) {
+                selectToNone();
+            }
         } else if (keyIsCtrl) {
+            setAria($, 'selected', true);
             if (KEY_A === key) {
                 exit = true;
-                forEachMap(tags, function (v) {
+                forEachMap(_tags, function (v) {
                     return setAria(v[2], 'selected', true), focusTo(v[2]), selectTo(v[2]);
                 });
             }
@@ -999,25 +1033,30 @@
             } else if (KEY_DELETE_LEFT === key) {
                 exit = true;
                 tagPrev = getPrev($);
-                tags.let(getTagValue($, 1), 0);
-                forEachMap(tags, function (v) {
+                _tags.let(getTagValue($, 1), 0);
+                forEachMap(_tags, function (v) {
                     if (getAria(v[2], 'selected')) {
                         tagPrev = getPrev(v[2]);
-                        tags.let(getTagValue(v[2], 1), 0);
+                        _tags.let(getTagValue(v[2], 1), 0);
                     }
                 });
                 focusTo(tagPrev || picker), picker.fire('change', [picker.value]);
             } else if (KEY_DELETE_RIGHT === key) {
                 exit = true;
                 tagNext = getNext($);
-                tags.let(getTagValue($, 1), 0);
-                forEachMap(tags, function (v) {
+                _tags.let(getTagValue($, 1), 0);
+                forEachMap(_tags, function (v) {
                     if (getAria(v[2], 'selected')) {
                         tagNext = getNext(v[2]);
-                        tags.let(getTagValue(v[2], 1), 0);
+                        _tags.let(getTagValue(v[2], 1), 0);
                     }
                 });
                 focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker.value]);
+            } else if (KEY_ESCAPE === key || KEY_TAB === key) {
+                exit = true;
+                selectToNone(), focusTo(picker);
+            } else {
+                selectToNone(), focusTo(picker);
             }
         }
         exit && offEventDefault(e);
@@ -1034,44 +1073,48 @@
         if (!_active) {
             return offEventDefault(e);
         }
-        picker._event = e;
         var _mask = picker._mask,
+            _tags = picker._tags,
             state = picker.state,
-            tags = picker.tags,
             hint = _mask.hint,
             escape = state.escape,
             exit,
             v;
         if (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape)) || KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape)) || hasValue(key, escape) || hasValue(keyCode, escape)) {
-            setValueInMap(_toValue(v = getText($)), v, tags);
-            return picker.focus().text = "", offEventDefault(e);
+            setValueInMap(_toValue(v = getText($)), v, _tags);
+            return focusTo(picker).text = "", offEventDefault(e);
         }
         delay(function () {
             return getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility');
         }, 1)();
-        "" === getCharBeforeCaret($);
-        var tagLast,
+        var caretIsToTheFirst = "" === getCharBeforeCaret($),
+            tagLast,
             textIsVoid = null === getText($, 0);
-        if (keyIsShift);
-        else if (keyIsCtrl) {
-            if (KEY_A === key && textIsVoid && tags.count()) {
+        if (keyIsShift) {
+            if (KEY_TAB === key) {
+                selectToNone();
+            }
+        } else if (keyIsCtrl) {
+            if (KEY_A === key && textIsVoid && _tags.count()) {
                 exit = true;
-                forEachMap(tags, function (v) {
+                forEachMap(_tags, function (v) {
                     return setAria(v[2], 'selected', true), focusTo(v[2]), selectTo(v[2]);
                 });
             }
         } else {
             if (KEY_ENTER === key);
-            else if (textIsVoid) {
+            else if (KEY_TAB === key) {
+                selectToNone();
+            } else if (caretIsToTheFirst || textIsVoid) {
                 if (KEY_ARROW_LEFT === key) {
                     exit = true;
-                    tagLast = toValueLastFromMap(tags);
+                    tagLast = toValueLastFromMap(_tags);
                     tagLast && focusTo(tagLast[2]);
                 } else if (KEY_DELETE_LEFT === key) {
-                    exit = true;
-                    tagLast = toValueLastFromMap(tags);
-                    tagLast && letValueInMap(getTagValue(tagLast[2], 1), tags);
-                    picker.focus();
+                    if (tagLast = toValueLastFromMap(_tags)) {
+                        exit = true;
+                        letValueInMap(getTagValue(tagLast[2], 1), _tags), picker.focus(-1);
+                    }
                 }
             }
         }
@@ -1083,14 +1126,14 @@
         _keyIsCtrl = e.ctrlKey;
         _keyIsShift = e.shiftKey;
         var picker = getReference($),
-            tags = picker.tags,
+            _tags = picker._tags,
             selected = 0;
-        forEachMap(tags, function (v) {
+        forEachMap(_tags, function (v) {
             if (getAria(v[2], 'selected')) {
                 ++selected;
             }
         });
-        if (selected < 2) {
+        if (selected < 2 && !_keyIsCtrl && !_keyIsShift) {
             letAria($, 'selected');
         }
     }
@@ -1100,16 +1143,46 @@
         _keyIsShift = e.shiftKey;
     }
 
+    function onPasteTag(e) {
+        offEventDefault(e);
+        var $ = this,
+            picker = getReference($),
+            _tags = picker._tags,
+            state = picker.state,
+            join = state.join;
+        forEachArray(e.clipboardData.getData('text/plain').split(join), function (v) {
+            if (!hasKeyInMap(v = _toValue(v.trim()), _tags)) {
+                _tags.set(v, v, 0);
+            }
+        });
+        forEachMap(_tags, function (v) {
+            return letAria(v[2], 'selected');
+        });
+        focusTo(picker.fire('change', [picker.value]));
+    }
+
     function onPasteTextInput(e) {
         offEventDefault(e);
         var $ = this,
             picker = getReference($),
             _mask = picker._mask,
-            hint = _mask.hint;
+            _tags = picker._tags,
+            state = picker.state,
+            hint = _mask.hint,
+            join = state.join;
         delay(function () {
             return getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility');
         }, 1)();
         insertAtSelection($, e.clipboardData.getData('text/plain'));
+        forEachArray((getText($) + "").split(join), function (v) {
+            if (!hasKeyInMap(v = _toValue(v.trim()), _tags)) {
+                _tags.set(v, v, 0);
+            }
+        });
+        forEachMap(_tags, function (v) {
+            return letAria(v[2], 'selected');
+        });
+        picker.fire('change', [picker.value]).text = "";
     }
 
     function onPointerDownMask(e) {
@@ -1124,22 +1197,35 @@
         offEventDefault(e);
         var $ = this,
             picker = getReference($),
-            tags = picker.tags;
-        focusTo($), forEachMap(tags, function (v) {
-            return letAria(v[2], 'selected');
-        });
+            _tags = picker._tags;
+        focusTo($);
+        if (!_keyIsCtrl && !_keyIsShift) {
+            forEachMap(_tags, function (v) {
+                return letAria(v[2], 'selected');
+            });
+        }
+        if (_keyIsCtrl) {
+            setAria($, 'selected', true);
+        }
     }
 
     function onPointerDownTagX(e) {
         var $ = this,
             tag = getParent($),
             picker = getReference(tag),
-            tags = picker.tags;
-        picker._event = e;
+            _tags = picker._tags;
         offEvent('mousedown', $, onPointerDownTagX);
         offEvent('touchstart', $, onPointerDownTagX);
-        letValueInMap(getTagValue(tag, 1), tags);
-        picker.focus(), offEventDefault(e);
+        letValueInMap(getTagValue(tag, 1), _tags);
+        focusTo(picker), offEventDefault(e);
+    }
+
+    function onResetForm() {
+        getReference(this).reset();
+    }
+
+    function onSubmitForm(e) {
+        console.log('submit');
     }
 
     function TagPicker(self, state) {
@@ -1234,11 +1320,11 @@
             },
             set: function set(options) {
                 var $ = this,
-                    values = [];
+                    tagsValues = [];
                 forEachMap($._tags, function (v) {
-                    return values.push(getTagValue(v[2]));
+                    return tagsValues.push(getTagValue(v[2], 1));
                 });
-                return $.fire('set.tags', [values]);
+                return $.fire('set.tags', [tagsValues]);
             }
         },
         text: {
@@ -1266,16 +1352,16 @@
             },
             set: function set(value) {
                 var $ = this,
-                    state = $.state;
-                if ($.value) {
-                    forEachArray($.value.split(state.join), function (v) {
-                        return $.tags.let(v, 0);
-                    });
-                }
-                forEachArray(value.split(state.join), function (v) {
-                    return $.tags.set(v, 0);
+                    _tags = $._tags,
+                    state = $.state,
+                    join = state.join;
+                $.value && forEachArray($.value.split(join), function (v) {
+                    return _tags.let(v, 0);
                 });
-                return $;
+                value && forEachArray(value.split(join), function (v) {
+                    return _tags.set(v, v, 0);
+                });
+                return $.fire('change', [$.value]);
             }
         }
     });
@@ -1289,7 +1375,6 @@
                 };
             }
             state = _fromStates({}, $.state, state || {});
-            $._event = null;
             $._tags = new TagPickerTags($);
             $._value = null;
             $.self = self;
@@ -1311,9 +1396,9 @@
             var form = getParentForm(self);
             var mask = setElement('div', {
                 'aria': {
-                    'disabled': isDisabledSelf ? 'true' : false,
-                    'multiselectable': 'true',
-                    'readonly': isReadOnlySelf ? 'true' : false
+                    'disabled': isDisabledSelf ? TOKEN_TRUE : false,
+                    'multiselectable': TOKEN_TRUE,
+                    'readonly': isReadOnlySelf ? TOKEN_TRUE : false
                 },
                 'class': n,
                 'role': 'listbox'
@@ -1329,20 +1414,20 @@
             });
             var textInput = setElement('span', {
                 'aria': {
-                    'disabled': isDisabledSelf ? 'true' : false,
-                    'multiline': 'false',
+                    'disabled': isDisabledSelf ? TOKEN_TRUE : false,
+                    'multiline': TOKEN_FALSE,
                     'placeholder': theInputPlaceholder,
-                    'readonly': isReadOnlySelf ? 'true' : false
+                    'readonly': isReadOnlySelf ? TOKEN_TRUE : false
                 },
                 'autocapitalize': 'off',
                 'contenteditable': isDisabledSelf || isReadOnlySelf ? false : "",
                 'role': 'textbox',
-                'spellcheck': 'false',
+                'spellcheck': TOKEN_FALSE,
                 'tabindex': isReadOnlySelf ? 0 : false
             });
             var textInputHint = setElement('span', theInputPlaceholder + "", {
                 'aria': {
-                    'hidden': 'true'
+                    'hidden': TOKEN_TRUE
                 }
             });
             setChildLast(mask, maskFlex);
@@ -1355,12 +1440,15 @@
             setNext(self, mask);
             setChildLast(mask, self);
             if (form) {
+                onEvent('reset', form, onResetForm);
+                onEvent('submit', form, onSubmitForm);
                 setID(form);
                 setReference(form, $);
             }
             onEvent('beforeinput', textInput, onBeforeInputTextInput);
             onEvent('cut', textInput, onCutTextInput);
             onEvent('focus', self, onFocusSelf);
+            onEvent('focus', textInput, onFocusTextInput);
             onEvent('keydown', textInput, onKeyDownTextInput);
             onEvent('keyup', textInput, onKeyUpTextInput);
             onEvent('mousedown', mask, onPointerDownMask);
@@ -1374,8 +1462,7 @@
                 input: textInput,
                 of: self,
                 self: mask,
-                text: text,
-                values: new Set()
+                text: text
             };
             // Re-assign some state value(s) using the setter to either normalize or reject the initial value
             // $.max = isMultipleSelect ? (max ?? Infinity) : 1;
@@ -1384,12 +1471,12 @@
                 _state2 = state,
                 join = _state2.join,
                 tags = _state2.tags,
-                values;
+                tagsValues;
             // Force the `this._active` value to `true` to set the initial value
             $._active = true;
             // Attach the current tag(s)
-            values = createTags($, tags || (theInputValue ? theInputValue.split(join) : []));
-            $._value = values.join(join);
+            tagsValues = createTags($, tags || (theInputValue ? theInputValue.split(join) : []));
+            $._value = tagsValues.join(join);
             // After the initial value has been set, restore the previous `this._active` value
             $._active = _active;
             // Force `id` attribute(s)
@@ -1420,6 +1507,15 @@
                 _mask = $._mask,
                 input = _mask.input;
             return focusTo(input), selectTo(input, mode), $;
+        },
+        reset: function reset(focus, mode) {
+            var $ = this,
+                _active = $._active;
+            if (!_active) {
+                return $;
+            }
+            $.value = $._value;
+            return focus ? $.focus(mode) : $;
         }
     });
     setObjectAttributes(TagPickerTags, {
@@ -1454,7 +1550,7 @@
             }
             if (!isSet(key)) {
                 forEachMap(values, function (v, k) {
-                    return $.delete(k, 0);
+                    return $.let(k, 0);
                 });
                 return _fireHook && of.fire('let.tags', [
                     []
@@ -1465,11 +1561,15 @@
             }
             var tag = r[2],
                 tagX = getElement('.' + n + '__x', tag);
+            offEvent('beforeinput', tag, onBeforeInputTag);
             offEvent('blur', tag, onBlurTag);
+            offEvent('cut', tag, onCutTag);
+            offEvent('focus', tag, onFocusTag);
             offEvent('keydown', tag, onKeyDownTag);
             offEvent('keyup', tag, onKeyUpTag);
             offEvent('mousedown', tag, onPointerDownTag);
             offEvent('mousedown', tagX, onPointerDownTagX);
+            offEvent('paste', tag, onPasteTag);
             offEvent('touchstart', tag, onPointerDownTag);
             offEvent('touchstart', tagX, onPointerDownTagX);
             letElement(tagX), letElement(tag);
@@ -1533,14 +1633,15 @@
             } else;
             var v = value[1].value;
             v = _fromValue(v || key);
-            tag = value[2] || setElement('span', {
+            tag = value[2] || setElement('data', {
                 'class': n + '__tag',
-                'data': {
-                    'value': v
-                },
+                // Make the tag “content editable”, so that the “Cut” option is available in the context menu, but do not
+                // allow user(s) to edit the tag text. We just want to make sure that the “Cut” option is available.
+                'contenteditable': TOKEN_TRUE,
                 'role': 'option',
                 'tabindex': -1,
-                'title': (_getState = getState(value[1], 'title')) != null ? _getState : false
+                'title': (_getState = getState(value[1], 'title')) != null ? _getState : false,
+                'value': v
             });
             tagText = value[2] ? getElement('.' + n + '__v', value[2]) : setElement('span', _fromValue(value[0]), {
                 'class': n + '__v',
@@ -1549,7 +1650,7 @@
             n += '__x';
             tagX = value[2] ? getElement('.' + n, value[2]) : setElement('span', {
                 'aria': {
-                    'hidden': 'true'
+                    'hidden': TOKEN_TRUE
                 },
                 'class': n,
                 'tabindex': -1
@@ -1567,11 +1668,15 @@
             setID(tagX);
             setAria(tagX, 'controls', getID(setID(tag)));
             if (!value[2]) {
+                onEvent('beforeinput', tag, onBeforeInputTag);
                 onEvent('blur', tag, onBlurTag);
+                onEvent('cut', tag, onCutTag);
+                onEvent('focus', tag, onFocusTag);
                 onEvent('keydown', tag, onKeyDownTag);
                 onEvent('keyup', tag, onKeyUpTag);
                 onEvent('mousedown', tag, onPointerDownTag);
                 onEvent('mousedown', tagX, onPointerDownTagX);
+                onEvent('paste', tag, onPasteTag);
                 onEvent('touchstart', tag, onPointerDownTag);
                 onEvent('touchstart', tagX, onPointerDownTagX);
             }

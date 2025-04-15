@@ -72,7 +72,7 @@
 }
 .tag-picker__tag {
   cursor: pointer;
-  user-select: none;
+  user-select: all;
 }
 .tag-picker__tag[aria-disabled=true][aria-selected=true] {
   background: rgba(0, 0, 255, 0.25);
