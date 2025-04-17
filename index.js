@@ -1049,7 +1049,9 @@
                 }
             } else if (KEY_ARROW_RIGHT === key) {
                 exit = true;
-                focusTo((tagNext = getNext($)) && tagNext !== text ? tagNext : picker);
+                if ((tagNext = getNext($)) && tagNext !== text) {
+                    focusTo(tagNext);
+                }
             } else {
                 setAria($, 'selected', true);
             }
@@ -1138,6 +1140,11 @@
         if (keyIsShift) {
             if (KEY_TAB === key) {
                 selectToNone();
+            } else if (KEY_ARROW_LEFT === key) {
+                exit = true;
+                selectToNone();
+                tagLast = toValueLastFromMap(_tags);
+                tagLast && focusTo(tagLast[2]) && setAria(tagLast[2], 'selected', true);
             }
         } else if (keyIsCtrl) {
             if (KEY_A === key && textIsVoid && _tags.count()) {
