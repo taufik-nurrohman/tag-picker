@@ -1037,12 +1037,21 @@
                 selectToNone();
             }
         } else if (keyIsCtrl) {
-            exit = true;
-            setAria($, 'selected', true);
             if (KEY_A === key) {
+                exit = true;
                 forEachMap(_tags, function (v) {
                     return setAria(v[2], 'selected', true), focusTo(v[2]), selectTo(v[2]);
                 });
+            } else if (KEY_ARROW_LEFT === key) {
+                exit = true;
+                if (tagPrev = getPrev($)) {
+                    focusTo(tagPrev);
+                }
+            } else if (KEY_ARROW_RIGHT === key) {
+                exit = true;
+                focusTo((tagNext = getNext($)) && tagNext !== text ? tagNext : picker);
+            } else {
+                setAria($, 'selected', true);
             }
         } else {
             if (KEY_ARROW_LEFT === key) {
@@ -1075,6 +1084,14 @@
                     }
                 });
                 focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker.value]);
+            } else if (KEY_ENTER === key || ' ' === key) {
+                exit = true;
+                getAria($, 'selected') ? letAria($, 'selected') : setAria($, 'selected', true);
+                forEachMap(_tags, function (v) {
+                    if (v[2] !== $ && getAria(v[2], 'selected')) {
+                        _tags.let(getTagValue(v[2]), 0);
+                    }
+                });
             } else if (KEY_ESCAPE === key || KEY_TAB === key) {
                 exit = true;
                 selectToNone(), focusTo(picker);
@@ -1128,6 +1145,10 @@
                 forEachMap(_tags, function (v) {
                     return setAria(v[2], 'selected', true), focusTo(v[2]), selectTo(v[2]);
                 });
+            } else if (KEY_ARROW_LEFT === key) {
+                exit = true;
+                tagLast = toValueLastFromMap(_tags);
+                tagLast && focusTo(tagLast[2]);
             }
         } else {
             if (KEY_ENTER === key);
@@ -1153,7 +1174,8 @@
     }
 
     function onKeyUpTag(e) {
-        var $ = this;
+        var $ = this,
+            key = e.key;
         _keyIsCtrl = e.ctrlKey;
         _keyIsShift = e.shiftKey;
         var picker = getReference($),
@@ -1164,7 +1186,7 @@
                 ++selected;
             }
         });
-        if (selected < 2 && !_keyIsCtrl && !_keyIsShift) {
+        if (selected < 2 && !_keyIsCtrl && !_keyIsShift && KEY_ENTER !== key && ' ' !== key) {
             letAria($, 'selected');
         }
     }
