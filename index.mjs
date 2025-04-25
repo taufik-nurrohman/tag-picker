@@ -156,7 +156,7 @@ function onKeyDownTag(e) {
     }
     let {_mask, _tags} = picker,
         {text} = _mask,
-        exit, tagPrev, tagNext;
+        exit, tagFirst, tagLast, tagNext, tagPrev;
     if (keyIsShift) {
         exit = true;
         setAria($, 'selected', true);
@@ -195,6 +195,14 @@ function onKeyDownTag(e) {
             if ((tagNext = getNext($)) && tagNext !== text) {
                 focusTo(tagNext);
             }
+        } else if (KEY_BEGIN === key) {
+            exit = true;
+            tagFirst = toValueFirstFromMap(_tags);
+            tagFirst && focusTo(tagFirst[2]);
+        } else if (KEY_END === key) {
+            exit = true;
+            tagLast = toValueLastFromMap(_tags);
+            tagLast && focusTo(tagLast[2]);
         } else {
             setAria($, 'selected', true);
         }
@@ -207,6 +215,14 @@ function onKeyDownTag(e) {
         } else if (KEY_ARROW_RIGHT === key) {
             exit = true;
             focusTo((tagNext = getNext($)) && tagNext !== text ? tagNext : picker);
+        } else if (KEY_BEGIN === key) {
+            exit = true;
+            tagFirst = toValueFirstFromMap(_tags);
+            tagFirst && focusTo(tagFirst[2]);
+        } else if (KEY_END === key) {
+            exit = true;
+            tagLast = toValueLastFromMap(_tags);
+            tagLast && focusTo(tagLast[2]);
         } else if (KEY_DELETE_LEFT === key) {
             exit = true;
             tagPrev = getPrev($);
@@ -295,9 +311,17 @@ function onKeyDownTextInput(e) {
             exit = true;
             tagLast = toValueLastFromMap(_tags);
             tagLast && focusTo(tagLast[2]);
+        } else if (KEY_BEGIN === key) {
+            exit = true;
+            tagFirst = toValueFirstFromMap(_tags);
+            tagFirst && focusTo(tagFirst[2]);
         }
     } else {
-        if (KEY_ENTER === key) {
+        if (KEY_BEGIN === key) {
+            exit = true;
+            tagFirst = toValueFirstFromMap(_tags);
+            tagFirst && focusTo(tagFirst[2]);
+        } else if (KEY_ENTER === key) {
             // TODO
         } else if (KEY_TAB === key) {
             selectToNone();

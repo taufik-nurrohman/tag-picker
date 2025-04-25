@@ -358,6 +358,9 @@
     var setValueInMap = function setValueInMap(k, v, map) {
         return map.set(k, v);
     };
+    var toValueFirstFromMap = function toValueFirstFromMap(map) {
+        return toValuesFromMap(map).shift();
+    };
     var toValueLastFromMap = function toValueLastFromMap(map) {
         return toValuesFromMap(map).pop();
     };
@@ -858,8 +861,10 @@
     var KEY_A = 'a';
     var KEY_ARROW_LEFT = 'ArrowLeft';
     var KEY_ARROW_RIGHT = 'ArrowRight';
+    var KEY_BEGIN = 'Home';
     var KEY_DELETE_LEFT = 'Backspace';
     var KEY_DELETE_RIGHT = 'Delete';
+    var KEY_END = 'End';
     var KEY_ENTER = 'Enter';
     var KEY_ESCAPE = 'Escape';
     var KEY_TAB = 'Tab';
@@ -1010,8 +1015,10 @@
             _tags = picker._tags,
             text = _mask.text,
             exit,
-            tagPrev,
-            tagNext;
+            tagFirst,
+            tagLast,
+            tagNext,
+            tagPrev;
         if (keyIsShift) {
             exit = true;
             setAria($, 'selected', true);
@@ -1052,6 +1059,14 @@
                 if ((tagNext = getNext($)) && tagNext !== text) {
                     focusTo(tagNext);
                 }
+            } else if (KEY_BEGIN === key) {
+                exit = true;
+                tagFirst = toValueFirstFromMap(_tags);
+                tagFirst && focusTo(tagFirst[2]);
+            } else if (KEY_END === key) {
+                exit = true;
+                tagLast = toValueLastFromMap(_tags);
+                tagLast && focusTo(tagLast[2]);
             } else {
                 setAria($, 'selected', true);
             }
@@ -1064,6 +1079,14 @@
             } else if (KEY_ARROW_RIGHT === key) {
                 exit = true;
                 focusTo((tagNext = getNext($)) && tagNext !== text ? tagNext : picker);
+            } else if (KEY_BEGIN === key) {
+                exit = true;
+                tagFirst = toValueFirstFromMap(_tags);
+                tagFirst && focusTo(tagFirst[2]);
+            } else if (KEY_END === key) {
+                exit = true;
+                tagLast = toValueLastFromMap(_tags);
+                tagLast && focusTo(tagLast[2]);
             } else if (KEY_DELETE_LEFT === key) {
                 exit = true;
                 tagPrev = getPrev($);
@@ -1135,6 +1158,7 @@
             return getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility');
         }, 1)();
         var caretIsToTheFirst = "" === getCharBeforeCaret($),
+            tagFirst,
             tagLast,
             textIsVoid = null === getText($, 0);
         if (keyIsShift) {
@@ -1156,9 +1180,17 @@
                 exit = true;
                 tagLast = toValueLastFromMap(_tags);
                 tagLast && focusTo(tagLast[2]);
+            } else if (KEY_BEGIN === key) {
+                exit = true;
+                tagFirst = toValueFirstFromMap(_tags);
+                tagFirst && focusTo(tagFirst[2]);
             }
         } else {
-            if (KEY_ENTER === key);
+            if (KEY_BEGIN === key) {
+                exit = true;
+                tagFirst = toValueFirstFromMap(_tags);
+                tagFirst && focusTo(tagFirst[2]);
+            } else if (KEY_ENTER === key);
             else if (KEY_TAB === key) {
                 selectToNone();
             } else if (caretIsToTheFirst || textIsVoid) {
