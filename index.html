@@ -69,7 +69,7 @@
       <form method="get" target="_blank">
         <p role="group"><input name="tags" placeholder="foo, bar, baz" type="text" value="foo, bar"> <button type="submit">Submit</button> <button type="reset">Reset</button></p>
       </form>
-      <h2 id="usage"><a href="#usage">#</a> Usage</h2>
+      <h2 id="usage"><a aria-hidden="true" href="#usage">#</a> Usage</h2>
       <div role="note">
         <p><strong>Note:</strong> CSS variables have been removed since version 4.0.0. From now on, I will only provide a minimal style just to make viable interaction. Expect it to look ugly by default. The main goal of this application is to be able to integrate it seamlessly into your web design. By providing a minimal style, it is easy to add other styles to it to adapt it to your own web design. Have a look at the source code on this page to see how I adapted the style to resemble the default style of the previous version.</p>
       </div>
@@ -105,7 +105,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <pre><code>import TagPicker from '@taufik-nurrohman/tag-picker';
 
 const picker = new TagPicker(document.querySelector('input'));</code></pre>
-      <h2 id="tests"><a href="#tests">#</a> Tests</h2>
+      <h2 id="tests"><a aria-hidden="true" href="#tests">#</a> Tests</h2>
       <ul>
         <li><a href="test.html" target="_blank">No Idea?</a></li>
         <li><a href="test/attach,detach.html" target="_blank">Attach, Detach</a></li>
@@ -124,7 +124,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
         <li><a href="test/value.html" target="_blank">Set Input Value</a></li>
         <li><a href="test/not.html" target="_blank">Validate Tag Name</a></li>
       </ul>
-      <h2 id="tweaks"><a href="#tweaks">#</a> Tweaks</h2>
+      <h2 id="tweaks"><a aria-hidden="true" href="#tweaks">#</a> Tweaks</h2>
       <ul>
         <li><a href="tweak/convert.html" target="_blank">Converted Tag Display</a></li>
         <li><a href="tweak/focus.hint.html" target="_blank">Hide Input Hint on Focus</a></li>
@@ -135,7 +135,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
         <li><a href="tweak/description.html" target="_blank">Warn for Duplicate Tags with Description Below the Input</a></li>
         <li><a href="tweak/target.html" target="_blank">Warn for Duplicate Tags with Flash Highlight</a></li>
       </ul>
-      <h2 id="constructor"><a href="#constructor">#</a> Constructor</h2>
+      <h2 id="constructor"><a aria-hidden="true" href="#constructor">#</a> Constructor</h2>
       <pre><code>const picker = new TagPicker(self, join = ', ');</code></pre>
       <pre><code>const picker = new TagPicker(self, state = {
     escape: [','],
@@ -145,7 +145,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
     pattern: null,
     with: []
 });</code></pre>
-      <h2 id="parameters"><a href="#parameters">#</a> Parameters</h2>
+      <h2 id="parameters"><a aria-hidden="true" href="#parameters">#</a> Parameters</h2>
       <h3><code>self</code></h3>
       <p>The <code>&lt;input&gt;</code> element.</p>
       <h3><code>join</code></h3>
@@ -164,7 +164,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <p>If defined, tag insertion will be performed only if tag name is matched with the pattern.</p>
       <h3><code>state.with</code></h3>
       <p>List of callable functions or objects containing an <code>attach()</code> method to be invoked each time the application is initialized. A very simple “plugin” system.</p>
-      <h2 id="methods"><a href="#methods">#</a> Methods</h2>
+      <h2 id="methods"><a aria-hidden="true" href="#methods">#</a> Methods</h2>
       <h3>Instance Methods</h3>
       <p>Instance methods are methods available through the results of a <code>TagPicker</code> construct.</p>
       <h4><code>picker.attach(self, state)</code></h4>
@@ -222,7 +222,7 @@ picker.set('baz', 2); // Insert “baz” tag at index 2 in the list</code></pre
       <pre><code>document.querySelectorAll('input').forEach(self => {
     const picker = TagPicker.of(self);
 });</code></pre>
-      <h2 id="properties"><a href="#properties">#</a> Properties</h2>
+      <h2 id="properties"><a aria-hidden="true" href="#properties">#</a> Properties</h2>
       <h3>Instance Properties</h3>
       <p>Instance properties are properties available through the results of a <code>TagPicker</code> construct.</p>
       <h4><code>picker.hooks</code></h4>
@@ -269,7 +269,7 @@ picker.clear(); // Clear value</code></pre>
 console.log([TagPicker.state, picker.state]);</code></pre>
       <h4><code>TagPicker.version</code></h4>
       <p>Returns the application version.</p>
-      <h2 id="extensions"><a href="#extensions">#</a> Extensions</h2>
+      <h2 id="extensions"><a aria-hidden="true" href="#extensions">#</a> Extensions</h2>
       <h3>Anatomy of an Extension</h3>
       <p>Extension as a function:</p>
       <pre><code>function Extension(self, state = {}) {
@@ -301,7 +301,7 @@ Object.defineProperty(Extension, 'name', {
         <li><a aria-disabled="true">Options Feature</a></li>
         <li><a href="../tag-picker.sort/index.html">Sortable Feature</a></li>
       </ul>
-      <h2 id="license"><a href="#license">#</a> License</h2>
+      <h2 id="license"><a aria-hidden="true" href="#license">#</a> License</h2>
       <p>Use it for free, pay if you get paid. So, you’ve just benefited financially after using this project? It’s a good idea to <a href="https://paypal.me/tatautaufik" target="_blank">share a little financial support</a> with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.</p>
       <p>Thank you! ❤️</p>
     </main>

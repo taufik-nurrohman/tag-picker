@@ -83,7 +83,7 @@ block content
         = ' '
         button(type='reset') Reset
     h2#usage
-      a(href='#usage') #
+      a(aria-hidden='true' href='#usage') #
       = ' Usage'
     div(role='note')
       p #[strong Note:] CSS variables have been removed since version 4.0.0. From now on, I will only provide a minimal style just to make viable interaction. Expect it to look ugly by default. The main goal of this application is to be able to integrate it seamlessly into your web design. By providing a minimal style, it is easy to add other styles to it to adapt it to your own web design. Have a look at the source code on this page to see how I adapted the style to resemble the default style of the previous version.
@@ -123,7 +123,7 @@ block content
       |
       | const picker = new TagPicker(document.querySelector('input'));
     h2#tests
-      a(href='#tests') #
+      a(aria-hidden='true' href='#tests') #
       = ' Tests'
     ul
       li: a(href='test.html' target='_blank') No Idea?
@@ -143,7 +143,7 @@ block content
       li: a(href='test/value.html' target='_blank') Set Input Value
       li: a(href='test/not.html' target='_blank') Validate Tag Name
     h2#tweaks
-      a(href='#tweaks') #
+      a(aria-hidden='true' href='#tweaks') #
       = ' Tweaks'
     ul
       li: a(href='tweak/convert.html' target='_blank') Converted Tag Display
@@ -155,7 +155,7 @@ block content
       li: a(href='tweak/description.html' target='_blank') Warn for Duplicate Tags with Description Below the Input
       li: a(href='tweak/target.html' target='_blank') Warn for Duplicate Tags with Flash Highlight
     h2#constructor
-      a(href='#constructor') #
+      a(aria-hidden='true' href='#constructor') #
       = ' Constructor'
     pre: code const picker = new TagPicker(self, join = ', ');
     pre: code
@@ -168,7 +168,7 @@ block content
       |     with: []
       | });
     h2#parameters
-      a(href='#parameters') #
+      a(aria-hidden='true' href='#parameters') #
       = ' Parameters'
     h3: code self
     p The #[code &lt;input&gt;] element.
@@ -189,7 +189,7 @@ block content
     h3: code state.with
     p List of callable functions or objects containing an #[code attach()] method to be invoked each time the application is initialized. A very simple “plugin” system.
     h2#methods
-      a(href='#methods') #
+      a(aria-hidden='true' href='#methods') #
       = ' Methods'
     h3 Instance Methods
     p Instance methods are methods available through the results of a #[code TagPicker] construct.
@@ -263,7 +263,7 @@ block content
       |     const picker = TagPicker.of(self);
       | });
     h2#properties
-     a(href='#properties') #
+     a(aria-hidden='true' href='#properties') #
      = ' Properties'
     h3 Instance Properties
     p Instance properties are properties available through the results of a #[code TagPicker] construct.
@@ -322,7 +322,7 @@ block content
     h4: code TagPicker.version
     p Returns the application version.
     h2#extensions
-      a(href='#extensions') #
+      a(aria-hidden='true' href='#extensions') #
       = ' Extensions'
     h3 Anatomy of an Extension
     p Extension as a function:
@@ -359,7 +359,7 @@ block content
       li: a(aria-disabled='true') Options Feature
       li: a(href='../tag-picker.sort/index.html') Sortable Feature
     h2#license
-      a(href='#license') #
+      a(aria-hidden='true' href='#license') #
       = ' License'
     p Use it for free, pay if you get paid. So, you’ve just benefited financially after using this project? It’s a good idea to #[a(href='https://paypal.me/tatautaufik' target='_blank') share a little financial support] with this open source project too. Your support will motivate me to do any further development, as well as to provide voluntary support to overcome problems related to this project.
     p Thank you! ❤️

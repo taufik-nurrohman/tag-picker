@@ -9,9 +9,35 @@ import {isArray, isFloat, isInstance, isInteger, isObject, isSet, isString} from
 import {offEvent, offEventDefault, onEvent} from '@taufik-nurrohman/event';
 import {toCount, toMapCount, toValue} from '@taufik-nurrohman/to';
 
+const EVENT_DOWN = 'down';
+const EVENT_UP = 'up';
+
+const EVENT_BLUR = 'blur';
+const EVENT_CUT = 'cut';
+const EVENT_FOCUS = 'focus';
+const EVENT_INPUT_START = 'beforeinput';
+const EVENT_KEY = 'key';
+const EVENT_KEY_DOWN = EVENT_KEY + EVENT_DOWN;
+const EVENT_KEY_UP = EVENT_KEY + EVENT_UP;
+const EVENT_MOUSE = 'mouse';
+const EVENT_MOUSE_DOWN = EVENT_MOUSE + EVENT_DOWN;
+const EVENT_MOUSE_UP = EVENT_MOUSE + EVENT_UP;
+const EVENT_PASTE = 'paste';
+const EVENT_RESET = 'reset';
+const EVENT_SUBMIT = 'submit';
+const EVENT_TOUCH = 'touch';
+const EVENT_TOUCH_END = EVENT_TOUCH + 'end';
+const EVENT_TOUCH_START = EVENT_TOUCH + 'start';
+
+const KEY_DOWN = 'Down';
+const KEY_LEFT = 'Left';
+const KEY_RIGHT = 'Right';
+const KEY_UP = 'Up';
+
 const KEY_A = 'a';
-const KEY_ARROW_LEFT = 'ArrowLeft';
-const KEY_ARROW_RIGHT = 'ArrowRight';
+const KEY_ARROW = 'Arrow';
+const KEY_ARROW_LEFT = KEY_ARROW + KEY_LEFT;
+const KEY_ARROW_RIGHT = KEY_ARROW + KEY_RIGHT;
 const KEY_BEGIN = 'Home';
 const KEY_DELETE_LEFT = 'Backspace';
 const KEY_DELETE_RIGHT = 'Delete';
@@ -203,6 +229,9 @@ function onKeyDownTag(e) {
             exit = true;
             tagLast = toValueLastFromMap(_tags);
             tagLast && focusTo(tagLast[2]);
+        } else if (KEY_ENTER === key || ' ' === key) {
+            exit = true;
+            getAria($, 'selected') ? letAria($, 'selected') : setAria($, 'selected', true);
         } else {
             setAria($, 'selected', true);
         }
@@ -248,11 +277,11 @@ function onKeyDownTag(e) {
         } else if (KEY_ENTER === key || ' ' === key) {
             exit = true;
             getAria($, 'selected') ? letAria($, 'selected') : setAria($, 'selected', true);
-            forEachMap(_tags, v => {
-                if (v[2] !== $ && getAria(v[2], 'selected')) {
-                    _tags.let(getTagValue(v[2]), 0);
-                }
-            });
+            // forEachMap(_tags, v => {
+            //     if (v[2] !== $ && getAria(v[2], 'selected')) {
+            //         _tags.let(getTagValue(v[2]), 0);
+            //     }
+            // });
         } else if (KEY_ESCAPE === key || KEY_TAB === key) {
             exit = true;
             selectToNone(), focusTo(picker);
@@ -412,7 +441,7 @@ function onPointerDownTag(e) {
     let $ = this,
         picker = getReference($),
         {_tags} = picker;
-    focusTo($);
+    focusTo($), selectTo($);
     if (!_keyIsCtrl && !_keyIsShift) {
         forEachMap(_tags, v => letAria(v[2], 'selected'));
     }
@@ -649,20 +678,20 @@ TagPicker._ = setObjectMethods(TagPicker, {
         setNext(self, mask);
         setChildLast(mask, self);
         if (form) {
-            onEvent('reset', form, onResetForm);
-            onEvent('submit', form, onSubmitForm);
+            onEvent(EVENT_RESET, form, onResetForm);
+            onEvent(EVENT_SUBMIT, form, onSubmitForm);
             setID(form);
             setReference(form, $);
         }
-        onEvent('beforeinput', textInput, onBeforeInputTextInput);
-        onEvent('cut', textInput, onCutTextInput);
-        onEvent('focus', self, onFocusSelf);
-        onEvent('focus', textInput, onFocusTextInput);
-        onEvent('keydown', textInput, onKeyDownTextInput);
-        onEvent('keyup', textInput, onKeyUpTextInput);
-        onEvent('mousedown', mask, onPointerDownMask);
-        onEvent('paste', textInput, onPasteTextInput);
-        onEvent('touchstart', mask, onPointerDownMask);
+        onEvent(EVENT_CUT, textInput, onCutTextInput);
+        onEvent(EVENT_FOCUS, self, onFocusSelf);
+        onEvent(EVENT_FOCUS, textInput, onFocusTextInput);
+        onEvent(EVENT_INPUT_START, textInput, onBeforeInputTextInput);
+        onEvent(EVENT_KEY_DOWN, textInput, onKeyDownTextInput);
+        onEvent(EVENT_KEY_UP, textInput, onKeyUpTextInput);
+        onEvent(EVENT_MOUSE_DOWN, mask, onPointerDownMask);
+        onEvent(EVENT_PASTE, textInput, onPasteTextInput);
+        onEvent(EVENT_TOUCH_START, mask, onPointerDownMask);
         self.tabIndex = -1;
         setReference(mask, $);
         $._mask = {
@@ -755,17 +784,17 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         }
         let tag = r[2],
             tagX = getElement('.' + n + '__x', tag);
-        offEvent('beforeinput', tag, onBeforeInputTag);
-        offEvent('blur', tag, onBlurTag);
-        offEvent('cut', tag, onCutTag);
-        offEvent('focus', tag, onFocusTag);
-        offEvent('keydown', tag, onKeyDownTag);
-        offEvent('keyup', tag, onKeyUpTag);
-        offEvent('mousedown', tag, onPointerDownTag);
-        offEvent('mousedown', tagX, onPointerDownTagX);
-        offEvent('paste', tag, onPasteTag);
-        offEvent('touchstart', tag, onPointerDownTag);
-        offEvent('touchstart', tagX, onPointerDownTagX);
+        offEvent(EVENT_BLUR, tag, onBlurTag);
+        offEvent(EVENT_CUT, tag, onCutTag);
+        offEvent(EVENT_FOCUS, tag, onFocusTag);
+        offEvent(EVENT_INPUT_START, tag, onBeforeInputTag);
+        offEvent(EVENT_KEY_DOWN, tag, onKeyDownTag);
+        offEvent(EVENT_KEY_UP, tag, onKeyUpTag);
+        offEvent(EVENT_MOUSE_DOWN, tag, onPointerDownTag);
+        offEvent(EVENT_MOUSE_DOWN, tagX, onPointerDownTagX);
+        offEvent(EVENT_PASTE, tag, onPasteTag);
+        offEvent(EVENT_TOUCH_START, tag, onPointerDownTag);
+        offEvent(EVENT_TOUCH_START, tagX, onPointerDownTagX);
         letElement(tagX), letElement(tag);
         r = letValueInMap(key, values);
         state.tags = values;
@@ -844,17 +873,17 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         setID(tagX);
         setAria(tagX, 'controls', getID(setID(tag)));
         if (!value[2]) {
-            onEvent('beforeinput', tag, onBeforeInputTag);
-            onEvent('blur', tag, onBlurTag);
-            onEvent('cut', tag, onCutTag);
-            onEvent('focus', tag, onFocusTag);
-            onEvent('keydown', tag, onKeyDownTag);
-            onEvent('keyup', tag, onKeyUpTag);
-            onEvent('mousedown', tag, onPointerDownTag);
-            onEvent('mousedown', tagX, onPointerDownTagX);
-            onEvent('paste', tag, onPasteTag);
-            onEvent('touchstart', tag, onPointerDownTag);
-            onEvent('touchstart', tagX, onPointerDownTagX);
+            onEvent(EVENT_BLUR, tag, onBlurTag);
+            onEvent(EVENT_CUT, tag, onCutTag);
+            onEvent(EVENT_FOCUS, tag, onFocusTag);
+            onEvent(EVENT_INPUT_START, tag, onBeforeInputTag);
+            onEvent(EVENT_KEY_DOWN, tag, onKeyDownTag);
+            onEvent(EVENT_KEY_UP, tag, onKeyUpTag);
+            onEvent(EVENT_MOUSE_DOWN, tag, onPointerDownTag);
+            onEvent(EVENT_MOUSE_DOWN, tagX, onPointerDownTagX);
+            onEvent(EVENT_PASTE, tag, onPasteTag);
+            onEvent(EVENT_TOUCH_START, tag, onPointerDownTag);
+            onEvent(EVENT_TOUCH_START, tagX, onPointerDownTagX);
         }
         setChildLast(tag, tagText);
         setChildLast(tag, tagX);

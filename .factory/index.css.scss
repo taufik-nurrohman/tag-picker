@@ -89,7 +89,6 @@ $name: 'tag-picker';
   }
   &__tag {
     cursor: pointer;
-    user-select: all;
     &[aria-disabled='true'] {
       &[aria-selected='true'] {
         background: rgba(0, 0, 255, 0.25);
