@@ -126,6 +126,7 @@
   line-height: 0;
   margin-right: -0.125em;
   position: relative;
+  user-select: none;
   width: 1em;
 }
 .tag-picker__x::after,

@@ -2,7 +2,7 @@ extends _index.pug
 
 block state
   - const scripts = ['index.js']
-  - const styles = ['../layout/index.min.css', 'index.min.css']
+  - const styles = ['../layout/index.min.css', '../layout/anchor/index.min.css', 'index.min.css']
   - const theme = '#000'
   - const title = 'Tag Picker ' + version
 
@@ -87,7 +87,9 @@ block content
       = ' Usage'
     div(role='note')
       p #[strong Note:] CSS variables have been removed since version 4.0.0. From now on, I will only provide a minimal style just to make viable interaction. Expect it to look ugly by default. The main goal of this application is to be able to integrate it seamlessly into your web design. By providing a minimal style, it is easy to add other styles to it to adapt it to your own web design. Have a look at the source code on this page to see how I adapted the style to resemble the default style of the previous version.
-    h3 Browser
+    h3#browser
+      a(aria-hidden='true' href='#browser') #
+      = ' Browser'
     pre: code
       | &lt;!DOCTYPE html&gt;
       | &lt;html dir="ltr"&gt;
@@ -110,14 +112,20 @@ block content
       |     &lt;/script&gt;
       |   &lt;/body&gt;
       | &lt;/html&gt;
-    h3 Node.js
+    h3#node-js
+      a(aria-hidden='true' href='#node-js') #
+      = ' Node.js'
     p Functions and methods in this application are mostly native JavaScript and are intended for use by the browser. Node.js doesn’t know about the DOM, so this kind of practice will probably be used more often to build new browser packages than to be used directly in the Node.js server.
-    h4 CommonJS
+    h4#cjs
+      a(aria-hidden='true' href='#cjs') #
+      = ' CommonJS'
     pre: code
       | const TagPicker = require('@taufik-nurrohman/tag-picker').default;
       |
       | const picker = new TagPicker(document.querySelector('input'));
-    h4 ECMAScript
+    h4#mjs
+      a(aria-hidden='true' href='#mjs') #
+      = ' ECMAScript'
     pre: code
       | import TagPicker from '@taufik-nurrohman/tag-picker';
       |
@@ -154,9 +162,9 @@ block content
       li: a(href='tweak/alert.html' target='_blank') Warn for Duplicate Tags with Alert Message
       li: a(href='tweak/description.html' target='_blank') Warn for Duplicate Tags with Description Below the Input
       li: a(href='tweak/target.html' target='_blank') Warn for Duplicate Tags with Flash Highlight
-    h2#constructor
-      a(aria-hidden='true' href='#constructor') #
-      = ' Constructor'
+    h2#constructors
+      a(aria-hidden='true' href='#constructors') #
+      = ' Constructors'
     pre: code const picker = new TagPicker(self, join = ', ');
     pre: code
       | const picker = new TagPicker(self, state = {
@@ -170,66 +178,122 @@ block content
     h2#parameters
       a(aria-hidden='true' href='#parameters') #
       = ' Parameters'
-    h3: code self
+    h3#parameter-self
+      a(aria-hidden='true' href='#parameter-self') #
+      = ' '
+      code self
     p The #[code &lt;input&gt;] element.
-    h3: code join
+    h3#parameter-join
+      a(aria-hidden='true' href='#parameter-join') #
+      = ' '
+      code join
     p The character to join the tags (usually a comma followed by a space).
-    h3: code state
+    h3#parameter-state
+      a(aria-hidden='true' href='#parameter-state') #
+      = ' '
+      code state
     p The configuration data.
-    h3: code state.escape
+    h4#parameter-state-escape
+      a(aria-hidden='true' href='#parameter-state-escape') #
+      = ' '
+      code state.escape
     p List of characters to trigger the tag insertion. It is #[code='[\',\']'] by default, which means that you cannot have a #[code ','] character in the tag name. You can also add #[code='\'\\n\''] and #[code='\'\\t\''] to the list so that it will insert a tag when you press the #[kbd Tab] or #[kbd Enter] key.
-    h3: code state.join
+    h4#parameter-state-join
+      a(aria-hidden='true' href='#parameter-state-join') #
+      = ' '
+      code state.join
     p The character to join the tags (usually a comma followed by a space).
-    h3: code state.max
+    h4#parameter-state-max
+      a(aria-hidden='true' href='#parameter-state-max') #
+      = ' '
+      code state.max
     p The maximum number of tags that can be inserted.
-    h3: code state.min
+    h4#parameter-state-min
+      a(aria-hidden='true' href='#parameter-state-min') #
+      = ' '
+      code state.min
     p The minimum number of tags that must be inserted to be able to submit the form. The default value of this state is set to #[code 0], but if the #[code required] attribute is present on the #[code &lt;input&gt;] element, then the default value of this state will be set to #[code 1].
-    h3: code state.pattern
+    h4#parameter-state-pattern
+      a(aria-hidden='true' href='#parameter-state-pattern') #
+      = ' '
+      code state.pattern
     p If defined, tag insertion will be performed only if tag name is matched with the pattern.
-    h3: code state.with
+    h4#parameter-state-with
+      a(aria-hidden='true' href='#parameter-state-with') #
+      = ' '
+      code state.with
     p List of callable functions or objects containing an #[code attach()] method to be invoked each time the application is initialized. A very simple “plugin” system.
     h2#methods
       a(aria-hidden='true' href='#methods') #
       = ' Methods'
-    h3 Instance Methods
+    h3#instance-methods
+      a(aria-hidden='true' href='#instance-methods') #
+      = ' Instance Methods'
     p Instance methods are methods available through the results of a #[code TagPicker] construct.
-    h4: code picker.attach(self, state)
+    h4#instance-method-attach
+      a(aria-hidden='true' href='#instance-method-attach') #
+      = ' '
+      code picker.attach(self, state)
     p Re-initializes the application and its extensions after it has been detached.
     pre: code
       | picker.attach();
-    h4: code picker.blur()
+    h4#instance-method-blur
+      a(aria-hidden='true' href='#instance-method-blur') #
+      = ' '
+      code picker.blur()
     p Blurs from the tag picker’s input.
     pre: code
       | picker.blur();
-    h4: code picker.detach()
+    h4#instance-method-detach
+      a(aria-hidden='true' href='#instance-method-detach') #
+      = ' '
+      code picker.detach()
     p Disables the application methods (except for the #[code attach()] method) and executes the #[code detach()] method of the extensions, if they are present.
     pre: code
       | picker.detach();
-    h4: code picker.fire(event, data, that)
+    h4#instance-method-fire
+      a(aria-hidden='true' href='#instance-method-fire') #
+      = ' '
+      code picker.fire(event, data, that)
     p Fires an event.
     pre: code
       | picker.fire('change', [picker._event]);
-    h4: code picker.focus(mode = true)
+    h4#instance-method-focus
+      a(aria-hidden='true' href='#instance-method-focus') #
+      = ' '
+      code picker.focus(mode = true)
     p Focuses to the tag picker’s input. If it has a text, it will select the text as well.
     pre: code
       | picker.focus(); // Focus and select the text
       | picker.focus(-1); // Focus and put the caret to the start of the text
       | picker.focus(+1); // Focus and put the caret to the end of the text
-    h4: code picker.get(name)
+    h4#instance-method-get
+      a(aria-hidden='true' href='#instance-method-get') #
+      = ' '
+      code picker.get(name)
     p Returns the tag position in the list, starting from #[code 0].
     pre: code
       | if (null !== picker.get('foo')) { … }
-    h4: code picker.let(name)
+    h4#instance-method-let
+      a(aria-hidden='true' href='#instance-method-let') #
+      = ' '
+      code picker.let(name)
     p Removes a tag by its name.
     pre: code
       | picker.let('foo'); // Remove “foo” tag
       | picker.let(); // Reset to the initial value
-    h4: code picker.off(event, then)
+    h4#instance-method-off
+      a(aria-hidden='true' href='#instance-method-off') #
+      = ' '
+      code picker.off(event, task)
     p Removes an event.
     pre: code
       | picker.off('change'); // Remove all events from the `change` event container
       | picker.off('change', onChange); // Remove `onChange` event from the `change` event container
-    h4: code picker.on(event, then)
+    h4#instance-method-on
+      a(aria-hidden='true' href='#instance-method-on') #
+      = ' '
+      code picker.on(event, task)
     p Adds a new event.
     pre: code
       | picker.on('change', function () {
@@ -241,22 +305,28 @@ block content
       | }
       |
       | picker.on('change', onChange);
-    h4: code picker.set(name, at = -1)
-    h4: code picker.set([name, title ?? name], at = -1)
+    h4#instance-method-set
+      a(aria-hidden='true' href='#instance-method-set') #
+      = ' '
+      code picker.set(name)
     p Adds a new tag with the given name.
     pre: code
       | picker.set('foo'); // Append “foo” tag
-      | picker.set('bar', 0); // Prepend “bar” tag
-      | picker.set('baz', 2); // Insert “baz” tag at index 2 in the list
-    pre: code
-      | picker.set(['cry', '😭']); // Append “cry” tag displayed as “😭”
-    h3 Static Methods
+    h3#static-methods
+      a(aria-hidden='true' href='#static-methods') #
+      = ' Static Methods'
     p Static methods are methods available directly on the #[code TagPicker] object.
-    h4: code TagPicker.from(self, state)
+    h4#static-method-from
+      a(aria-hidden='true' href='#static-method-from') #
+      = ' '
+      code TagPicker.from(self, state)
     p Creates a new #[code TagPicker] instance.
     pre: code
       | const picker = TagPicker.from(document.querySelector('input'));
-    h4: code TagPicker.of(self)
+    h4#static-method-of
+      a(aria-hidden='true' href='#static-method-of') #
+      = ' '
+      code TagPicker.of(self)
     p Gets #[code TagPicker] instance of an element.
     pre: code
       | document.querySelectorAll('input').forEach(self => {
@@ -265,31 +335,51 @@ block content
     h2#properties
      a(aria-hidden='true' href='#properties') #
      = ' Properties'
-    h3 Instance Properties
+    h3#instance-properties
+      a(aria-hidden='true' href='#instance-properties') #
+      = ' Instance Properties'
     p Instance properties are properties available through the results of a #[code TagPicker] construct.
-    h4: code picker.hooks
+    h4#instance-property-hooks
+      a(aria-hidden='true' href='#instance-property-hooks') #
+      = ' '
+      code picker.hooks
     p Returns the events data.
     pre: code
       | console.log(picker.hooks);
-    h4: code picker.mask
+    h4#instance-property-mask
+      a(aria-hidden='true' href='#instance-property-mask') #
+      = ' '
+      code picker.mask
     p Returns the tag picker’s mask.
     pre: code
       | picker.mask.classList.add(picker.state.n + '--dark');
-    h4: code picker.self
+    h4#instance-property-self
+      a(aria-hidden='true' href='#instance-property-self') #
+      = ' '
+      code picker.self
     p Returns the #[code &lt;input&gt;] element.
     pre: code
       | console.log(picker.self.getAttribute('name'));
-    h4: code picker.state
+    h4#instance-property-state
+      a(aria-hidden='true' href='#instance-property-state') #
+      = ' '
+      code picker.state
     p Returns the application states if any.
     pre: code
       | console.log(picker.state);
-    h4: code picker.text
+    h4#instance-property-text
+      a(aria-hidden='true' href='#instance-property-text') #
+      = ' '
+      code picker.text
     p Gets or sets the current text in the tag picker’s input.
     pre: code
       | console.log(picker.text);
     pre: code
       | picker.text = 'foo, bar, baz';
-    h4: code picker.value
+    h4#instance-property-value
+      a(aria-hidden='true' href='#instance-property-value') #
+      = ' '
+      code picker.value
     p Proxy that passes to the #[code picker.self.value] property, with additional actions that are executed while the value is being set.
     pre: code
       | console.log(picker.value);
@@ -299,9 +389,14 @@ block content
       | });
       |
       | picker.value = 'foo, bar, baz';
-    h3 Static Properties
+    h3#static-properties
+      a(aria-hidden='true' href='#static-properties') #
+      = ' Static Properties'
     p Static properties are properties available directly on the #[code TagPicker] object.
-    h4: code TagPicker._
+    h4#static-property-prototype
+      a(aria-hidden='true' href='#static-property-prototype') #
+      = ' '
+      code TagPicker._
     p Alias for #[code TagPicker.prototype].
     pre: code
       | TagPicker._.clear = function () {
@@ -311,7 +406,10 @@ block content
       | const picker = new TagPicker(document.querySelector('input'));
       |
       | picker.clear(); // Clear value
-    h4: code TagPicker.state
+    h4#static-property-state
+      a(aria-hidden='true' href='#static-property-prototype') #
+      = ' '
+      code TagPicker.state
     p Returns the default values of #[code picker.state].
     pre: code
       | const picker = new TagPicker(document.querySelector('input'), {
@@ -319,12 +417,17 @@ block content
       | });
       |
       | console.log([TagPicker.state, picker.state]);
-    h4: code TagPicker.version
+    h4#static-property-version
+      a(aria-hidden='true' href='#static-property-version') #
+      = ' '
+      code TagPicker.version
     p Returns the application version.
     h2#extensions
       a(aria-hidden='true' href='#extensions') #
       = ' Extensions'
-    h3 Anatomy of an Extension
+    h3#anatomy-of-an-extension
+      a(aria-hidden='true' href='#anatomy-of-an-extension') #
+      = ' Anatomy of an Extension'
     p Extension as a function:
     pre: code
       | function Extension(self, state = {}) {
@@ -343,7 +446,9 @@ block content
       |     detach: function (self, state = {}) {},
       |     name: 'Extension'
       | };
-    h3 Usage of an Extension
+    h3#usage-of-an-extension
+      a(aria-hidden='true' href='#usage-of-an-extension') #
+      = ' Usage of an Extension'
     p As a core extension:
     pre: code
       | TagPicker.state.with.push(Extension);
@@ -352,7 +457,9 @@ block content
       | const picker = new TagPicker(document.querySelector('input'), {
       |     with: [Extension]
       | });
-    h3 List of Extensions
+    h3#list-of-extensions
+      a(aria-hidden='true' href='#list-of-extensions') #
+      = ' List of Extensions'
     ul
       li: a(aria-disabled='true') Clear Feature
       li: a(aria-disabled='true') History Feature
