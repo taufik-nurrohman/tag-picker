@@ -165,6 +165,10 @@ block content
     h2#constructors
       a(aria-hidden='true' href='#constructors') #
       = ' Constructors'
+    h3#constructor-tag-picker
+      a(aria-hidden='true' href='#constructor-tag-picker') #
+      = ' '
+      code TagPicker(self, state)
     pre: code const picker = new TagPicker(self, join = ', ');
     pre: code
       | const picker = new TagPicker(self, state = {
@@ -175,6 +179,13 @@ block content
       |     pattern: null,
       |     with: []
       | });
+    h3#constructor-tag-picker-tags
+      a(aria-hidden='true' href='#constructor-tag-picker-tags') #
+      = ' '
+      code TagPicker.Tags(picker, tags)
+    p: em TODO
+    pre: code
+      | const tags = new TagPicker.Tags(picker, ['Tag 1', 'Tag 2', 'Tag 3']);
     h2#parameters
       a(aria-hidden='true' href='#parameters') #
       = ' Parameters'
