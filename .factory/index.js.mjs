@@ -5,9 +5,10 @@ import {fromStates, fromValue} from '@taufik-nurrohman/from';
 import {getAria, getElement, getElementIndex, getHTML, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setClasses, setElement, setID, setNext, setPrev, setStyle, setStyles, setText, setValue} from '@taufik-nurrohman/document';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
-import {isArray, isFloat, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
+import {isArray, isFloat, isFunction, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
 import {offEvent, offEventDefault, onEvent} from '@taufik-nurrohman/event';
 import {toCount, toMapCount, toValue} from '@taufik-nurrohman/to';
+import {toPattern} from '@taufik-nurrohman/pattern';
 
 const EVENT_DOWN = 'down';
 const EVENT_UP = 'up';
@@ -471,8 +472,6 @@ function onPointerDownTagX(e) {
         tag = getParent($),
         picker = getReference(tag),
         {_tags} = picker;
-    offEvent('mousedown', $, onPointerDownTagX);
-    offEvent('touchstart', $, onPointerDownTagX);
     letValueInMap(getTagValue(tag), _tags);
     focusTo(picker), offEventDefault(e);
 }
@@ -482,7 +481,15 @@ function onResetForm() {
 }
 
 function onSubmitForm(e) {
-    console.log('submit');
+    let $ = this,
+        picker = getReference($),
+        {_tags, max, min} = picker,
+        count = _tags.count();
+    if (count > max) {
+        picker.fire('max.tags', [count, max]).focus(), offEventDefault(e);
+    } else if (count < min) {
+        picker.fire('min.tags', [count, min]).focus(), offEventDefault(e);
+    }
 }
 
 function TagPicker(self, state) {
@@ -565,14 +572,18 @@ setObjectAttributes(TagPicker, {
     },
     max: {
         get: function () {
+            let {max} = this.state;
+            return Infinity === max || (isInteger(max) && max >= 0) ? max : Infinity;
         },
         set: function (value) {
             let $ = this;
-            return $;
+            return ($.state.max = isInteger(value) && value >= 0 ? value : Infinity), $;
         }
     },
     min: {
         get: function () {
+            let {min} = this.state;
+            return isInteger(min) && min >= 0 ? min : 0;
         },
         set: function (value) {
             let $ = this;
@@ -717,8 +728,8 @@ TagPicker._ = setObjectMethods(TagPicker, {
             text: text
         };
         // Re-assign some state value(s) using the setter to either normalize or reject the initial value
-        // $.max = isMultipleSelect ? (max ?? Infinity) : 1;
-        // $.min = isInputSelf ? 0 : (min ?? 1);
+        $.max = Infinity === max || (isInteger(max) && max >= 0) ? max : Infinity;
+        $.min = isInteger(min) && min >= 0 ? min : 0;
         let {_active} = $,
             {join, tags} = state, tagsValues;
         // Force the `this._active` value to `true` to set the initial value
@@ -784,14 +795,19 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
     delete: function (key, _fireHook = 1) {
         let $ = this,
             {of, values} = $,
-            {_active, _mask, self, state} = of,
-            {join, n} = state, r, tagsValues = [];
+            {_active} = of;
         if (!_active) {
             return false;
         }
+        let {_mask, min, self, state} = of,
+            {join, n} = state,
+            count, r, tagsValues = [];
+        if ((count = $.count()) < min + 1) {
+            return (_fireHook && of.fire('min.tags', [count, min])), false;
+        }
         if (!isSet(key)) {
             forEachMap(values, (v, k) => $.let(k, 0));
-            return _fireHook && of.fire('let.tags', [[]]) && 0 === $.count();
+            return (_fireHook && of.fire('let.tags', [[]])), 0 === $.count();
         }
         if (!(r = getValueInMap(key = toValue(key), values))) {
             return (_fireHook && of.fire('not.tag', [key])), false;
@@ -836,13 +852,13 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         if (!_active) {
             return false;
         }
-        if ($.has(key = toValue(key))) {
-            return (_fireHook && of.fire('has.tag', [key])), false;
-        }
-        let {_mask, self, state} = of,
+        let {_mask, max, self, state} = of,
             {text} = _mask,
-            {join, n} = state,
-            classes, styles, tag, tagText, tagX, tagsValues = [];
+            {join, n, pattern} = state,
+            classes, count, r, styles, tag, tagText, tagX, tagsValues = [];
+        if ((count = $.count()) >= max) {
+            return (_fireHook && of.fire('max.tags', [count, max])), false;
+        }
         // `picker.tags.set('asdf')`
         if (!isSet(value)) {
             value = [key, {}];
@@ -852,7 +868,21 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         // `picker.tags.set('asdf', [ … ])`
         } else {}
         let {value: v} = value[1];
-        v = fromValue(v || key);
+        if ("" === (v = fromValue(v || key)) || (isString(pattern) && !toPattern(pattern).test(v))) {
+            return (_fireHook && of.fire('not.tag', [key])), false;
+        }
+        if (isFunction(pattern)) {
+            if (isArray(r = pattern.call(of, v))) {
+                key = v = r[1] ? (r[1].value ?? r[0]) : r[0];
+                value = r;
+            } else if (isString(r)) {
+                key = v = r;
+                value[0] = r;
+            }
+        }
+        if ($.has(key = toValue(key))) {
+            return (_fireHook && of.fire('has.tag', [key])), false;
+        }
         tag = value[2] || setElement('data', {
             'class': n + '__tag',
             // Make the tag “content editable”, so that the “Cut” option is available in the context menu, but do not
@@ -906,6 +936,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         setPrev(text, tag);
         setReference(tag, of);
         value[2] = tag;
+        _fireHook && of.fire('is.tag', [key]);
         setValueInMap(key, value, values);
         state.tags = values;
         forEachMap(values, (v, k) => tagsValues.push(fromValue(k)));

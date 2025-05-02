@@ -1,0 +1,29 @@
+extends ../../_index.pug
+
+block state
+  - const scripts = ['../../index.min.js']
+  - const styles = ['../../index.min.css']
+  - const title = 'Tag Picker'
+
+block script
+  script
+    | const picker = new TagPicker(document.querySelector('input'), {
+    |     pattern: function (value) {
+    |         return [value, {
+    |             value: '@' + (value || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "")
+    |         }];
+    |     }
+    | });
+
+block style
+  style
+    | .tag-picker {
+    |   width: 100%;
+    | }
+
+block content
+  main
+    form(method='get' target='_blank')
+      p Convert tag value to #[code @kebab-case] and keep the original input as it is.
+      p: input(name='test' type='text')
+      p: button(type='submit') Submit

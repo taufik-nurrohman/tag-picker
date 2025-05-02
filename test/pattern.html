@@ -14,19 +14,16 @@
   </head>
   <body>
     <main>
-      <p>Submitting a form by pressing the <em>Submit</em> button vs. pressing the <kbd>Enter</kbd> key in the tag picker visual.</p>
+      <p>Convert tag name to <code>@kebab-case</code>. Also have a look at how I did a tag value conversion without changing the original input <a href="pattern/value.html">here</a>.</p>
       <form method="get" target="_blank">
-        <p><input name="test" type="text" value="foo, bar"></p>
-        <p><label><input name="prevent" type="checkbox"> <span>Test Default Prevention via JavaScript</span></label></p>
+        <p><input name="test" type="text"></p>
         <p><button type="submit">Submit</button></p>
       </form>
     </main>
     <script src="../index.min.js"></script>
     <script>
-      const picker = new TagPicker(document.forms[0].test);
-      picker.self.form.addEventListener('submit', function (e) {
-          console.log(picker.value);
-          this.prevent.checked && e.preventDefault();
+      const picker = new TagPicker(document.querySelector('input'), {
+          pattern: value => '@' + (value || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "")
       });
     </script>
   </body>

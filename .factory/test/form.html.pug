@@ -7,7 +7,7 @@ block state
 
 block script
   script
-    | const picker = new TagPicker(document.forms[0].tags);
+    | const picker = new TagPicker(document.forms[0].test);
     |
     | picker.self.form.addEventListener('submit', function (e) {
     |     console.log(picker.value);
@@ -23,8 +23,8 @@ block style
 block content
   main
     p Submitting a form by pressing the #[em Submit] button vs. pressing the #[kbd Enter] key in the tag picker visual.
-    form(method='get')
-      p: input(name='tags' type='text' value='foo, bar')
+    form(method='get' target='_blank')
+      p: input(name='test' type='text' value='foo, bar')
       p
         label
           input(name='prevent' type='checkbox')

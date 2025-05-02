@@ -11,8 +11,8 @@ block script
     |     min: 3
     | });
     |
-    | picker.on('min.tags', function () {
-    |     console.error('The minimum number of tags that must be inserted to be able to submit the form is ' + this.state.min + '.');
+    | picker.on('min.tags', function (count, min) {
+    |     alert('The minimum number of tags that must be inserted to be able to submit the form is ' + min + '.');
     | });
 
 block style
@@ -23,7 +23,7 @@ block style
 
 block content
   main
-    p Minimum tags inserted to be able to submit the form is 3.
-    form(method='get')
-      p: input(name='tags' type='text')
+    p Minimum tags inserted to be able to submit the form is #[code 3].
+    form(method='get' target='_blank')
+      p: input(name='test' type='text')
       p: button(type='submit') Submit

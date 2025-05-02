@@ -25,10 +25,10 @@
       const picker = new TagPicker(document.querySelector('input'), {
           pattern: '^[a-z\\d]+(-[a-z\\d]+)*$'
       });
-      picker.on('is.tag', function (e, tag) {
+      picker.on('is.tag', tag => {
           console.info('The input “' + tag + '” is a valid tag name.');
       });
-      picker.on('not.tag', function (e, tag) {
+      picker.on('not.tag', tag => {
           console.error('The input “' + tag + '” is not a valid tag name.');
       });
     </script>

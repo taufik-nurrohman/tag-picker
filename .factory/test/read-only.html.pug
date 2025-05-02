@@ -17,8 +17,8 @@ block style
 
 block content
   main
-    form(method='get')
-      p: input(name='tags' readonly type='text' value='foo, bar')
+    form(method='get' target='_blank')
+      p: input(name='test' readonly type='text' value='foo, bar')
       p
         label
           input(checked onchange='picker.self.readOnly = this.checked; picker.detach().attach();' type='checkbox')

@@ -14,9 +14,9 @@
   </head>
   <body>
     <main>
-      <p>Minimum tags inserted to be able to submit the form is 3.</p>
-      <form method="get">
-        <p><input name="tags" type="text"></p>
+      <p>Minimum tags inserted to be able to submit the form is <code>3</code>.</p>
+      <form method="get" target="_blank">
+        <p><input name="test" type="text"></p>
         <p><button type="submit">Submit</button></p>
       </form>
     </main>
@@ -25,8 +25,8 @@
       const picker = new TagPicker(document.querySelector('input'), {
           min: 3
       });
-      picker.on('min.tags', function () {
-          console.error('The minimum number of tags that must be inserted to be able to submit the form is ' + this.state.min + '.');
+      picker.on('min.tags', function (count, min) {
+          alert('The minimum number of tags that must be inserted to be able to submit the form is ' + min + '.');
       });
     </script>
   </body>

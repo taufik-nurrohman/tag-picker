@@ -117,6 +117,9 @@
     var isFloat = function isFloat(x) {
         return isNumber(x) && 0 !== x % 1;
     };
+    var isFunction = function isFunction(x) {
+        return 'function' === typeof x;
+    };
     var isInstance = function isInstance(x, of, exact) {
         if (!x || 'object' !== typeof x) {
             return false;
@@ -858,6 +861,15 @@
         }
         node.addEventListener(name, then, options);
     };
+    var isPattern = function isPattern(pattern) {
+        return isInstance(pattern, RegExp);
+    };
+    var toPattern = function toPattern(pattern, opt) {
+        if (isPattern(pattern)) {
+            return pattern;
+        }
+        return new RegExp(pattern, isSet(opt) ? opt : 'g');
+    };
     var EVENT_DOWN = 'down';
     var EVENT_UP = 'up';
     var EVENT_BLUR = 'blur';
@@ -1342,8 +1354,6 @@
             tag = getParent($),
             picker = getReference(tag),
             _tags = picker._tags;
-        offEvent('mousedown', $, onPointerDownTagX);
-        offEvent('touchstart', $, onPointerDownTagX);
         letValueInMap(getTagValue(tag), _tags);
         focusTo(picker), offEventDefault(e);
     }
@@ -1353,7 +1363,17 @@
     }
 
     function onSubmitForm(e) {
-        console.log('submit');
+        var $ = this,
+            picker = getReference($),
+            _tags = picker._tags,
+            max = picker.max,
+            min = picker.min,
+            count = _tags.count();
+        if (count > max) {
+            picker.fire('max.tags', [count, max]).focus(), offEventDefault(e);
+        } else if (count < min) {
+            picker.fire('min.tags', [count, min]).focus(), offEventDefault(e);
+        }
     }
 
     function TagPicker(self, state) {
@@ -1429,14 +1449,20 @@
             }
         },
         max: {
-            get: function get() {},
+            get: function get() {
+                var max = this.state.max;
+                return Infinity === max || isInteger(max) && max >= 0 ? max : Infinity;
+            },
             set: function set(value) {
                 var $ = this;
-                return $;
+                return $.state.max = isInteger(value) && value >= 0 ? value : Infinity, $;
             }
         },
         min: {
-            get: function get() {},
+            get: function get() {
+                var min = this.state.min;
+                return isInteger(min) && min >= 0 ? min : 0;
+            },
             set: function set(value) {
                 var $ = this;
                 return $;
@@ -1507,9 +1533,9 @@
             $._value = null;
             $.self = self;
             $.state = state;
-            var _state = state;
-            _state.max;
-            var min = _state.min,
+            var _state = state,
+                max = _state.max,
+                min = _state.min,
                 n = _state.n,
                 isDisabledSelf = isDisabled(self),
                 isReadOnlySelf = isReadOnly(self),
@@ -1593,8 +1619,8 @@
                 text: text
             };
             // Re-assign some state value(s) using the setter to either normalize or reject the initial value
-            // $.max = isMultipleSelect ? (max ?? Infinity) : 1;
-            // $.min = isInputSelf ? 0 : (min ?? 1);
+            $.max = Infinity === max || isInteger(max) && max >= 0 ? max : Infinity;
+            $.min = isInteger(min) && min >= 0 ? min : 0;
             var _active = $._active,
                 _state2 = state,
                 join = _state2.join,
@@ -1666,15 +1692,20 @@
                 of = $.of,
                 values = $.values,
                 _active = of._active;
+            if (!_active) {
+                return false;
+            }
             of._mask;
-            var self = of.self,
+            var min = of.min,
+                self = of.self,
                 state = of.state,
                 join = state.join,
                 n = state.n,
+                count,
                 r,
                 tagsValues = [];
-            if (!_active) {
-                return false;
+            if ((count = $.count()) < min + 1) {
+                return _fireHook && of.fire('min.tags', [count, min]), false;
             }
             if (!isSet(key)) {
                 forEachMap(values, function (v, k) {
@@ -1682,7 +1713,7 @@
                 });
                 return _fireHook && of.fire('let.tags', [
                     []
-                ]) && 0 === $.count();
+                ]), 0 === $.count();
             }
             if (!(r = getValueInMap(key = _toValue(key), values))) {
                 return _fireHook && of.fire('not.tag', [key]), false;
@@ -1737,21 +1768,25 @@
             if (!_active) {
                 return false;
             }
-            if ($.has(key = _toValue(key))) {
-                return _fireHook && of.fire('has.tag', [key]), false;
-            }
             var _mask = of._mask,
+                max = of.max,
                 self = of.self,
                 state = of.state,
                 text = _mask.text,
                 join = state.join,
                 n = state.n,
+                pattern = state.pattern,
                 classes,
+                count,
+                r,
                 styles,
                 tag,
                 tagText,
                 tagX,
                 tagsValues = [];
+            if ((count = $.count()) >= max) {
+                return _fireHook && of.fire('max.tags', [count, max]), false;
+            }
             // `picker.tags.set('asdf')`
             if (!isSet(value)) {
                 value = [key, {}];
@@ -1761,7 +1796,22 @@
                 // `picker.tags.set('asdf', [ … ])`
             } else;
             var v = value[1].value;
-            v = _fromValue(v || key);
+            if ("" === (v = _fromValue(v || key)) || isString(pattern) && !toPattern(pattern).test(v)) {
+                return _fireHook && of.fire('not.tag', [key]), false;
+            }
+            if (isFunction(pattern)) {
+                if (isArray(r = pattern.call(of, v))) {
+                    var _r$1$value;
+                    key = v = r[1] ? (_r$1$value = r[1].value) != null ? _r$1$value : r[0] : r[0];
+                    value = r;
+                } else if (isString(r)) {
+                    key = v = r;
+                    value[0] = r;
+                }
+            }
+            if ($.has(key = _toValue(key))) {
+                return _fireHook && of.fire('has.tag', [key]), false;
+            }
             tag = value[2] || setElement('data', {
                 'class': n + '__tag',
                 // Make the tag “content editable”, so that the “Cut” option is available in the context menu, but do not
@@ -1815,6 +1865,7 @@
             setPrev(text, tag);
             setReference(tag, of);
             value[2] = tag;
+            _fireHook && of.fire('is.tag', [key]);
             setValueInMap(key, value, values);
             state.tags = values;
             forEachMap(values, function (v, k) {

@@ -5,7 +5,7 @@
     <meta content="width=device-width" name="viewport">
     <meta content="Better tags input interaction with JavaScript." name="description">
     <title>Tag Picker</title>
-    <link href="../index.min.css" rel="stylesheet">
+    <link href="../../index.min.css" rel="stylesheet">
     <style>
       .tag-picker {
         width: 100%;
@@ -14,19 +14,20 @@
   </head>
   <body>
     <main>
-      <p>Maximum tags allowed to be inserted is <code>3</code>. Some text to copy: <mark style="user-select:all;" tabindex="0">foo, bar, baz, qux</mark></p>
       <form method="get" target="_blank">
+        <p>Convert tag value to <code>@kebab-case</code> and keep the original input as it is.</p>
         <p><input name="test" type="text"></p>
         <p><button type="submit">Submit</button></p>
       </form>
     </main>
-    <script src="../index.min.js"></script>
+    <script src="../../index.min.js"></script>
     <script>
       const picker = new TagPicker(document.querySelector('input'), {
-          max: 3
-      });
-      picker.on('max.tags', function (count, max) {
-          alert('The maximum number of tags that can be inserted is ' + max + '.');
+          pattern: function (value) {
+              return [value, {
+                  value: '@' + (value || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "")
+              }];
+          }
       });
     </script>
   </body>
