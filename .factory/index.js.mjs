@@ -13,6 +13,7 @@ const EVENT_DOWN = 'down';
 const EVENT_UP = 'up';
 
 const EVENT_BLUR = 'blur';
+const EVENT_COPY = 'copy';
 const EVENT_CUT = 'cut';
 const EVENT_FOCUS = 'focus';
 const EVENT_INPUT_START = 'beforeinput';
@@ -132,20 +133,33 @@ function onBlurTag() {
     }
 }
 
-function onCutTag(e) {
+function onCopyTag(e) {
     offEventDefault(e);
     let $ = this,
         picker = getReference($),
         {_tags, state} = picker,
-        {join} = state, selected = [], v;
+        {join} = state, selected = [];
     setAria($, 'selected', true);
     forEachMap(_tags, v => {
         if (getAria(v[2], 'selected')) {
-            selected.push(v = getTagValue(v[2]));
-            _tags.let(v, 0);
+            selected.push(getTagValue(v[2]));
         }
     });
-    e.clipboardData.setData('text/plain', selected.join(join)), focusTo(picker.fire('change', [picker.value]));
+    e.clipboardData.setData('text/plain', selected.join(join));
+}
+
+function onCutTag(e) {
+    offEventDefault(e);
+    let $ = this,
+        picker = getReference($),
+        {_tags} = picker;
+    onCopyTag.call($, e);
+    forEachMap(_tags, v => {
+        if (getAria(v[2], 'selected')) {
+            _tags.let(getTagValue(v[2]), 0);
+        }
+    });
+    focusTo(picker.fire('change', [picker.value]));
 }
 
 function onCutTextInput() {
@@ -785,6 +799,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         let tag = r[2],
             tagX = getElement('.' + n + '__x', tag);
         offEvent(EVENT_BLUR, tag, onBlurTag);
+        offEvent(EVENT_COPY, tag, onCopyTag);
         offEvent(EVENT_CUT, tag, onCutTag);
         offEvent(EVENT_FOCUS, tag, onFocusTag);
         offEvent(EVENT_INPUT_START, tag, onBeforeInputTag);
@@ -874,6 +889,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         setAria(tagX, 'controls', getID(setID(tag)));
         if (!value[2]) {
             onEvent(EVENT_BLUR, tag, onBlurTag);
+            onEvent(EVENT_COPY, tag, onCopyTag);
             onEvent(EVENT_CUT, tag, onCutTag);
             onEvent(EVENT_FOCUS, tag, onFocusTag);
             onEvent(EVENT_INPUT_START, tag, onBeforeInputTag);
