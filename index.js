@@ -1017,7 +1017,7 @@
         onCopyTag.call($, e);
         forEachMap(_tags, function (v) {
             if (getAria(v[2], 'selected')) {
-                _tags.let(getTagValue(v[2]), 0);
+                letAria(v[2], 'selected'), _tags.let(getTagValue(v[2]), 0);
             }
         });
         focusTo(picker.fire('change', [picker.value]));
@@ -1142,7 +1142,7 @@
                 forEachMap(_tags, function (v) {
                     if (getAria(v[2], 'selected')) {
                         tagPrev = getPrev(v[2]);
-                        _tags.let(getTagValue(v[2]), 0);
+                        letAria(v[2], 'selected'), _tags.let(getTagValue(v[2]), 0);
                     }
                 });
                 focusTo(tagPrev || picker), picker.fire('change', [picker.value]);
@@ -1153,18 +1153,13 @@
                 forEachMap(_tags, function (v) {
                     if (getAria(v[2], 'selected')) {
                         tagNext = getNext(v[2]);
-                        _tags.let(getTagValue(v[2]), 0);
+                        letAria(v[2], 'selected'), _tags.let(getTagValue(v[2]), 0);
                     }
                 });
                 focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker.value]);
             } else if (KEY_ENTER === key || ' ' === key) {
                 exit = true;
                 getAria($, 'selected') ? letAria($, 'selected') : setAria($, 'selected', true);
-                // forEachMap(_tags, v => {
-                //     if (v[2] !== $ && getAria(v[2], 'selected')) {
-                //         _tags.let(getTagValue(v[2]), 0);
-                //     }
-                // });
             } else if (KEY_ESCAPE === key || KEY_TAB === key) {
                 exit = true;
                 selectToNone(), focusTo(picker);
