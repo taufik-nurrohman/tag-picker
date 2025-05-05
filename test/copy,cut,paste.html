@@ -20,20 +20,11 @@
     <script src="../index.min.js"></script>
     <script>
       const picker = new TagPicker(document.querySelector('input'));
-      picker.on('copy', function (e, tags) {
-          console.info('Tags “' + tags.join(this.state.join) + '” copied successfully.');
+      picker.on('let.tag', name => {
+          console.info('Tag “' + name + '” deleted successfully.');
       });
-      picker.on('cut', function (e, tags) {
-          console.info('Tags “' + tags.join(this.state.join) + '” cut successfully.');
-      });
-      picker.on('paste', function (e, tags) {
-          console.info('Tags “' + tags.join(this.state.join) + '” are going to be pasted.');
-      });
-      picker.on('let.tag', function (e, tag) {
-          console.info('Tag “' + tag + '” deleted successfully.');
-      });
-      picker.on('set.tag', function (e, tag) {
-          console.info('Tag “' + tag + '” inserted successfully.');
+      picker.on('set.tag', name => {
+          console.info('Tag “' + name + '” inserted successfully.');
       });
     </script>
   </body>

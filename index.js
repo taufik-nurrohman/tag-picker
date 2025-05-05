@@ -307,7 +307,7 @@
         }
         return map;
     };
-    var forEachObject$1 = function forEachObject(object, at) {
+    var forEachObject = function forEachObject(object, at) {
         var v;
         for (var k in object) {
             v = at(object[k], k);
@@ -343,7 +343,7 @@
         if (!asStaticAttributes) {
             of = getPrototype(of);
         }
-        return forEachObject$1(attributes, function (v, k) {
+        return forEachObject(attributes, function (v, k) {
             Object.defineProperty(of, k, v);
         }), of;
     };
@@ -351,7 +351,7 @@
         {
             of = getPrototype(of);
         }
-        return forEachObject$1(methods, function (v, k) {
+        return forEachObject(methods, function (v, k) {
             of [k] = v;
         }), of;
     };
@@ -532,7 +532,7 @@
         return setAttribute(node, 'aria-' + aria, true === value ? 'true' : value);
     };
     var setArias = function setArias(node, data) {
-        return forEachObject$1(data, function (v, k) {
+        return forEachObject(data, function (v, k) {
             v || "" === v || 0 === v ? setAria(node, k, v) : letAria(node, k);
         }), node;
     };
@@ -543,7 +543,7 @@
         return node.setAttribute(attribute, _fromValue(value)), node;
     };
     var setAttributes = function setAttributes(node, attributes) {
-        return forEachObject$1(attributes, function (v, k) {
+        return forEachObject(attributes, function (v, k) {
             if ('aria' === k && isObject(v)) {
                 return setArias(node, v), 1;
             }
@@ -572,14 +572,14 @@
             }), node;
         }
         if (isObject(classes)) {
-            return forEachObject$1(classes, function (v, k) {
+            return forEachObject(classes, function (v, k) {
                 return v ? setClass(node, k) : letClass(node, k);
             }), node;
         }
         return node.className = classes, node;
     };
     var setData = function setData(node, data) {
-        return forEachObject$1(data, function (v, k) {
+        return forEachObject(data, function (v, k) {
             v || "" === v || 0 === v ? setDatum(node, k, v) : letDatum(node, k);
         }), node;
     };
@@ -642,7 +642,7 @@
         return node.style[toCaseCamel(style)] = _fromValue(value), node;
     };
     var setStyles = function setStyles(node, styles) {
-        return forEachObject$1(styles, function (v, k) {
+        return forEachObject(styles, function (v, k) {
             v || "" === v || 0 === v ? setStyle(node, k, v) : letStyle(node, k);
         }), node;
     };
@@ -930,9 +930,9 @@
                 }
             });
         }
-        var _tags = $._tags,
-            state = $.state,
-            r = [];
+        var _tags = $._tags;
+        $.state;
+        var r = [];
         // Reset the tag(s) data, but do not fire the `let.tags` hook
         _tags.let(null, 0);
         forEachMap(map, function (v, k) {
@@ -944,7 +944,6 @@
             // Set the tag data, but do not fire the `set.tag` hook
             _tags.set(_toValue(isArray(v) && v[1] ? (_v$1$value3 = v[1].value) != null ? _v$1$value3 : k : k), v, 0);
         });
-        state.tags = map;
         return r;
     }
 
@@ -1017,7 +1016,7 @@
         onCopyTag.call($, e);
         forEachMap(_tags, function (v) {
             if (getAria(v[2], 'selected')) {
-                letAria(v[2], 'selected'), _tags.let(getTagValue(v[2]), 0);
+                letValueInMap(getTagValue(v[2]), _tags);
             }
         });
         focusTo(picker.fire('change', [picker.value]));
@@ -1137,23 +1136,23 @@
                 tagLast && focusTo(tagLast[2]);
             } else if (KEY_DELETE_LEFT === key) {
                 exit = true;
+                letValueInMap(getTagValue($), _tags);
                 tagPrev = getPrev($);
-                _tags.let(getTagValue($), 0);
                 forEachMap(_tags, function (v) {
                     if (getAria(v[2], 'selected')) {
+                        letValueInMap(getTagValue(v[2]), _tags);
                         tagPrev = getPrev(v[2]);
-                        letAria(v[2], 'selected'), _tags.let(getTagValue(v[2]), 0);
                     }
                 });
                 focusTo(tagPrev || picker), picker.fire('change', [picker.value]);
             } else if (KEY_DELETE_RIGHT === key) {
                 exit = true;
+                letValueInMap(getTagValue($), _tags);
                 tagNext = getNext($);
-                _tags.let(getTagValue($), 0);
                 forEachMap(_tags, function (v) {
                     if (getAria(v[2], 'selected')) {
+                        letValueInMap(getTagValue(v[2]), _tags);
                         tagNext = getNext(v[2]);
-                        letAria(v[2], 'selected'), _tags.let(getTagValue(v[2]), 0);
                     }
                 });
                 focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker.value]);
@@ -1167,7 +1166,7 @@
             } else if (1 === toCount(key)) {
                 forEachMap(_tags, function (v) {
                     if (getAria(v[2], 'selected')) {
-                        _tags.let(getTagValue(v[2]), 0);
+                        letValueInMap(getTagValue(v[2]), _tags);
                     }
                 });
                 selectToNone(), focusTo(picker).fire('change', [picker.value]);
@@ -1184,10 +1183,14 @@
             keyIsShift = _keyIsShift = e.shiftKey,
             picker = getReference($),
             _active = picker._active,
+            _fix = picker._fix,
             self = picker.self,
             form,
             submit;
         if (!_active) {
+            if (_fix && KEY_TAB === key) {
+                return selectToNone();
+            }
             return offEventDefault(e);
         }
         var _mask = picker._mask,
@@ -1302,7 +1305,7 @@
             join = state.join;
         forEachArray(e.clipboardData.getData('text/plain').split(join), function (v) {
             if (!hasKeyInMap(v = _toValue(v.trim()), _tags)) {
-                _tags.set(v, v, 0);
+                setValueInMap(v, v, _tags);
             }
         });
         forEachMap(_tags, function (v) {
@@ -1326,7 +1329,7 @@
         insertAtSelection($, e.clipboardData.getData('text/plain'));
         forEachArray((getText($) + "").split(join), function (v) {
             if (!hasKeyInMap(v = _toValue(v.trim()), _tags)) {
-                _tags.set(v, v, 0);
+                setValueInMap(v, v, _tags);
             }
         });
         forEachMap(_tags, function (v) {
@@ -1455,7 +1458,6 @@
         'min': 0,
         'n': 'tag-picker',
         'pattern': null,
-        'tags': null,
         'with': []
     };
     TagPicker.version = '4.1.0';
@@ -1470,7 +1472,22 @@
                 return this._active;
             },
             set: function set(value) {
-                var $ = this;
+                var $ = this,
+                    _mask = $._mask,
+                    mask = $.mask,
+                    self = $.self,
+                    input = _mask.input,
+                    v = !!value;
+                self.disabled = !($._active = v);
+                if (v) {
+                    letAria(input, 'disabled');
+                    letAria(mask, 'disabled');
+                    setAttribute(input, 'contenteditable', "");
+                } else {
+                    letAttribute(input, 'contenteditable');
+                    setAria(input, 'disabled', true);
+                    setAria(mask, 'disabled', true);
+                }
                 return $;
             }
         },
@@ -1479,7 +1496,24 @@
                 return this._fix;
             },
             set: function set(value) {
-                var $ = this;
+                var $ = this,
+                    _mask = $._mask,
+                    mask = $.mask,
+                    self = $.self,
+                    input = _mask.input,
+                    v = !!value;
+                $._active = !($._fix = self.readOnly = v);
+                if (v) {
+                    letAttribute(input, 'contenteditable');
+                    setAria(input, 'readonly', true);
+                    setAria(mask, 'readonly', true);
+                    setAttribute(input, 'tabindex', 0);
+                } else {
+                    letAria(input, 'readonly');
+                    letAria(mask, 'readonly');
+                    letAttribute(input, 'tabindex');
+                    setAttribute(input, 'contenteditable', "");
+                }
                 return $;
             }
         },
@@ -1507,9 +1541,10 @@
             get: function get() {
                 return this._tags;
             },
-            set: function set(options) {
+            set: function set(tags) {
                 var $ = this,
                     tagsValues = [];
+                createTags($, tags);
                 forEachMap($._tags, function (v) {
                     return tagsValues.push(getTagValue(v[2], 1));
                 });
@@ -1545,10 +1580,10 @@
                     state = $.state,
                     join = state.join;
                 $.value && forEachArray($.value.split(join), function (v) {
-                    return _tags.let(v, 0);
+                    return letValueInMap(v, _tags);
                 });
                 value && forEachArray(value.split(join), function (v) {
-                    return _tags.set(v, v, 0);
+                    return setValueInMap(v, v, _tags);
                 });
                 return $.fire('change', [$.value]);
             }
@@ -1659,12 +1694,11 @@
             var _active = $._active,
                 _state2 = state,
                 join = _state2.join,
-                tags = _state2.tags,
                 tagsValues;
             // Force the `this._active` value to `true` to set the initial value
             $._active = true;
             // Attach the current tag(s)
-            tagsValues = createTags($, tags || (theInputValue ? theInputValue.split(join) : []));
+            tagsValues = createTags($, theInputValue ? theInputValue.split(join) : []);
             $._value = tagsValues.join(join);
             // After the initial value has been set, restore the previous `this._active` value
             $._active = _active;
@@ -1689,6 +1723,63 @@
                     }
                 });
             }
+            return $;
+        },
+        blur: function blur() {
+            selectToNone();
+            var $ = this,
+                _mask = $._mask,
+                _tags = $._tags,
+                input = _mask.input;
+            forEachMap(_tags, function (v) {
+                return v[2].blur();
+            });
+            return input.blur(), $;
+        },
+        detach: function detach() {
+            var $ = this,
+                _mask = $._mask,
+                mask = $.mask,
+                self = $.self,
+                state = $.state,
+                input = _mask.input;
+            var form = getParentForm(self);
+            $._active = false;
+            $._tags = new TagPickerTags($);
+            $._value = null;
+            if (form) {
+                offEvent(EVENT_RESET, form, onResetForm);
+                offEvent(EVENT_SUBMIT, form, onSubmitForm);
+            }
+            offEvent(EVENT_CUT, input, onCutTextInput);
+            offEvent(EVENT_FOCUS, self, onFocusSelf);
+            offEvent(EVENT_FOCUS, input, onFocusTextInput);
+            offEvent(EVENT_INPUT_START, input, onBeforeInputTextInput);
+            offEvent(EVENT_KEY_DOWN, input, onKeyDownTextInput);
+            offEvent(EVENT_KEY_UP, input, onKeyUpTextInput);
+            offEvent(EVENT_MOUSE_DOWN, mask, onPointerDownMask);
+            offEvent(EVENT_PASTE, input, onPasteTextInput);
+            offEvent(EVENT_TOUCH_START, mask, onPointerDownMask);
+            // Detach extension(s)
+            if (isArray(state.with)) {
+                forEachArray(state.with, function (v, k) {
+                    if (isString(v)) {
+                        v = TagPicker[v];
+                    }
+                    if (isObject(v) && isFunction(v.detach)) {
+                        v.detach.call($, self, state);
+                    }
+                });
+            }
+            self.tabIndex = null;
+            letAria(self, 'hidden');
+            letClass(self, state.n + '__self');
+            setNext(mask, self);
+            letElement(mask);
+            $._mask = {
+                of: self
+            };
+            $.mask = null;
             return $;
         },
         focus: function focus(mode) {
@@ -1748,7 +1839,7 @@
                 });
                 return _fireHook && of.fire('let.tags', [
                     []
-                ]), 0 === $.count();
+                ]).fire('change', [null]), 0 === $.count();
             }
             if (!(r = getValueInMap(key = _toValue(key), values))) {
                 return _fireHook && of.fire('not.tag', [key]), false;
@@ -1769,7 +1860,6 @@
             offEvent(EVENT_TOUCH_START, tagX, onPointerDownTagX);
             letElement(tagX), letElement(tag);
             r = letValueInMap(key, values);
-            state.tags = values;
             forEachMap(values, function (v, k) {
                 return tagsValues.push(_fromValue(k));
             });
@@ -1811,10 +1901,8 @@
                 join = state.join,
                 n = state.n,
                 pattern = state.pattern,
-                classes,
                 count,
                 r,
-                styles,
                 tag,
                 tagText,
                 tagX,
@@ -1831,7 +1919,7 @@
                 // `picker.tags.set('asdf', [ … ])`
             } else;
             var v = value[1].value;
-            if ("" === (v = _fromValue(v || key)) || isString(pattern) && !toPattern(pattern).test(v)) {
+            if (null === key || "" === (v = _fromValue(v || key).trim()) || isString(pattern) && !toPattern(pattern).test(v)) {
                 return _fireHook && of.fire('not.tag', [key]), false;
             }
             if (isFunction(pattern)) {
@@ -1869,14 +1957,6 @@
                 'class': n,
                 'tabindex': -1
             });
-            if (classes = getState(value[1], 'class')) {
-                setClasses(tag, classes);
-            }
-            if (isObject(styles = getState(value[1], 'style'))) {
-                setStyles(tag, styles);
-            } else if (styles) {
-                setAttribute(tag, 'style', styles);
-            }
             // Force `id` attribute(s)
             setID(tagText);
             setID(tagX);
@@ -1902,7 +1982,6 @@
             value[2] = tag;
             _fireHook && of.fire('is.tag', [key]);
             setValueInMap(key, value, values);
-            state.tags = values;
             forEachMap(values, function (v, k) {
                 return tagsValues.push(_fromValue(k));
             });

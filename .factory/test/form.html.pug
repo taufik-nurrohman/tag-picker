@@ -22,12 +22,15 @@ block style
 
 block content
   main
-    p Submitting a form by pressing the #[em Submit] button vs. pressing the #[kbd Enter] key in the tag picker visual.
+    p Submitting a form by pressing the #[em Submit] button vs. pressing the #[kbd Enter] key in the tag picker mask.
     form(method='get' target='_blank')
-      p: input(name='test' type='text' value='foo, bar')
+      p: input(name='test' type='text' value='a, b')
       p
         label
           input(name='prevent' type='checkbox')
           = ' '
           span Test Default Prevention via JavaScript
-      p: button(type='submit') Submit
+      p
+        button(type='submit') Submit
+        = ' '
+        button(type='reset') Reset

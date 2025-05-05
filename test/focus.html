@@ -14,9 +14,10 @@
   </head>
   <body>
     <main>
-      <p><input placeholder="Tags go here&hellip;" type="text"></p>
+      <p><input autofocus id="test" type="text" value="a, b"></p>
+      <p><label for="test" style="text-decoration:underline;">Click here</label> to focus to the tag picker!</p>
     </main>
-    <script src="../index.js"></script>
+    <script src="../index.min.js"></script>
     <script>
       const picker = new TagPicker(document.querySelector('input'));
     </script>

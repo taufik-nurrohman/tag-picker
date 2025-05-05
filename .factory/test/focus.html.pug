@@ -1,7 +1,7 @@
 extends ../_index.pug
 
 block state
-  - const scripts = ['../index.js']
+  - const scripts = ['../index.min.js']
   - const styles = ['../index.min.css']
   - const title = 'Tag Picker'
 
@@ -17,4 +17,5 @@ block style
 
 block content
   main
-    p: input(placeholder!='Tags go here&hellip;' type='text')
+    p: input(autofocus id='test' type='text' value='a, b')
+    p #[label(for='test' style={'text-decoration': 'underline'}) Click here] to focus to the tag picker!

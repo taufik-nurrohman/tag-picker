@@ -113,14 +113,13 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
         <li><a href="test/pattern.html" target="_blank">Convert Tag Name</a></li>
         <li><a href="test/copy,cut,paste.html" target="_blank">Copy, Cut, and Paste Events</a></li>
         <li><a href="test/escape.html" target="_blank">Disabled Characters</a></li>
-        <li><a href="test/disabled.html" target="_blank">Disabled Input</a></li>
-        <li><a href="test/focus-auto.html" target="_blank">Focus Automatically</a></li>
-        <li><a href="test/focus.html" target="_blank">Focus States</a></li>
+        <li><a href="test/disabled.html" target="_blank">Disabled State</a></li>
+        <li><a href="test/focus.html" target="_blank">Focus Automatically</a></li>
         <li><a href="test/form.html" target="_blank">Form Events</a></li>
         <li><a href="test/max.html" target="_blank">Limit Maximum Tags</a></li>
         <li><a href="test/min.html" target="_blank">Limit Minimum Tags</a></li>
-        <li><a href="test/read-only.html" target="_blank">Read-Only Input</a></li>
-        <li><a href="test/required.html" target="_blank">Required Input</a></li>
+        <li><a href="test/read-only.html" target="_blank">Read-Only State</a></li>
+        <li><a href="test/required.html" target="_blank">Required State</a></li>
         <li><a href="test/hint.html" target="_blank">Set Input Hint</a></li>
         <li><a href="test/value.html" target="_blank">Set Input Value</a></li>
         <li><a href="test/not.html" target="_blank">Validate Tag Name</a></li>
@@ -159,14 +158,50 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <p>The configuration data.</p>
       <h4 id="parameter-state-escape"><a aria-hidden="true" href="#parameter-state-escape">#</a> <code>state.escape</code></h4>
       <p>List of characters to trigger the tag insertion. It is <code>[',']</code> by default, which means that you cannot have a <code>','</code> character in the tag name. You can also add <code>'\n'</code> and <code>'\t'</code> to the list so that it will insert a tag when you press the <kbd>Tab</kbd> or <kbd>Enter</kbd> key.</p>
+      <pre><code>const picker = new TagPicker(document.querySelector('input'), {
+    escape: [',', ' ', '\n', '\t']
+});</code></pre>
       <h4 id="parameter-state-join"><a aria-hidden="true" href="#parameter-state-join">#</a> <code>state.join</code></h4>
       <p>The character to join the tags (usually a comma followed by a space).</p>
+      <pre><code>const picker = new TagPicker(document.querySelector('input'), '+');</code></pre>
+      <pre><code>const picker = new TagPicker(document.querySelector('input'), {
+    join: '+'
+});</code></pre>
       <h4 id="parameter-state-max"><a aria-hidden="true" href="#parameter-state-max">#</a> <code>state.max</code></h4>
       <p>The maximum number of tags that can be inserted.</p>
+      <pre><code>const picker = new TagPicker(document.querySelector('input'), {
+    max: 12
+});</code></pre>
       <h4 id="parameter-state-min"><a aria-hidden="true" href="#parameter-state-min">#</a> <code>state.min</code></h4>
       <p>The minimum number of tags that must be inserted to be able to submit the form. The default value of this state is set to <code>0</code>, but if the <code>required</code> attribute is present on the <code>&lt;input&gt;</code> element, then the default value of this state will be set to <code>1</code>.</p>
+      <pre><code>const picker = new TagPicker(document.querySelector('input'), {
+    min: 5
+});</code></pre>
       <h4 id="parameter-state-pattern"><a aria-hidden="true" href="#parameter-state-pattern">#</a> <code>state.pattern</code></h4>
-      <p>If defined, tag insertion will be performed only if tag name is matched with the pattern.</p>
+      <p>If defined, the tag will be inserted only if the input matches the pattern. if value is defined as a function, this configuration will be used to convert the current input to the desired tag format. return value can be a string or an array containing the desired tag text and its attributes.</p>
+      <pre><code>const picker = new TagPicker(document.querySelector('input'), {
+    pattern: '^[a-z\\d]+(-[a-z\\d]+)*$'
+});
+
+picker.on('is.tag', name => {
+    console.info('The input “' + name + '” is a valid tag name.');
+});
+
+picker.on('not.tag', name => {
+    console.error('The input “' + name + '” is not a valid tag name.');
+});</code></pre>
+      <pre><code>const picker = new TagPicker(document.querySelector('input'), {
+    pattern: function (value) {
+        return (value || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "");
+    }
+});</code></pre>
+      <pre><code>const picker = new TagPicker(document.querySelector('input'), {
+    pattern: function (value) {
+        return [value, {
+            value: (value || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "")
+        }];
+    }
+});</code></pre>
       <h4 id="parameter-state-with"><a aria-hidden="true" href="#parameter-state-with">#</a> <code>state.with</code></h4>
       <p>List of callable functions or objects containing an <code>attach()</code> method to be invoked each time the application is initialized. A very simple “plugin” system.</p>
       <h2 id="methods"><a aria-hidden="true" href="#methods">#</a> Methods</h2>
@@ -179,23 +214,16 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <p>Blurs from the tag picker’s input.</p>
       <pre><code>picker.blur();</code></pre>
       <h4 id="instance-method-detach"><a aria-hidden="true" href="#instance-method-detach">#</a> <code>picker.detach()</code></h4>
-      <p>Disables the application methods (except for the <code>attach()</code> method) and executes the <code>detach()</code> method of the extensions, if they are present.</p>
+      <p>Removes the application view and executes the <code>detach()</code> method of the extensions, if they are present.</p>
       <pre><code>picker.detach();</code></pre>
       <h4 id="instance-method-fire"><a aria-hidden="true" href="#instance-method-fire">#</a> <code>picker.fire(event, data, that)</code></h4>
       <p>Fires an event.</p>
-      <pre><code>picker.fire('change', [picker._event]);</code></pre>
+      <pre><code>picker.fire('change', [picker.value]);</code></pre>
       <h4 id="instance-method-focus"><a aria-hidden="true" href="#instance-method-focus">#</a> <code>picker.focus(mode = true)</code></h4>
       <p>Focuses to the tag picker’s input. If it has a text, it will select the text as well.</p>
       <pre><code>picker.focus(); // Focus and select the text
 picker.focus(-1); // Focus and put the caret to the start of the text
 picker.focus(+1); // Focus and put the caret to the end of the text</code></pre>
-      <h4 id="instance-method-get"><a aria-hidden="true" href="#instance-method-get">#</a> <code>picker.get(name)</code></h4>
-      <p>Returns the tag position in the list, starting from <code>0</code>.</p>
-      <pre><code>if (null !== picker.get('foo')) { … }</code></pre>
-      <h4 id="instance-method-let"><a aria-hidden="true" href="#instance-method-let">#</a> <code>picker.let(name)</code></h4>
-      <p>Removes a tag by its name.</p>
-      <pre><code>picker.let('foo'); // Remove “foo” tag
-picker.let(); // Reset to the initial value</code></pre>
       <h4 id="instance-method-off"><a aria-hidden="true" href="#instance-method-off">#</a> <code>picker.off(event, task)</code></h4>
       <p>Removes an event.</p>
       <pre><code>picker.off('change'); // Remove all events from the `change` event container
@@ -210,9 +238,6 @@ picker.off('change', onChange); // Remove `onChange` event from the `change` eve
 }
 
 picker.on('change', onChange);</code></pre>
-      <h4 id="instance-method-set"><a aria-hidden="true" href="#instance-method-set">#</a> <code>picker.set(name)</code></h4>
-      <p>Adds a new tag with the given name.</p>
-      <pre><code>picker.set('foo'); // Append “foo” tag</code></pre>
       <h3 id="static-methods"><a aria-hidden="true" href="#static-methods">#</a> Static Methods</h3>
       <p>Static methods are methods available directly on the <code>TagPicker</code> object.</p>
       <h4 id="static-method-from"><a aria-hidden="true" href="#static-method-from">#</a> <code>TagPicker.from(self, state)</code></h4>
@@ -226,22 +251,109 @@ picker.on('change', onChange);</code></pre>
       <h2 id="properties"><a aria-hidden="true" href="#properties">#</a> Properties</h2>
       <h3 id="instance-properties"><a aria-hidden="true" href="#instance-properties">#</a> Instance Properties</h3>
       <p>Instance properties are properties available through the results of a <code>TagPicker</code> construct.</p>
+      <h4 id="instance-property-active"><a aria-hidden="true" href="#instance-property-active">#</a> <code>picker.active</code></h4>
+      <p>Gets or sets the active state of the tag picker. By setting the value to <code>false</code> or <code>true</code>, the disabled state of the source element will also be set automatically.</p>
+      <pre><code>picker.active = false; // Disable tag picker
+picker.active = true; // Enable tag picker</code></pre>
+      <h4 id="instance-property-fix"><a aria-hidden="true" href="#instance-property-fix">#</a> <code>picker.fix</code></h4>
+      <p>Gets or sets the read-only state of the tag picker. By setting the value to <code>false</code> or <code>true</code>, the read-only state of the source element will also be set automatically.</p>
+      <pre><code>picker.fix = true; // Make the tag picker “read-only”</code></pre>
       <h4 id="instance-property-hooks"><a aria-hidden="true" href="#instance-property-hooks">#</a> <code>picker.hooks</code></h4>
       <p>Returns the events data.</p>
       <pre><code>console.log(picker.hooks);</code></pre>
       <h4 id="instance-property-mask"><a aria-hidden="true" href="#instance-property-mask">#</a> <code>picker.mask</code></h4>
       <p>Returns the tag picker’s mask.</p>
       <pre><code>picker.mask.classList.add(picker.state.n + '--dark');</code></pre>
+      <h4 id="instance-property-max"><a aria-hidden="true" href="#instance-property-max">#</a> <code>picker.max</code></h4>
+      <p>Proxy that passes to the <code>picker.state.max</code> property, with additional actions that are executed while the value is being set.</p>
+      <pre><code>console.log(picker.max); // Returns the `picker.state.max` value</code></pre>
+      <pre><code>picker.max = 4; // Allow a maximum of 4 tags to be inserted.</code></pre>
+      <h4 id="instance-property-min"><a aria-hidden="true" href="#instance-property-min">#</a> <code>picker.min</code></h4>
+      <p>Proxy that passes to the <code>picker.state.min</code> property, with additional actions that are executed while the value is being set.</p>
+      <pre><code>console.log(picker.min); // Returns the `picker.state.min` value</code></pre>
+      <pre><code>picker.min = 4; // Insert at least 4 tags to be able to submit the form.</code></pre>
       <h4 id="instance-property-self"><a aria-hidden="true" href="#instance-property-self">#</a> <code>picker.self</code></h4>
       <p>Returns the <code>&lt;input&gt;</code> element.</p>
       <pre><code>console.log(picker.self.getAttribute('name'));</code></pre>
       <h4 id="instance-property-state"><a aria-hidden="true" href="#instance-property-state">#</a> <code>picker.state</code></h4>
       <p>Returns the application states if any.</p>
       <pre><code>console.log(picker.state);</code></pre>
+      <h4 id="instance-property-tags"><a aria-hidden="true" href="#instance-property-tags">#</a> <code>picker.tags</code></h4>
+      <p>Gets the current tags list data, or sets (overwrites) the current tags list with a new data.</p>
+      <pre><code>console.log(picker.tags);</code></pre>
+      <pre><code>picker.tags = [
+    'Tag 1',
+    'Tag 2',
+    'Tag 3'
+];
+
+// Or…
+picker.tags.set('Tag 1');
+picker.tags.set('Tag 2');
+picker.tags.set('Tag 3');</code></pre>
+      <pre><code>picker.tags = [
+    ['Tag 1', {
+        value: 'tag-1'
+    }],
+    ['Tag 2', {
+        value: 'tag-2'
+    }],
+    ['Tag 3', {
+        title: 'This is a tag description.',
+        value: 'tag-3'
+    }]
+];
+
+// Or…
+picker.tags.set('tag-1', 'Tag 1');
+picker.tags.set('tag-2', 'Tag 2');
+picker.tags.set('tag-3', ['Tag 3', {
+    title: 'This is a tag description.'
+}]);</code></pre>
+      <pre><code>picker.tags = {
+    'tag-1': 'Tag 1',
+    'tag-2': 'Tag 2',
+    'tag-3': 'Tag 3'
+};
+
+// Or…
+picker.tags.set('tag-1', 'Tag 1');
+picker.tags.set('tag-2', 'Tag 2');
+picker.tags.set('tag-3', 'Tag 3');</code></pre>
+      <pre><code>const tags = new Map;
+
+tags.set('tag-1', 'Tag 1');
+tags.set('tag-2', 'Tag 2');
+tags.set('tag-3', 'Tag 3');
+
+picker.tags = tags;</code></pre>
+      <h5 id="instance-property-tags-method-at"><a aria-hidden="true" href="#instance-property-tags-method-at">#</a> <code>picker.tags.at(key)</code></h5>
+      <p>Returns the raw tag data from its key.</p>
+      <pre><code>console.log(picker.tags.at('tag-1'));</code></pre>
+      <h5 id="instance-property-tags-method-count"><a aria-hidden="true" href="#instance-property-tags-method-count">#</a> <code>picker.tags.count()</code></h5>
+      <p>Returns the total number of tags.</p>
+      <pre><code>console.log(picker.tags.count());</code></pre>
+      <h5 id="instance-property-tags-method-get"><a aria-hidden="true" href="#instance-property-tags-method-get">#</a> <code>picker.tags.get(key)</code></h5>
+      <p>Returns the tag position in the list, starting from <code>0</code>.</p>
+      <pre><code>if (-1 !== picker.tags.get('tag-1')) { … }</code></pre>
+      <h5 id="instance-property-tags-method-has"><a aria-hidden="true" href="#instance-property-tags-method-has">#</a> <code>picker.tags.has(key)</code></h5>
+      <p>Returns <code>true</code> if the tag is present.</p>
+      <pre><code>if (picker.tags.has('tag-1')) { … }</code></pre>
+      <h5 id="instance-property-tags-method-let"><a aria-hidden="true" href="#instance-property-tags-method-let">#</a> <code>picker.tags.let(key)</code></h5>
+      <p>Removes a tag by its key.</p>
+      <pre><code>picker.tags.let('tag-1'); // Remove “tag-1” tag
+picker.tags.let(); // Remove all tags</code></pre>
+      <h5 id="instance-property-tags-method-set"><a aria-hidden="true" href="#instance-property-tags-method-set">#</a> <code>picker.tags.set(key, value)</code></h5>
+      <p>Adds a new tag with the given value or key and value.</p>
+      <pre><code>picker.tags.set('tag-1');
+picker.tags.set('tag-2', 'Tag 2');
+picker.tags.set('tag-3', ['Tag 3', {
+    title: 'This is a tag description.'
+}]);</code></pre>
       <h4 id="instance-property-text"><a aria-hidden="true" href="#instance-property-text">#</a> <code>picker.text</code></h4>
       <p>Gets or sets the current text in the tag picker’s input.</p>
       <pre><code>console.log(picker.text);</code></pre>
-      <pre><code>picker.text = 'foo, bar, baz';</code></pre>
+      <pre><code>picker.text = 'tag-1, tag-2, tag-3';</code></pre>
       <h4 id="instance-property-value"><a aria-hidden="true" href="#instance-property-value">#</a> <code>picker.value</code></h4>
       <p>Proxy that passes to the <code>picker.self.value</code> property, with additional actions that are executed while the value is being set.</p>
       <pre><code>console.log(picker.value);</code></pre>
@@ -249,7 +361,7 @@ picker.on('change', onChange);</code></pre>
     console.log(this.value);
 });
 
-picker.value = 'foo, bar, baz';</code></pre>
+picker.value = 'tag-1, tag-2, tag-3';</code></pre>
       <h3 id="static-properties"><a aria-hidden="true" href="#static-properties">#</a> Static Properties</h3>
       <p>Static properties are properties available directly on the <code>TagPicker</code> object.</p>
       <h4 id="static-property-prototype"><a aria-hidden="true" href="#static-property-prototype">#</a> <code>TagPicker._</code></h4>
@@ -264,7 +376,7 @@ picker.clear(); // Clear value</code></pre>
       <h4 id="static-property-state"><a aria-hidden="true" href="#static-property-prototype">#</a> <code>TagPicker.state</code></h4>
       <p>Returns the default values of <code>picker.state</code>.</p>
       <pre><code>const picker = new TagPicker(document.querySelector('input'), {
-    foo: ['bar', 'baz', 'qux']
+    test: [1, 2, true]
 });
 
 console.log([TagPicker.state, picker.state]);</code></pre>
@@ -274,8 +386,7 @@ console.log([TagPicker.state, picker.state]);</code></pre>
       <h3 id="anatomy-of-an-extension"><a aria-hidden="true" href="#anatomy-of-an-extension">#</a> Anatomy of an Extension</h3>
       <p>Extension as a function:</p>
       <pre><code>function Extension(self, state = {}) {
-    this.a = 1;
-    this.b = function () {};
+    this.test = 1;
     return this;
 }
 
@@ -284,8 +395,14 @@ Object.defineProperty(Extension, 'name', {
 });</code></pre>
       <p>Extension as an object:</p>
       <pre><code>const Extension = {
-    attach: function (self, state = {}) {},
-    detach: function (self, state = {}) {},
+    attach: function (self, state = {}) {
+        this.test = 1;
+        return this;
+    },
+    detach: function (self, state = {}) {
+        delete this.test;
+        return this;
+    },
     name: 'Extension'
 };</code></pre>
       <h3 id="usage-of-an-extension"><a aria-hidden="true" href="#usage-of-an-extension">#</a> Usage of an Extension</h3>
@@ -310,7 +427,7 @@ Object.defineProperty(Extension, 'name', {
       <hr>
       <p>© 2025 <a href="/">Taufik Nurrohman</a></p>
     </footer>
-    <script src="index.js"></script>
+    <script src="index.min.js"></script>
     <script>
       const picker = new TagPicker(document.forms[0].tags);
       picker.on('change', function () {
