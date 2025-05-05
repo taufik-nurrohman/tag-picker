@@ -903,7 +903,7 @@
     var TOKEN_FALSE = 'false';
     var TOKEN_TRUE = 'true';
     var name = 'TagPicker';
-    var _keyIsCtrl, _keyIsShift;
+    var _keyIsCtrl, _keyIsShift, _keyOverTag;
 
     function createTags($, tags) {
         var map = isInstance(tags, Map) ? tags : new Map();
@@ -1046,7 +1046,7 @@
     }
 
     function onKeyDownTag(e) {
-        var $ = this,
+        var $ = _keyOverTag = this,
             key = e.key;
         e.keyCode;
         var keyIsCtrl = _keyIsCtrl = e.ctrlKey,
@@ -1163,7 +1163,8 @@
             } else if (KEY_ESCAPE === key || KEY_TAB === key) {
                 exit = true;
                 selectToNone(), focusTo(picker);
-            } else {
+                // Any type-able key
+            } else if (1 === toCount(key)) {
                 forEachMap(_tags, function (v) {
                     if (getAria(v[2], 'selected')) {
                         _tags.let(getTagValue(v[2]), 0);
@@ -1182,7 +1183,10 @@
             keyIsCtrl = _keyIsCtrl = e.ctrlKey,
             keyIsShift = _keyIsShift = e.shiftKey,
             picker = getReference($),
-            _active = picker._active;
+            _active = picker._active,
+            self = picker.self,
+            form,
+            submit;
         if (!_active) {
             return offEventDefault(e);
         }
@@ -1205,7 +1209,9 @@
             tagLast,
             textIsVoid = null === getText($, 0);
         if (keyIsShift) {
-            if (KEY_TAB === key) {
+            if (KEY_ENTER === key) {
+                exit = true;
+            } else if (KEY_TAB === key) {
                 selectToNone();
             } else if (KEY_ARROW_LEFT === key) {
                 exit = true;
@@ -1227,14 +1233,22 @@
                 exit = true;
                 tagFirst = toValueFirstFromMap(_tags);
                 tagFirst && focusTo(tagFirst[2]);
+            } else if (KEY_ENTER === key) {
+                exit = true;
             }
         } else {
             if (KEY_BEGIN === key) {
                 exit = true;
                 tagFirst = toValueFirstFromMap(_tags);
                 tagFirst && focusTo(tagFirst[2]);
-            } else if (KEY_ENTER === key);
-            else if (KEY_TAB === key) {
+            } else if (KEY_ENTER === key) {
+                exit = true;
+                if ((form = getParentForm(self)) && isFunction(form.requestSubmit)) {
+                    // <https://developer.mozilla.org/en-US/docs/Glossary/Submit_button>
+                    submit = getElement('button:not([type]),button[type=submit],input[type=image],input[type=submit]', form);
+                    submit ? form.requestSubmit(submit) : form.requestSubmit();
+                }
+            } else if (KEY_TAB === key) {
                 selectToNone();
             } else if (caretIsToTheFirst || textIsVoid) {
                 if (KEY_ARROW_LEFT === key) {
@@ -1256,6 +1270,7 @@
     }
 
     function onKeyUpTag(e) {
+        _keyOverTag = 0;
         var $ = this,
             key = e.key;
         _keyIsCtrl = e.ctrlKey;
@@ -1334,13 +1349,38 @@
             picker = getReference($),
             _tags = picker._tags;
         focusTo($), selectTo($);
-        if (!_keyIsCtrl && !_keyIsShift) {
+        if (!_keyIsCtrl) {
             forEachMap(_tags, function (v) {
                 return letAria(v[2], 'selected');
             });
         }
         if (_keyIsCtrl) {
             setAria($, 'selected', true);
+        } else if (_keyIsShift && _keyOverTag) {
+            var tagEndIndex = getElementIndex($),
+                tagStartIndex = getElementIndex(_keyOverTag),
+                tagCurrent = _keyOverTag,
+                tagNext,
+                tagPrev;
+            setAria($, 'selected', true);
+            setAria(_keyOverTag, 'selected', true);
+            // Select to the right
+            if (tagEndIndex > tagStartIndex) {
+                while (tagNext = getNext(tagCurrent)) {
+                    if ($ === tagNext) {
+                        break;
+                    }
+                    setAria(tagCurrent = tagNext, 'selected', true);
+                }
+                // Select to the left
+            } else if (tagEndIndex < tagStartIndex) {
+                while (tagPrev = getPrev(tagCurrent)) {
+                    if ($ === tagPrev) {
+                        break;
+                    }
+                    setAria(tagCurrent = tagPrev, 'selected', true);
+                }
+            }
         }
     }
 

@@ -53,7 +53,7 @@ const TOKEN_TRUE = 'true';
 
 const name = 'TagPicker';
 
-let _keyIsCtrl, _keyIsShift;
+let _keyIsCtrl, _keyIsShift, _keyOverTag;
 
 function createTags($, tags) {
     const map = isInstance(tags, Map) ? tags : new Map;
@@ -185,7 +185,7 @@ function onFocusTextInput() {
 }
 
 function onKeyDownTag(e) {
-    let $ = this,
+    let $ = _keyOverTag = this,
         key = e.key,
         keyCode = e.keyCode,
         keyIsCtrl = _keyIsCtrl = e.ctrlKey,
@@ -295,7 +295,8 @@ function onKeyDownTag(e) {
         } else if (KEY_ESCAPE === key || KEY_TAB === key) {
             exit = true;
             selectToNone(), focusTo(picker);
-        } else {
+        // Any type-able key
+        } else if (1 === toCount(key)) {
             forEachMap(_tags, v => {
                 if (getAria(v[2], 'selected')) {
                     _tags.let(getTagValue(v[2]), 0);
@@ -314,7 +315,7 @@ function onKeyDownTextInput(e) {
         keyIsCtrl = _keyIsCtrl = e.ctrlKey,
         keyIsShift = _keyIsShift = e.shiftKey,
         picker = getReference($),
-        {_active} = picker;
+        {_active, self} = picker, form, submit;
     if (!_active) {
         return offEventDefault(e);
     }
@@ -334,7 +335,9 @@ function onKeyDownTextInput(e) {
         tagFirst, tagLast,
         textIsVoid = null === getText($, 0);
     if (keyIsShift) {
-        if (KEY_TAB === key) {
+        if (KEY_ENTER === key) {
+            exit = true;
+        } else if (KEY_TAB === key) {
             selectToNone();
         } else if (KEY_ARROW_LEFT === key) {
             exit = true;
@@ -354,6 +357,8 @@ function onKeyDownTextInput(e) {
             exit = true;
             tagFirst = toValueFirstFromMap(_tags);
             tagFirst && focusTo(tagFirst[2]);
+        } else if (KEY_ENTER === key) {
+            exit = true;
         }
     } else {
         if (KEY_BEGIN === key) {
@@ -361,7 +366,12 @@ function onKeyDownTextInput(e) {
             tagFirst = toValueFirstFromMap(_tags);
             tagFirst && focusTo(tagFirst[2]);
         } else if (KEY_ENTER === key) {
-            // TODO
+            exit = true;
+            if ((form = getParentForm(self)) && isFunction(form.requestSubmit)) {
+                // <https://developer.mozilla.org/en-US/docs/Glossary/Submit_button>
+                submit = getElement('button:not([type]),button[type=submit],input[type=image],input[type=submit]', form);
+                submit ? form.requestSubmit(submit) : form.requestSubmit();
+            }
         } else if (KEY_TAB === key) {
             selectToNone();
         } else if (caretIsToTheFirst || textIsVoid) {
@@ -385,6 +395,7 @@ function onKeyDownTextInput(e) {
 }
 
 function onKeyUpTag(e) {
+    _keyOverTag = 0;
     let $ = this,
         key = e.key,
         keyIsCtrl = _keyIsCtrl = e.ctrlKey,
@@ -452,13 +463,34 @@ function onPointerDownTag(e) {
         picker = getReference($),
         {_tags} = picker;
     focusTo($), selectTo($);
-    if (!_keyIsCtrl && !_keyIsShift) {
+    if (!_keyIsCtrl) {
         forEachMap(_tags, v => letAria(v[2], 'selected'));
     }
     if (_keyIsCtrl) {
         setAria($, 'selected', true);
-    } else if (_keyIsShift) {
-        // TODO
+    } else if (_keyIsShift && _keyOverTag) {
+        let tagEndIndex = getElementIndex($),
+            tagStartIndex = getElementIndex(_keyOverTag),
+            tagCurrent = _keyOverTag, tagNext, tagPrev;
+        setAria($, 'selected', true);
+        setAria(_keyOverTag, 'selected', true);
+        // Select to the right
+        if (tagEndIndex > tagStartIndex) {
+            while (tagNext = getNext(tagCurrent)) {
+                if ($ === tagNext) {
+                    break;
+                }
+                setAria(tagCurrent = tagNext, 'selected', true);
+            }
+        // Select to the left
+        } else if (tagEndIndex < tagStartIndex) {
+            while (tagPrev = getPrev(tagCurrent)) {
+                if ($ === tagPrev) {
+                    break;
+                }
+                setAria(tagCurrent = tagPrev, 'selected', true);
+            }
+        }
     }
 }
 
