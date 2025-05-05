@@ -8,23 +8,14 @@
     <link href="../index.min.css" rel="stylesheet">
     <style>
       .tag-picker {
-        border-width: 2px;
         width: 100%;
-      }
-      .tag-picker.tag-picker--focus {
-        border-color: #f00;
-      }
-      .tag-picker.tag-picker--focus-tag {
-        background: #0f0;
-      }
-      .tag-picker.tag-picker--focus-text {
-        background: #ff0;
       }
     </style>
   </head>
   <body>
     <main>
-      <p><input placeholder="Tags go here&hellip;" type="text"></p>
+      <p><input autofocus id="test" type="text" value="a, b"></p>
+      <p><label for="test" style="text-decoration:underline;">Click here</label> to focus to the tag picker!</p>
     </main>
     <script src="../index.min.js"></script>
     <script>

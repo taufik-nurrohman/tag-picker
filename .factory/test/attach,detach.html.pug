@@ -12,13 +12,18 @@ block script
 block style
   style
     | .tag-picker {
-    |   width: 100%;
+    |   width: 8em;
     | }
 
 block content
   main
-    form(method='get')
-      p: input(name='tags' type='text' value='foo, bar')
+    form(method='get' target='_blank')
+      p asdf
+      p
+        = 'asdf '
+        input(name='test' type='text' value='a, b')
+        = ' asdf'
+      p asdf
       p
         button(onclick='this.disabled = true; this.nextElementSibling.disabled = false; picker.detach(); return false;' type='button') Detach
         = ' '

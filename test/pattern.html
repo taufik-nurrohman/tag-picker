@@ -14,22 +14,16 @@
   </head>
   <body>
     <main>
-      <p>Valid tag name must match the <code>^[a-z\d](-[a-z\d])*$</code> pattern!</p>
-      <form method="get">
-        <p><input name="tags" type="text"></p>
+      <p>Convert tag name to <code>@kebab-case</code>. Also have a look at how I did a tag value conversion without changing the original input <a href="pattern/value.html">here</a>.</p>
+      <form method="get" target="_blank">
+        <p><input name="test" type="text"></p>
         <p><button type="submit">Submit</button></p>
       </form>
     </main>
     <script src="../index.min.js"></script>
     <script>
       const picker = new TagPicker(document.querySelector('input'), {
-          pattern: '^[a-z\\d]+(-[a-z\\d]+)*$'
-      });
-      picker.on('is.tag', name => {
-          console.info('The input “' + name + '” is a valid tag name.');
-      });
-      picker.on('not.tag', name => {
-          console.error('The input “' + name + '” is not a valid tag name.');
+          pattern: value => '@' + (value || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "")
       });
     </script>
   </body>

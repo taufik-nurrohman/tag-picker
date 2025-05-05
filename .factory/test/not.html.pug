@@ -11,12 +11,12 @@ block script
     |     pattern: '^[a-z\\d]+(-[a-z\\d]+)*$'
     | });
     |
-    | picker.on('is.tag', function (e, tag) {
-    |     console.info('The input “' + tag + '” is a valid tag name.');
+    | picker.on('is.tag', name => {
+    |     console.info('The input “' + name + '” is a valid tag name.');
     | });
     |
-    | picker.on('not.tag', function (e, tag) {
-    |     console.error('The input “' + tag + '” is not a valid tag name.');
+    | picker.on('not.tag', name => {
+    |     console.error('The input “' + name + '” is not a valid tag name.');
     | });
 
 block style

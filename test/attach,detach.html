@@ -8,14 +8,16 @@
     <link href="../index.min.css" rel="stylesheet">
     <style>
       .tag-picker {
-        width: 100%;
+        width: 8em;
       }
     </style>
   </head>
   <body>
     <main>
-      <form method="get">
-        <p><input name="tags" type="text" value="foo, bar"></p>
+      <form method="get" target="_blank">
+        <p>asdf</p>
+        <p>asdf <input name="test" type="text" value="a, b"> asdf</p>
+        <p>asdf</p>
         <p><button onclick="this.disabled = true; this.nextElementSibling.disabled = false; picker.detach(); return false;" type="button">Detach</button> <button disabled onclick="this.disabled = true; this.previousElementSibling.disabled = false; picker.attach(); return false;" type="button">Attach</button> <button type="submit">Submit</button></p>
       </form>
     </main>

@@ -14,15 +14,16 @@
   </head>
   <body>
     <main>
-      <form method="get">
-        <p><input name="tags" readonly type="text" value="foo, bar"></p>
-        <p><label><input checked onchange="picker.self.readOnly = this.checked; picker.detach().attach();" type="checkbox"> <span>Read-Only</span></label></p>
-        <p><button type="submit">Submit</button> <button onclick="picker.set('baz').focus();" type="button">Add &ldquo;baz&rdquo; Tag</button></p>
+      <form method="get" target="_blank">
+        <p><input name="test" readonly type="text" value="a, b"></p>
+        <p><label><input checked onchange="picker.fix = this.checked;" type="checkbox"> <span>Read-Only</span></label></p>
+        <p><button type="submit">Submit</button> <button onclick="picker.tags.set('c'), picker.focus();" type="button">Add &ldquo;c&rdquo; Tag</button></p>
       </form>
     </main>
     <script src="../index.min.js"></script>
     <script>
       const picker = new TagPicker(document.querySelector('input'));
+      picker.fix = document.querySelector('input[type=checkbox]').checked;
     </script>
   </body>
 </html>

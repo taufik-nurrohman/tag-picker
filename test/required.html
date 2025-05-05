@@ -14,8 +14,8 @@
   </head>
   <body>
     <main>
-      <form method="get">
-        <p><input name="tags" required type="text"></p>
+      <form method="get" target="_blank">
+        <p><input name="test" required type="text"></p>
         <p><label><input checked onchange="picker.self.required = this.checked; picker.detach().attach(picker.self, {min: 0});" type="checkbox"> <span>Required</span></label></p>
         <p><button type="submit">Submit</button> <button onclick="picker.set('baz').focus();" type="button">Add &ldquo;baz&rdquo; Tag</button></p>
       </form>

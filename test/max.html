@@ -14,9 +14,9 @@
   </head>
   <body>
     <main>
-      <p>Maximum tags allowed to be inserted is 3. Some text to copy: <mark style="user-select:all;" tabindex="0">foo, bar, baz, qux</mark></p>
-      <form method="get">
-        <p><input name="tags" type="text"></p>
+      <p>Maximum tags allowed to be inserted is <code>3</code>. Some text to copy: <mark style="user-select:all;" tabindex="0">foo, bar, baz, qux</mark></p>
+      <form method="get" target="_blank">
+        <p><input name="test" type="text"></p>
         <p><button type="submit">Submit</button></p>
       </form>
     </main>
@@ -25,9 +25,8 @@
       const picker = new TagPicker(document.querySelector('input'), {
           max: 3
       });
-      picker.on('max.tags', function (e, tag) {
-          console.error('The maximum number of tags that can be inserted is ' + this.state.max + '.');
-          tag && console.info('Last typed tag name is “' + tag + '”');
+      picker.on('max.tags', function (count, max) {
+          alert('The maximum number of tags that can be inserted is ' + max + '.');
       });
     </script>
   </body>

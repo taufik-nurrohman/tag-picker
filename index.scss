@@ -1,17 +1,34 @@
 $name: 'tag-picker';
 
-%tag {
+%item {
   align-items: center;
   border: 1px solid;
   border-color: inherit;
   display: flex;
   gap: 0.25em;
-  justify-content: center;
-  overflow: hidden;
   padding: 0 0.25em;
-  position: relative;
-  text-decoration: none;
 }
+
+%items {
+  border-color: inherit;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  padding: 1px;
+}
+
+// %tag {
+//   align-items: center;
+//   border: 1px solid;
+//   border-color: inherit;
+//   display: flex;
+//   gap: 0.25em;
+//   justify-content: center;
+//   overflow: hidden;
+//   padding: 0 0.25em;
+//   position: relative;
+//   text-decoration: none;
+// }
 
 .#{$name} {
   &,
@@ -30,50 +47,61 @@ $name: 'tag-picker';
   flex-wrap: wrap;
   position: relative;
   vertical-align: middle;
-  &__self {
-    left: -9999px;
-    position: fixed;
-    top: -9999px;
-    &:disabled {
-      + .#{$name} {
-        color: rgba(128, 128, 128, 1);
-      }
-      + .#{$name} {
-        &,
-        & * {
-          cursor: not-allowed;
-        }
-      }
+  &[aria-disabled='true'] {
+    color: rgba(128, 128, 128);
+    cursor: not-allowed;
+    * {
+      pointer-events: none;
     }
-    &:read-only {
-      + .#{$name} {
-        .#{$name}__x {
-          cursor: not-allowed;
-        }
-      }
+    .#{$name}__tag[aria-selected='true'] {
+      background: rgba(0, 0, 255, 0.25);
     }
   }
   &__flex {
-    border-color: inherit;
-    display: flex;
-    flex-wrap: wrap;
+    @extend %items;
     flex: 1;
-    gap: 1px;
-    padding: 1px;
+    overflow: hidden;
+  }
+  &__self {
+    background: 0 0;
+    border-radius: 0;
+    border: 0;
+    bottom: 0;
+    box-shadow: none;
+    color: transparent;
+    font: 0/0 a;
+    height: 1px;
+    left: 0;
+    margin: 0;
+    opacity: 0;
+    outline: 0;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    text-shadow: none;
+    width: 1px;
+  }
+  &__tag,
+  &__text {
+    @extend %item;
+    overflow: hidden;
+    position: relative;
   }
   &__tag {
-    @extend %tag;
     cursor: pointer;
-    &:focus {
-      outline: 2px solid;
-      outline: {
-        offset: -2px;
+    &[aria-disabled='true'] {
+      &[aria-selected='true'] {
+        background: rgba(0, 0, 255, 0.25);
       }
     }
-    &--selected {
+    &[aria-selected='true'] {
       background: rgba(0, 0, 255, 0.5);
     }
-    // Keep selection (so that context menu can show the “Copy” command), but hide it visually
+    &:focus {
+      outline: 1px solid;
+      outline-offset: -2px;
+    }
+    // Keep selection (so that context menu can show the “Copy”, “Cut”, and “Paste” command), but hide it visually!
     ::selection {
       background-color: transparent;
       color: inherit;
@@ -88,7 +116,6 @@ $name: 'tag-picker';
     }
   }
   &__text {
-    @extend %tag;
     border-color: transparent;
     flex: 1;
     span {
@@ -121,10 +148,12 @@ $name: 'tag-picker';
     }
   }
   &__x {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     height: 1em;
     line-height: 0;
     margin-right: -0.125em;
     position: relative;
+    user-select: none;
     width: 1em;
     &::after,
     &::before {

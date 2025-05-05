@@ -8,11 +8,7 @@ block state
 block script
   script
     | const picker = new TagPicker(document.querySelector('input'), {
-    |     min: 3
-    | });
-    |
-    | picker.on('min.tags', function (count, min) {
-    |     alert('The minimum number of tags that must be inserted to be able to submit the form is ' + min + '.');
+    |     pattern: value => '@' + (value || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "")
     | });
 
 block style
@@ -23,7 +19,7 @@ block style
 
 block content
   main
-    p Minimum tags inserted to be able to submit the form is #[code 3]. Some text to copy: #[mark(style={'user-select': 'all'} tabindex='0') foo, bar, baz, qux]
+    p Convert tag name to #[code @kebab-case]. Also have a look at how I did a tag value conversion without changing the original input #[a(href='pattern/value.html') here].
     form(method='get' target='_blank')
       p: input(name='test' type='text')
       p: button(type='submit') Submit
