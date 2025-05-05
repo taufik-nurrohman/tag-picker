@@ -1610,6 +1610,8 @@
                 isDisabledSelf = isDisabled(self),
                 isReadOnlySelf = isReadOnly(self),
                 isRequiredSelf = isRequired(self),
+                theInputID = self.id,
+                theInputName = self.name,
                 theInputPlaceholder = self.placeholder,
                 theInputValue = getValue(self);
             $._active = !isDisabledSelf && !isReadOnlySelf;
@@ -1708,6 +1710,8 @@
             setID(self);
             setID(textInput);
             setID(textInputHint);
+            theInputID && setDatum(mask, 'id', theInputID);
+            theInputName && setDatum(mask, 'name', theInputName);
             // Attach extension(s)
             if (isSet(state) && isArray(state.with)) {
                 forEachArray(state.with, function (v, k) {

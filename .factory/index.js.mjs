@@ -2,7 +2,7 @@ import {/* focusTo, */getCharBeforeCaret, getSelection, insertAtSelection, selec
 import {delay} from '@taufik-nurrohman/tick';
 import {forEachArray, forEachMap, forEachObject, getPrototype, getReference, getValueInMap, hasKeyInMap, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap, toValueFirstFromMap, toValueLastFromMap} from '@taufik-nurrohman/f';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
-import {getAria, getElement, getElementIndex, getHTML, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letAttribute, letClass, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setClasses, setElement, setID, setNext, setPrev, setStyle, setText, setValue} from '@taufik-nurrohman/document';
+import {getAria, getElement, getElementIndex, getHTML, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letAttribute, letClass, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setClasses, setDatum, setElement, setID, setNext, setPrev, setStyle, setText, setValue} from '@taufik-nurrohman/document';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isFloat, isFunction, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
@@ -706,6 +706,8 @@ TagPicker._ = setObjectMethods(TagPicker, {
             isDisabledSelf = isDisabled(self),
             isReadOnlySelf = isReadOnly(self),
             isRequiredSelf = isRequired(self),
+            theInputID = self.id,
+            theInputName = self.name,
             theInputPlaceholder = self.placeholder,
             theInputValue = getValue(self);
         $._active = !isDisabledSelf && !isReadOnlySelf;
@@ -802,6 +804,8 @@ TagPicker._ = setObjectMethods(TagPicker, {
         setID(self);
         setID(textInput);
         setID(textInputHint);
+        theInputID && setDatum(mask, 'id', theInputID);
+        theInputName && setDatum(mask, 'name', theInputName);
         // Attach extension(s)
         if (isSet(state) && isArray(state.with)) {
             forEachArray(state.with, (v, k) => {
