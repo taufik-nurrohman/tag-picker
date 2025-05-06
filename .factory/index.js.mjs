@@ -104,22 +104,31 @@ function onBeforeInputTag(e) {
     offEventDefault(e);
 }
 
+// Better mobile support
 function onBeforeInputTextInput(e) {
     let $ = this,
-        data = e.data,
+        {data, inputType} = e,
         picker = getReference($),
         {_active, _mask, _tags, state} = picker,
         {hint} = _mask,
-        {escape} = state, exit, key;
+        {escape} = state, tagLast, exit, key, v;
     key = isString(data) && 1 === toCount(data) ? data : 0;
     if (
         (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape))) ||
         (KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape))) ||
-        (hasValue(key, escape))
+        (0 !== key && hasValue(key, escape))
     ) {
         exit = true;
         setValueInMap(toValue(v = getText($)), v, _tags);
         focusTo(picker).text = "";
+    } else if ('deleteContentBackward' === inputType && !getText($, 0)) {
+        letStyle(hint, 'visibility');
+        if (tagLast = toValueLastFromMap(_tags)) {
+            exit = true;
+            letValueInMap(getTagValue(tagLast[2]), _tags);
+        }
+    } else if ('insertText' === inputType) {
+        setStyle(hint, 'visibility', 'hidden');
     }
     exit && offEventDefault(e);
 }
@@ -335,7 +344,7 @@ function onKeyDownTextInput(e) {
     delay(() => getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility'), 1)();
     let caretIsToTheFirst = "" === getCharBeforeCaret($),
         tagFirst, tagLast,
-        textIsVoid = null === getText($, 0);
+        textIsVoid = !getText($, 0);
     if (keyIsShift) {
         if (KEY_ENTER === key) {
             exit = true;
@@ -643,7 +652,7 @@ setObjectAttributes(TagPicker, {
         },
         set: function (value) {
             let $ = this;
-            return $;
+            return ($.state.min = isInteger(value) && value >= 0 ? value : 0), $;
         }
     },
     tags: {
@@ -685,7 +694,31 @@ setObjectAttributes(TagPicker, {
             value && forEachArray(value.split(join), v => setValueInMap(v, v, _tags));
             return $.fire('change', [$.value]);
         }
-    }
+    },
+    vital: {
+        get: function () {
+            return this._vital;
+        },
+        set: function (value) {
+            let $ = this,
+                {_mask, mask, min, self} = $,
+                {input} = _mask,
+                v = !!value;
+            self.required = v;
+            if (v) {
+                if (0 === min) {
+                    $.min = 1;
+                }
+                setAria(input, 'required', true);
+                setAria(mask, 'required', true);
+            } else {
+                $.min = 0;
+                letAria(input, 'required');
+                letAria(mask, 'required');
+            }
+            return $;
+        }
+    },
 });
 
 TagPicker._ = setObjectMethods(TagPicker, {
@@ -712,6 +745,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
             theInputValue = getValue(self);
         $._active = !isDisabledSelf && !isReadOnlySelf;
         $._fix = isReadOnlySelf;
+        $._vital = isRequiredSelf;
         if (isRequiredSelf && min < 1) {
             state.min = min = 1; // Force minimum tag(s) to insert to be `1`
         }
@@ -720,7 +754,8 @@ TagPicker._ = setObjectMethods(TagPicker, {
             'aria': {
                 'disabled': isDisabledSelf ? TOKEN_TRUE : false,
                 'multiselectable': TOKEN_TRUE,
-                'readonly': isReadOnlySelf ? TOKEN_TRUE : false
+                'readonly': isReadOnlySelf ? TOKEN_TRUE : false,
+                'required': isRequiredSelf ? TOKEN_TRUE : false
             },
             'class': n,
             'role': 'listbox'
@@ -740,6 +775,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
                 'multiline': TOKEN_FALSE,
                 'placeholder': theInputPlaceholder,
                 'readonly': isReadOnlySelf ? TOKEN_TRUE : false,
+                'required': isRequiredSelf ? TOKEN_TRUE : false
             },
             'autocapitalize': 'off',
             'contenteditable': isDisabledSelf || isReadOnlySelf ? false : "",

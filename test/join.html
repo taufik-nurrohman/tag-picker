@@ -15,15 +15,15 @@
   <body>
     <main>
       <p>Using <code>,</code> as tags separator (default):</p>
-      <p><input type="text" value="foo, bar, baz"></p>
+      <p><input type="text" value="a, b, c"></p>
       <p>Using <code>;</code> as tags separator:</p>
-      <p><input type="text" value="foo; bar; baz"></p>
+      <p><input type="text" value="a; b; c"></p>
     </main>
     <script src="../index.js"></script>
     <script>
-      const inputs = document.querySelectorAll('input');
-      const picker_0 = new TagPicker(inputs[0]);
-      const picker_1 = new TagPicker(inputs[1], {
+      const sources = document.querySelectorAll('input');
+      const pickerComma = new TagPicker(sources[0]);
+      const pickerSemiColon = new TagPicker(sources[1], {
           escape: [';'],
           join: '; '
       });

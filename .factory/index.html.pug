@@ -1,7 +1,7 @@
 extends _index.pug
 
 block state
-  - const scripts = ['index.min.js']
+  - const scripts = ['index.js']
   - const styles = ['../layout/index.min.css', '../layout/anchor/index.min.css', 'index.min.css']
   - const theme = '#000'
   - const title = 'Tag Picker ' + version
@@ -138,6 +138,7 @@ block content
       li: a(href='test/attach,detach.html' target='_blank') Attach, Detach
       li: a(href='test/pattern.html' target='_blank') Convert Tag Name
       li: a(href='test/copy,cut,paste.html' target='_blank') Copy, Cut, and Paste Events
+      li: a(href='test/join.html' target='_blank') Custom Tags Separator
       li: a(href='test/escape.html' target='_blank') Disabled Characters
       li: a(href='test/disabled.html' target='_blank') Disabled State
       li: a(href='test/focus.html' target='_blank') Focus Automatically
@@ -146,15 +147,13 @@ block content
       li: a(href='test/min.html' target='_blank') Limit Minimum Tags
       li: a(href='test/read-only.html' target='_blank') Read-Only State
       li: a(href='test/required.html' target='_blank') Required State
-      li: a(href='test/hint.html' target='_blank') Set Input Hint
-      li: a(href='test/value.html' target='_blank') Set Input Value
       li: a(href='test/not.html' target='_blank') Validate Tag Name
     h2#tweaks
       a(aria-hidden='true' href='#tweaks') #
       = ' Tweaks'
     ul
       li: a(href='tweak/convert.html' target='_blank') Converted Tag Display
-      li: a(href='tweak/focus.hint.html' target='_blank') Hide Input Hint on Focus
+      li: a(href='tweak/focus.html' target='_blank') Hide Input Hint on Focus
       li: a(href='tweak/blur.html' target='_blank') Insert Tag Name on Blur
       li: a(href='tweak/invalid.html' target='_blank') Invalid State (Custom)
       li: a(href='tweak/array.html' target='_blank') Tags as Array
@@ -182,7 +181,7 @@ block content
       a(aria-hidden='true' href='#constructor-tag-picker-tags') #
       = ' '
       code TagPicker.Tags(picker, tags)
-    p: em TODO
+    p This constructor is used internally. It is the return value of the #[a(href='#instance-property-tags') #[code picker.tags]] property. It contains methods like #[a(href='#instance-property-tags-method-get') #[code get()]], #[a(href='#instance-property-tags-method-has') #[code has()]], #[a(href='#instance-property-tags-method-let') #[code let()]], and #[a(href='#instance-property-tags-method-set') #[code set()]] to modify the current tags.
     pre: code
       | const tags = new TagPicker.Tags(picker, ['Tag 1', 'Tag 2', 'Tag 3']);
     h2#parameters
@@ -276,19 +275,19 @@ block content
       a(aria-hidden='true' href='#parameter-state-with') #
       = ' '
       code state.with
-    p List of callable functions or objects containing an #[code attach()] method to be invoked each time the application is initialized. A very simple “plugin” system.
+    p List of #[a(href='#anatomy-of-an-extension') callable functions or objects] containing an #[code attach()] method to be invoked each time the application is initialized. A very simple “plugin” system.
     h2#methods
       a(aria-hidden='true' href='#methods') #
       = ' Methods'
     h3#instance-methods
       a(aria-hidden='true' href='#instance-methods') #
       = ' Instance Methods'
-    p Instance methods are methods available through the results of a #[code TagPicker] construct.
+    p Instance methods are methods available through the results of a #[a(href='#constructor-tag-picker') #[code TagPicker]] construct.
     h4#instance-method-attach
       a(aria-hidden='true' href='#instance-method-attach') #
       = ' '
       code picker.attach(self, state)
-    p Re-initializes the application and its extensions after it has been detached.
+    p Re-initializes the application and its #[a(href='#extensions') extensions] after it has been detached.
     pre: code
       | picker.attach();
     h4#instance-method-blur
@@ -302,7 +301,7 @@ block content
       a(aria-hidden='true' href='#instance-method-detach') #
       = ' '
       code picker.detach()
-    p Removes the application view and executes the #[code detach()] method of the extensions, if they are present.
+    p Removes the application view and executes the #[code detach()] method of the #[a(href='#extensions') extensions], if they are present.
     pre: code
       | picker.detach();
     h4#instance-method-fire
@@ -347,19 +346,19 @@ block content
     h3#static-methods
       a(aria-hidden='true' href='#static-methods') #
       = ' Static Methods'
-    p Static methods are methods available directly on the #[code TagPicker] object.
+    p Static methods are methods available directly on the #[a(href='#constructor-tag-picker') #[code TagPicker]] object.
     h4#static-method-from
       a(aria-hidden='true' href='#static-method-from') #
       = ' '
       code TagPicker.from(self, state)
-    p Creates a new #[code TagPicker] instance.
+    p Creates a new #[a(href='#constructor-tag-picker') #[code TagPicker]] instance.
     pre: code
       | const picker = TagPicker.from(document.querySelector('input'));
     h4#static-method-of
       a(aria-hidden='true' href='#static-method-of') #
       = ' '
       code TagPicker.of(self)
-    p Gets #[code TagPicker] instance of an element.
+    p Gets #[a(href='#constructor-tag-picker') #[code TagPicker]] instance of an element.
     pre: code
       | document.querySelectorAll('input').forEach(self => {
       |     const picker = TagPicker.of(self);
@@ -370,15 +369,15 @@ block content
     h3#instance-properties
       a(aria-hidden='true' href='#instance-properties') #
       = ' Instance Properties'
-    p Instance properties are properties available through the results of a #[code TagPicker] construct.
+    p Instance properties are properties available through the results of a #[a(href='#constructor-tag-picker') #[code TagPicker]] construct.
     h4#instance-property-active
       a(aria-hidden='true' href='#instance-property-active') #
       = ' '
       code picker.active
     p Gets or sets the active state of the tag picker. By setting the value to #[code false] or #[code true], the disabled state of the source element will also be set automatically.
     pre: code
-      | picker.active = false; // Disable tag picker
-      | picker.active = true; // Enable tag picker
+      | picker.active = false; // Make the tag picker “disabled”
+      | picker.active = true; // Make the tag picker “enabled”
     h4#instance-property-fix
       a(aria-hidden='true' href='#instance-property-fix') #
       = ' '
@@ -404,7 +403,7 @@ block content
       a(aria-hidden='true' href='#instance-property-max') #
       = ' '
       code picker.max
-    p Proxy that passes to the #[code picker.state.max] property, with additional actions that are executed while the value is being set.
+    p Proxy that passes to the #[a(href='#parameter-state-max') #[code picker.state.max]] property, with additional actions that are executed while the value is being set.
     pre: code
       | console.log(picker.max); // Returns the `picker.state.max` value
     pre: code
@@ -413,7 +412,7 @@ block content
       a(aria-hidden='true' href='#instance-property-min') #
       = ' '
       code picker.min
-    p Proxy that passes to the #[code picker.state.min] property, with additional actions that are executed while the value is being set.
+    p Proxy that passes to the #[a(href='#parameter-state-min') #[code picker.state.min]] property, with additional actions that are executed while the value is being set.
     pre: code
       | console.log(picker.min); // Returns the `picker.state.min` value
     pre: code
@@ -549,7 +548,7 @@ block content
       a(aria-hidden='true' href='#instance-property-value') #
       = ' '
       code picker.value
-    p Proxy that passes to the #[code picker.self.value] property, with additional actions that are executed while the value is being set.
+    p Proxy that passes to the #[a(href='#instance-property-self') #[code picker.self.value]] property, with additional actions that are executed while the value is being set.
     pre: code
       | console.log(picker.value);
     pre: code
@@ -558,10 +557,17 @@ block content
       | });
       |
       | picker.value = 'tag-1, tag-2, tag-3';
+    h4#instance-property-vital
+      a(aria-hidden='true' href='#instance-property-vital') #
+      = ' '
+      code picker.vital
+    p Gets or sets the required state of the tag picker. By setting the value to #[code false] or #[code true], the required state of the source element will also be set automatically. If the value is set to #[code true] and the current #[a(href='#instance-property-min') #[code picker.min]] value is #[code 0], then it will change the current #[a(href='#instance-property-min') #[code picker.min]] value to #[code 1].
+    pre: code
+      | picker.vital = true; // Make the tag picker “required”
     h3#static-properties
       a(aria-hidden='true' href='#static-properties') #
       = ' Static Properties'
-    p Static properties are properties available directly on the #[code TagPicker] object.
+    p Static properties are properties available directly on the #[a(href='#constructor-tag-picker') #[code TagPicker]] object.
     h4#static-property-prototype
       a(aria-hidden='true' href='#static-property-prototype') #
       = ' '
@@ -579,7 +585,7 @@ block content
       a(aria-hidden='true' href='#static-property-prototype') #
       = ' '
       code TagPicker.state
-    p Returns the default values of #[code picker.state].
+    p Returns the default values of #[a(href='#instance-property-state') #[code picker.state]].
     pre: code
       | const picker = new TagPicker(document.querySelector('input'), {
       |     test: [1, 2, true]

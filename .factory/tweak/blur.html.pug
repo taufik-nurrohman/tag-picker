@@ -9,9 +9,9 @@ block script
   script
     | const picker = new TagPicker(document.querySelector('input'));
     |
-    | picker.on('blur', function () {
-    |     const text = this.text;
-    |     text && (this.set(text), this.text = ""); // Insert on blur
+    | picker._mask.input.addEventListener('blur', function () {
+    |     const text = picker.text;
+    |     text && (picker.tags.set(text), picker.text = ""); // Insert on blur
     | });
 
 block style
@@ -23,6 +23,6 @@ block style
 block content
   main
     p Previous versions would do this by default, but #[a(href='https://github.com/taufik-nurrohman/tag-picker/discussions/19' target='_blank') some people] do not want this behavior. Have a look at the source code to see how I restore the old behavior!
-    form(method='get')
-      p: input(name='tags' type='text' value='foo, bar, baz')
+    form(method='get' target='_blank')
+      p: input(name='test' type='text' value='a, b, c')
       p: button(type='submit') Submit

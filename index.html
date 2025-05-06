@@ -112,6 +112,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
         <li><a href="test/attach,detach.html" target="_blank">Attach, Detach</a></li>
         <li><a href="test/pattern.html" target="_blank">Convert Tag Name</a></li>
         <li><a href="test/copy,cut,paste.html" target="_blank">Copy, Cut, and Paste Events</a></li>
+        <li><a href="test/join.html" target="_blank">Custom Tags Separator</a></li>
         <li><a href="test/escape.html" target="_blank">Disabled Characters</a></li>
         <li><a href="test/disabled.html" target="_blank">Disabled State</a></li>
         <li><a href="test/focus.html" target="_blank">Focus Automatically</a></li>
@@ -120,14 +121,12 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
         <li><a href="test/min.html" target="_blank">Limit Minimum Tags</a></li>
         <li><a href="test/read-only.html" target="_blank">Read-Only State</a></li>
         <li><a href="test/required.html" target="_blank">Required State</a></li>
-        <li><a href="test/hint.html" target="_blank">Set Input Hint</a></li>
-        <li><a href="test/value.html" target="_blank">Set Input Value</a></li>
         <li><a href="test/not.html" target="_blank">Validate Tag Name</a></li>
       </ul>
       <h2 id="tweaks"><a aria-hidden="true" href="#tweaks">#</a> Tweaks</h2>
       <ul>
         <li><a href="tweak/convert.html" target="_blank">Converted Tag Display</a></li>
-        <li><a href="tweak/focus.hint.html" target="_blank">Hide Input Hint on Focus</a></li>
+        <li><a href="tweak/focus.html" target="_blank">Hide Input Hint on Focus</a></li>
         <li><a href="tweak/blur.html" target="_blank">Insert Tag Name on Blur</a></li>
         <li><a href="tweak/invalid.html" target="_blank">Invalid State (Custom)</a></li>
         <li><a href="tweak/array.html" target="_blank">Tags as Array</a></li>
@@ -147,7 +146,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
     with: []
 });</code></pre>
       <h3 id="constructor-tag-picker-tags"><a aria-hidden="true" href="#constructor-tag-picker-tags">#</a> <code>TagPicker.Tags(picker, tags)</code></h3>
-      <p><em>TODO</em></p>
+      <p>This constructor is used internally. It is the return value of the <a href="#instance-property-tags"><code>picker.tags</code></a> property. It contains methods like <a href="#instance-property-tags-method-get"><code>get()</code></a>, <a href="#instance-property-tags-method-has"><code>has()</code></a>, <a href="#instance-property-tags-method-let"><code>let()</code></a>, and <a href="#instance-property-tags-method-set"><code>set()</code></a> to modify the current tags.</p>
       <pre><code>const tags = new TagPicker.Tags(picker, ['Tag 1', 'Tag 2', 'Tag 3']);</code></pre>
       <h2 id="parameters"><a aria-hidden="true" href="#parameters">#</a> Parameters</h2>
       <h3 id="parameter-self"><a aria-hidden="true" href="#parameter-self">#</a> <code>self</code></h3>
@@ -203,18 +202,18 @@ picker.on('not.tag', name => {
     }
 });</code></pre>
       <h4 id="parameter-state-with"><a aria-hidden="true" href="#parameter-state-with">#</a> <code>state.with</code></h4>
-      <p>List of callable functions or objects containing an <code>attach()</code> method to be invoked each time the application is initialized. A very simple “plugin” system.</p>
+      <p>List of <a href="#anatomy-of-an-extension">callable functions or objects</a> containing an <code>attach()</code> method to be invoked each time the application is initialized. A very simple “plugin” system.</p>
       <h2 id="methods"><a aria-hidden="true" href="#methods">#</a> Methods</h2>
       <h3 id="instance-methods"><a aria-hidden="true" href="#instance-methods">#</a> Instance Methods</h3>
-      <p>Instance methods are methods available through the results of a <code>TagPicker</code> construct.</p>
+      <p>Instance methods are methods available through the results of a <a href="#constructor-tag-picker"><code>TagPicker</code></a> construct.</p>
       <h4 id="instance-method-attach"><a aria-hidden="true" href="#instance-method-attach">#</a> <code>picker.attach(self, state)</code></h4>
-      <p>Re-initializes the application and its extensions after it has been detached.</p>
+      <p>Re-initializes the application and its <a href="#extensions">extensions</a> after it has been detached.</p>
       <pre><code>picker.attach();</code></pre>
       <h4 id="instance-method-blur"><a aria-hidden="true" href="#instance-method-blur">#</a> <code>picker.blur()</code></h4>
       <p>Blurs from the tag picker’s input.</p>
       <pre><code>picker.blur();</code></pre>
       <h4 id="instance-method-detach"><a aria-hidden="true" href="#instance-method-detach">#</a> <code>picker.detach()</code></h4>
-      <p>Removes the application view and executes the <code>detach()</code> method of the extensions, if they are present.</p>
+      <p>Removes the application view and executes the <code>detach()</code> method of the <a href="#extensions">extensions</a>, if they are present.</p>
       <pre><code>picker.detach();</code></pre>
       <h4 id="instance-method-fire"><a aria-hidden="true" href="#instance-method-fire">#</a> <code>picker.fire(event, data, that)</code></h4>
       <p>Fires an event.</p>
@@ -239,22 +238,22 @@ picker.off('change', onChange); // Remove `onChange` event from the `change` eve
 
 picker.on('change', onChange);</code></pre>
       <h3 id="static-methods"><a aria-hidden="true" href="#static-methods">#</a> Static Methods</h3>
-      <p>Static methods are methods available directly on the <code>TagPicker</code> object.</p>
+      <p>Static methods are methods available directly on the <a href="#constructor-tag-picker"><code>TagPicker</code></a> object.</p>
       <h4 id="static-method-from"><a aria-hidden="true" href="#static-method-from">#</a> <code>TagPicker.from(self, state)</code></h4>
-      <p>Creates a new <code>TagPicker</code> instance.</p>
+      <p>Creates a new <a href="#constructor-tag-picker"><code>TagPicker</code></a> instance.</p>
       <pre><code>const picker = TagPicker.from(document.querySelector('input'));</code></pre>
       <h4 id="static-method-of"><a aria-hidden="true" href="#static-method-of">#</a> <code>TagPicker.of(self)</code></h4>
-      <p>Gets <code>TagPicker</code> instance of an element.</p>
+      <p>Gets <a href="#constructor-tag-picker"><code>TagPicker</code></a> instance of an element.</p>
       <pre><code>document.querySelectorAll('input').forEach(self => {
     const picker = TagPicker.of(self);
 });</code></pre>
       <h2 id="properties"><a aria-hidden="true" href="#properties">#</a> Properties</h2>
       <h3 id="instance-properties"><a aria-hidden="true" href="#instance-properties">#</a> Instance Properties</h3>
-      <p>Instance properties are properties available through the results of a <code>TagPicker</code> construct.</p>
+      <p>Instance properties are properties available through the results of a <a href="#constructor-tag-picker"><code>TagPicker</code></a> construct.</p>
       <h4 id="instance-property-active"><a aria-hidden="true" href="#instance-property-active">#</a> <code>picker.active</code></h4>
       <p>Gets or sets the active state of the tag picker. By setting the value to <code>false</code> or <code>true</code>, the disabled state of the source element will also be set automatically.</p>
-      <pre><code>picker.active = false; // Disable tag picker
-picker.active = true; // Enable tag picker</code></pre>
+      <pre><code>picker.active = false; // Make the tag picker “disabled”
+picker.active = true; // Make the tag picker “enabled”</code></pre>
       <h4 id="instance-property-fix"><a aria-hidden="true" href="#instance-property-fix">#</a> <code>picker.fix</code></h4>
       <p>Gets or sets the read-only state of the tag picker. By setting the value to <code>false</code> or <code>true</code>, the read-only state of the source element will also be set automatically.</p>
       <pre><code>picker.fix = true; // Make the tag picker “read-only”</code></pre>
@@ -265,11 +264,11 @@ picker.active = true; // Enable tag picker</code></pre>
       <p>Returns the tag picker’s mask.</p>
       <pre><code>picker.mask.classList.add(picker.state.n + '--dark');</code></pre>
       <h4 id="instance-property-max"><a aria-hidden="true" href="#instance-property-max">#</a> <code>picker.max</code></h4>
-      <p>Proxy that passes to the <code>picker.state.max</code> property, with additional actions that are executed while the value is being set.</p>
+      <p>Proxy that passes to the <a href="#parameter-state-max"><code>picker.state.max</code></a> property, with additional actions that are executed while the value is being set.</p>
       <pre><code>console.log(picker.max); // Returns the `picker.state.max` value</code></pre>
       <pre><code>picker.max = 4; // Allow a maximum of 4 tags to be inserted.</code></pre>
       <h4 id="instance-property-min"><a aria-hidden="true" href="#instance-property-min">#</a> <code>picker.min</code></h4>
-      <p>Proxy that passes to the <code>picker.state.min</code> property, with additional actions that are executed while the value is being set.</p>
+      <p>Proxy that passes to the <a href="#parameter-state-min"><code>picker.state.min</code></a> property, with additional actions that are executed while the value is being set.</p>
       <pre><code>console.log(picker.min); // Returns the `picker.state.min` value</code></pre>
       <pre><code>picker.min = 4; // Insert at least 4 tags to be able to submit the form.</code></pre>
       <h4 id="instance-property-self"><a aria-hidden="true" href="#instance-property-self">#</a> <code>picker.self</code></h4>
@@ -355,15 +354,18 @@ picker.tags.set('tag-3', ['Tag 3', {
       <pre><code>console.log(picker.text);</code></pre>
       <pre><code>picker.text = 'tag-1, tag-2, tag-3';</code></pre>
       <h4 id="instance-property-value"><a aria-hidden="true" href="#instance-property-value">#</a> <code>picker.value</code></h4>
-      <p>Proxy that passes to the <code>picker.self.value</code> property, with additional actions that are executed while the value is being set.</p>
+      <p>Proxy that passes to the <a href="#instance-property-self"><code>picker.self.value</code></a> property, with additional actions that are executed while the value is being set.</p>
       <pre><code>console.log(picker.value);</code></pre>
       <pre><code>picker.on('change', function () {
     console.log(this.value);
 });
 
 picker.value = 'tag-1, tag-2, tag-3';</code></pre>
+      <h4 id="instance-property-vital"><a aria-hidden="true" href="#instance-property-vital">#</a> <code>picker.vital</code></h4>
+      <p>Gets or sets the required state of the tag picker. By setting the value to <code>false</code> or <code>true</code>, the required state of the source element will also be set automatically. If the value is set to <code>true</code> and the current <a href="#instance-property-min"><code>picker.min</code></a> value is <code>0</code>, then it will change the current <a href="#instance-property-min"><code>picker.min</code></a> value to <code>1</code>.</p>
+      <pre><code>picker.vital = true; // Make the tag picker “required”</code></pre>
       <h3 id="static-properties"><a aria-hidden="true" href="#static-properties">#</a> Static Properties</h3>
-      <p>Static properties are properties available directly on the <code>TagPicker</code> object.</p>
+      <p>Static properties are properties available directly on the <a href="#constructor-tag-picker"><code>TagPicker</code></a> object.</p>
       <h4 id="static-property-prototype"><a aria-hidden="true" href="#static-property-prototype">#</a> <code>TagPicker._</code></h4>
       <p>Alias for <code>TagPicker.prototype</code>.</p>
       <pre><code>TagPicker._.clear = function () {
@@ -374,7 +376,7 @@ const picker = new TagPicker(document.querySelector('input'));
 
 picker.clear(); // Clear value</code></pre>
       <h4 id="static-property-state"><a aria-hidden="true" href="#static-property-prototype">#</a> <code>TagPicker.state</code></h4>
-      <p>Returns the default values of <code>picker.state</code>.</p>
+      <p>Returns the default values of <a href="#instance-property-state"><code>picker.state</code></a>.</p>
       <pre><code>const picker = new TagPicker(document.querySelector('input'), {
     test: [1, 2, true]
 });
@@ -427,7 +429,7 @@ Object.defineProperty(Extension, 'name', {
       <hr>
       <p>© 2025 <a href="/">Taufik Nurrohman</a></p>
     </footer>
-    <script src="index.min.js"></script>
+    <script src="index.js"></script>
     <script>
       const picker = new TagPicker(document.forms[0].tags);
       picker.on('change', function () {

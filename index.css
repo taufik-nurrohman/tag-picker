@@ -122,7 +122,6 @@
   z-index: 0;
 }
 .tag-picker__x {
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   height: 1em;
   line-height: 0;
   margin-right: -0.125em;

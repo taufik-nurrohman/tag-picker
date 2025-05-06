@@ -9,8 +9,10 @@ block script
   script
     | const picker = new TagPicker(document.querySelector('input'));
     |
-    | picker.on('min.tags', function () {
-    |     console.error('The minimum number of tags that must be inserted to be able to submit the form is ' + this.state.min + '.');
+    | picker.vital = document.querySelector('input[type=checkbox]').checked;
+    |
+    | picker.on('min.tags', function (count, min) {
+    |     console.error('The minimum number of tags that must be inserted to be able to submit the form is ' + min + '.');
     | });
 
 block style
@@ -25,10 +27,10 @@ block content
       p: input(name='test' required type='text')
       p
         label
-          input(checked onchange='picker.self.required = this.checked; picker.detach().attach(picker.self, {min: 0});' type='checkbox')
+          input(checked onchange='picker.vital = this.checked;' type='checkbox')
           = ' '
           span Required
       p
         button(type='submit') Submit
         = ' '
-        button(onclick='picker.set(\'baz\').focus();' type='button') Add &ldquo;baz&rdquo; Tag
+        button(onclick='picker.tags.set(\'a\'), picker.focus();' type='button') Add &ldquo;a&rdquo; Tag

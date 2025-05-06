@@ -7,10 +7,10 @@ block state
 
 block script
   script
-    | const inputs = document.querySelectorAll('input');
+    | const sources = document.querySelectorAll('input');
     |
-    | const picker_0 = new TagPicker(inputs[0]);
-    | const picker_1 = new TagPicker(inputs[1], {
+    | const pickerComma = new TagPicker(sources[0]);
+    | const pickerSemiColon = new TagPicker(sources[1], {
     |     escape: [';'],
     |     join: '; '
     | });
@@ -24,6 +24,6 @@ block style
 block content
   main
     p Using #[code ,] as tags separator (default):
-    p: input(type='text' value='foo, bar, baz')
+    p: input(type='text' value='a, b, c')
     p Using #[code ;] as tags separator:
-    p: input(type='text' value='foo; bar; baz')
+    p: input(type='text' value='a; b; c')

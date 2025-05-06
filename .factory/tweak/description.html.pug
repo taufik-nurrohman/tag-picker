@@ -14,9 +14,9 @@ block script
     | d.style.display = 'block';
     | d.style.marginTop = '0.5em';
     |
-    | picker.on('has.tag', function (e, tag) {
-    |     d.innerHTML = 'Tag “' + tag + '” already exists.';
-    |     picker.self.parentNode.append(d);
+    | picker.on('has.tag', name => {
+    |     d.innerHTML = 'Tag “' + name + '” already exists.';
+    |     picker.mask.after(d);
     |     setTimeout(() => d.remove(), 1000);
     | });
 
@@ -28,5 +28,5 @@ block style
 
 block content
   main
-    p Add #[em foo] again to see the effect!
-    p: input(type='text' value='foo, bar, baz')
+    p Add #[em c] again to see the effect!
+    p: input(type='text' value='a, b, c')

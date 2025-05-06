@@ -9,12 +9,12 @@ block script
   script
     | const picker = new TagPicker(document.querySelector('input'));
     |
-    | picker.on('has.tag', function (e, tag) {
-    |     const node = this._tags.get(tag);
-    |     if (node) {
-    |         node.classList.add(this.state.n + '__tag--target');
+    | picker.on('has.tag', function (name) {
+    |     const at = this.tags.at(name);
+    |     if (at) {
+    |         at[2].setAttribute('aria-pressed', 'true');
     |         setTimeout(() => {
-    |             node.classList.remove(this.state.n + '__tag--target');
+    |             at[2].removeAttribute('aria-pressed');
     |         }, 1000);
     |     }
     | });
@@ -24,11 +24,11 @@ block style
     | .tag-picker {
     |   width: 100%;
     | }
-    | .tag-picker__tag--target {
+    | .tag-picker__tag[aria-pressed='true'] {
     |   background: rgb(255, 0, 0, 0.5);
     | }
 
 block content
   main
-    p Add #[em foo] again to see the effect!
-    p: input(type='text' value='foo, bar, baz')
+    p Add #[em c] again to see the effect!
+    p: input(type='text' value='a, b, c')

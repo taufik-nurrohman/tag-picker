@@ -9,8 +9,8 @@ block script
   script
     | const picker = new TagPicker(document.querySelector('input'));
     |
-    | picker.on('has.tag', function (e, tag) {
-    |     alert('Tag “' + tag + '” already exists.');
+    | picker.on('has.tag', name => {
+    |     alert('Tag “' + name + '” already exists.');
     | });
 
 block style
@@ -21,5 +21,5 @@ block style
 
 block content
   main
-    p Add #[em foo] again to see the effect!
-    p: input(type='text' value='foo, bar, baz')
+    p Add #[em c] again to see the effect!
+    p: input(type='text' value='a, b, c')

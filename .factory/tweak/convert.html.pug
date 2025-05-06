@@ -14,6 +14,21 @@ block script
     | };
     |
     | const picker = new TagPicker(document.querySelector('input'));
+    | const views = { cry: '😭', happy: '😄', sad: '☹️', smile: '☺️' };
+    |
+    | picker.on('set.tag', function (name) {
+    |     if (!views[name] || !this.tags.at(name)) {
+    |         return;
+    |     }
+    |     this.tags.at(name)[2].querySelector('[role=none]').textContent = views[name];
+    | });
+    |
+    | picker.tags.values.forEach((v, k) => {
+    |     if (!views[k]) {
+    |         return;
+    |     }
+    |     v[2].querySelector('[role=none]').textContent = views[k];
+    | });
 
 block style
   style
@@ -25,6 +40,6 @@ block content
   main
     form(method='get')
       p Convert tag view based on its value. Try #[mark(style={'user-select': 'all'} tabindex='0') cry], #[mark(style={'user-select': 'all'} tabindex='0') happy], #[mark(style={'user-select': 'all'} tabindex='0') sad], #[mark(style={'user-select': 'all'} tabindex='0') smile].
-      p: input(name='tags' type='text' value='happy, sad')
+      p: input(name='test' type='text' value='happy, sad')
       = ' '
       p: button(type='submit') Submit
