@@ -229,7 +229,7 @@ block content
     p The maximum number of tags that can be inserted.
     pre: code
       | const picker = new TagPicker(document.querySelector('input'), {
-      |     max: 12
+      |     max: 25
       | });
     h4#parameter-state-min
       a(aria-hidden='true' href='#parameter-state-min') #
@@ -275,7 +275,7 @@ block content
       a(aria-hidden='true' href='#parameter-state-with') #
       = ' '
       code state.with
-    p List of #[a(href='#anatomy-of-an-extension') callable functions or objects] containing an #[code attach()] method to be invoked each time the application is initialized. A very simple “plugin” system.
+    p List of #[a(href='#anatomy-of-an-extension') callable functions or objects containing an #[code attach()] method] to be invoked each time the application is initialized. A very simple “plugin” system.
     h2#methods
       a(aria-hidden='true' href='#methods') #
       = ' Methods'

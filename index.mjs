@@ -718,7 +718,7 @@ setObjectAttributes(TagPicker, {
             }
             return $;
         }
-    },
+    }
 });
 
 TagPicker._ = setObjectMethods(TagPicker, {

@@ -3,21 +3,21 @@
   "browser": "index.min.js",
   "bugs": "https://github.com/taufik-nurrohman/tag-picker/issues",
   "dependencies": {
-    "@taufik-nurrohman/document": "*",
-    "@taufik-nurrohman/event": "*",
-    "@taufik-nurrohman/f": "*",
-    "@taufik-nurrohman/from": "*",
-    "@taufik-nurrohman/has": "*",
-    "@taufik-nurrohman/hook": "*",
-    "@taufik-nurrohman/is": "*",
-    "@taufik-nurrohman/pattern": "*",
-    "@taufik-nurrohman/selection": "*",
-    "@taufik-nurrohman/tick": "*",
-    "@taufik-nurrohman/to": "*"
+    "@taufik-nurrohman/document": "^1.5.1",
+    "@taufik-nurrohman/event": "^1.0.1",
+    "@taufik-nurrohman/f": "^1.3.0",
+    "@taufik-nurrohman/from": "^1.1.0",
+    "@taufik-nurrohman/has": "^1.0.0",
+    "@taufik-nurrohman/hook": "^1.2.2",
+    "@taufik-nurrohman/is": "^1.0.4",
+    "@taufik-nurrohman/pattern": "^1.0.1",
+    "@taufik-nurrohman/selection": "^1.1.0",
+    "@taufik-nurrohman/tick": "^1.0.1",
+    "@taufik-nurrohman/to": "^1.2.0"
   },
   "description": "Better tags input interaction with JavaScript.",
   "devDependencies": {
-    "@taufik-nurrohman/factory": "*"
+    "@taufik-nurrohman/factory": "^2.2.4"
   },
   "exports": {
     "import": "./index.mjs",

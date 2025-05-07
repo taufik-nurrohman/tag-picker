@@ -169,7 +169,7 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
       <h4 id="parameter-state-max"><a aria-hidden="true" href="#parameter-state-max">#</a> <code>state.max</code></h4>
       <p>The maximum number of tags that can be inserted.</p>
       <pre><code>const picker = new TagPicker(document.querySelector('input'), {
-    max: 12
+    max: 25
 });</code></pre>
       <h4 id="parameter-state-min"><a aria-hidden="true" href="#parameter-state-min">#</a> <code>state.min</code></h4>
       <p>The minimum number of tags that must be inserted to be able to submit the form. The default value of this state is set to <code>0</code>, but if the <code>required</code> attribute is present on the <code>&lt;input&gt;</code> element, then the default value of this state will be set to <code>1</code>.</p>
@@ -202,7 +202,7 @@ picker.on('not.tag', name => {
     }
 });</code></pre>
       <h4 id="parameter-state-with"><a aria-hidden="true" href="#parameter-state-with">#</a> <code>state.with</code></h4>
-      <p>List of <a href="#anatomy-of-an-extension">callable functions or objects</a> containing an <code>attach()</code> method to be invoked each time the application is initialized. A very simple “plugin” system.</p>
+      <p>List of <a href="#anatomy-of-an-extension">callable functions or objects containing an <code>attach()</code> method</a> to be invoked each time the application is initialized. A very simple “plugin” system.</p>
       <h2 id="methods"><a aria-hidden="true" href="#methods">#</a> Methods</h2>
       <h3 id="instance-methods"><a aria-hidden="true" href="#instance-methods">#</a> Instance Methods</h3>
       <p>Instance methods are methods available through the results of a <a href="#constructor-tag-picker"><code>TagPicker</code></a> construct.</p>
