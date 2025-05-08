@@ -1036,6 +1036,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
             // allow user(s) to edit the tag text. We just want to make sure that the “Cut” option is available.
             'contenteditable': TOKEN_TRUE,
             'role': 'option',
+            'spellcheck': TOKEN_FALSE,
             'tabindex': -1,
             'title': getState(value[1], 'title') ?? false,
             'value': v

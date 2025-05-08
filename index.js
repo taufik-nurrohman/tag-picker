@@ -1986,6 +1986,7 @@
                 // allow user(s) to edit the tag text. We just want to make sure that the “Cut” option is available.
                 'contenteditable': TOKEN_TRUE,
                 'role': 'option',
+                'spellcheck': TOKEN_FALSE,
                 'tabindex': -1,
                 'title': (_getState = getState(value[1], 'title')) != null ? _getState : false,
                 'value': v
