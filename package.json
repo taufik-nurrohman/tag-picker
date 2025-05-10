@@ -3,7 +3,7 @@
   "browser": "index.min.js",
   "bugs": "https://github.com/taufik-nurrohman/tag-picker/issues",
   "dependencies": {
-    "@taufik-nurrohman/document": "^1.5.1",
+    "@taufik-nurrohman/document": "^1.5.3",
     "@taufik-nurrohman/event": "^1.0.1",
     "@taufik-nurrohman/f": "^1.3.0",
     "@taufik-nurrohman/from": "^1.1.0",

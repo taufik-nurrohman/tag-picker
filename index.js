@@ -630,10 +630,10 @@
         return setAttribute(node, 'id', isSet(value) ? value : getID(node, batch));
     };
     var setNext = function setNext(current, node) {
-        return getParent(current).insertBefore(node, getNext(current, true)), node;
+        return current.after(node), node;
     };
     var setPrev = function setPrev(current, node) {
-        return getParent(current).insertBefore(node, current), node;
+        return current.before(node), node;
     };
     var setStyle = function setStyle(node, style, value) {
         if (isNumber(value)) {
