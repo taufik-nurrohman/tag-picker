@@ -1991,11 +1991,15 @@
                 // Make the tag “content editable”, so that the “Cut” option is available in the context menu, but do not
                 // allow user(s) to edit the tag text. We just want to make sure that the “Cut” option is available.
                 'contenteditable': TOKEN_TRUE,
+                // <https://html.spec.whatwg.org/multipage/interaction.html#attr-inputmode-keyword-none>
+                'inputmode': 'none',
                 'role': 'option',
                 'spellcheck': TOKEN_FALSE,
                 'tabindex': -1,
                 'title': (_getState = getState(value[1], 'title')) != null ? _getState : false,
-                'value': v
+                'value': v,
+                // <https://www.w3.org/TR/virtual-keyboard#dom-elementcontenteditable-virtualkeyboardpolicy>
+                'virtualkeyboardpolicy': 'manual'
             });
             tagText = value[2] ? getElement('.' + n + '__v', value[2]) : setElement('span', _fromValue(value[0]), {
                 'class': n + '__v',
