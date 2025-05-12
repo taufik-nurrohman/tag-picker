@@ -55,7 +55,11 @@ const TOKEN_READONLY = 'readonly';
 const TOKEN_READ_ONLY = 'readOnly';
 const TOKEN_REQUIRED = 'required';
 const TOKEN_SELECTED = 'selected';
+const TOKEN_TABINDEX = 'tabindex';
+const TOKEN_TAB_INDEX = 'tabIndex';
 const TOKEN_TRUE = 'true';
+const TOKEN_VALUE = 'value';
+const TOKEN_VALUES = TOKEN_VALUE + 's';
 
 const name = 'TagPicker';
 
@@ -68,7 +72,7 @@ function createTags($, tags) {
             if (isArray(tag)) {
                 tag[0] = tag[0] ?? "";
                 tag[1] = tag[1] ?? {};
-                setValueInMap(toValue(tag[1].value ?? tag[0]), tag, map);
+                setValueInMap(toValue(tag[1][TOKEN_VALUE] ?? tag[0]), tag, map);
             } else {
                 setValueInMap(toValue(tag), [tag, {}], map);
             }
@@ -78,7 +82,7 @@ function createTags($, tags) {
             if (isArray(v)) {
                 tags[k][0] = v[0] ?? "";
                 tags[k][1] = v[1] ?? {};
-                setValueInMap(toValue(v[1].value ?? k), v, map);
+                setValueInMap(toValue(v[1][TOKEN_VALUE] ?? k), v, map);
             } else {
                 setValueInMap(toValue(k), [v, {}], map);
             }
@@ -89,10 +93,10 @@ function createTags($, tags) {
     _tags.let(null, 0);
     forEachMap(map, (v, k) => {
         if (isArray(v) && v[1]) {
-            r.push(v[1].value ?? k);
+            r.push(v[1][TOKEN_VALUE] ?? k);
         }
         // Set the tag data, but do not fire the `set.tag` hook
-        _tags.set(toValue(isArray(v) && v[1] ? (v[1].value ?? k) : k), v, 0);
+        _tags.set(toValue(isArray(v) && v[1] ? (v[1][TOKEN_VALUE] ?? k) : k), v, 0);
     });
     return r;
 }
@@ -174,7 +178,7 @@ function onCutTag(e) {
             letValueInMap(getTagValue(v[2]), _tags);
         }
     });
-    focusTo(picker.fire('change', [picker.value]));
+    focusTo(picker.fire('change', [picker[TOKEN_VALUE]]));
 }
 
 function onCutTextInput() {
@@ -291,7 +295,7 @@ function onKeyDownTag(e) {
                     tagPrev = getPrev(v[2]);
                 }
             });
-            focusTo(tagPrev || picker), picker.fire('change', [picker.value]);
+            focusTo(tagPrev || picker), picker.fire('change', [picker[TOKEN_VALUE]]);
         } else if (KEY_DELETE_RIGHT === key) {
             exit = true;
             letValueInMap(getTagValue($), _tags);
@@ -302,7 +306,7 @@ function onKeyDownTag(e) {
                     tagNext = getNext(v[2]);
                 }
             });
-            focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker.value]);
+            focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker[TOKEN_VALUE]]);
         } else if (KEY_ENTER === key || ' ' === key) {
             exit = true;
             getAria($, TOKEN_SELECTED) ? letAria($, TOKEN_SELECTED) : setAria($, TOKEN_SELECTED, true);
@@ -316,7 +320,7 @@ function onKeyDownTag(e) {
                     letValueInMap(getTagValue(v[2]), _tags);
                 }
             });
-            selectToNone(), focusTo(picker).fire('change', [picker.value]);
+            selectToNone(), focusTo(picker).fire('change', [picker[TOKEN_VALUE]]);
         }
     }
     exit && offEventDefault(e);
@@ -446,7 +450,7 @@ function onPasteTag(e) {
         }
     });
     forEachMap(_tags, v => letAria(v[2], TOKEN_SELECTED));
-    focusTo(picker.fire('change', [picker.value]));
+    focusTo(picker.fire('change', [picker[TOKEN_VALUE]]));
 }
 
 function onPasteTextInput(e) {
@@ -464,7 +468,7 @@ function onPasteTextInput(e) {
         }
     });
     forEachMap(_tags, v => letAria(v[2], TOKEN_SELECTED));
-    picker.fire('change', [picker.value]).text = "";
+    picker.fire('change', [picker[TOKEN_VALUE]]).text = "";
 }
 
 function onPointerDownMask(e) {
@@ -563,7 +567,7 @@ function TagPickerTags(of, tags) {
         return new TagPickerTags(of, tags);
     }
     $.of = of;
-    $.values = new Map;
+    $[TOKEN_VALUES] = new Map;
     if (tags) {
         createTags(of, tags);
     }
@@ -631,11 +635,11 @@ setObjectAttributes(TagPicker, {
                 letAttribute(input, TOKEN_CONTENTEDITABLE);
                 setAria(input, TOKEN_READONLY, true);
                 setAria(mask, TOKEN_READONLY, true);
-                setAttribute(input, 'tabindex', 0);
+                setAttribute(input, TOKEN_TABINDEX, 0);
             } else {
                 letAria(input, TOKEN_READONLY);
                 letAria(mask, TOKEN_READONLY);
-                letAttribute(input, 'tabindex');
+                letAttribute(input, TOKEN_TABINDEX);
                 setAttribute(input, TOKEN_CONTENTEDITABLE, "");
             }
             return $;
@@ -696,9 +700,9 @@ setObjectAttributes(TagPicker, {
             let $ = this,
                 {_tags, state} = $,
                 {join} = state;
-            $.value && forEachArray($.value.split(join), v => letValueInMap(v, _tags));
+            $[TOKEN_VALUE] && forEachArray($[TOKEN_VALUE].split(join), v => letValueInMap(v, _tags));
             value && forEachArray(value.split(join), v => setValueInMap(v, v, _tags));
-            return $.fire('change', [$.value]);
+            return $.fire('change', [$[TOKEN_VALUE]]);
         }
     },
     vital: {
@@ -818,7 +822,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
         onEvent(EVENT_MOUSE_DOWN, mask, onPointerDownMask);
         onEvent(EVENT_PASTE, textInput, onPasteTextInput);
         onEvent(EVENT_TOUCH_START, mask, onPointerDownMask);
-        self.tabIndex = -1;
+        self[TOKEN_TAB_INDEX] = -1;
         setReference(mask, $);
         $._mask = {
             flex: maskFlex,
@@ -829,8 +833,8 @@ TagPicker._ = setObjectMethods(TagPicker, {
             text: text
         };
         // Re-assign some state value(s) using the setter to either normalize or reject the initial value
-        $.max = Infinity === max || (isInteger(max) && max >= 0) ? max : Infinity;
-        $.min = isInteger(min) && min >= 0 ? min : 0;
+        $.max = max = Infinity === max || (isInteger(max) && max >= 0) ? max : Infinity;
+        $.min = min = isInteger(min) && min >= 0 ? min : 0;
         let {_active} = $,
             {join} = state, tagsValues;
         // Force the `this._active` value to `true` to set the initial value
@@ -905,7 +909,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
                 }
             });
         }
-        self.tabIndex = null;
+        self[TOKEN_TAB_INDEX] = null;
         letAria(self, 'hidden');
         letClass(self, state.n + '__self');
         setNext(mask, self);
@@ -928,7 +932,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
         if (!_active) {
             return $;
         }
-        $.value = $._value;
+        $[TOKEN_VALUE] = $._value;
         return focus ? $.focus(mode) : $;
     }
 });
@@ -941,10 +945,10 @@ setObjectAttributes(TagPickerTags, {
 
 TagPickerTags._ = setObjectMethods(TagPickerTags, {
     at: function (key) {
-        return getValueInMap(toValue(key), this.values);
+        return getValueInMap(toValue(key), this[TOKEN_VALUES]);
     },
     count: function () {
-        return toMapCount(this.values);
+        return toMapCount(this[TOKEN_VALUES]);
     },
     delete: function (key, _fireHook = 1) {
         let $ = this,
@@ -993,7 +997,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         return value ? getElementIndex(value[2]) : -1;
     },
     has: function (key) {
-        return hasKeyInMap(toValue(key), this.values);
+        return hasKeyInMap(toValue(key), this[TOKEN_VALUES]);
     },
     let: function (key, _fireHook = 1) {
         return this.delete(key, _fireHook);
@@ -1026,7 +1030,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         }
         if (isFunction(pattern)) {
             if (isArray(r = pattern.call(of, v))) {
-                key = v = r[1] ? (r[1].value ?? r[0]) : r[0];
+                key = v = r[1] ? (r[1][TOKEN_VALUE] ?? r[0]) : r[0];
                 value = r;
             } else if (isString(r)) {
                 key = v = r;
@@ -1096,7 +1100,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
 
 // In order for an object to be iterable, it must have a `Symbol.iterator` key
 getPrototype(TagPickerTags)[Symbol.iterator] = function () {
-    return this.values[Symbol.iterator]();
+    return this[TOKEN_VALUES][Symbol.iterator]();
 };
 
 TagPicker.Tags = TagPickerTags;

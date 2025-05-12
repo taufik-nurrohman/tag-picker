@@ -17,19 +17,6 @@ $name: 'tag-picker';
   padding: 1px;
 }
 
-// %tag {
-//   align-items: center;
-//   border: 1px solid;
-//   border-color: inherit;
-//   display: flex;
-//   gap: 0.25em;
-//   justify-content: center;
-//   overflow: hidden;
-//   padding: 0 0.25em;
-//   position: relative;
-//   text-decoration: none;
-// }
-
 .#{$name} {
   &,
   & * {
@@ -146,6 +133,9 @@ $name: 'tag-picker';
         z-index: 0;
       }
     }
+  }
+  &__v {
+    flex: 1;
   }
   &__x {
     height: 1em;

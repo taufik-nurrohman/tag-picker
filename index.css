@@ -121,6 +121,9 @@
   white-space: nowrap;
   z-index: 0;
 }
+.tag-picker__v {
+  flex: 1;
+}
 .tag-picker__x {
   height: 1em;
   line-height: 0;
