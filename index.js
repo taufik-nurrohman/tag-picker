@@ -1430,9 +1430,9 @@
             min = picker.min,
             count = _tags.count();
         if (count > max) {
-            picker.fire('max.tags', [count, max]).focus(), offEventDefault(e);
+            focusTo(picker.fire('max.tags', [count, max])), offEventDefault(e);
         } else if (count < min) {
-            picker.fire('min.tags', [count, min]).focus(), offEventDefault(e);
+            focusTo(picker.fire('min.tags', [count, min])), offEventDefault(e);
         }
     }
 
