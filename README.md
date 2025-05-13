@@ -18,6 +18,10 @@ minimalist interface for an enhanced user experience. Users can easily add tags 
 <kbd>Backspace</kbd> or <kbd>Delete</kbd> keys). Developers can easily integrate and customize this application styles
 to match the design of their web project.
 
+It supports native keyboard interaction as if it were plain text. You should be able to copy, cut, and paste from/to the
+mask. Click a tag to select it, press the <kbd>Control</kbd> key while clicking the tag to select multiple tags. You can
+also select the tags using the combination of <kbd>Shift</kbd> and <kbd>ArrowLeft</kbd> or <kbd>ArrowRight</kbd> keys.
+
 Contribute
 ----------
 
