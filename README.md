@@ -12,14 +12,17 @@ Better tags input interaction with JavaScript.
   <img alt="Tag Picker" src="https://github.com/user-attachments/assets/f9fb79ff-e13d-4f3e-a09a-53dc8915992c">
 </picture>
 
-Tag Picker is a JavaScript application designed to simplify the management of comma-separated lists of words, offering a minimalist interface for an enhanced user experience. Users can easily add tags by typing a word and pressing the <kbd>,</kbd> key (by default), or remove tags with a quick click (or by using common keys such as the <kbd>Backspace</kbd> or <kbd>Delete</kbd> keys). Developers can easily integrate and customize this application styles to match the design of their web project.
-
-[Demo and Documentation](https://taufik-nurrohman.github.io/tag-picker "View Demo")
+Tag Picker is a JavaScript application designed to simplify the management of comma-separated lists of words, offering a
+minimalist interface for an enhanced user experience. Users can easily add tags by typing a word and pressing the
+<kbd>,</kbd> key (by default), or remove tags with a quick click (or by using common keys such as the
+<kbd>Backspace</kbd> or <kbd>Delete</kbd> keys). Developers can easily integrate and customize this application styles
+to match the design of their web project.
 
 Contribute
 ----------
 
- - **Please do not make pull requests by editing the files that are in the root of the project. They are generated automatically by the build tool.**
+ - **Please do not make pull requests by editing the files that are in the root of the project. They are generated
+   automatically by the build tool.**
  - Install [Git](https://en.wikipedia.org/wiki/Git) and [Node.js](https://en.wikipedia.org/wiki/Node.js)
  - Run `git clone https://github.com/taufik-nurrohman/tag-picker.git`
  - Run `cd tag-picker && npm install --save-dev`
