@@ -2,7 +2,7 @@ import {/* focusTo, */getCharBeforeCaret, getSelection, insertAtSelection, selec
 import {delay} from '@taufik-nurrohman/tick';
 import {forEachArray, forEachMap, forEachObject, getPrototype, getReference, getValueInMap, hasKeyInMap, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap, toValueFirstFromMap, toValueLastFromMap} from '@taufik-nurrohman/f';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
-import {getAria, getElement, getElementIndex, getHTML, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letAttribute, letClass, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setClasses, setDatum, setElement, setID, setNext, setPrev, setStyle, setText, setValue} from '@taufik-nurrohman/document';
+import {getAria, getElement, getElementIndex, getHTML, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letAttribute, letClass, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setDatum, setElement, setID, setNext, setPrev, setStyle, setText, setValue} from '@taufik-nurrohman/document';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isFloat, isFunction, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
@@ -23,18 +23,14 @@ const EVENT_KEY_DOWN = EVENT_KEY + EVENT_DOWN;
 const EVENT_KEY_UP = EVENT_KEY + EVENT_UP;
 const EVENT_MOUSE = 'mouse';
 const EVENT_MOUSE_DOWN = EVENT_MOUSE + EVENT_DOWN;
-const EVENT_MOUSE_UP = EVENT_MOUSE + EVENT_UP;
 const EVENT_PASTE = 'paste';
 const EVENT_RESET = 'reset';
 const EVENT_SUBMIT = 'submit';
 const EVENT_TOUCH = 'touch';
-const EVENT_TOUCH_END = EVENT_TOUCH + 'end';
 const EVENT_TOUCH_START = EVENT_TOUCH + 'start';
 
-const KEY_DOWN = 'Down';
 const KEY_LEFT = 'Left';
 const KEY_RIGHT = 'Right';
-const KEY_UP = 'Up';
 
 const KEY_A = 'a';
 const KEY_ARROW = 'Arrow';
@@ -88,7 +84,7 @@ function createTags($, tags) {
             }
         });
     }
-    let {_tags, state} = $, r = [];
+    let {_tags} = $, r = [];
     // Reset the tag(s) data, but do not fire the `let.tags` hook
     _tags.let(null, 0);
     forEachMap(map, (v, k) => {
@@ -119,7 +115,11 @@ function onBeforeInputTextInput(e) {
     let $ = this,
         {data, inputType} = e,
         picker = getReference($),
-        {_active, _mask, _tags, state} = picker,
+        {_active} = picker;
+    if (!_active) {
+        return offEventDefault(e);
+    }
+    let {_mask, _tags, state} = picker,
         {hint} = _mask,
         {escape} = state, tagLast, exit, key, v;
     key = isString(data) && 1 === toCount(data) ? data : 0;
@@ -205,7 +205,6 @@ function onFocusTextInput() {
 function onKeyDownTag(e) {
     let $ = _keyOverTag = this,
         key = e.key,
-        keyCode = e.keyCode,
         keyIsCtrl = _keyIsCtrl = e.ctrlKey,
         keyIsShift = _keyIsShift = e.shiftKey,
         picker = getReference($),
@@ -419,8 +418,6 @@ function onKeyUpTag(e) {
     _keyOverTag = 0;
     let $ = this,
         key = e.key,
-        keyIsCtrl = _keyIsCtrl = e.ctrlKey,
-        keyIsShift = _keyIsShift = e.shiftKey,
         picker = getReference($),
         {_tags} = picker, selected = 0;
     forEachMap(_tags, v => {
@@ -428,6 +425,8 @@ function onKeyUpTag(e) {
             ++selected;
         }
     });
+    _keyIsCtrl = e.ctrlKey;
+    _keyIsShift = e.shiftKey;
     if (selected < 2 && !_keyIsCtrl && !_keyIsShift && KEY_ENTER !== key && ' ' !== key) {
         letAria($, TOKEN_SELECTED);
     }
@@ -957,7 +956,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         if (!_active) {
             return false;
         }
-        let {_mask, min, self, state} = of,
+        let {min, self, state} = of,
             {join, n} = state,
             count, r, tagsValues = [];
         if ((count = $.count()) < min + 1) {

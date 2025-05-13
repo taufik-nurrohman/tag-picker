@@ -940,9 +940,8 @@
                 }
             });
         }
-        var _tags = $._tags;
-        $.state;
-        var r = [];
+        var _tags = $._tags,
+            r = [];
         // Reset the tag(s) data, but do not fire the `let.tags` hook
         _tags.let(null, 0);
         forEachMap(map, function (v, k) {
@@ -973,8 +972,11 @@
         var $ = this,
             data = e.data,
             inputType = e.inputType,
-            picker = getReference($);
-        picker._active;
+            picker = getReference($),
+            _active = picker._active;
+        if (!_active) {
+            return offEventDefault(e);
+        }
         var _mask = picker._mask,
             _tags = picker._tags,
             state = picker.state,
@@ -1067,9 +1069,8 @@
 
     function onKeyDownTag(e) {
         var $ = _keyOverTag = this,
-            key = e.key;
-        e.keyCode;
-        var keyIsCtrl = _keyIsCtrl = e.ctrlKey,
+            key = e.key,
+            keyIsCtrl = _keyIsCtrl = e.ctrlKey,
             keyIsShift = _keyIsShift = e.shiftKey,
             picker = getReference($),
             _active = picker._active;
@@ -1296,10 +1297,8 @@
     function onKeyUpTag(e) {
         _keyOverTag = 0;
         var $ = this,
-            key = e.key;
-        _keyIsCtrl = e.ctrlKey;
-        _keyIsShift = e.shiftKey;
-        var picker = getReference($),
+            key = e.key,
+            picker = getReference($),
             _tags = picker._tags,
             selected = 0;
         forEachMap(_tags, function (v) {
@@ -1307,6 +1306,8 @@
                 ++selected;
             }
         });
+        _keyIsCtrl = e.ctrlKey;
+        _keyIsShift = e.shiftKey;
         if (selected < 2 && !_keyIsCtrl && !_keyIsShift && KEY_ENTER !== key && ' ' !== key) {
             letAria($, TOKEN_SELECTED);
         }
@@ -1876,7 +1877,6 @@
             if (!_active) {
                 return false;
             }
-            of._mask;
             var min = of.min,
                 self = of.self,
                 state = of.state,
