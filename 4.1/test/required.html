@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <form method="get" target="_blank">
+        <p><input name="test" required type="text"></p>
+        <p><label><input checked onchange="picker.vital = this.checked;" type="checkbox"> <span>Required</span></label></p>
+        <p><button type="submit">Submit</button> <button onclick="picker.tags.set('a'), picker.focus();" type="button">Add &ldquo;a&rdquo; Tag</button></p>
+      </form>
+    </main>
+    <script src="../index.min.js"></script>
+    <script>
+      const picker = new TagPicker(document.querySelector('input'));
+      picker.vital = document.querySelector('input[type=checkbox]').checked;
+      picker.on('min.tags', function (count, min) {
+          alert('The minimum number of tags that must be inserted to be able to submit the form is ' + min + '.');
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker {
+        width: 100%;
+      }
+      .tag-picker[aria-invalid='true'] {
+        color: #f00;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p>Add <em>c</em> tag again, or add <em>3</em> more tags, or type any tag name that does not match <code>^[a-z\d]+(-[a-z\d]+)*$</code> pattern!</p>
+      <p><input type="text" value="a, b, c"></p>
+    </main>
+    <script src="../index.min.js"></script>
+    <script>
+      const picker = new TagPicker(document.querySelector('input'), {
+          max: 5,
+          pattern: '^[a-z\\d]+(-[a-z\\d]+)*$'
+      });
+
+      function letInvalid() {
+          this.mask.removeAttribute('aria-invalid');
+      }
+
+      function setInvalid() {
+          this.mask.setAttribute('aria-invalid', 'true');
+          setTimeout(() => {
+              this.mask.removeAttribute('aria-invalid');
+          }, 1000);
+      }
+      picker.on('has.tag', setInvalid);
+      picker.on('let.tag', letInvalid);
+      picker.on('max.tags', setInvalid);
+      picker.on('min.tags', setInvalid);
+      picker.on('not.tag', setInvalid);
+      picker.on('set.tag', letInvalid);
+      picker._mask.input.addEventListener('blur', function () {
+          letInvalid.call(picker);
+      });
+    </script>
+  </body>
+</html>
