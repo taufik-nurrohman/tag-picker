@@ -6,7 +6,11 @@ Better tags input interaction with JavaScript.
 ![index.js](https://img.shields.io/github/size/taufik-nurrohman/tag-picker/index.js?branch=main&color=%23f1e05a&label=index.js&labelColor=%231f2328&style=flat-square)
 ![index.min.js](https://img.shields.io/github/size/taufik-nurrohman/tag-picker/index.min.js?branch=main&color=%23f1e05a&label=index.min.js&labelColor=%231f2328&style=flat-square)
 
-![Tag Picker](https://user-images.githubusercontent.com/1669261/126896222-c4d40a5e-a130-4319-a15a-3ec490b175b3.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/f9fb79ff-e13d-4f3e-a09a-53dc8915992c">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/63990ba5-24c6-4cf8-99e6-a960f8310d04">
+  <img alt="Tag Picker" src="https://github.com/user-attachments/assets/63990ba5-24c6-4cf8-99e6-a960f8310d04">
+</picture>
 
 Tag Picker is a JavaScript application designed to simplify the management of comma-separated lists of words, offering a minimalist interface for an enhanced user experience. Users can easily add tags by typing a word and pressing the <kbd>,</kbd> key (by default), or remove tags with a quick click (or by using common keys such as the <kbd>Backspace</kbd> or <kbd>Delete</kbd> keys). Developers can easily integrate and customize this application styles to match the design of their web project.
 
