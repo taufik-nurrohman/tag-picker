@@ -21,6 +21,7 @@
         border-width: 2px;
       }
       .tag-picker {
+        background: #fff;
         border-color: #000;
         color: #000;
         flex: 1;
@@ -28,6 +29,11 @@
       .tag-picker:focus,
       .tag-picker:focus-within {
         border-color: #00f;
+      }
+      .tag-picker[aria-invalid='true'] {
+        background: rgba(255, 0, 0, 0.125);
+        border-color: #f00;
+        color: inherit;
       }
       .tag-picker__flex {
         gap: 2px;
