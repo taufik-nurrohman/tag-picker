@@ -44,6 +44,9 @@ $name: 'tag-picker';
       background: rgba(0, 0, 255, 0.25);
     }
   }
+  &[aria-invalid='true'] {
+    color: rgb(255, 0, 0);
+  }
   &__flex {
     @extend %items;
     flex: 1;

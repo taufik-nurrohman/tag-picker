@@ -42,6 +42,9 @@
 .tag-picker[aria-disabled=true] .tag-picker__tag[aria-selected=true] {
   background: rgba(0, 0, 255, 0.25);
 }
+.tag-picker[aria-invalid=true] {
+  color: rgb(255, 0, 0);
+}
 .tag-picker__flex {
   flex: 1;
   overflow: hidden;

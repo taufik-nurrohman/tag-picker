@@ -18,6 +18,7 @@ const EVENT_COPY = 'copy';
 const EVENT_CUT = 'cut';
 const EVENT_FOCUS = 'focus';
 const EVENT_INPUT_START = 'beforeinput';
+const EVENT_INVALID = 'invalid';
 const EVENT_KEY = 'key';
 const EVENT_KEY_DOWN = EVENT_KEY + EVENT_DOWN;
 const EVENT_KEY_UP = EVENT_KEY + EVENT_UP;
@@ -47,6 +48,7 @@ const KEY_TAB = 'Tab';
 const TOKEN_CONTENTEDITABLE = 'contenteditable';
 const TOKEN_DISABLED = 'disabled';
 const TOKEN_FALSE = 'false';
+const TOKEN_INVALID = EVENT_INVALID;
 const TOKEN_READONLY = 'readonly';
 const TOKEN_READ_ONLY = 'readOnly';
 const TOKEN_REQUIRED = 'required';
@@ -200,6 +202,15 @@ function onFocusTag() {
 
 function onFocusTextInput() {
     selectTo(this);
+}
+
+function onInvalidSelf(e) {
+    e && offEventDefault(e);
+    let $ = this,
+        picker = getReference($),
+        {mask} = picker;
+    setAria(mask, TOKEN_INVALID, true);
+    delay(() => letAria(mask, TOKEN_INVALID), 1000)();
 }
 
 function onKeyDownTag(e) {
@@ -530,11 +541,13 @@ function onResetForm() {
 function onSubmitForm(e) {
     let $ = this,
         picker = getReference($),
-        {_tags, max, min} = picker,
+        {_tags, max, min, self} = picker,
         count = _tags.count();
     if (count > max) {
+        onInvalidSelf.call(self);
         focusTo(picker.fire('max.tags', [count, max])), offEventDefault(e);
     } else if (count < min) {
+        onInvalidSelf.call(self);
         focusTo(picker.fire('min.tags', [count, min])), offEventDefault(e);
     }
 }
@@ -589,7 +602,7 @@ TagPicker.state = {
     'with': []
 };
 
-TagPicker.version = '4.1.0';
+TagPicker.version = '4.1.1';
 
 setObjectAttributes(TagPicker, {
     name: {
@@ -816,6 +829,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
         onEvent(EVENT_FOCUS, self, onFocusSelf);
         onEvent(EVENT_FOCUS, textInput, onFocusTextInput);
         onEvent(EVENT_INPUT_START, textInput, onBeforeInputTextInput);
+        onEvent(EVENT_INVALID, self, onInvalidSelf);
         onEvent(EVENT_KEY_DOWN, textInput, onKeyDownTextInput);
         onEvent(EVENT_KEY_UP, textInput, onKeyUpTextInput);
         onEvent(EVENT_MOUSE_DOWN, mask, onPointerDownMask);
@@ -889,9 +903,10 @@ TagPicker._ = setObjectMethods(TagPicker, {
             offEvent(EVENT_SUBMIT, form, onSubmitForm);
         }
         offEvent(EVENT_CUT, input, onCutTextInput);
-        offEvent(EVENT_FOCUS, self, onFocusSelf);
         offEvent(EVENT_FOCUS, input, onFocusTextInput);
+        offEvent(EVENT_FOCUS, self, onFocusSelf);
         offEvent(EVENT_INPUT_START, input, onBeforeInputTextInput);
+        offEvent(EVENT_INVALID, self, onInvalidSelf);
         offEvent(EVENT_KEY_DOWN, input, onKeyDownTextInput);
         offEvent(EVENT_KEY_UP, input, onKeyUpTextInput);
         offEvent(EVENT_MOUSE_DOWN, mask, onPointerDownMask);
@@ -959,7 +974,8 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         let {min, self, state} = of,
             {join, n} = state,
             count, r, tagsValues = [];
-        if ((count = $.count()) < min + 1) {
+        if ((count = $.count()) <= min) {
+            _fireHook && onInvalidSelf.call(self);
             return (_fireHook && of.fire('min.tags', [count, min])), false;
         }
         if (!isSet(key)) {
@@ -967,6 +983,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
             return (_fireHook && of.fire('let.tags', [[]]).fire('change', [null])), 0 === $.count();
         }
         if (!(r = getValueInMap(key = toValue(key), values))) {
+            onInvalidSelf.call(self);
             return (_fireHook && of.fire('not.tag', [key])), false;
         }
         let tag = r[2],
@@ -1013,6 +1030,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
             {join, n, pattern} = state,
             count, r, tag, tagText, tagX, tagsValues = [];
         if ((count = $.count()) >= max) {
+            _fireHook && onInvalidSelf.call(self);
             return (_fireHook && of.fire('max.tags', [count, max])), false;
         }
         // `picker.tags.set('asdf')`
@@ -1025,6 +1043,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         } else {}
         let {value: v} = value[1];
         if (null === key || "" === (v = fromValue(v || key).trim()) || (isString(pattern) && !toPattern(pattern).test(v))) {
+            onInvalidSelf.call(self);
             return (_fireHook && of.fire('not.tag', [key])), false;
         }
         if (isFunction(pattern)) {
@@ -1037,6 +1056,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
             }
         }
         if ($.has(key = toValue(key))) {
+            onInvalidSelf.call(self);
             return (_fireHook && of.fire('has.tag', [key])), false;
         }
         tag = value[2] || setElement('data', {

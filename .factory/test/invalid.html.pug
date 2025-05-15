@@ -1,0 +1,24 @@
+extends ../_index.pug
+
+block state
+  - const scripts = ['../index.min.js']
+  - const styles = ['../index.min.css']
+  - const title = 'Tag Picker'
+
+block script
+  script
+    | const picker = new TagPicker(document.querySelector('input'), {
+    |     max: 5,
+    |     pattern: '^[a-z\\d]+(-[a-z\\d]+)*$'
+    | });
+
+block style
+  style
+    | .tag-picker {
+    |   width: 100%;
+    | }
+
+block content
+  main
+    p Add #[em c] tag again, or add #[em 3] more tags, or type any tag name that does not match #[code='^[a-z\\d]+(-[a-z\\d]+)*$'] pattern!
+    p: input(type='text' value='a, b, c')

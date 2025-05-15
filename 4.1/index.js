@@ -877,6 +877,7 @@
     var EVENT_CUT = 'cut';
     var EVENT_FOCUS = 'focus';
     var EVENT_INPUT_START = 'beforeinput';
+    var EVENT_INVALID = 'invalid';
     var EVENT_KEY = 'key';
     var EVENT_KEY_DOWN = EVENT_KEY + EVENT_DOWN;
     var EVENT_KEY_UP = EVENT_KEY + EVENT_UP;
@@ -903,6 +904,7 @@
     var TOKEN_CONTENTEDITABLE = 'contenteditable';
     var TOKEN_DISABLED = 'disabled';
     var TOKEN_FALSE = 'false';
+    var TOKEN_INVALID = EVENT_INVALID;
     var TOKEN_READONLY = 'readonly';
     var TOKEN_READ_ONLY = 'readOnly';
     var TOKEN_REQUIRED = 'required';
@@ -1065,6 +1067,17 @@
 
     function onFocusTextInput() {
         selectTo(this);
+    }
+
+    function onInvalidSelf(e) {
+        e && offEventDefault(e);
+        var $ = this,
+            picker = getReference($),
+            mask = picker.mask;
+        setAria(mask, TOKEN_INVALID, true);
+        delay(function () {
+            return letAria(mask, TOKEN_INVALID);
+        }, 1000)();
     }
 
     function onKeyDownTag(e) {
@@ -1428,10 +1441,13 @@
             _tags = picker._tags,
             max = picker.max,
             min = picker.min,
+            self = picker.self,
             count = _tags.count();
         if (count > max) {
+            onInvalidSelf.call(self);
             focusTo(picker.fire('max.tags', [count, max])), offEventDefault(e);
         } else if (count < min) {
+            onInvalidSelf.call(self);
             focusTo(picker.fire('min.tags', [count, min])), offEventDefault(e);
         }
     }
@@ -1482,7 +1498,7 @@
         'pattern': null,
         'with': []
     };
-    TagPicker.version = '4.1.0';
+    TagPicker.version = '4.1.1';
     setObjectAttributes(TagPicker, {
         name: {
             value: name
@@ -1727,6 +1743,7 @@
             onEvent(EVENT_FOCUS, self, onFocusSelf);
             onEvent(EVENT_FOCUS, textInput, onFocusTextInput);
             onEvent(EVENT_INPUT_START, textInput, onBeforeInputTextInput);
+            onEvent(EVENT_INVALID, self, onInvalidSelf);
             onEvent(EVENT_KEY_DOWN, textInput, onKeyDownTextInput);
             onEvent(EVENT_KEY_UP, textInput, onKeyUpTextInput);
             onEvent(EVENT_MOUSE_DOWN, mask, onPointerDownMask);
@@ -1808,9 +1825,10 @@
                 offEvent(EVENT_SUBMIT, form, onSubmitForm);
             }
             offEvent(EVENT_CUT, input, onCutTextInput);
-            offEvent(EVENT_FOCUS, self, onFocusSelf);
             offEvent(EVENT_FOCUS, input, onFocusTextInput);
+            offEvent(EVENT_FOCUS, self, onFocusSelf);
             offEvent(EVENT_INPUT_START, input, onBeforeInputTextInput);
+            offEvent(EVENT_INVALID, self, onInvalidSelf);
             offEvent(EVENT_KEY_DOWN, input, onKeyDownTextInput);
             offEvent(EVENT_KEY_UP, input, onKeyUpTextInput);
             offEvent(EVENT_MOUSE_DOWN, mask, onPointerDownMask);
@@ -1885,7 +1903,8 @@
                 count,
                 r,
                 tagsValues = [];
-            if ((count = $.count()) < min + 1) {
+            if ((count = $.count()) <= min) {
+                _fireHook && onInvalidSelf.call(self);
                 return _fireHook && of.fire('min.tags', [count, min]), false;
             }
             if (!isSet(key)) {
@@ -1897,6 +1916,7 @@
                 ]).fire('change', [null]), 0 === $.count();
             }
             if (!(r = getValueInMap(key = _toValue(key), values))) {
+                onInvalidSelf.call(self);
                 return _fireHook && of.fire('not.tag', [key]), false;
             }
             var tag = r[2],
@@ -1963,6 +1983,7 @@
                 tagX,
                 tagsValues = [];
             if ((count = $.count()) >= max) {
+                _fireHook && onInvalidSelf.call(self);
                 return _fireHook && of.fire('max.tags', [count, max]), false;
             }
             // `picker.tags.set('asdf')`
@@ -1975,6 +1996,7 @@
             } else;
             var v = value[1].value;
             if (null === key || "" === (v = _fromValue(v || key).trim()) || isString(pattern) && !toPattern(pattern).test(v)) {
+                onInvalidSelf.call(self);
                 return _fireHook && of.fire('not.tag', [key]), false;
             }
             if (isFunction(pattern)) {
@@ -1988,6 +2010,7 @@
                 }
             }
             if ($.has(key = _toValue(key))) {
+                onInvalidSelf.call(self);
                 return _fireHook && of.fire('has.tag', [key]), false;
             }
             tag = value[2] || setElement('data', {

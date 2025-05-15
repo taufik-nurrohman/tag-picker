@@ -12,9 +12,9 @@ block script
     | picker.on('has.tag', function (name) {
     |     const at = this.tags.at(name);
     |     if (at) {
-    |         at[2].setAttribute('aria-pressed', 'true');
+    |         at[2].setAttribute('aria-busy', 'true');
     |         setTimeout(() => {
-    |             at[2].removeAttribute('aria-pressed');
+    |             at[2].removeAttribute('aria-busy');
     |         }, 1000);
     |     }
     | });
@@ -24,8 +24,8 @@ block style
     | .tag-picker {
     |   width: 100%;
     | }
-    | .tag-picker__tag[aria-pressed='true'] {
-    |   background: rgb(255, 0, 0, 0.5);
+    | .tag-picker__tag[aria-busy='true'] {
+    |   background: rgb(255, 0, 0, 0.25);
     | }
 
 block content
