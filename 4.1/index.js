@@ -876,7 +876,7 @@
     var EVENT_COPY = 'copy';
     var EVENT_CUT = 'cut';
     var EVENT_FOCUS = 'focus';
-    var EVENT_INPUT_START = 'beforeinput';
+    var EVENT_INPUT = 'input';
     var EVENT_INVALID = 'invalid';
     var EVENT_KEY = 'key';
     var EVENT_KEY_DOWN = EVENT_KEY + EVENT_DOWN;
@@ -914,6 +914,7 @@
     var TOKEN_TRUE = 'true';
     var TOKEN_VALUE = 'value';
     var TOKEN_VALUES = TOKEN_VALUE + 's';
+    var TOKEN_VISIBILITY = 'visibility';
     var name = 'TagPicker';
     var _keyIsCtrl, _keyIsShift, _keyOverTag;
 
@@ -965,45 +966,6 @@
     function getTagValue(tag, parseValue) {
         return getValue(tag, parseValue);
     }
-    // Do not allow user(s) to edit the tag text
-    function onBeforeInputTag(e) {
-        offEventDefault(e);
-    }
-    // Better mobile support
-    function onBeforeInputTextInput(e) {
-        var $ = this,
-            data = e.data,
-            inputType = e.inputType,
-            picker = getReference($),
-            _active = picker._active;
-        if (!_active) {
-            return offEventDefault(e);
-        }
-        var _mask = picker._mask,
-            _tags = picker._tags,
-            state = picker.state,
-            hint = _mask.hint,
-            escape = state.escape,
-            tagLast,
-            exit,
-            key,
-            v;
-        key = isString(data) && 1 === toCount(data) ? data : 0;
-        if (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape)) || KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape)) || 0 !== key && hasValue(key, escape)) {
-            exit = true;
-            setValueInMap(_toValue(v = getText($)), v, _tags);
-            focusTo(picker).text = "";
-        } else if ('deleteContentBackward' === inputType && !getText($, 0)) {
-            letStyle(hint, 'visibility');
-            if (tagLast = toValueLastFromMap(_tags)) {
-                exit = true;
-                letValueInMap(getTagValue(tagLast[2]), _tags);
-            }
-        } else if ('insertText' === inputType) {
-            setStyle(hint, 'visibility', 'hidden');
-        }
-        exit && offEventDefault(e);
-    }
 
     function onBlurTag() {
         var $ = this,
@@ -1053,7 +1015,7 @@
             _mask = picker._mask,
             hint = _mask.hint;
         delay(function () {
-            return getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility');
+            return getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
         }, 1)();
     }
 
@@ -1067,6 +1029,45 @@
 
     function onFocusTextInput() {
         selectTo(this);
+    }
+    // Do not allow user(s) to edit the tag text
+    function onInputTag(e) {
+        offEventDefault(e);
+    }
+    // Better mobile support
+    function onInputTextInput(e) {
+        var $ = this,
+            data = e.data,
+            inputType = e.inputType,
+            picker = getReference($),
+            _active = picker._active;
+        if (!_active) {
+            return offEventDefault(e);
+        }
+        var _mask = picker._mask,
+            _tags = picker._tags,
+            state = picker.state,
+            hint = _mask.hint,
+            escape = state.escape,
+            tagLast,
+            exit,
+            key,
+            v;
+        key = isString(data) && 1 === toCount(data) ? data : 0;
+        if (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape)) || KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape)) || 0 !== key && hasValue(key, escape)) {
+            exit = true;
+            setValueInMap(_toValue(v = getText($)), v, _tags);
+            focusTo(picker).text = "";
+        } else if ('deleteContentBackward' === inputType && !getText($, 0)) {
+            letStyle(hint, TOKEN_VISIBILITY);
+            if (tagLast = toValueLastFromMap(_tags)) {
+                exit = true;
+                letValueInMap(getTagValue(tagLast[2]), _tags);
+            }
+        } else if ('insertText' === inputType) {
+            setStyle(hint, TOKEN_VISIBILITY, 'hidden');
+        }
+        exit && offEventDefault(e);
     }
 
     function onInvalidSelf(e) {
@@ -1240,7 +1241,7 @@
             return focusTo(picker).text = "", offEventDefault(e);
         }
         delay(function () {
-            return getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility');
+            return getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
         }, 1)();
         var caretIsToTheFirst = "" === getCharBeforeCaret($),
             tagFirst,
@@ -1359,7 +1360,7 @@
             hint = _mask.hint,
             join = state.join;
         delay(function () {
-            return getText($, 0) ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility');
+            return getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
         }, 1)();
         insertAtSelection($, e.clipboardData.getData('text/plain'));
         forEachArray((getText($) + "").split(join), function (v) {
@@ -1498,7 +1499,7 @@
         'pattern': null,
         'with': []
     };
-    TagPicker.version = '4.1.1';
+    TagPicker.version = '4.1.2';
     setObjectAttributes(TagPicker, {
         name: {
             value: name
@@ -1604,7 +1605,7 @@
                     return $;
                 }
                 setText(input, v = _fromValue(value));
-                return v ? setStyle(hint, 'visibility', 'hidden') : letStyle(hint, 'visibility'), $;
+                return v ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY), $;
             }
         },
         value: {
@@ -1742,7 +1743,7 @@
             onEvent(EVENT_CUT, textInput, onCutTextInput);
             onEvent(EVENT_FOCUS, self, onFocusSelf);
             onEvent(EVENT_FOCUS, textInput, onFocusTextInput);
-            onEvent(EVENT_INPUT_START, textInput, onBeforeInputTextInput);
+            onEvent(EVENT_INPUT, textInput, onInputTextInput);
             onEvent(EVENT_INVALID, self, onInvalidSelf);
             onEvent(EVENT_KEY_DOWN, textInput, onKeyDownTextInput);
             onEvent(EVENT_KEY_UP, textInput, onKeyUpTextInput);
@@ -1827,7 +1828,7 @@
             offEvent(EVENT_CUT, input, onCutTextInput);
             offEvent(EVENT_FOCUS, input, onFocusTextInput);
             offEvent(EVENT_FOCUS, self, onFocusSelf);
-            offEvent(EVENT_INPUT_START, input, onBeforeInputTextInput);
+            offEvent(EVENT_INPUT, input, onInputTextInput);
             offEvent(EVENT_INVALID, self, onInvalidSelf);
             offEvent(EVENT_KEY_DOWN, input, onKeyDownTextInput);
             offEvent(EVENT_KEY_UP, input, onKeyUpTextInput);
@@ -1925,7 +1926,7 @@
             offEvent(EVENT_COPY, tag, onCopyTag);
             offEvent(EVENT_CUT, tag, onCutTag);
             offEvent(EVENT_FOCUS, tag, onFocusTag);
-            offEvent(EVENT_INPUT_START, tag, onBeforeInputTag);
+            offEvent(EVENT_INPUT, tag, onInputTag);
             offEvent(EVENT_KEY_DOWN, tag, onKeyDownTag);
             offEvent(EVENT_KEY_UP, tag, onKeyUpTag);
             offEvent(EVENT_MOUSE_DOWN, tag, onPointerDownTag);
@@ -2049,7 +2050,7 @@
                 onEvent(EVENT_COPY, tag, onCopyTag);
                 onEvent(EVENT_CUT, tag, onCutTag);
                 onEvent(EVENT_FOCUS, tag, onFocusTag);
-                onEvent(EVENT_INPUT_START, tag, onBeforeInputTag);
+                onEvent(EVENT_INPUT, tag, onInputTag);
                 onEvent(EVENT_KEY_DOWN, tag, onKeyDownTag);
                 onEvent(EVENT_KEY_UP, tag, onKeyUpTag);
                 onEvent(EVENT_MOUSE_DOWN, tag, onPointerDownTag);
