@@ -18,6 +18,7 @@ const EVENT_COPY = 'copy';
 const EVENT_CUT = 'cut';
 const EVENT_FOCUS = 'focus';
 const EVENT_INPUT = 'input';
+const EVENT_INPUT_START = 'before' + EVENT_INPUT;
 const EVENT_INVALID = 'invalid';
 const EVENT_KEY = 'key';
 const EVENT_KEY_DOWN = EVENT_KEY + EVENT_DOWN;
@@ -108,6 +109,31 @@ function getTagValue(tag, parseValue) {
     return getValue(tag, parseValue);
 }
 
+// Do not allow user(s) to edit the tag text
+function onBeforeInputTag(e) {
+    offEventDefault(e);
+}
+
+// Better mobile support
+function onBeforeInputTextInput(e) {
+    let $ = this,
+        {inputType} = e,
+        picker = getReference($),
+        {_active} = picker;
+    if (!_active) {
+        return offEventDefault(e);
+    }
+    let {_tags} = picker,
+        exit, tagLast;
+    if ('deleteContentBackward' === inputType && !getText($, 0)) {
+        if (tagLast = toValueLastFromMap(_tags)) {
+            exit = true;
+            letValueInMap(getTagValue(tagLast[2]), _tags);
+        }
+    }
+    exit && offEventDefault(e);
+}
+
 function onBlurTag() {
     let $ = this,
         picker = getReference($),
@@ -167,11 +193,6 @@ function onFocusTextInput() {
     selectTo(this);
 }
 
-// Do not allow user(s) to edit the tag text
-function onInputTag(e) {
-    offEventDefault(e);
-}
-
 // Better mobile support
 function onInputTextInput(e) {
     let $ = this,
@@ -183,7 +204,7 @@ function onInputTextInput(e) {
     }
     let {_mask, _tags, state} = picker,
         {hint} = _mask,
-        {escape} = state, tagLast, exit, key, v;
+        {escape} = state, exit, key, v;
     key = isString(data) && 1 === toCount(data) ? data : 0;
     if (
         (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape))) ||
@@ -193,12 +214,8 @@ function onInputTextInput(e) {
         exit = true;
         setValueInMap(toValue(v = getText($)), v, _tags);
         focusTo(picker).text = "";
-    } else if (('deleteContentBackward' === inputType || 'deleteContentForward' === inputType) && !getText($, 0)) {
+    } else if ('deleteContent' === inputType.slice(0, 13) && !getText($, 0)) {
         letStyle(hint, TOKEN_VISIBILITY);
-        if ('deleteContentBackward' === inputType && (tagLast = toValueLastFromMap(_tags))) {
-            exit = true;
-            letValueInMap(getTagValue(tagLast[2]), _tags);
-        }
     } else if ('insertText' === inputType) {
         setStyle(hint, TOKEN_VISIBILITY, 'hidden');
     }
@@ -603,7 +620,7 @@ TagPicker.state = {
     'with': []
 };
 
-TagPicker.version = '4.1.3';
+TagPicker.version = '4.1.4';
 
 setObjectAttributes(TagPicker, {
     name: {
@@ -830,6 +847,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
         onEvent(EVENT_FOCUS, self, onFocusSelf);
         onEvent(EVENT_FOCUS, textInput, onFocusTextInput);
         onEvent(EVENT_INPUT, textInput, onInputTextInput);
+        onEvent(EVENT_INPUT_START, textInput, onBeforeInputTextInput);
         onEvent(EVENT_INVALID, self, onInvalidSelf);
         onEvent(EVENT_KEY_DOWN, textInput, onKeyDownTextInput);
         onEvent(EVENT_KEY_UP, textInput, onKeyUpTextInput);
@@ -907,6 +925,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
         offEvent(EVENT_FOCUS, input, onFocusTextInput);
         offEvent(EVENT_FOCUS, self, onFocusSelf);
         offEvent(EVENT_INPUT, input, onInputTextInput);
+        offEvent(EVENT_INPUT_START, input, onBeforeInputTextInput);
         offEvent(EVENT_INVALID, self, onInvalidSelf);
         offEvent(EVENT_KEY_DOWN, input, onKeyDownTextInput);
         offEvent(EVENT_KEY_UP, input, onKeyUpTextInput);
@@ -993,7 +1012,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         offEvent(EVENT_COPY, tag, onCopyTag);
         offEvent(EVENT_CUT, tag, onCutTag);
         offEvent(EVENT_FOCUS, tag, onFocusTag);
-        offEvent(EVENT_INPUT, tag, onInputTag);
+        offEvent(EVENT_INPUT_START, tag, onBeforeInputTag);
         offEvent(EVENT_KEY_DOWN, tag, onKeyDownTag);
         offEvent(EVENT_KEY_UP, tag, onKeyUpTag);
         offEvent(EVENT_MOUSE_DOWN, tag, onPointerDownTag);
@@ -1096,7 +1115,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
             onEvent(EVENT_COPY, tag, onCopyTag);
             onEvent(EVENT_CUT, tag, onCutTag);
             onEvent(EVENT_FOCUS, tag, onFocusTag);
-            onEvent(EVENT_INPUT, tag, onInputTag);
+            onEvent(EVENT_INPUT_START, tag, onBeforeInputTag);
             onEvent(EVENT_KEY_DOWN, tag, onKeyDownTag);
             onEvent(EVENT_KEY_UP, tag, onKeyUpTag);
             onEvent(EVENT_MOUSE_DOWN, tag, onPointerDownTag);
