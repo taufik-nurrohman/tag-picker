@@ -1058,9 +1058,9 @@
             exit = true;
             setValueInMap(_toValue(v = getText($)), v, _tags);
             focusTo(picker).text = "";
-        } else if ('deleteContentBackward' === inputType && !getText($, 0)) {
+        } else if (('deleteContentBackward' === inputType || 'deleteContentForward' === inputType) && !getText($, 0)) {
             letStyle(hint, TOKEN_VISIBILITY);
-            if (tagLast = toValueLastFromMap(_tags)) {
+            if ('deleteContentBackward' === inputType && (tagLast = toValueLastFromMap(_tags))) {
                 exit = true;
                 letValueInMap(getTagValue(tagLast[2]), _tags);
             }
@@ -1499,7 +1499,7 @@
         'pattern': null,
         'with': []
     };
-    TagPicker.version = '4.1.2';
+    TagPicker.version = '4.1.3';
     setObjectAttributes(TagPicker, {
         name: {
             value: name
