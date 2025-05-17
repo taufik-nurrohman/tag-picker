@@ -1,8 +1,8 @@
-import {/* focusTo, */getCharBeforeCaret, getSelection, insertAtSelection, selectTo, selectToNone} from '@taufik-nurrohman/selection';
+import {/* focusTo, */getCharBeforeCaret, insertAtSelection, selectTo, selectToNone} from '@taufik-nurrohman/selection';
 import {delay} from '@taufik-nurrohman/tick';
 import {forEachArray, forEachMap, forEachObject, getPrototype, getReference, getValueInMap, hasKeyInMap, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap, toValueFirstFromMap, toValueLastFromMap} from '@taufik-nurrohman/f';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
-import {getAria, getElement, getElementIndex, getHTML, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letAttribute, letClass, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setDatum, setElement, setID, setNext, setPrev, setStyle, setText, setValue} from '@taufik-nurrohman/document';
+import {getAria, getElement, getElementIndex, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letAttribute, letClass, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setDatum, setElement, setID, setNext, setPrev, setStyle, setText, setValue} from '@taufik-nurrohman/document';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isFloat, isFunction, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
@@ -432,16 +432,14 @@ function onKeyDownTextInput(e) {
         } else if (caretIsToTheFirst || textIsVoid) {
             if (KEY_ARROW_LEFT === key) {
                 exit = true;
+                selectToNone();
                 tagLast = toValueLastFromMap(_tags);
                 tagLast && focusTo(tagLast[2]);
             } else if (KEY_DELETE_LEFT === key) {
-                if (tagLast = toValueLastFromMap(_tags)) {
-                    if (!textIsVoid && getHTML($) === getSelection($)) {
-                        // Text was all selected
-                    } else {
-                        exit = true;
-                        letValueInMap(getTagValue(tagLast[2]), _tags);
-                    }
+                if (textIsVoid) {
+                    exit = true;
+                    tagLast = toValueLastFromMap(_tags);
+                    tagLast && letValueInMap(getTagValue(tagLast[2]), _tags);
                 }
             }
         }

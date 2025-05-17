@@ -416,18 +416,6 @@
         }
         return index;
     };
-    var getHTML = function getHTML(node, trim) {
-        if (trim === void 0) {
-            trim = true;
-        }
-        var state = 'innerHTML';
-        if (!hasState(node, state)) {
-            return false;
-        }
-        var content = node[state];
-        content = trim ? content.trim() : content;
-        return "" !== content ? content : null;
-    };
     var getID = function getID(node, batch) {
         if (batch === void 0) {
             batch = 'e:';
@@ -679,18 +667,6 @@
         range.collapse(true);
         range.setStart(node, 0);
         return (range + "").slice(-1);
-    };
-    // The `node` parameter is currently not in use
-    var getSelection = function getSelection(node, selection) {
-        selection = selection || _getSelection();
-        if (!selection.rangeCount) {
-            return null;
-        }
-        var c = setElement('div');
-        for (var i = 0, j = selection.rangeCount; i < j; ++i) {
-            setChildLast(c, selection.getRangeAt(i).cloneContents());
-        }
-        return getHTML(c);
     };
     // <https://stackoverflow.com/a/6691294/1163000>
     // The `node` parameter is currently not in use
@@ -1328,15 +1304,14 @@
             } else if (caretIsToTheFirst || textIsVoid) {
                 if (KEY_ARROW_LEFT === key) {
                     exit = true;
+                    selectToNone();
                     tagLast = toValueLastFromMap(_tags);
                     tagLast && focusTo(tagLast[2]);
                 } else if (KEY_DELETE_LEFT === key) {
-                    if (tagLast = toValueLastFromMap(_tags)) {
-                        if (!textIsVoid && getHTML($) === getSelection());
-                        else {
-                            exit = true;
-                            letValueInMap(getTagValue(tagLast[2]), _tags);
-                        }
+                    if (textIsVoid) {
+                        exit = true;
+                        tagLast = toValueLastFromMap(_tags);
+                        tagLast && letValueInMap(getTagValue(tagLast[2]), _tags);
                     }
                 }
             }
