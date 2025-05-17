@@ -1287,7 +1287,8 @@
             } else if (KEY_TAB === key) {
                 selectToNone();
             } else if (KEY_ARROW_LEFT === key) {
-                if (caretIsToTheFirst || textIsVoid) {
+                if ("" !== getCharBeforeCaret($));
+                else {
                     exit = true;
                     selectToNone();
                     tagLast = toValueLastFromMap(_tags);

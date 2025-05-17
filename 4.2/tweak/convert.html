@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <form method="get">
+        <p>Convert tag view based on its value. Try <mark style="user-select:all;" tabindex="0">cry</mark>, <mark style="user-select:all;" tabindex="0">happy</mark>, <mark style="user-select:all;" tabindex="0">sad</mark>, <mark style="user-select:all;" tabindex="0">smile</mark>.</p>
+        <p><input name="test" type="text" value="happy, sad"></p>
+        <p><button type="submit">Submit</button></p>
+      </form>
+    </main>
+    <script src="../index.min.js"></script>
+    <script>
+      TagPicker._._set = function (tag) {
+          let value = tag.getAttribute('data-value'),
+              views = {
+                  cry: '😭',
+                  happy: '😄',
+                  sad: '☹️',
+                  smile: '☺️'
+              };
+          views[value] && (tag.children[0].textContent = views[value]);
+      };
+      const picker = new TagPicker(document.querySelector('input'));
+      const views = {
+          cry: '😭',
+          happy: '😄',
+          sad: '☹️',
+          smile: '☺️'
+      };
+      picker.on('set.tag', function (name) {
+          if (!views[name] || !this.tags.at(name)) {
+              return;
+          }
+          this.tags.at(name)[2].querySelector('[role=none]').textContent = views[name];
+      });
+      picker.tags.values.forEach((v, k) => {
+          if (!views[k]) {
+              return;
+          }
+          v[2].querySelector('[role=none]').textContent = views[k];
+      });
+    </script>
+  </body>
+</html>

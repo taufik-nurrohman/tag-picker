@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p>Using <code>,</code> as tags separator (default):</p>
+      <p><input type="text" value="a, b, c"></p>
+      <p>Using <code>;</code> as tags separator:</p>
+      <p><input type="text" value="a; b; c"></p>
+    </main>
+    <script src="../index.js"></script>
+    <script>
+      const sources = document.querySelectorAll('input');
+      const pickerComma = new TagPicker(sources[0]);
+      const pickerSemiColon = new TagPicker(sources[1], {
+          escape: [';'],
+          join: '; '
+      });
+    </script>
+  </body>
+</html>

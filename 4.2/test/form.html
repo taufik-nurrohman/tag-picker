@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p>Submitting a form by pressing the <em>Submit</em> button vs. pressing the <kbd>Enter</kbd> key in the tag picker mask.</p>
+      <form method="get" target="_blank">
+        <p><input name="test" type="text" value="a, b"></p>
+        <p><label><input name="prevent" type="checkbox"> <span>Test Default Prevention via JavaScript</span></label></p>
+        <p><button type="submit">Submit</button> <button type="reset">Reset</button></p>
+      </form>
+    </main>
+    <script src="../index.min.js"></script>
+    <script>
+      const picker = new TagPicker(document.forms[0].test);
+      picker.self.form.addEventListener('submit', function (e) {
+          console.log(picker.value);
+          this.prevent.checked && e.preventDefault();
+      });
+    </script>
+  </body>
+</html>

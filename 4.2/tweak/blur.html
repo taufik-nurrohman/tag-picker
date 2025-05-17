@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p>Previous versions would do this by default, but <a href="https://github.com/taufik-nurrohman/tag-picker/discussions/19" target="_blank">some people</a> do not want this behavior. Have a look at the source code to see how I restore the old behavior!</p>
+      <form method="get" target="_blank">
+        <p><input name="test" type="text" value="a, b, c"></p>
+        <p><button type="submit">Submit</button></p>
+      </form>
+    </main>
+    <script src="../index.min.js"></script>
+    <script>
+      const picker = new TagPicker(document.querySelector('input'));
+      picker._mask.input.addEventListener('blur', function () {
+          const text = picker.text;
+          text && (picker.tags.set(text), picker.text = ""); // Insert on blur
+      });
+    </script>
+  </body>
+</html>

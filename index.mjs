@@ -226,9 +226,13 @@ function onInvalidSelf(e) {
     e && offEventDefault(e);
     let $ = this,
         picker = getReference($),
-        {mask} = picker;
-    setAria(mask, TOKEN_INVALID, true);
-    delay(() => letAria(mask, TOKEN_INVALID))[0](1000);
+        {mask, state} = picker,
+        {time} = state,
+        {error} = time;
+    if (isInteger(error) && error > 0) {
+        setAria(mask, TOKEN_INVALID, true);
+        delay(() => letAria(mask, TOKEN_INVALID))[0](error);
+    }
 }
 
 function onKeyDownTag(e) {
@@ -315,23 +319,23 @@ function onKeyDownTag(e) {
             tagLast && focusTo(tagLast[2]);
         } else if (KEY_DELETE_LEFT === key) {
             exit = true;
-            letValueInMap(getTagValue($), _tags);
             tagPrev = getPrev($);
+            letValueInMap(getTagValue($), _tags);
             forEachMap(_tags, v => {
                 if (getAria(v[2], TOKEN_SELECTED)) {
-                    letValueInMap(getTagValue(v[2]), _tags);
                     tagPrev = getPrev(v[2]);
+                    letValueInMap(getTagValue(v[2]), _tags);
                 }
             });
             focusTo(tagPrev || picker), picker.fire('change', [picker[TOKEN_VALUE]]);
         } else if (KEY_DELETE_RIGHT === key) {
             exit = true;
-            letValueInMap(getTagValue($), _tags);
             tagNext = getNext($);
+            letValueInMap(getTagValue($), _tags);
             forEachMap(_tags, v => {
                 if (getAria(v[2], TOKEN_SELECTED)) {
-                    letValueInMap(getTagValue(v[2]), _tags);
                     tagNext = getNext(v[2]);
+                    letValueInMap(getTagValue(v[2]), _tags);
                 }
             });
             focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker[TOKEN_VALUE]]);
@@ -389,10 +393,12 @@ function onKeyDownTextInput(e) {
         } else if (KEY_TAB === key) {
             selectToNone();
         } else if (KEY_ARROW_LEFT === key) {
-            exit = true;
-            selectToNone();
-            tagLast = toValueLastFromMap(_tags);
-            tagLast && focusTo(tagLast[2]) && setAria(tagLast[2], TOKEN_SELECTED, true);
+            if (caretIsToTheFirst || textIsVoid) {
+                exit = true;
+                selectToNone();
+                tagLast = toValueLastFromMap(_tags);
+                tagLast && focusTo(tagLast[2]) && setAria(tagLast[2], TOKEN_SELECTED, true);
+            }
         }
     } else if (keyIsCtrl) {
         if (KEY_A === key && textIsVoid && _tags.count()) {
@@ -485,18 +491,23 @@ function onPasteTextInput(e) {
     offEventDefault(e);
     let $ = this,
         picker = getReference($),
-        {_mask, _tags, state} = picker,
+        {_mask, _tags, self, state} = picker,
         {hint} = _mask,
-        {join} = state;
+        {join} = state, v;
     delay(() => getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY))[0](1);
-    insertAtSelection($, e.clipboardData.getData('text/plain'));
-    forEachArray((getText($) + "").split(join), v => {
-        if (!hasKeyInMap(v = toValue(v.trim()), _tags)) {
-            setValueInMap(v, v, _tags);
-        }
-    });
-    forEachMap(_tags, v => letAria(v[2], TOKEN_SELECTED));
-    picker.fire('change', [picker[TOKEN_VALUE]]).text = "";
+    insertAtSelection($, v = e.clipboardData.getData('text/plain'));
+    if (v !== getText($)) {} else {
+        forEachArray((getText($) + "").split(join), v => {
+            if (!hasKeyInMap(v = toValue(v.trim()), _tags)) {
+                setValueInMap(v, v, _tags);
+            } else {
+                onInvalidSelf.call(self);
+                picker.fire('has.tag', [toValue(v)]);
+            }
+        });
+        forEachMap(_tags, v => letAria(v[2], TOKEN_SELECTED));
+        picker.fire('change', [picker[TOKEN_VALUE]]).text = "";
+    }
 }
 
 function onPointerDownMask(e) {
@@ -617,10 +628,13 @@ TagPicker.state = {
     'min': 0,
     'n': 'tag-picker',
     'pattern': null,
+    'time': {
+        'error': 1000
+    },
     'with': []
 };
 
-TagPicker.version = '4.1.5';
+TagPicker.version = '4.2.0';
 
 setObjectAttributes(TagPicker, {
     name: {

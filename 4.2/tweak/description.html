@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p>Add <em>c</em> again to see the effect!</p>
+      <p><input type="text" value="a, b, c"></p>
+    </main>
+    <script src="../index.min.js"></script>
+    <script>
+      const d = document.createElement('small');
+      const picker = new TagPicker(document.querySelector('input'));
+      d.style.color = 'red';
+      d.style.display = 'block';
+      d.style.marginTop = '0.5em';
+      picker.on('has.tag', name => {
+          d.innerHTML = 'Tag “' + name + '” already exists.';
+          picker.mask.after(d);
+          setTimeout(() => d.remove(), 1000);
+      });
+    </script>
+  </body>
+</html>

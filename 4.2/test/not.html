@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width" name="viewport">
+    <meta content="Better tags input interaction with JavaScript." name="description">
+    <title>Tag Picker</title>
+    <link href="../index.min.css" rel="stylesheet">
+    <style>
+      .tag-picker {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p>Valid tag name must match the <code>^[a-z\d](-[a-z\d])*$</code> pattern!</p>
+      <form method="get">
+        <p><input name="test" type="text"></p>
+        <p><button type="submit">Submit</button></p>
+      </form>
+    </main>
+    <script src="../index.min.js"></script>
+    <script>
+      const picker = new TagPicker(document.querySelector('input'), {
+          pattern: '^[a-z\\d]+(-[a-z\\d]+)*$'
+      });
+      picker.on('is.tag', name => {
+          console.info('The input “' + name + '” is a valid tag name.');
+      });
+      picker.on('not.tag', name => {
+          console.error('The input “' + name + '” is not a valid tag name.');
+      });
+    </script>
+  </body>
+</html>

@@ -178,6 +178,9 @@ block content
       |     max: Infinity,
       |     min: 0,
       |     pattern: null,
+      |     time: {
+      |         error: 1000
+      |     }
       |     with: []
       | });
     h3#constructor-tag-picker-tags
@@ -272,6 +275,28 @@ block content
       |         return [value, {
       |             value: (value || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "")
       |         }];
+      |     }
+      | });
+    h4#parameter-state-time
+      a(aria-hidden='true' href='#parameter-state-time') #
+      = ' '
+      code state.time
+    p Stores configuration data related to time in milliseconds.
+    h5#parameter-state-time-error
+      a(aria-hidden='true' href='#parameter-state-time-error') #
+      = ' '
+      code state.time.error
+    p Determines how long the invalid state is presented to the user. If the value is less than or equal to #[code 0], the built-in invalid state will be disabled.
+    pre: code
+      | const picker = new TagPicker(document.querySelector('input'), {
+      |     time: {
+      |         error: 999999999 // As long as possible
+      |     }
+      | });
+    pre: code
+      | const picker = new TagPicker(document.querySelector('input'), {
+      |     time: {
+      |         error: 0 // Disable the built-in invalid state
       |     }
       | });
     h4#parameter-state-with

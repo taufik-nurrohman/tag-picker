@@ -5,7 +5,7 @@
     <meta content="#000" name="theme-color">
     <meta content="width=device-width" name="viewport">
     <meta content="Better tags input interaction with JavaScript." name="description">
-    <title>Tag Picker 4.1.4</title>
+    <title>Tag Picker 4.2.0</title>
     <link href="../../layout/index.min.css" rel="stylesheet">
     <link href="../../layout/anchor/index.min.css" rel="stylesheet">
     <link href="index.min.css" rel="stylesheet">
@@ -67,7 +67,7 @@
     <p role="alert">Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
       <hgroup>
-        <h1>Tag Picker 4.1.4</h1>
+        <h1>Tag Picker 4.2.0</h1>
         <p>Tag Picker is a JavaScript application designed to simplify the management of comma-separated lists of words, offering a minimalist interface for an enhanced user experience. Users can easily add tags by typing a word and pressing the <kbd>,</kbd> key (by default), or remove tags with a quick click (or by using common keys such as the <kbd>Backspace</kbd> or <kbd>Delete</kbd> keys). Developers can easily integrate and customize this application styles to match the design of their web project.</p>
       </hgroup>
       <p>It supports native keyboard interaction as if it were plain text. You should be able to copy, cut, and paste from/to the mask. Click a tag to select it, press the <kbd>Control</kbd> key while clicking the tag to select multiple tags. You can also select the tags using the combination of <kbd>Shift</kbd> and <kbd>ArrowLeft</kbd> or <kbd>ArrowRight</kbd> keys.</p>
@@ -149,6 +149,9 @@ const picker = new TagPicker(document.querySelector('input'));</code></pre>
     max: Infinity,
     min: 0,
     pattern: null,
+    time: {
+        error: 1000
+    }
     with: []
 });</code></pre>
       <h3 id="constructor-tag-picker-tags"><a aria-hidden="true" href="#constructor-tag-picker-tags">#</a> <code>TagPicker.Tags(picker, tags)</code></h3>
@@ -205,6 +208,20 @@ picker.on('not.tag', name => {
         return [value, {
             value: (value || "").toLowerCase().replace(/[^a-z\d-]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, "")
         }];
+    }
+});</code></pre>
+      <h4 id="parameter-state-time"><a aria-hidden="true" href="#parameter-state-time">#</a> <code>state.time</code></h4>
+      <p>Stores configuration data related to time in milliseconds.</p>
+      <h5 id="parameter-state-time-error"><a aria-hidden="true" href="#parameter-state-time-error">#</a> <code>state.time.error</code></h5>
+      <p>Determines how long the invalid state is presented to the user. If the value is less than or equal to <code>0</code>, the built-in invalid state will be disabled.</p>
+      <pre><code>const picker = new TagPicker(document.querySelector('input'), {
+    time: {
+        error: 999999999 // As long as possible
+    }
+});</code></pre>
+      <pre><code>const picker = new TagPicker(document.querySelector('input'), {
+    time: {
+        error: 0 // Disable the built-in invalid state
     }
 });</code></pre>
       <h4 id="parameter-state-with"><a aria-hidden="true" href="#parameter-state-with">#</a> <code>state.with</code></h4>
