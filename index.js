@@ -772,11 +772,12 @@
     var clearTimeout = W.clearTimeout,
         setTimeout = W.setTimeout; // For better minification
     var delay = function delay(task, time) {
-        var timer;
+        var stickyTime = isInteger(time) && time >= 0,
+            timer;
         return [function () {
             var _this2 = this;
             var lot = _toArray(arguments);
-            if (!isInteger(time) || time < 0) {
+            if (!stickyTime) {
                 time = lot.shift();
             }
             timer = setTimeout(function () {
@@ -1521,7 +1522,7 @@
         },
         'with': []
     };
-    TagPicker.version = '4.2.0';
+    TagPicker.version = '4.2.1';
     setObjectAttributes(TagPicker, {
         name: {
             value: name
