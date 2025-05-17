@@ -177,7 +177,7 @@ function onCutTextInput() {
         picker = getReference($),
         {_mask} = picker,
         {hint} = _mask;
-    delay(() => getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY), 1)();
+    delay(() => getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY))[0](1);
 }
 
 function onFocusSelf() {
@@ -228,7 +228,7 @@ function onInvalidSelf(e) {
         picker = getReference($),
         {mask} = picker;
     setAria(mask, TOKEN_INVALID, true);
-    delay(() => letAria(mask, TOKEN_INVALID), 1000)();
+    delay(() => letAria(mask, TOKEN_INVALID))[0](1000);
 }
 
 function onKeyDownTag(e) {
@@ -379,7 +379,7 @@ function onKeyDownTextInput(e) {
         setValueInMap(toValue(v = getText($)), v, _tags);
         return (focusTo(picker).text = ""), offEventDefault(e);
     }
-    delay(() => getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY), 1)();
+    delay(() => getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY))[0](1);
     let caretIsToTheFirst = "" === getCharBeforeCaret($),
         tagFirst, tagLast,
         textIsVoid = !getText($, 0);
@@ -488,7 +488,7 @@ function onPasteTextInput(e) {
         {_mask, _tags, state} = picker,
         {hint} = _mask,
         {join} = state;
-    delay(() => getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY), 1)();
+    delay(() => getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY))[0](1);
     insertAtSelection($, e.clipboardData.getData('text/plain'));
     forEachArray((getText($) + "").split(join), v => {
         if (!hasKeyInMap(v = toValue(v.trim()), _tags)) {
@@ -620,7 +620,7 @@ TagPicker.state = {
     'with': []
 };
 
-TagPicker.version = '4.1.4';
+TagPicker.version = '4.1.5';
 
 setObjectAttributes(TagPicker, {
     name: {

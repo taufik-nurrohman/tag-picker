@@ -375,10 +375,11 @@
     };
     var references = new WeakMap();
 
-    function _toArray(iterable) {
+    function _toArray$1(iterable) {
         return Array.from(iterable);
     }
     var D = document;
+    var W = window;
     var getAria = function getAria(node, aria, parseValue) {
         if (parseValue === void 0) {
             parseValue = true;
@@ -399,7 +400,7 @@
         return parent['first' + (anyNode ? "" : 'Element') + 'Child'] || null;
     };
     var getChildren = function getChildren(parent, index, anyNode) {
-        var children = _toArray(parent['child' + ('Nodes')]);
+        var children = _toArray$1(parent['child' + ('Nodes')]);
         return isNumber(index) ? children[index] || null : children;
     };
     var getElement = function getElement(query, scope) {
@@ -788,14 +789,26 @@
         }
         return selection.addRange(range), selection;
     };
-    var delay = function delay(then, time) {
-        return function () {
-            var _arguments2 = arguments,
-                _this2 = this;
-            setTimeout(function () {
-                return then.apply(_this2, _arguments2);
+
+    function _toArray(iterable) {
+        return Array.from(iterable);
+    }
+    var clearTimeout = W.clearTimeout,
+        setTimeout = W.setTimeout; // For better minification
+    var delay = function delay(task, time) {
+        var timer;
+        return [function () {
+            var _this2 = this;
+            var lot = _toArray(arguments);
+            if (!isInteger(time) || time < 0) {
+                time = lot.shift();
+            }
+            timer = setTimeout(function () {
+                return task.apply(_this2, lot);
             }, time);
-        };
+        }, function () {
+            timer && clearTimeout(timer);
+        }];
     };
 
     function hook($, $$) {
@@ -1041,7 +1054,7 @@
             hint = _mask.hint;
         delay(function () {
             return getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
-        }, 1)();
+        })[0](1);
     }
 
     function onFocusSelf() {
@@ -1094,7 +1107,7 @@
         setAria(mask, TOKEN_INVALID, true);
         delay(function () {
             return letAria(mask, TOKEN_INVALID);
-        }, 1000)();
+        })[0](1000);
     }
 
     function onKeyDownTag(e) {
@@ -1258,7 +1271,7 @@
         }
         delay(function () {
             return getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
-        }, 1)();
+        })[0](1);
         var caretIsToTheFirst = "" === getCharBeforeCaret($),
             tagFirst,
             tagLast,
@@ -1377,7 +1390,7 @@
             join = state.join;
         delay(function () {
             return getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
-        }, 1)();
+        })[0](1);
         insertAtSelection($, e.clipboardData.getData('text/plain'));
         forEachArray((getText($) + "").split(join), function (v) {
             if (!hasKeyInMap(v = _toValue(v.trim()), _tags)) {
@@ -1515,7 +1528,7 @@
         'pattern': null,
         'with': []
     };
-    TagPicker.version = '4.1.4';
+    TagPicker.version = '4.1.5';
     setObjectAttributes(TagPicker, {
         name: {
             value: name

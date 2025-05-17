@@ -12,7 +12,7 @@
     "@taufik-nurrohman/is": "^1.0.4",
     "@taufik-nurrohman/pattern": "^1.0.1",
     "@taufik-nurrohman/selection": "^1.1.0",
-    "@taufik-nurrohman/tick": "^1.0.1",
+    "@taufik-nurrohman/tick": "^2.0.1",
     "@taufik-nurrohman/to": "^1.2.0"
   },
   "description": "Better tags input interaction with JavaScript.",
@@ -50,5 +50,5 @@
   "scripts": {
     "pack": "pack --clean=false --from=.factory --js-format=umd --js-name=TagPicker --js-top='%(js.license)' --mjs=true --scss=true --to=."
   },
-  "version": "4.1.4"
+  "version": "4.1.5"
 }
