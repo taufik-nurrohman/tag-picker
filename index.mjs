@@ -632,7 +632,7 @@ TagPicker.state = {
     'with': []
 };
 
-TagPicker.version = '4.2.1';
+TagPicker.version = '4.2.2';
 
 setObjectAttributes(TagPicker, {
     name: {

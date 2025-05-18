@@ -46,9 +46,9 @@
             var o = 0;
             return function () {
                 return o >= r.length ? {
-                    done: !0
+                    done: true
                 } : {
-                    done: !1,
+                    done: false,
                     value: r[o++]
                 };
             };
@@ -64,8 +64,8 @@
                 i,
                 u,
                 a = [],
-                f = !0,
-                o = !1;
+                f = true,
+                o = false;
             try {
                 if (i = (t = t.call(r)).next, 0 === l) {
                     if (Object(t) !== t) return;
@@ -73,7 +73,7 @@
                 } else
                     for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0);
             } catch (r) {
-                o = !0, n = r;
+                o = true, n = r;
             } finally {
                 try {
                     if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return;
@@ -1522,7 +1522,7 @@
         },
         'with': []
     };
-    TagPicker.version = '4.2.1';
+    TagPicker.version = '4.2.2';
     setObjectAttributes(TagPicker, {
         name: {
             value: name
