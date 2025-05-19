@@ -964,6 +964,7 @@
     // Better mobile support
     function onBeforeInputTextInput(e) {
         var $ = this,
+            data = e.data,
             inputType = e.inputType,
             picker = getReference($),
             _active = picker._active;
@@ -971,9 +972,18 @@
             return offEventDefault(e);
         }
         var _tags = picker._tags,
+            state = picker.state,
+            escape = state.escape,
             exit,
-            tagLast;
-        if ('deleteContentBackward' === inputType && !getText($, 0)) {
+            key,
+            tagLast,
+            v;
+        key = isString(data) && 1 === toCount(data) ? data : 0;
+        if (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape)) || KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape)) || 0 !== key && hasValue(key, escape)) {
+            exit = true;
+            setValueInMap(_toValue(v = getText($)), v, _tags);
+            focusTo(picker).text = "";
+        } else if ('deleteContentBackward' === inputType && !getText($, 0)) {
             if (tagLast = toValueLastFromMap(_tags)) {
                 exit = true;
                 letValueInMap(getTagValue(tagLast[2]), _tags);
@@ -1048,32 +1058,19 @@
     // Better mobile support
     function onInputTextInput(e) {
         var $ = this,
-            data = e.data,
-            inputType = e.inputType,
             picker = getReference($),
             _active = picker._active;
         if (!_active) {
             return offEventDefault(e);
         }
         var _mask = picker._mask,
-            _tags = picker._tags,
-            state = picker.state,
             hint = _mask.hint,
-            escape = state.escape,
-            exit,
-            key,
-            v;
-        key = isString(data) && 1 === toCount(data) ? data : 0;
-        if (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape)) || KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape)) || 0 !== key && hasValue(key, escape)) {
-            exit = true;
-            setValueInMap(_toValue(v = getText($)), v, _tags);
-            focusTo(picker).text = "";
-        } else if ('deleteContent' === inputType.slice(0, 13) && !getText($, 0)) {
+            inputType = e.inputType;
+        if ('deleteContent' === inputType.slice(0, 13) && !getText($, 0)) {
             letStyle(hint, TOKEN_VISIBILITY);
         } else if ('insertText' === inputType) {
             setStyle(hint, TOKEN_VISIBILITY, 'hidden');
         }
-        exit && offEventDefault(e);
     }
 
     function onInvalidSelf(e) {
@@ -1395,11 +1392,23 @@
     }
 
     function onPointerDownMask(e) {
-        var target = e.target;
-        if ('option' === getRole(target) || getParent(target, '[role=option]'));
-        else {
-            focusTo(getReference(this)), offEventDefault(e);
+        offEventDefault(e);
+        var $ = this,
+            picker = getReference($),
+            target = e.target;
+        // Is it focused on a tag mask?
+        if (target && 'option' === getRole(target)) {
+            return; // Yes it is!
         }
+        // Is it focused on a node in the tag mask?
+        while (target && $ !== target) {
+            target = getParent(target);
+            if (target && 'option' === getRole(target)) {
+                return; // Yes it is!
+            }
+        }
+        // It focuses on something else in the root mask. The default is to execute `picker.focus()`
+        focusTo(picker);
     }
 
     function onPointerDownTag(e) {
