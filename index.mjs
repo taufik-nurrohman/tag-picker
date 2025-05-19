@@ -1049,6 +1049,9 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         setValue(self, tagsValues = tagsValues.join(join));
         return (_fireHook && of.fire('let.tag', [key]).fire('change', ["" !== tagsValues ? tagsValues : null])), r;
     },
+    entries: function () {
+        return this.values.entries();
+    },
     get: function (key) {
         let $ = this,
             {values} = $,

@@ -1961,6 +1961,9 @@
             setValue(self, tagsValues = tagsValues.join(join));
             return _fireHook && of.fire('let.tag', [key]).fire('change', ["" !== tagsValues ? tagsValues : null]), r;
         },
+        entries: function entries() {
+            return this.values.entries();
+        },
         get: function get(key) {
             var $ = this,
                 values = $.values,
