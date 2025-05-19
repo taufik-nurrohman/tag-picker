@@ -5,7 +5,7 @@
   "dependencies": {
     "@taufik-nurrohman/document": "^1.5.3",
     "@taufik-nurrohman/event": "^1.0.1",
-    "@taufik-nurrohman/f": "^1.3.3",
+    "@taufik-nurrohman/f": "^1.3.4",
     "@taufik-nurrohman/from": "^1.1.0",
     "@taufik-nurrohman/has": "^1.0.0",
     "@taufik-nurrohman/hook": "^1.2.2",

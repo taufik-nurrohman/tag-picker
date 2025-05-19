@@ -38,24 +38,6 @@
         if (Array.isArray(r)) return r;
     }
 
-    function _createForOfIteratorHelperLoose(r, e) {
-        var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
-        if (t) return (t = t.call(r)).next.bind(t);
-        if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || r && "number" == typeof r.length) {
-            t && (r = t);
-            var o = 0;
-            return function () {
-                return o >= r.length ? {
-                    done: true
-                } : {
-                    done: false,
-                    value: r[o++]
-                };
-            };
-        }
-        throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-    }
-
     function _iterableToArrayLimit(r, l) {
         var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
         if (null != t) {
@@ -274,7 +256,7 @@
     };
     var forEachArray = function forEachArray(array, at) {
         for (var i = 0, j = toCount(array), v; i < j; ++i) {
-            v = at(array[i], i);
+            v = at.call(array, array[i], i);
             if (-1 === v) {
                 array.splice(i, 1);
                 continue;
@@ -289,11 +271,13 @@
         return array;
     };
     var forEachMap = function forEachMap(map, at) {
-        for (var _iterator = _createForOfIteratorHelperLoose(map), _step; !(_step = _iterator()).done;) {
-            var _step$value = _maybeArrayLike(_slicedToArray, _step.value, 2),
-                k = _step$value[0],
-                v = _step$value[1];
-            v = at(v, k);
+        var items = map.entries(),
+            item = items.next();
+        while (!item.done) {
+            var _item$value = _maybeArrayLike(_slicedToArray, item.value, 2),
+                k = _item$value[0],
+                v = _item$value[1];
+            v = at.call(map, v, k);
             if (-1 === v) {
                 letValueInMap(k, map);
                 continue;
@@ -304,13 +288,14 @@
             if (1 === v) {
                 continue;
             }
+            item = items.next();
         }
         return map;
     };
     var forEachObject = function forEachObject(object, at) {
         var v;
         for (var k in object) {
-            v = at(object[k], k);
+            v = at.call(object, object[k], k);
             if (-1 === v) {
                 delete object[k];
                 continue;
