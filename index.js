@@ -1904,6 +1904,7 @@
         count: function count() {
             return toMapCount(this[TOKEN_VALUES]);
         },
+        // To be used by the `letValueInMap()` function
         delete: function _delete(key, _fireHook) {
             if (_fireHook === void 0) {
                 _fireHook = 1;
@@ -1961,6 +1962,7 @@
             setValue(self, tagsValues = tagsValues.join(join));
             return _fireHook && of.fire('let.tag', [key]).fire('change', ["" !== tagsValues ? tagsValues : null]), r;
         },
+        // To be used by the `forEachMap()` function
         entries: function entries() {
             return this.values.entries();
         },

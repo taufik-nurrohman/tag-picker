@@ -1007,6 +1007,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
     count: function () {
         return toMapCount(this[TOKEN_VALUES]);
     },
+    // To be used by the `letValueInMap()` function
     delete: function (key, _fireHook = 1) {
         let $ = this,
             {of, values} = $,
@@ -1049,6 +1050,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         setValue(self, tagsValues = tagsValues.join(join));
         return (_fireHook && of.fire('let.tag', [key]).fire('change', ["" !== tagsValues ? tagsValues : null])), r;
     },
+    // To be used by the `forEachMap()` function
     entries: function () {
         return this.values.entries();
     },
