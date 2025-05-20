@@ -18,6 +18,7 @@
 
 .tag-picker,
 .tag-picker * {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   box-sizing: border-box;
   color: inherit;
   font: inherit;
