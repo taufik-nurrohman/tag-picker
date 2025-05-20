@@ -38,24 +38,6 @@
         if (Array.isArray(r)) return r;
     }
 
-    function _createForOfIteratorHelperLoose(r, e) {
-        var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
-        if (t) return (t = t.call(r)).next.bind(t);
-        if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || r && "number" == typeof r.length) {
-            t && (r = t);
-            var o = 0;
-            return function () {
-                return o >= r.length ? {
-                    done: true
-                } : {
-                    done: false,
-                    value: r[o++]
-                };
-            };
-        }
-        throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-    }
-
     function _iterableToArrayLimit(r, l) {
         var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
         if (null != t) {
@@ -88,7 +70,7 @@
     function _maybeArrayLike(r, a, e) {
         if (a && !Array.isArray(a) && "number" == typeof a.length) {
             var y = a.length;
-            return _arrayLikeToArray(a, e < y ? e : y);
+            return _arrayLikeToArray(a, void 0 !== e && e < y ? e : y);
         }
         return r(a, e);
     }
@@ -274,7 +256,7 @@
     };
     var forEachArray = function forEachArray(array, at) {
         for (var i = 0, j = toCount(array), v; i < j; ++i) {
-            v = at(array[i], i);
+            v = at.call(array, array[i], i);
             if (-1 === v) {
                 array.splice(i, 1);
                 continue;
@@ -289,11 +271,13 @@
         return array;
     };
     var forEachMap = function forEachMap(map, at) {
-        for (var _iterator = _createForOfIteratorHelperLoose(map), _step; !(_step = _iterator()).done;) {
-            var _step$value = _maybeArrayLike(_slicedToArray, _step.value, 2),
-                k = _step$value[0],
-                v = _step$value[1];
-            v = at(v, k);
+        var items = map.entries(),
+            item = items.next();
+        while (!item.done) {
+            var _item$value = _maybeArrayLike(_slicedToArray, item.value, 2),
+                k = _item$value[0],
+                v = _item$value[1];
+            v = at.call(map, v, k);
             if (-1 === v) {
                 letValueInMap(k, map);
                 continue;
@@ -304,13 +288,14 @@
             if (1 === v) {
                 continue;
             }
+            item = items.next();
         }
         return map;
     };
     var forEachObject = function forEachObject(object, at) {
         var v;
         for (var k in object) {
-            v = at(object[k], k);
+            v = at.call(object, object[k], k);
             if (-1 === v) {
                 delete object[k];
                 continue;
@@ -896,16 +881,33 @@
     var TOKEN_DISABLED = 'disabled';
     var TOKEN_FALSE = 'false';
     var TOKEN_INVALID = EVENT_INVALID;
+    var TOKEN_PRESSED = 'pressed';
     var TOKEN_READONLY = 'readonly';
     var TOKEN_READ_ONLY = 'readOnly';
     var TOKEN_REQUIRED = 'required';
-    var TOKEN_SELECTED = 'selected';
     var TOKEN_TABINDEX = 'tabindex';
     var TOKEN_TAB_INDEX = 'tabIndex';
     var TOKEN_TRUE = 'true';
     var TOKEN_VALUE = 'value';
     var TOKEN_VALUES = TOKEN_VALUE + 's';
     var TOKEN_VISIBILITY = 'visibility';
+    var _delay = delay(function (picker) {
+            letAria(picker.mask, TOKEN_INVALID);
+        }),
+        _delay2 = _maybeArrayLike(_slicedToArray, _delay, 2),
+        letError = _delay2[0],
+        letErrorAbort = _delay2[1];
+    var setError = function setError(picker) {
+        setAria(picker.mask, TOKEN_INVALID, true);
+    };
+    var _delay3 = delay(function (picker) {
+            var _mask = picker._mask,
+                hint = _mask.hint,
+                input = _mask.input;
+            getText(input, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
+        }),
+        _delay4 = _maybeArrayLike(_slicedToArray, _delay3, 1),
+        toggleHint = _delay4[0];
     var name = 'TagPicker';
     var _keyIsCtrl, _keyIsShift, _keyOverTag;
 
@@ -998,9 +1000,18 @@
             _tags = picker._tags;
         if (!_keyIsCtrl && !_keyIsShift) {
             forEachMap(_tags, function (v) {
-                return letAria(v[2], TOKEN_SELECTED);
+                return letAria(v[2], TOKEN_PRESSED);
             });
         }
+    }
+
+    function onBlurTextInput() {
+        var $ = this,
+            picker = getReference($),
+            state = picker.state,
+            time = state.time,
+            error = time.error;
+        letError(isInteger(error) && error > 0 ? error : 0, picker);
     }
 
     function onCopyTag(e) {
@@ -1011,9 +1022,9 @@
             state = picker.state,
             join = state.join,
             selected = [];
-        setAria($, TOKEN_SELECTED, true);
+        setAria($, TOKEN_PRESSED, true);
         forEachMap(_tags, function (v) {
-            if (getAria(v[2], TOKEN_SELECTED)) {
+            if (getAria(v[2], TOKEN_PRESSED)) {
                 selected.push(getTagValue(v[2]));
             }
         });
@@ -1027,7 +1038,7 @@
             _tags = picker._tags;
         onCopyTag.call($, e);
         forEachMap(_tags, function (v) {
-            if (getAria(v[2], TOKEN_SELECTED)) {
+            if (getAria(v[2], TOKEN_PRESSED)) {
                 letValueInMap(getTagValue(v[2]), _tags);
             }
         });
@@ -1035,13 +1046,7 @@
     }
 
     function onCutTextInput() {
-        var $ = this,
-            picker = getReference($),
-            _mask = picker._mask,
-            hint = _mask.hint;
-        delay(function () {
-            return getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
-        })[0](1);
+        toggleHint(1, getReference(this));
     }
 
     function onFocusSelf() {
@@ -1053,7 +1058,15 @@
     }
 
     function onFocusTextInput() {
-        selectTo(this);
+        var $ = this,
+            picker = getReference($),
+            state = picker.state,
+            pattern = state.pattern,
+            value = getText($);
+        if (value && isString(pattern) && !toPattern(pattern).test(value)) {
+            letErrorAbort(), setError(picker);
+        }
+        selectTo($);
     }
     // Better mobile support
     function onInputTextInput(e) {
@@ -1064,29 +1077,26 @@
             return offEventDefault(e);
         }
         var _mask = picker._mask,
+            state = picker.state,
             hint = _mask.hint,
-            inputType = e.inputType;
-        if ('deleteContent' === inputType.slice(0, 13) && !getText($, 0)) {
+            pattern = state.pattern,
+            inputType = e.inputType,
+            v = getText($, 0);
+        if ('deleteContent' === inputType.slice(0, 13) && !v) {
             letStyle(hint, TOKEN_VISIBILITY);
         } else if ('insertText' === inputType) {
             setStyle(hint, TOKEN_VISIBILITY, 'hidden');
+        }
+        if (isString(pattern) && !toPattern(pattern).test(v)) {
+            letErrorAbort(), setError(picker);
+        } else {
+            letError(0, picker);
         }
     }
 
     function onInvalidSelf(e) {
         e && offEventDefault(e);
-        var $ = this,
-            picker = getReference($),
-            mask = picker.mask,
-            state = picker.state,
-            time = state.time,
-            error = time.error;
-        if (isInteger(error) && error > 0) {
-            setAria(mask, TOKEN_INVALID, true);
-            delay(function () {
-                return letAria(mask, TOKEN_INVALID);
-            })[0](error);
-        }
+        onBlurTextInput.call(this);
     }
 
     function onKeyDownTag(e) {
@@ -1109,22 +1119,22 @@
             tagPrev;
         if (keyIsShift) {
             exit = true;
-            setAria($, TOKEN_SELECTED, true);
+            setAria($, TOKEN_PRESSED, true);
             if (KEY_ARROW_LEFT === key) {
                 if (tagPrev = getPrev($)) {
-                    if (getAria(tagPrev, TOKEN_SELECTED)) {
-                        letAria($, TOKEN_SELECTED);
+                    if (getAria(tagPrev, TOKEN_PRESSED)) {
+                        letAria($, TOKEN_PRESSED);
                     } else {
-                        setAria(tagPrev, TOKEN_SELECTED, true);
+                        setAria(tagPrev, TOKEN_PRESSED, true);
                     }
                     focusTo(tagPrev);
                 }
             } else if (KEY_ARROW_RIGHT === key) {
                 if ((tagNext = getNext($)) && tagNext !== text) {
-                    if (getAria(tagNext, TOKEN_SELECTED)) {
-                        letAria($, TOKEN_SELECTED);
+                    if (getAria(tagNext, TOKEN_PRESSED)) {
+                        letAria($, TOKEN_PRESSED);
                     } else {
-                        setAria(tagNext, TOKEN_SELECTED, true);
+                        setAria(tagNext, TOKEN_PRESSED, true);
                     }
                     focusTo(tagNext);
                 }
@@ -1135,7 +1145,7 @@
             if (KEY_A === key) {
                 exit = true;
                 forEachMap(_tags, function (v) {
-                    return setAria(v[2], TOKEN_SELECTED, true), focusTo(v[2]), selectTo(v[2]);
+                    return setAria(v[2], TOKEN_PRESSED, true), focusTo(v[2]), selectTo(v[2]);
                 });
             } else if (KEY_ARROW_LEFT === key) {
                 exit = true;
@@ -1157,9 +1167,9 @@
                 tagLast && focusTo(tagLast[2]);
             } else if (KEY_ENTER === key || ' ' === key) {
                 exit = true;
-                getAria($, TOKEN_SELECTED) ? letAria($, TOKEN_SELECTED) : setAria($, TOKEN_SELECTED, true);
+                getAria($, TOKEN_PRESSED) ? letAria($, TOKEN_PRESSED) : setAria($, TOKEN_PRESSED, true);
             } else {
-                setAria($, TOKEN_SELECTED, true);
+                setAria($, TOKEN_PRESSED, true);
             }
         } else {
             if (KEY_ARROW_LEFT === key) {
@@ -1183,7 +1193,7 @@
                 tagPrev = getPrev($);
                 letValueInMap(getTagValue($), _tags);
                 forEachMap(_tags, function (v) {
-                    if (getAria(v[2], TOKEN_SELECTED)) {
+                    if (getAria(v[2], TOKEN_PRESSED)) {
                         tagPrev = getPrev(v[2]);
                         letValueInMap(getTagValue(v[2]), _tags);
                     }
@@ -1194,7 +1204,7 @@
                 tagNext = getNext($);
                 letValueInMap(getTagValue($), _tags);
                 forEachMap(_tags, function (v) {
-                    if (getAria(v[2], TOKEN_SELECTED)) {
+                    if (getAria(v[2], TOKEN_PRESSED)) {
                         tagNext = getNext(v[2]);
                         letValueInMap(getTagValue(v[2]), _tags);
                     }
@@ -1202,14 +1212,14 @@
                 focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker[TOKEN_VALUE]]);
             } else if (KEY_ENTER === key || ' ' === key) {
                 exit = true;
-                getAria($, TOKEN_SELECTED) ? letAria($, TOKEN_SELECTED) : setAria($, TOKEN_SELECTED, true);
+                getAria($, TOKEN_PRESSED) ? letAria($, TOKEN_PRESSED) : setAria($, TOKEN_PRESSED, true);
             } else if (KEY_ESCAPE === key || KEY_TAB === key) {
                 exit = true;
                 selectToNone(), focusTo(picker);
                 // Any type-able key
             } else if (1 === toCount(key)) {
                 forEachMap(_tags, function (v) {
-                    if (getAria(v[2], TOKEN_SELECTED)) {
+                    if (getAria(v[2], TOKEN_PRESSED)) {
                         letValueInMap(getTagValue(v[2]), _tags);
                     }
                 });
@@ -1237,10 +1247,8 @@
             }
             return offEventDefault(e);
         }
-        var _mask = picker._mask,
-            _tags = picker._tags,
+        var _tags = picker._tags,
             state = picker.state,
-            hint = _mask.hint,
             escape = state.escape,
             exit,
             v;
@@ -1248,9 +1256,7 @@
             setValueInMap(_toValue(v = getText($)), v, _tags);
             return focusTo(picker).text = "", offEventDefault(e);
         }
-        delay(function () {
-            return getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
-        })[0](1);
+        toggleHint(1, picker);
         var caretIsToTheFirst = "" === getCharBeforeCaret($),
             tagFirst,
             tagLast,
@@ -1265,14 +1271,14 @@
                     exit = true;
                     selectToNone();
                     tagLast = toValueLastFromMap(_tags);
-                    tagLast && focusTo(tagLast[2]) && setAria(tagLast[2], TOKEN_SELECTED, true);
+                    tagLast && focusTo(tagLast[2]) && setAria(tagLast[2], TOKEN_PRESSED, true);
                 }
             }
         } else if (keyIsCtrl) {
             if (KEY_A === key && textIsVoid && _tags.count()) {
                 exit = true;
                 forEachMap(_tags, function (v) {
-                    return setAria(v[2], TOKEN_SELECTED, true), focusTo(v[2]), selectTo(v[2]);
+                    return setAria(v[2], TOKEN_PRESSED, true), focusTo(v[2]), selectTo(v[2]);
                 });
             } else if (KEY_ARROW_LEFT === key) {
                 exit = true;
@@ -1325,14 +1331,14 @@
             _tags = picker._tags,
             selected = 0;
         forEachMap(_tags, function (v) {
-            if (getAria(v[2], TOKEN_SELECTED)) {
+            if (getAria(v[2], TOKEN_PRESSED)) {
                 ++selected;
             }
         });
         _keyIsCtrl = e.ctrlKey;
         _keyIsShift = e.shiftKey;
         if (selected < 2 && !_keyIsCtrl && !_keyIsShift && KEY_ENTER !== key && ' ' !== key) {
-            letAria($, TOKEN_SELECTED);
+            letAria($, TOKEN_PRESSED);
         }
     }
 
@@ -1354,7 +1360,7 @@
             }
         });
         forEachMap(_tags, function (v) {
-            return letAria(v[2], TOKEN_SELECTED);
+            return letAria(v[2], TOKEN_PRESSED);
         });
         focusTo(picker.fire('change', [picker[TOKEN_VALUE]]));
     }
@@ -1363,17 +1369,12 @@
         offEventDefault(e);
         var $ = this,
             picker = getReference($),
-            _mask = picker._mask,
             _tags = picker._tags,
             self = picker.self,
             state = picker.state,
-            hint = _mask.hint,
             join = state.join,
             v;
-        delay(function () {
-            return getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
-        })[0](1);
-        insertAtSelection($, v = e.clipboardData.getData('text/plain'));
+        toggleHint(1, picker), insertAtSelection($, v = e.clipboardData.getData('text/plain'));
         if (v !== getText($));
         else {
             forEachArray((getText($) + "").split(join), function (v) {
@@ -1385,7 +1386,7 @@
                 }
             });
             forEachMap(_tags, function (v) {
-                return letAria(v[2], TOKEN_SELECTED);
+                return letAria(v[2], TOKEN_PRESSED);
             });
             picker.fire('change', [picker[TOKEN_VALUE]]).text = "";
         }
@@ -1419,26 +1420,26 @@
         focusTo($), selectTo($);
         if (!_keyIsCtrl) {
             forEachMap(_tags, function (v) {
-                return letAria(v[2], TOKEN_SELECTED);
+                return letAria(v[2], TOKEN_PRESSED);
             });
         }
         if (_keyIsCtrl) {
-            setAria($, TOKEN_SELECTED, true);
+            setAria($, TOKEN_PRESSED, true);
         } else if (_keyIsShift && _keyOverTag) {
             var tagEndIndex = getElementIndex($),
                 tagStartIndex = getElementIndex(_keyOverTag),
                 tagCurrent = _keyOverTag,
                 tagNext,
                 tagPrev;
-            setAria($, TOKEN_SELECTED, true);
-            setAria(_keyOverTag, TOKEN_SELECTED, true);
+            setAria($, TOKEN_PRESSED, true);
+            setAria(_keyOverTag, TOKEN_PRESSED, true);
             // Select to the right
             if (tagEndIndex > tagStartIndex) {
                 while (tagNext = getNext(tagCurrent)) {
                     if ($ === tagNext) {
                         break;
                     }
-                    setAria(tagCurrent = tagNext, TOKEN_SELECTED, true);
+                    setAria(tagCurrent = tagNext, TOKEN_PRESSED, true);
                 }
                 // Select to the left
             } else if (tagEndIndex < tagStartIndex) {
@@ -1446,7 +1447,7 @@
                     if ($ === tagPrev) {
                         break;
                     }
-                    setAria(tagCurrent = tagPrev, TOKEN_SELECTED, true);
+                    setAria(tagCurrent = tagPrev, TOKEN_PRESSED, true);
                 }
             }
         }
@@ -1772,6 +1773,7 @@
                 setID(form);
                 setReference(form, $);
             }
+            onEvent(EVENT_BLUR, textInput, onBlurTextInput);
             onEvent(EVENT_CUT, textInput, onCutTextInput);
             onEvent(EVENT_FOCUS, self, onFocusSelf);
             onEvent(EVENT_FOCUS, textInput, onFocusTextInput);
@@ -1858,6 +1860,7 @@
                 offEvent(EVENT_RESET, form, onResetForm);
                 offEvent(EVENT_SUBMIT, form, onSubmitForm);
             }
+            offEvent(EVENT_BLUR, input, onBlurTextInput);
             offEvent(EVENT_CUT, input, onCutTextInput);
             offEvent(EVENT_FOCUS, input, onFocusTextInput);
             offEvent(EVENT_FOCUS, self, onFocusSelf);
@@ -1919,6 +1922,7 @@
         count: function count() {
             return toMapCount(this[TOKEN_VALUES]);
         },
+        // To be used by the `letValueInMap()` function
         delete: function _delete(key, _fireHook) {
             if (_fireHook === void 0) {
                 _fireHook = 1;
@@ -1976,6 +1980,10 @@
             setValue(self, tagsValues = tagsValues.join(join));
             return _fireHook && of.fire('let.tag', [key]).fire('change', ["" !== tagsValues ? tagsValues : null]), r;
         },
+        // To be used by the `forEachMap()` function
+        entries: function entries() {
+            return this.values.entries();
+        },
         get: function get(key) {
             var $ = this,
                 values = $.values,
@@ -1992,7 +2000,7 @@
             return this.delete(key, _fireHook);
         },
         set: function set(key, value, _fireHook) {
-            var _getState;
+            var _value$1$active, _value$1$mark, _getState;
             if (_fireHook === void 0) {
                 _fireHook = 1;
             }
@@ -2023,13 +2031,29 @@
             }
             // `picker.tags.set('asdf')`
             if (!isSet(value)) {
-                value = [key, {}];
+                value = [key, {
+                    active: true,
+                    mark: false
+                }];
                 // `picker.tags.set('asdf', 'asdf')`
             } else if (isFloat(value) || isInteger(value) || isString(value)) {
-                value = [value, {}];
+                value = [value, {
+                    active: true,
+                    mark: false
+                }];
                 // `picker.tags.set('asdf', [ … ])`
             } else;
-            var v = value[1].value;
+            // All tag(s) act as selected option(s) that complement the mask root. The mask root functions as a `listbox`
+            // with active `aria-multiselectable` attribute. For visually impaired user(s), this element should be described
+            // as a multiple selection control with all option(s) selected. There is no point in having a way to disable a
+            // tag to exclude it from the selection. The best strategy is to simply remove the tag. That’s why the `active`
+            // option is always `true` and every tag has an active `aria-selected` attribute.
+            value[1].active = (_value$1$active = value[1].active) != null ? _value$1$active : true;
+            // This `mark` option is used to determine the state of the `aria-pressed` attribute.
+            value[1].mark = (_value$1$mark = value[1].mark) != null ? _value$1$mark : false;
+            var _value$ = value[1],
+                mark = _value$.mark,
+                v = _value$.value;
             if (null === key || "" === (v = _fromValue(v || key).trim()) || isString(pattern) && !toPattern(pattern).test(v)) {
                 onInvalidSelf.call(self);
                 return _fireHook && of.fire('not.tag', [key]), false;
@@ -2049,6 +2073,10 @@
                 return _fireHook && of.fire('has.tag', [key]), false;
             }
             tag = value[2] || setElement('data', {
+                'aria': {
+                    'pressed': mark ? TOKEN_TRUE : false,
+                    'selected': TOKEN_TRUE
+                },
                 'class': n + '__tag',
                 // Make the tag “content editable”, so that the “Cut” option is available in the context menu, but do not
                 // allow user(s) to edit the tag text. We just want to make sure that the “Cut” option is available.
