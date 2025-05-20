@@ -39,7 +39,7 @@
 .tag-picker[aria-disabled=true] * {
   pointer-events: none;
 }
-.tag-picker[aria-disabled=true] .tag-picker__tag[aria-selected=true] {
+.tag-picker[aria-disabled=true] .tag-picker__tag[aria-pressed=true] {
   background: rgba(0, 0, 255, 0.25);
 }
 .tag-picker[aria-invalid=true] {
@@ -76,10 +76,10 @@
 .tag-picker__tag {
   cursor: pointer;
 }
-.tag-picker__tag[aria-disabled=true][aria-selected=true] {
+.tag-picker__tag[aria-disabled=true][aria-pressed=true] {
   background: rgba(0, 0, 255, 0.25);
 }
-.tag-picker__tag[aria-selected=true] {
+.tag-picker__tag[aria-pressed=true] {
   background: rgba(0, 0, 255, 0.5);
 }
 .tag-picker__tag:focus {

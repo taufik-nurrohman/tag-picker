@@ -40,7 +40,7 @@ $name: 'tag-picker';
     * {
       pointer-events: none;
     }
-    .#{$name}__tag[aria-selected='true'] {
+    .#{$name}__tag[aria-pressed='true'] {
       background: rgba(0, 0, 255, 0.25);
     }
   }
@@ -80,11 +80,11 @@ $name: 'tag-picker';
   &__tag {
     cursor: pointer;
     &[aria-disabled='true'] {
-      &[aria-selected='true'] {
+      &[aria-pressed='true'] {
         background: rgba(0, 0, 255, 0.25);
       }
     }
-    &[aria-selected='true'] {
+    &[aria-pressed='true'] {
       background: rgba(0, 0, 255, 0.5);
     }
     &:focus {

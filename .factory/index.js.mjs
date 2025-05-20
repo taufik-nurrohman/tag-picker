@@ -50,16 +50,30 @@ const TOKEN_CONTENTEDITABLE = 'contenteditable';
 const TOKEN_DISABLED = 'disabled';
 const TOKEN_FALSE = 'false';
 const TOKEN_INVALID = EVENT_INVALID;
+const TOKEN_PRESSED = 'pressed';
 const TOKEN_READONLY = 'readonly';
 const TOKEN_READ_ONLY = 'readOnly';
 const TOKEN_REQUIRED = 'required';
-const TOKEN_SELECTED = 'selected';
 const TOKEN_TABINDEX = 'tabindex';
 const TOKEN_TAB_INDEX = 'tabIndex';
 const TOKEN_TRUE = 'true';
 const TOKEN_VALUE = 'value';
 const TOKEN_VALUES = TOKEN_VALUE + 's';
 const TOKEN_VISIBILITY = 'visibility';
+
+const [letError, letErrorAbort] = delay(function (picker) {
+    letAria(picker.mask, TOKEN_INVALID);
+});
+
+const setError = function (picker) {
+    setAria(picker.mask, TOKEN_INVALID, true);
+};
+
+const [toggleHint] = delay(function (picker) {
+    let {_mask} = picker,
+        {hint, input} = _mask;
+    getText(input, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
+});
 
 const name = 'TagPicker';
 
@@ -148,8 +162,17 @@ function onBlurTag() {
         picker = getReference($),
         {_tags} = picker;
     if (!_keyIsCtrl && !_keyIsShift) {
-        forEachMap(_tags, v => letAria(v[2], TOKEN_SELECTED));
+        forEachMap(_tags, v => letAria(v[2], TOKEN_PRESSED));
     }
+}
+
+function onBlurTextInput() {
+    let $ = this,
+        picker = getReference($),
+        {state} = picker,
+        {time} = state,
+        {error} = time;
+    letError(isInteger(error) && error > 0 ? error : 0, picker);
 }
 
 function onCopyTag(e) {
@@ -158,9 +181,9 @@ function onCopyTag(e) {
         picker = getReference($),
         {_tags, state} = picker,
         {join} = state, selected = [];
-    setAria($, TOKEN_SELECTED, true);
+    setAria($, TOKEN_PRESSED, true);
     forEachMap(_tags, v => {
-        if (getAria(v[2], TOKEN_SELECTED)) {
+        if (getAria(v[2], TOKEN_PRESSED)) {
             selected.push(getTagValue(v[2]));
         }
     });
@@ -174,7 +197,7 @@ function onCutTag(e) {
         {_tags} = picker;
     onCopyTag.call($, e);
     forEachMap(_tags, v => {
-        if (getAria(v[2], TOKEN_SELECTED)) {
+        if (getAria(v[2], TOKEN_PRESSED)) {
             letValueInMap(getTagValue(v[2]), _tags);
         }
     });
@@ -182,11 +205,7 @@ function onCutTag(e) {
 }
 
 function onCutTextInput() {
-    let $ = this,
-        picker = getReference($),
-        {_mask} = picker,
-        {hint} = _mask;
-    delay(() => getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY))[0](1);
+    toggleHint(1, getReference(this));
 }
 
 function onFocusSelf() {
@@ -199,7 +218,15 @@ function onFocusTag() {
 }
 
 function onFocusTextInput() {
-    selectTo(this);
+    let $ = this,
+        picker = getReference($),
+        {state} = picker,
+        {pattern} = state,
+        value = getText($);
+    if (value && isString(pattern) && !toPattern(pattern).test(value)) {
+        letErrorAbort(), setError(picker);
+    }
+    selectTo($);
 }
 
 // Better mobile support
@@ -210,27 +237,26 @@ function onInputTextInput(e) {
     if (!_active) {
         return offEventDefault(e);
     }
-    let {_mask} = picker,
+    let {_mask, state} = picker,
         {hint} = _mask,
-        {inputType} = e;
-    if ('deleteContent' === inputType.slice(0, 13) && !getText($, 0)) {
+        {pattern} = state,
+        {inputType} = e,
+        v = getText($, 0);
+    if ('deleteContent' === inputType.slice(0, 13) && !v) {
         letStyle(hint, TOKEN_VISIBILITY);
     } else if ('insertText' === inputType) {
         setStyle(hint, TOKEN_VISIBILITY, 'hidden');
+    }
+    if (isString(pattern) && !toPattern(pattern).test(v)) {
+        letErrorAbort(), setError(picker);
+    } else {
+        letError(0, picker);
     }
 }
 
 function onInvalidSelf(e) {
     e && offEventDefault(e);
-    let $ = this,
-        picker = getReference($),
-        {mask, state} = picker,
-        {time} = state,
-        {error} = time;
-    if (isInteger(error) && error > 0) {
-        setAria(mask, TOKEN_INVALID, true);
-        delay(() => letAria(mask, TOKEN_INVALID))[0](error);
-    }
+    onBlurTextInput.call(this);
 }
 
 function onKeyDownTag(e) {
@@ -248,22 +274,22 @@ function onKeyDownTag(e) {
         exit, tagFirst, tagLast, tagNext, tagPrev;
     if (keyIsShift) {
         exit = true;
-        setAria($, TOKEN_SELECTED, true);
+        setAria($, TOKEN_PRESSED, true);
         if (KEY_ARROW_LEFT === key) {
             if (tagPrev = getPrev($)) {
-                if (getAria(tagPrev, TOKEN_SELECTED)) {
-                    letAria($, TOKEN_SELECTED);
+                if (getAria(tagPrev, TOKEN_PRESSED)) {
+                    letAria($, TOKEN_PRESSED);
                 } else {
-                    setAria(tagPrev, TOKEN_SELECTED, true);
+                    setAria(tagPrev, TOKEN_PRESSED, true);
                 }
                 focusTo(tagPrev);
             }
         } else if (KEY_ARROW_RIGHT === key) {
             if ((tagNext = getNext($)) && tagNext !== text) {
-                if (getAria(tagNext, TOKEN_SELECTED)) {
-                    letAria($, TOKEN_SELECTED);
+                if (getAria(tagNext, TOKEN_PRESSED)) {
+                    letAria($, TOKEN_PRESSED);
                 } else {
-                    setAria(tagNext, TOKEN_SELECTED, true);
+                    setAria(tagNext, TOKEN_PRESSED, true);
                 }
                 focusTo(tagNext);
             }
@@ -273,7 +299,7 @@ function onKeyDownTag(e) {
     } else if (keyIsCtrl) {
         if (KEY_A === key) {
             exit = true;
-            forEachMap(_tags, v => (setAria(v[2], TOKEN_SELECTED, true), focusTo(v[2]), selectTo(v[2])));
+            forEachMap(_tags, v => (setAria(v[2], TOKEN_PRESSED, true), focusTo(v[2]), selectTo(v[2])));
         } else if (KEY_ARROW_LEFT === key) {
             exit = true;
             if (tagPrev = getPrev($)) {
@@ -294,9 +320,9 @@ function onKeyDownTag(e) {
             tagLast && focusTo(tagLast[2]);
         } else if (KEY_ENTER === key || ' ' === key) {
             exit = true;
-            getAria($, TOKEN_SELECTED) ? letAria($, TOKEN_SELECTED) : setAria($, TOKEN_SELECTED, true);
+            getAria($, TOKEN_PRESSED) ? letAria($, TOKEN_PRESSED) : setAria($, TOKEN_PRESSED, true);
         } else {
-            setAria($, TOKEN_SELECTED, true);
+            setAria($, TOKEN_PRESSED, true);
         }
     } else {
         if (KEY_ARROW_LEFT === key) {
@@ -320,7 +346,7 @@ function onKeyDownTag(e) {
             tagPrev = getPrev($);
             letValueInMap(getTagValue($), _tags);
             forEachMap(_tags, v => {
-                if (getAria(v[2], TOKEN_SELECTED)) {
+                if (getAria(v[2], TOKEN_PRESSED)) {
                     tagPrev = getPrev(v[2]);
                     letValueInMap(getTagValue(v[2]), _tags);
                 }
@@ -331,7 +357,7 @@ function onKeyDownTag(e) {
             tagNext = getNext($);
             letValueInMap(getTagValue($), _tags);
             forEachMap(_tags, v => {
-                if (getAria(v[2], TOKEN_SELECTED)) {
+                if (getAria(v[2], TOKEN_PRESSED)) {
                     tagNext = getNext(v[2]);
                     letValueInMap(getTagValue(v[2]), _tags);
                 }
@@ -339,14 +365,14 @@ function onKeyDownTag(e) {
             focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker[TOKEN_VALUE]]);
         } else if (KEY_ENTER === key || ' ' === key) {
             exit = true;
-            getAria($, TOKEN_SELECTED) ? letAria($, TOKEN_SELECTED) : setAria($, TOKEN_SELECTED, true);
+            getAria($, TOKEN_PRESSED) ? letAria($, TOKEN_PRESSED) : setAria($, TOKEN_PRESSED, true);
         } else if (KEY_ESCAPE === key || KEY_TAB === key) {
             exit = true;
             selectToNone(), focusTo(picker);
         // Any type-able key
         } else if (1 === toCount(key)) {
             forEachMap(_tags, v => {
-                if (getAria(v[2], TOKEN_SELECTED)) {
+                if (getAria(v[2], TOKEN_PRESSED)) {
                     letValueInMap(getTagValue(v[2]), _tags);
                 }
             });
@@ -370,8 +396,7 @@ function onKeyDownTextInput(e) {
         }
         return offEventDefault(e);
     }
-    let {_mask, _tags, state} = picker,
-        {hint} = _mask,
+    let {_tags, state} = picker,
         {escape} = state, exit, v;
     if (
         (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape))) ||
@@ -381,7 +406,7 @@ function onKeyDownTextInput(e) {
         setValueInMap(toValue(v = getText($)), v, _tags);
         return (focusTo(picker).text = ""), offEventDefault(e);
     }
-    delay(() => getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY))[0](1);
+    toggleHint(1, picker);
     let caretIsToTheFirst = "" === getCharBeforeCaret($),
         tagFirst, tagLast,
         textIsVoid = !getText($, 0);
@@ -395,13 +420,13 @@ function onKeyDownTextInput(e) {
                 exit = true;
                 selectToNone();
                 tagLast = toValueLastFromMap(_tags);
-                tagLast && focusTo(tagLast[2]) && setAria(tagLast[2], TOKEN_SELECTED, true);
+                tagLast && focusTo(tagLast[2]) && setAria(tagLast[2], TOKEN_PRESSED, true);
             }
         }
     } else if (keyIsCtrl) {
         if (KEY_A === key && textIsVoid && _tags.count()) {
             exit = true;
-            forEachMap(_tags, v => (setAria(v[2], TOKEN_SELECTED, true), focusTo(v[2]), selectTo(v[2])));
+            forEachMap(_tags, v => (setAria(v[2], TOKEN_PRESSED, true), focusTo(v[2]), selectTo(v[2])));
         } else if (KEY_ARROW_LEFT === key) {
             exit = true;
             tagLast = toValueLastFromMap(_tags);
@@ -452,14 +477,14 @@ function onKeyUpTag(e) {
         picker = getReference($),
         {_tags} = picker, selected = 0;
     forEachMap(_tags, v => {
-        if (getAria(v[2], TOKEN_SELECTED)) {
+        if (getAria(v[2], TOKEN_PRESSED)) {
             ++selected;
         }
     });
     _keyIsCtrl = e.ctrlKey;
     _keyIsShift = e.shiftKey;
     if (selected < 2 && !_keyIsCtrl && !_keyIsShift && KEY_ENTER !== key && ' ' !== key) {
-        letAria($, TOKEN_SELECTED);
+        letAria($, TOKEN_PRESSED);
     }
 }
 
@@ -479,7 +504,7 @@ function onPasteTag(e) {
             setValueInMap(v, v, _tags);
         }
     });
-    forEachMap(_tags, v => letAria(v[2], TOKEN_SELECTED));
+    forEachMap(_tags, v => letAria(v[2], TOKEN_PRESSED));
     focusTo(picker.fire('change', [picker[TOKEN_VALUE]]));
 }
 
@@ -487,11 +512,9 @@ function onPasteTextInput(e) {
     offEventDefault(e);
     let $ = this,
         picker = getReference($),
-        {_mask, _tags, self, state} = picker,
-        {hint} = _mask,
+        {_tags, self, state} = picker,
         {join} = state, v;
-    delay(() => getText($, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY))[0](1);
-    insertAtSelection($, v = e.clipboardData.getData('text/plain'));
+    toggleHint(1, picker), insertAtSelection($, v = e.clipboardData.getData('text/plain'));
     if (v !== getText($)) {} else {
         forEachArray((getText($) + "").split(join), v => {
             if (!hasKeyInMap(v = toValue(v.trim()), _tags)) {
@@ -501,7 +524,7 @@ function onPasteTextInput(e) {
                 picker.fire('has.tag', [toValue(v)]);
             }
         });
-        forEachMap(_tags, v => letAria(v[2], TOKEN_SELECTED));
+        forEachMap(_tags, v => letAria(v[2], TOKEN_PRESSED));
         picker.fire('change', [picker[TOKEN_VALUE]]).text = "";
     }
 }
@@ -533,23 +556,23 @@ function onPointerDownTag(e) {
         {_tags} = picker;
     focusTo($), selectTo($);
     if (!_keyIsCtrl) {
-        forEachMap(_tags, v => letAria(v[2], TOKEN_SELECTED));
+        forEachMap(_tags, v => letAria(v[2], TOKEN_PRESSED));
     }
     if (_keyIsCtrl) {
-        setAria($, TOKEN_SELECTED, true);
+        setAria($, TOKEN_PRESSED, true);
     } else if (_keyIsShift && _keyOverTag) {
         let tagEndIndex = getElementIndex($),
             tagStartIndex = getElementIndex(_keyOverTag),
             tagCurrent = _keyOverTag, tagNext, tagPrev;
-        setAria($, TOKEN_SELECTED, true);
-        setAria(_keyOverTag, TOKEN_SELECTED, true);
+        setAria($, TOKEN_PRESSED, true);
+        setAria(_keyOverTag, TOKEN_PRESSED, true);
         // Select to the right
         if (tagEndIndex > tagStartIndex) {
             while (tagNext = getNext(tagCurrent)) {
                 if ($ === tagNext) {
                     break;
                 }
-                setAria(tagCurrent = tagNext, TOKEN_SELECTED, true);
+                setAria(tagCurrent = tagNext, TOKEN_PRESSED, true);
             }
         // Select to the left
         } else if (tagEndIndex < tagStartIndex) {
@@ -557,7 +580,7 @@ function onPointerDownTag(e) {
                 if ($ === tagPrev) {
                     break;
                 }
-                setAria(tagCurrent = tagPrev, TOKEN_SELECTED, true);
+                setAria(tagCurrent = tagPrev, TOKEN_PRESSED, true);
             }
         }
     }
@@ -866,6 +889,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
             setID(form);
             setReference(form, $);
         }
+        onEvent(EVENT_BLUR, textInput, onBlurTextInput);
         onEvent(EVENT_CUT, textInput, onCutTextInput);
         onEvent(EVENT_FOCUS, self, onFocusSelf);
         onEvent(EVENT_FOCUS, textInput, onFocusTextInput);
@@ -944,6 +968,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
             offEvent(EVENT_RESET, form, onResetForm);
             offEvent(EVENT_SUBMIT, form, onSubmitForm);
         }
+        offEvent(EVENT_BLUR, input, onBlurTextInput);
         offEvent(EVENT_CUT, input, onCutTextInput);
         offEvent(EVENT_FOCUS, input, onFocusTextInput);
         offEvent(EVENT_FOCUS, self, onFocusSelf);
@@ -1083,13 +1108,27 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         }
         // `picker.tags.set('asdf')`
         if (!isSet(value)) {
-            value = [key, {}];
+            value = [key, {
+                active: true,
+                mark: false
+            }];
         // `picker.tags.set('asdf', 'asdf')`
         } else if (isFloat(value) || isInteger(value) || isString(value)) {
-            value = [value, {}];
+            value = [value, {
+                active: true,
+                mark: false
+            }];
         // `picker.tags.set('asdf', [ … ])`
         } else {}
-        let {value: v} = value[1];
+        // All tag(s) act as selected option(s) that complement the mask root. The mask root functions as a `listbox`
+        // with active `aria-multiselectable` attribute. For visually impaired user(s), this element should be described
+        // as a multiple selection control with all option(s) selected. There is no point in having a way to disable a
+        // tag to exclude it from the selection. The best strategy is to simply remove the tag. That’s why the `active`
+        // option is always `true` and every tag has an active `aria-selected` attribute.
+        value[1].active = value[1].active ?? true;
+        // This `mark` option is used to determine the state of the `aria-pressed` attribute.
+        value[1].mark = value[1].mark ?? false;
+        let {mark, value: v} = value[1];
         if (null === key || "" === (v = fromValue(v || key).trim()) || (isString(pattern) && !toPattern(pattern).test(v))) {
             onInvalidSelf.call(self);
             return (_fireHook && of.fire('not.tag', [key])), false;
@@ -1108,6 +1147,10 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
             return (_fireHook && of.fire('has.tag', [key])), false;
         }
         tag = value[2] || setElement('data', {
+            'aria': {
+                'pressed': mark ? TOKEN_TRUE : false,
+                'selected': TOKEN_TRUE
+            },
             'class': n + '__tag',
             // Make the tag “content editable”, so that the “Cut” option is available in the context menu, but do not
             // allow user(s) to edit the tag text. We just want to make sure that the “Cut” option is available.
