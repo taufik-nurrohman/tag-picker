@@ -71,9 +71,15 @@ const setError = function (picker) {
 
 const [toggleHint] = delay(function (picker) {
     let {_mask} = picker,
-        {hint, input} = _mask;
-    getText(input, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
+        {input} = _mask;
+    toggleHintByValue(picker, getText(input, 0));
 });
+
+const toggleHintByValue = function (picker, value) {
+    let {_mask} = picker,
+        {hint} = _mask;
+    value ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
+};
 
 const name = 'TagPicker';
 
@@ -237,15 +243,14 @@ function onInputTextInput(e) {
     if (!_active) {
         return offEventDefault(e);
     }
-    let {_mask, state} = picker,
-        {hint} = _mask,
+    let {state} = picker,
         {pattern} = state,
         {inputType} = e,
         v = getText($, 0);
     if ('deleteContent' === inputType.slice(0, 13) && !v) {
-        letStyle(hint, TOKEN_VISIBILITY);
+        toggleHintByValue(picker, 0);
     } else if ('insertText' === inputType) {
-        setStyle(hint, TOKEN_VISIBILITY, 'hidden');
+        toggleHintByValue(picker, 1);
     }
     if (isString(pattern) && !toPattern(pattern).test(v)) {
         letErrorAbort(), setError(picker);
@@ -390,15 +395,15 @@ function onKeyDownTextInput(e) {
         keyIsCtrl = _keyIsCtrl = e.ctrlKey,
         keyIsShift = _keyIsShift = e.shiftKey,
         picker = getReference($),
-        {_active, _fix, self} = picker, form, submit;
+        {_active, _fix} = picker;
     if (!_active) {
         if (_fix && KEY_TAB === key) {
             return selectToNone();
         }
         return offEventDefault(e);
     }
-    let {_tags, state} = picker,
-        {escape} = state, exit, v;
+    let {_tags, self, state} = picker,
+        {escape} = state, exit, form, submit, v;
     if (
         (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape))) ||
         (KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape))) ||
@@ -759,13 +764,13 @@ setObjectAttributes(TagPicker, {
         },
         set: function (value) {
             let $ = this,
-                {_active, _mask} = $,
-                {hint, input} = _mask, v;
+                {_active} = $;
             if (!_active) {
                 return $;
             }
-            setText(input, v = fromValue(value));
-            return (v ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY)), $;
+            let {_mask} = $,
+                {input} = _mask, v;
+            return setText(input, v = fromValue(value)), toggleHintByValue($, v), $;
         }
     },
     value: {

@@ -897,12 +897,16 @@
     };
     var _delay3 = delay(function (picker) {
             var _mask = picker._mask,
-                hint = _mask.hint,
                 input = _mask.input;
-            getText(input, 0) ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
+            toggleHintByValue(picker, getText(input, 0));
         }),
         _delay4 = _maybeArrayLike(_slicedToArray, _delay3, 1),
         toggleHint = _delay4[0];
+    var toggleHintByValue = function toggleHintByValue(picker, value) {
+        var _mask = picker._mask,
+            hint = _mask.hint;
+        value ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY);
+    };
     var name = 'TagPicker';
     var _keyIsCtrl, _keyIsShift, _keyOverTag;
 
@@ -1071,16 +1075,14 @@
         if (!_active) {
             return offEventDefault(e);
         }
-        var _mask = picker._mask,
-            state = picker.state,
-            hint = _mask.hint,
+        var state = picker.state,
             pattern = state.pattern,
             inputType = e.inputType,
             v = getText($, 0);
         if ('deleteContent' === inputType.slice(0, 13) && !v) {
-            letStyle(hint, TOKEN_VISIBILITY);
+            toggleHintByValue(picker, 0);
         } else if ('insertText' === inputType) {
-            setStyle(hint, TOKEN_VISIBILITY, 'hidden');
+            toggleHintByValue(picker, 1);
         }
         if (isString(pattern) && !toPattern(pattern).test(v)) {
             letErrorAbort(), setError(picker);
@@ -1233,10 +1235,7 @@
             keyIsShift = _keyIsShift = e.shiftKey,
             picker = getReference($),
             _active = picker._active,
-            _fix = picker._fix,
-            self = picker.self,
-            form,
-            submit;
+            _fix = picker._fix;
         if (!_active) {
             if (_fix && KEY_TAB === key) {
                 return selectToNone();
@@ -1244,9 +1243,12 @@
             return offEventDefault(e);
         }
         var _tags = picker._tags,
+            self = picker.self,
             state = picker.state,
             escape = state.escape,
             exit,
+            form,
+            submit,
             v;
         if (KEY_ENTER === key && (hasValue('\n', escape) || hasValue(13, escape)) || KEY_TAB === key && (hasValue('\t', escape) || hasValue(9, escape)) || hasValue(key, escape) || hasValue(keyCode, escape)) {
             setValueInMap(_toValue(v = getText($)), v, _tags);
@@ -1528,7 +1530,7 @@
         },
         'with': []
     };
-    TagPicker.version = '4.2.2';
+    TagPicker.version = '4.2.3';
     setObjectAttributes(TagPicker, {
         name: {
             value: name
@@ -1625,16 +1627,14 @@
             },
             set: function set(value) {
                 var $ = this,
-                    _active = $._active,
-                    _mask = $._mask,
-                    hint = _mask.hint,
-                    input = _mask.input,
-                    v;
+                    _active = $._active;
                 if (!_active) {
                     return $;
                 }
-                setText(input, v = _fromValue(value));
-                return v ? setStyle(hint, TOKEN_VISIBILITY, 'hidden') : letStyle(hint, TOKEN_VISIBILITY), $;
+                var _mask = $._mask,
+                    input = _mask.input,
+                    v;
+                return setText(input, v = _fromValue(value)), toggleHintByValue($, v), $;
             }
         },
         value: {
