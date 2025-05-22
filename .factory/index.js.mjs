@@ -2,7 +2,7 @@ import {/* focusTo, */getCharBeforeCaret, insertAtSelection, selectTo, selectToN
 import {delay} from '@taufik-nurrohman/tick';
 import {forEachArray, forEachMap, forEachObject, getPrototype, getReference, getValueInMap, hasKeyInMap, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap, toValueFirstFromMap, toValueLastFromMap} from '@taufik-nurrohman/f';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
-import {getAria, getElement, getElementIndex, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letAttribute, letClass, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setDatum, setElement, setID, setNext, setPrev, setStyle, setText, setValue} from '@taufik-nurrohman/document';
+import {D, getAria, getElement, getElementIndex, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letAttribute, letClass, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setDatum, setElement, setID, setNext, setPrev, setStyle, setText, setValue} from '@taufik-nurrohman/document';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isFloat, isFunction, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
@@ -175,10 +175,12 @@ function onBlurTag() {
 function onBlurTextInput() {
     let $ = this,
         picker = getReference($),
-        {state} = picker,
+        {mask, state} = picker,
         {time} = state,
         {error} = time;
     letError(isInteger(error) && error > 0 ? error : 0, picker);
+    onEvent(EVENT_MOUSE_DOWN, mask, onPointerDownMask);
+    onEvent(EVENT_TOUCH_START, mask, onPointerDownMask);
 }
 
 function onCopyTag(e) {
@@ -229,13 +231,15 @@ function onFocusTag() {
 function onFocusTextInput() {
     let $ = this,
         picker = getReference($),
-        {state} = picker,
+        {mask, state} = picker,
         {pattern} = state,
         value = getText($);
     if (value && isString(pattern) && !toPattern(pattern).test(value)) {
         letErrorAbort(), setError(picker);
     }
     selectTo($);
+    offEvent(EVENT_MOUSE_DOWN, mask, onPointerDownMask);
+    offEvent(EVENT_TOUCH_START, mask, onPointerDownMask);
 }
 
 // Better mobile support
@@ -1013,8 +1017,11 @@ TagPicker._ = setObjectMethods(TagPicker, {
     },
     focus: function (mode) {
         let $ = this,
-            {_mask} = $,
+            {_active, _fix, _mask} = $,
             {input} = _mask;
+        if (!_active && !_fix) {
+            return $;
+        }
         return focusTo(input), selectTo(input, mode), $;
     },
     reset: function (focus, mode) {

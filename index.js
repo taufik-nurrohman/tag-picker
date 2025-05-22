@@ -1011,10 +1011,13 @@
     function onBlurTextInput() {
         var $ = this,
             picker = getReference($),
+            mask = picker.mask,
             state = picker.state,
             time = state.time,
             error = time.error;
         letError(isInteger(error) && error > 0 ? error : 0, picker);
+        onEvent(EVENT_MOUSE_DOWN, mask, onPointerDownMask);
+        onEvent(EVENT_TOUCH_START, mask, onPointerDownMask);
     }
 
     function onCopyTag(e) {
@@ -1066,6 +1069,7 @@
     function onFocusTextInput() {
         var $ = this,
             picker = getReference($),
+            mask = picker.mask,
             state = picker.state,
             pattern = state.pattern,
             value = getText($);
@@ -1073,6 +1077,8 @@
             letErrorAbort(), setError(picker);
         }
         selectTo($);
+        offEvent(EVENT_MOUSE_DOWN, mask, onPointerDownMask);
+        offEvent(EVENT_TOUCH_START, mask, onPointerDownMask);
     }
     // Better mobile support
     function onInputTextInput(e) {
@@ -1899,8 +1905,13 @@
         },
         focus: function focus(mode) {
             var $ = this,
+                _active = $._active,
+                _fix = $._fix,
                 _mask = $._mask,
                 input = _mask.input;
+            if (!_active && !_fix) {
+                return $;
+            }
             return focusTo(input), selectTo(input, mode), $;
         },
         reset: function reset(focus, mode) {
