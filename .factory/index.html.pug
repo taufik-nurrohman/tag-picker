@@ -371,6 +371,14 @@ block content
       | }
       |
       | picker.on('change', onChange);
+    h4#instance-method-reset
+      a(aria-hidden='true' href='#instance-method-reset') #
+      = ' '
+      code picker.reset(focus, mode = true)
+    p Resets the tag picker’s value to its initial value.
+    pre: code
+      | picker.reset(); // Reset the tag picker’s value
+      | picker.reset(true); // Reset the tag picker’s value and focus to the tag picker’s input
     h3#static-methods
       a(aria-hidden='true' href='#static-methods') #
       = ' Static Methods'
