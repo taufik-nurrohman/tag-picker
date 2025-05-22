@@ -118,7 +118,7 @@
         return null === x;
     };
     var isNumber = function isNumber(x) {
-        return 'number' === typeof x;
+        return 'number' === typeof x && !Number.isNaN(x);
     };
     var isNumeric = function isNumeric(x) {
         return /^[+-]?(?:\d*\.)?\d+$/.test(x + "");
