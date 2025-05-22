@@ -2,7 +2,7 @@ import {/* focusTo, */getCharBeforeCaret, insertAtSelection, selectTo, selectToN
 import {delay} from '@taufik-nurrohman/tick';
 import {forEachArray, forEachMap, forEachObject, getPrototype, getReference, getValueInMap, hasKeyInMap, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap, toValueFirstFromMap, toValueLastFromMap} from '@taufik-nurrohman/f';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
-import {D, getAria, getElement, getElementIndex, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letAttribute, letClass, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setDatum, setElement, setID, setNext, setPrev, setStyle, setText, setValue} from '@taufik-nurrohman/document';
+import {getAria, getElement, getElementIndex, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letAttribute, letClass, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setDatum, setElement, setID, setNext, setPrev, setStyle, setText, setValue} from '@taufik-nurrohman/document';
 import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isFloat, isFunction, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
