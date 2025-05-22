@@ -113,7 +113,7 @@ $name: 'tag-picker';
       flex: 1;
       position: relative;
       z-index: 1;
-      // Ensure height even when tag(s) is empty
+      // Ensure height even when it is empty
       &::after {
         content: '\200c';
       }
