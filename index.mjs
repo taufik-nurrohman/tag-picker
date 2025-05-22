@@ -194,6 +194,9 @@ function onCopyTag(e) {
         }
     });
     e.clipboardData.setData('text/plain', selected.join(join));
+    if (toCount(selected) < 2) {
+        letAria($, TOKEN_PRESSED);
+    }
 }
 
 function onCutTag(e) {
@@ -1080,10 +1083,6 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         forEachMap(values, (v, k) => tagsValues.push(fromValue(k)));
         setValue(self, tagsValues = tagsValues.join(join));
         return (_fireHook && of.fire('let.tag', [key]).fire('change', ["" !== tagsValues ? tagsValues : null])), r;
-    },
-    // To be used by the `forEachMap()` function
-    entries: function () {
-        return this.values.entries();
     },
     get: function (key) {
         let $ = this,
