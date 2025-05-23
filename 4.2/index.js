@@ -1035,7 +1035,7 @@
             }
         });
         e.clipboardData.setData('text/plain', selected.join(join));
-        if (toCount(selected) < 2) {
+        if (EVENT_CUT !== e.type && toCount(selected) < 2) {
             letAria($, TOKEN_PRESSED);
         }
     }
@@ -1247,13 +1247,9 @@
             keyIsCtrl = _keyIsCtrl = e.ctrlKey,
             keyIsShift = _keyIsShift = e.shiftKey,
             picker = getReference($),
-            _active = picker._active,
-            _fix = picker._fix;
+            _active = picker._active;
         if (!_active) {
-            if (_fix && KEY_TAB === key) {
-                return selectToNone();
-            }
-            return offEventDefault(e);
+            return;
         }
         var _tags = picker._tags,
             self = picker.self,
@@ -1543,7 +1539,7 @@
         },
         'with': []
     };
-    TagPicker.version = '4.2.3';
+    TagPicker.version = '4.2.4';
     setObjectAttributes(TagPicker, {
         name: {
             value: name
@@ -1557,6 +1553,7 @@
             set: function set(value) {
                 var $ = this,
                     _mask = $._mask,
+                    _tags = $._tags,
                     mask = $.mask,
                     self = $.self,
                     input = _mask.input,
@@ -1566,10 +1563,18 @@
                     letAria(input, TOKEN_DISABLED);
                     letAria(mask, TOKEN_DISABLED);
                     setAttribute(input, TOKEN_CONTENTEDITABLE, "");
+                    forEachMap(_tags, function (v) {
+                        setAttribute(v[2], TOKEN_CONTENTEDITABLE, "");
+                        setAttribute(v[2], TOKEN_TABINDEX, -1);
+                    });
                 } else {
                     letAttribute(input, TOKEN_CONTENTEDITABLE);
                     setAria(input, TOKEN_DISABLED, true);
                     setAria(mask, TOKEN_DISABLED, true);
+                    forEachMap(_tags, function (v) {
+                        letAttribute(v[2], TOKEN_CONTENTEDITABLE);
+                        letAttribute(v[2], TOKEN_TABINDEX);
+                    });
                 }
                 return $;
             }
@@ -1581,6 +1586,7 @@
             set: function set(value) {
                 var $ = this,
                     _mask = $._mask,
+                    _tags = $._tags,
                     mask = $.mask,
                     self = $.self,
                     input = _mask.input,
@@ -1591,11 +1597,19 @@
                     setAria(input, TOKEN_READONLY, true);
                     setAria(mask, TOKEN_READONLY, true);
                     setAttribute(input, TOKEN_TABINDEX, 0);
+                    forEachMap(_tags, function (v) {
+                        letAttribute(v[2], TOKEN_CONTENTEDITABLE);
+                        letAttribute(v[2], TOKEN_TABINDEX);
+                    });
                 } else {
                     letAria(input, TOKEN_READONLY);
                     letAria(mask, TOKEN_READONLY);
                     letAttribute(input, TOKEN_TABINDEX);
                     setAttribute(input, TOKEN_CONTENTEDITABLE, "");
+                    forEachMap(_tags, function (v) {
+                        setAttribute(v[2], TOKEN_CONTENTEDITABLE, "");
+                        setAttribute(v[2], TOKEN_TABINDEX, -1);
+                    });
                 }
                 return $;
             }
@@ -1813,8 +1827,9 @@
             // Re-assign some state value(s) using the setter to either normalize or reject the initial value
             $.max = max = Infinity === max || isInteger(max) && max >= 0 ? max : Infinity;
             $.min = min = isInteger(min) && min >= 0 ? min : 0;
-            var _active = $._active,
-                _state2 = state,
+            var _active = $._active;
+            $._tags;
+            var _state2 = state,
                 join = _state2.join,
                 tagsValues;
             // Force the `this._active` value to `true` to set the initial value
@@ -2030,7 +2045,8 @@
             if (!_active) {
                 return false;
             }
-            var _mask = of._mask,
+            var _fix = of._fix,
+                _mask = of._mask,
                 max = of.max,
                 self = of.self,
                 state = of.state,
@@ -2110,6 +2126,11 @@
                 // <https://www.w3.org/TR/virtual-keyboard#dom-elementcontenteditable-virtualkeyboardpolicy>
                 'virtualkeyboardpolicy': 'manual'
             });
+            // Disable focus on “read-only” tag picker
+            if (_fix) {
+                letAttribute(tag, TOKEN_CONTENTEDITABLE);
+                letAttribute(tag, TOKEN_TABINDEX);
+            }
             tagText = value[2] ? getElement('.' + n + '__v', value[2]) : setElement('span', _fromValue(value[0]), {
                 'class': n + '__v',
                 'role': 'none'
