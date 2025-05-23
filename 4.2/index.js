@@ -1011,10 +1011,13 @@
     function onBlurTextInput() {
         var $ = this,
             picker = getReference($),
+            mask = picker.mask,
             state = picker.state,
             time = state.time,
             error = time.error;
         letError(isInteger(error) && error > 0 ? error : 0, picker);
+        onEvent(EVENT_MOUSE_DOWN, mask, onPointerDownMask);
+        onEvent(EVENT_TOUCH_START, mask, onPointerDownMask);
     }
 
     function onCopyTag(e) {
@@ -1066,6 +1069,7 @@
     function onFocusTextInput() {
         var $ = this,
             picker = getReference($),
+            mask = picker.mask,
             state = picker.state,
             pattern = state.pattern,
             value = getText($);
@@ -1073,6 +1077,8 @@
             letErrorAbort(), setError(picker);
         }
         selectTo($);
+        offEvent(EVENT_MOUSE_DOWN, mask, onPointerDownMask);
+        offEvent(EVENT_TOUCH_START, mask, onPointerDownMask);
     }
     // Better mobile support
     function onInputTextInput(e) {
@@ -1651,15 +1657,22 @@
             },
             set: function set(value) {
                 var $ = this,
-                    _tags = $._tags,
+                    _active = $._active,
+                    _fix = $._fix;
+                if (!_active && !_fix) {
+                    return $;
+                }
+                var _tags = $._tags,
                     state = $.state,
                     join = state.join;
+                $._active = true;
                 $[TOKEN_VALUE] && forEachArray($[TOKEN_VALUE].split(join), function (v) {
                     return letValueInMap(v, _tags);
                 });
                 value && forEachArray(value.split(join), function (v) {
                     return setValueInMap(v, v, _tags);
                 });
+                $._active = _active;
                 return $.fire('change', [$[TOKEN_VALUE]]);
             }
         },
@@ -1702,7 +1715,6 @@
             }
             state = _fromStates({}, $.state, state || {});
             $._tags = new TagPickerTags($);
-            $._value = null;
             $.self = self;
             $.state = state;
             var _state = state,
@@ -1809,7 +1821,7 @@
             $._active = true;
             // Attach the current tag(s)
             tagsValues = createTags($, theInputValue ? theInputValue.split(join) : []);
-            $._value = tagsValues.join(join);
+            $['_' + TOKEN_VALUE] = tagsValues.join(join);
             // After the initial value has been set, restore the previous `this._active` value
             $._active = _active;
             // Force `id` attribute(s)
@@ -1824,7 +1836,7 @@
             if (isSet(state) && isArray(state.with)) {
                 forEachArray(state.with, function (v, k) {
                     if (isString(v)) {
-                        v = OptionPicker[v];
+                        v = TagPicker[v];
                     }
                     // `const Extension = function (self, state = {}) {}`
                     if (isFunction(v)) {
@@ -1858,7 +1870,7 @@
             var form = getParentForm(self);
             $._active = false;
             $._tags = new TagPickerTags($);
-            $._value = null;
+            $['_' + TOKEN_VALUE] = null;
             if (form) {
                 offEvent(EVENT_RESET, form, onResetForm);
                 offEvent(EVENT_SUBMIT, form, onSubmitForm);
@@ -1899,17 +1911,25 @@
         },
         focus: function focus(mode) {
             var $ = this,
-                _mask = $._mask,
+                _active = $._active,
+                _fix = $._fix;
+            if (!_active && !_fix) {
+                return $;
+            }
+            var _mask = $._mask,
                 input = _mask.input;
             return focusTo(input), selectTo(input, mode), $;
         },
         reset: function reset(focus, mode) {
             var $ = this,
-                _active = $._active;
-            if (!_active) {
+                _active = $._active,
+                _fix = $._fix;
+            if (!_active && !_fix) {
                 return $;
             }
-            $[TOKEN_VALUE] = $._value;
+            $._active = true;
+            $[TOKEN_VALUE] = $['_' + TOKEN_VALUE];
+            $._active = _active;
             return focus ? $.focus(mode) : $;
         }
     });

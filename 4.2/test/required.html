@@ -17,12 +17,15 @@
       <form method="get" target="_blank">
         <p><input name="test" required type="text"></p>
         <p><label><input checked onchange="picker.vital = this.checked;" type="checkbox"> <span>Required</span></label></p>
-        <p><button type="submit">Submit</button> <button onclick="picker.tags.set('a'), picker.focus();" type="button">Add &ldquo;a&rdquo; Tag</button></p>
+        <p><button type="submit">Submit</button> <button type="reset">Reset</button> <button onclick="picker.tags.set('a'), picker.focus();" type="button">Add &ldquo;a&rdquo; Tag</button></p>
       </form>
     </main>
     <script src="../index.min.js"></script>
     <script>
       const picker = new TagPicker(document.querySelector('input'));
+      picker.self.form.addEventListener('reset', function () {
+          setTimeout(() => picker.vital = document.querySelector('input[type=checkbox]').checked, 1);
+      });
       picker.vital = document.querySelector('input[type=checkbox]').checked;
       picker.on('min.tags', function (count, min) {
           alert('The minimum number of tags that must be inserted to be able to submit the form is ' + min + '.');

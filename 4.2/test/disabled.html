@@ -14,15 +14,18 @@
   </head>
   <body>
     <main>
-      <form method="get">
+      <form method="get" target="_blank">
         <p><input disabled name="test" type="text" value="a, b"></p>
         <p><label><input onchange="picker.active = this.checked;" type="checkbox"> <span>Enable</span></label></p>
-        <p><button type="submit">Submit</button> <button onclick="picker.tags.set('c'), picker.focus();" type="button">Add &ldquo;c&rdquo; Tag</button></p>
+        <p><button type="submit">Submit</button> <button type="reset">Reset</button> <button onclick="picker.tags.set('c'), picker.focus();" type="button">Add &ldquo;c&rdquo; Tag</button></p>
       </form>
     </main>
     <script src="../index.min.js"></script>
     <script>
       const picker = new TagPicker(document.querySelector('input'));
+      picker.self.form.addEventListener('reset', function () {
+          setTimeout(() => picker.active = document.querySelector('input[type=checkbox]').checked, 1);
+      });
       picker.active = document.querySelector('input[type=checkbox]').checked;
     </script>
   </body>
