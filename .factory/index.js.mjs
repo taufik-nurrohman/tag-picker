@@ -196,7 +196,7 @@ function onCopyTag(e) {
         }
     });
     e.clipboardData.setData('text/plain', selected.join(join));
-    if (toCount(selected) < 2) {
+    if (EVENT_CUT !== e.type && toCount(selected) < 2) {
         letAria($, TOKEN_PRESSED);
     }
 }
@@ -402,12 +402,9 @@ function onKeyDownTextInput(e) {
         keyIsCtrl = _keyIsCtrl = e.ctrlKey,
         keyIsShift = _keyIsShift = e.shiftKey,
         picker = getReference($),
-        {_active, _fix} = picker;
+        {_active} = picker;
     if (!_active) {
-        if (_fix && KEY_TAB === key) {
-            return selectToNone();
-        }
-        return offEventDefault(e);
+        return;
     }
     let {_tags, self, state} = picker,
         {escape} = state, exit, form, submit, v;
@@ -694,7 +691,7 @@ setObjectAttributes(TagPicker, {
         },
         set: function (value) {
             let $ = this,
-                {_mask, mask, self} = $,
+                {_mask, _tags, mask, self} = $,
                 {input} = _mask,
                 v = !!value;
             self[TOKEN_DISABLED] = !($._active = v);
@@ -702,10 +699,18 @@ setObjectAttributes(TagPicker, {
                 letAria(input, TOKEN_DISABLED);
                 letAria(mask, TOKEN_DISABLED);
                 setAttribute(input, TOKEN_CONTENTEDITABLE, "");
+                forEachMap(_tags, v => {
+                    setAttribute(v[2], TOKEN_CONTENTEDITABLE, "");
+                    setAttribute(v[2], TOKEN_TABINDEX, -1);
+                });
             } else {
                 letAttribute(input, TOKEN_CONTENTEDITABLE);
                 setAria(input, TOKEN_DISABLED, true);
                 setAria(mask, TOKEN_DISABLED, true);
+                forEachMap(_tags, v => {
+                    letAttribute(v[2], TOKEN_CONTENTEDITABLE);
+                    letAttribute(v[2], TOKEN_TABINDEX);
+                });
             }
             return $;
         }
@@ -716,7 +721,7 @@ setObjectAttributes(TagPicker, {
         },
         set: function (value) {
             let $ = this,
-                {_mask, mask, self} = $,
+                {_mask, _tags, mask, self} = $,
                 {input} = _mask,
                 v = !!value;
             $._active = !($._fix = self[TOKEN_READ_ONLY] = v);
@@ -725,11 +730,19 @@ setObjectAttributes(TagPicker, {
                 setAria(input, TOKEN_READONLY, true);
                 setAria(mask, TOKEN_READONLY, true);
                 setAttribute(input, TOKEN_TABINDEX, 0);
+                forEachMap(_tags, v => {
+                    letAttribute(v[2], TOKEN_CONTENTEDITABLE);
+                    letAttribute(v[2], TOKEN_TABINDEX);
+                });
             } else {
                 letAria(input, TOKEN_READONLY);
                 letAria(mask, TOKEN_READONLY);
                 letAttribute(input, TOKEN_TABINDEX);
                 setAttribute(input, TOKEN_CONTENTEDITABLE, "");
+                forEachMap(_tags, v => {
+                    setAttribute(v[2], TOKEN_CONTENTEDITABLE, "");
+                    setAttribute(v[2], TOKEN_TABINDEX, -1);
+                });
             }
             return $;
         }
@@ -932,7 +945,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
         // Re-assign some state value(s) using the setter to either normalize or reject the initial value
         $.max = max = Infinity === max || (isInteger(max) && max >= 0) ? max : Infinity;
         $.min = min = isInteger(min) && min >= 0 ? min : 0;
-        let {_active} = $,
+        let {_active, _tags} = $,
             {join} = state, tagsValues;
         // Force the `this._active` value to `true` to set the initial value
         $._active = true;
@@ -1118,7 +1131,7 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
         if (!_active) {
             return false;
         }
-        let {_mask, max, self, state} = of,
+        let {_fix, _mask, max, self, state} = of,
             {text} = _mask,
             {join, n, pattern} = state,
             count, r, tag, tagText, tagX, tagsValues = [];
@@ -1185,6 +1198,11 @@ TagPickerTags._ = setObjectMethods(TagPickerTags, {
             // <https://www.w3.org/TR/virtual-keyboard#dom-elementcontenteditable-virtualkeyboardpolicy>
             'virtualkeyboardpolicy': 'manual'
         });
+        // Disable focus on “read-only” tag picker
+        if (_fix) {
+            letAttribute(tag, TOKEN_CONTENTEDITABLE);
+            letAttribute(tag, TOKEN_TABINDEX);
+        }
         tagText = value[2] ? getElement('.' + n + '__v', value[2]) : setElement('span', fromValue(value[0]), {
             'class': n + '__v',
             'role': 'none'
