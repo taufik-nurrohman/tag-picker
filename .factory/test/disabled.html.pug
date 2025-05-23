@@ -19,7 +19,7 @@ block style
 
 block content
   main
-    form(method='get')
+    form(method='get' target='_blank')
       p: input(disabled name='test' type='text' value='a, b')
       p
         label
@@ -28,5 +28,7 @@ block content
           span Enable
       p
         button(type='submit') Submit
+        = ' '
+        button(type='reset') Reset
         = ' '
         button(onclick='picker.tags.set(\'c\'), picker.focus();' type='button') Add &ldquo;c&rdquo; Tag

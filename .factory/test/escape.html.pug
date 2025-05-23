@@ -19,6 +19,7 @@ block style
 
 block content
   main
-    form
+    form(method='get' target='_blank')
       p Disable #[kbd ,], #[kbd Space], #[kbd Tab] and #[kbd Enter] key.
       p: input(name='test' type='text' value='a, b, c')
+      p: button(type='submit') Submit
