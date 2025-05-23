@@ -831,7 +831,6 @@ TagPicker._ = setObjectMethods(TagPicker, {
         }
         state = fromStates({}, $.state, state || {});
         $._tags = new TagPickerTags($);
-        $._value = null;
         $.self = self;
         $.state = state;
         let {max, min, n} = state,
@@ -933,7 +932,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
         $._active = true;
         // Attach the current tag(s)
         tagsValues = createTags($, (theInputValue ? theInputValue.split(join) : []));
-        $._value = tagsValues.join(join);
+        $['_' + TOKEN_VALUE] = tagsValues.join(join);
         // After the initial value has been set, restore the previous `this._active` value
         $._active = _active;
         // Force `id` attribute(s)
@@ -948,7 +947,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
         if (isSet(state) && isArray(state.with)) {
             forEachArray(state.with, (v, k) => {
                 if (isString(v)) {
-                    v = OptionPicker[v];
+                    v = TagPicker[v];
                 }
                 // `const Extension = function (self, state = {}) {}`
                 if (isFunction(v)) {
@@ -976,7 +975,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
         const form = getParentForm(self);
         $._active = false;
         $._tags = new TagPickerTags($);
-        $._value = null;
+        $['_' + TOKEN_VALUE] = null;
         if (form) {
             offEvent(EVENT_RESET, form, onResetForm);
             offEvent(EVENT_SUBMIT, form, onSubmitForm);
@@ -1030,7 +1029,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
         if (!_active) {
             return $;
         }
-        $[TOKEN_VALUE] = $._value;
+        $[TOKEN_VALUE] = $['_' + TOKEN_VALUE];
         return focus ? $.focus(mode) : $;
     }
 });

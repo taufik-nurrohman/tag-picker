@@ -1708,7 +1708,6 @@
             }
             state = _fromStates({}, $.state, state || {});
             $._tags = new TagPickerTags($);
-            $._value = null;
             $.self = self;
             $.state = state;
             var _state = state,
@@ -1815,7 +1814,7 @@
             $._active = true;
             // Attach the current tag(s)
             tagsValues = createTags($, theInputValue ? theInputValue.split(join) : []);
-            $._value = tagsValues.join(join);
+            $['_' + TOKEN_VALUE] = tagsValues.join(join);
             // After the initial value has been set, restore the previous `this._active` value
             $._active = _active;
             // Force `id` attribute(s)
@@ -1830,7 +1829,7 @@
             if (isSet(state) && isArray(state.with)) {
                 forEachArray(state.with, function (v, k) {
                     if (isString(v)) {
-                        v = OptionPicker[v];
+                        v = TagPicker[v];
                     }
                     // `const Extension = function (self, state = {}) {}`
                     if (isFunction(v)) {
@@ -1864,7 +1863,7 @@
             var form = getParentForm(self);
             $._active = false;
             $._tags = new TagPickerTags($);
-            $._value = null;
+            $['_' + TOKEN_VALUE] = null;
             if (form) {
                 offEvent(EVENT_RESET, form, onResetForm);
                 offEvent(EVENT_SUBMIT, form, onSubmitForm);
@@ -1920,7 +1919,7 @@
             if (!_active) {
                 return $;
             }
-            $[TOKEN_VALUE] = $._value;
+            $[TOKEN_VALUE] = $['_' + TOKEN_VALUE];
             return focus ? $.focus(mode) : $;
         }
     });
