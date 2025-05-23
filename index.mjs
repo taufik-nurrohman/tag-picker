@@ -1016,11 +1016,12 @@ TagPicker._ = setObjectMethods(TagPicker, {
     },
     focus: function (mode) {
         let $ = this,
-            {_active, _fix, _mask} = $,
-            {input} = _mask;
+            {_active, _fix} = $;
         if (!_active && !_fix) {
             return $;
         }
+        let {_mask} = $,
+            {input} = _mask;
         return focusTo(input), selectTo(input, mode), $;
     },
     reset: function (focus, mode) {

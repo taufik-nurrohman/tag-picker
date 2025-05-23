@@ -9,6 +9,10 @@ block script
   script
     | const picker = new TagPicker(document.querySelector('input'));
     |
+    | picker.self.form.addEventListener('reset', function () {
+    |     setTimeout(() => picker.fix = document.querySelector('input[type=checkbox]').checked, 1);
+    | });
+    |
     | picker.fix = document.querySelector('input[type=checkbox]').checked;
 
 block style

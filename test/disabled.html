@@ -23,6 +23,9 @@
     <script src="../index.min.js"></script>
     <script>
       const picker = new TagPicker(document.querySelector('input'));
+      picker.self.form.addEventListener('reset', function () {
+          setTimeout(() => picker.active = document.querySelector('input[type=checkbox]').checked, 1);
+      });
       picker.active = document.querySelector('input[type=checkbox]').checked;
     </script>
   </body>

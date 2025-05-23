@@ -1905,12 +1905,12 @@
         focus: function focus(mode) {
             var $ = this,
                 _active = $._active,
-                _fix = $._fix,
-                _mask = $._mask,
-                input = _mask.input;
+                _fix = $._fix;
             if (!_active && !_fix) {
                 return $;
             }
+            var _mask = $._mask,
+                input = _mask.input;
             return focusTo(input), selectTo(input, mode), $;
         },
         reset: function reset(focus, mode) {
