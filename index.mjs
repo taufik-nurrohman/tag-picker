@@ -793,8 +793,10 @@ setObjectAttributes(TagPicker, {
             }
             let {_tags, state} = $,
                 {join} = state;
+            $._active = true;
             $[TOKEN_VALUE] && forEachArray($[TOKEN_VALUE].split(join), v => letValueInMap(v, _tags));
             value && forEachArray(value.split(join), v => setValueInMap(v, v, _tags));
+            $._active = _active;
             return $.fire('change', [$[TOKEN_VALUE]]);
         }
     },
@@ -1034,7 +1036,9 @@ TagPicker._ = setObjectMethods(TagPicker, {
         if (!_active && !_fix) {
             return $;
         }
+        $._active = true;
         $[TOKEN_VALUE] = $['_' + TOKEN_VALUE];
+        $._active = _active;
         return focus ? $.focus(mode) : $;
     }
 });

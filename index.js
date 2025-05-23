@@ -1665,12 +1665,14 @@
                 var _tags = $._tags,
                     state = $.state,
                     join = state.join;
+                $._active = true;
                 $[TOKEN_VALUE] && forEachArray($[TOKEN_VALUE].split(join), function (v) {
                     return letValueInMap(v, _tags);
                 });
                 value && forEachArray(value.split(join), function (v) {
                     return setValueInMap(v, v, _tags);
                 });
+                $._active = _active;
                 return $.fire('change', [$[TOKEN_VALUE]]);
             }
         },
@@ -1925,7 +1927,9 @@
             if (!_active && !_fix) {
                 return $;
             }
+            $._active = true;
             $[TOKEN_VALUE] = $['_' + TOKEN_VALUE];
+            $._active = _active;
             return focus ? $.focus(mode) : $;
         }
     });
