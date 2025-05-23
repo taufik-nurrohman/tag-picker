@@ -787,7 +787,11 @@ setObjectAttributes(TagPicker, {
         },
         set: function (value) {
             let $ = this,
-                {_tags, state} = $,
+                {_active, _fix} = $;
+            if (!_active && !_fix) {
+                return $;
+            }
+            let {_tags, state} = $,
                 {join} = state;
             $[TOKEN_VALUE] && forEachArray($[TOKEN_VALUE].split(join), v => letValueInMap(v, _tags));
             value && forEachArray(value.split(join), v => setValueInMap(v, v, _tags));
@@ -1026,8 +1030,8 @@ TagPicker._ = setObjectMethods(TagPicker, {
     },
     reset: function (focus, mode) {
         let $ = this,
-            {_active} = $;
-        if (!_active) {
+            {_active, _fix} = $;
+        if (!_active && !_fix) {
             return $;
         }
         $[TOKEN_VALUE] = $['_' + TOKEN_VALUE];

@@ -1657,7 +1657,12 @@
             },
             set: function set(value) {
                 var $ = this,
-                    _tags = $._tags,
+                    _active = $._active,
+                    _fix = $._fix;
+                if (!_active && !_fix) {
+                    return $;
+                }
+                var _tags = $._tags,
                     state = $.state,
                     join = state.join;
                 $[TOKEN_VALUE] && forEachArray($[TOKEN_VALUE].split(join), function (v) {
@@ -1915,8 +1920,9 @@
         },
         reset: function reset(focus, mode) {
             var $ = this,
-                _active = $._active;
-            if (!_active) {
+                _active = $._active,
+                _fix = $._fix;
+            if (!_active && !_fix) {
                 return $;
             }
             $[TOKEN_VALUE] = $['_' + TOKEN_VALUE];
