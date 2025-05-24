@@ -1539,7 +1539,7 @@
         },
         'with': []
     };
-    TagPicker.version = '4.2.4';
+    TagPicker.version = '4.2.5';
     setObjectAttributes(TagPicker, {
         name: {
             value: name
