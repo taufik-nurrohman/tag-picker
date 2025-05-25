@@ -1688,7 +1688,6 @@
                 selectToNone();
                 var $ = this,
                     _active = $._active;
-                $._fix;
                 if (!_active) {
                     return $;
                 }
@@ -1842,9 +1841,8 @@
             // Re-assign some state value(s) using the setter to either normalize or reject the initial value
             $.max = max = Infinity === max || isInteger(max) && max >= 0 ? max : Infinity;
             $.min = min = isInteger(min) && min >= 0 ? min : 0;
-            var _active = $._active;
-            $._tags;
-            var _state2 = state,
+            var _active = $._active,
+                _state2 = state,
                 join = _state2.join,
                 tagsValues;
             // Force the `this._active` value to `true` to set the initial value

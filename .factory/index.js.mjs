@@ -810,7 +810,7 @@ setObjectAttributes(TagPicker, {
         set: function (value) {
             selectToNone();
             let $ = this,
-                {_active, _fix} = $;
+                {_active} = $;
             if (!_active) {
                 return $;
             }
@@ -954,7 +954,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
         // Re-assign some state value(s) using the setter to either normalize or reject the initial value
         $.max = max = Infinity === max || (isInteger(max) && max >= 0) ? max : Infinity;
         $.min = min = isInteger(min) && min >= 0 ? min : 0;
-        let {_active, _tags} = $,
+        let {_active} = $,
             {join} = state, tagsValues;
         // Force the `this._active` value to `true` to set the initial value
         $._active = true;
