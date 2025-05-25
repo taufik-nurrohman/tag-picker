@@ -12,7 +12,7 @@
     "@taufik-nurrohman/is": "^1.0.5",
     "@taufik-nurrohman/pattern": "^1.0.1",
     "@taufik-nurrohman/selection": "^1.1.0",
-    "@taufik-nurrohman/tick": "^2.1.0",
+    "@taufik-nurrohman/tick": "^2.1.1",
     "@taufik-nurrohman/to": "^1.2.0"
   },
   "description": "Better tags input interaction with JavaScript.",
