@@ -1651,6 +1651,7 @@
                 return this._tags;
             },
             set: function set(tags) {
+                selectToNone();
                 var $ = this,
                     tagsValues = [];
                 createTags($, tags);
@@ -1665,6 +1666,7 @@
                 return getText(this._mask.input);
             },
             set: function set(value) {
+                selectToNone();
                 var $ = this,
                     _active = $._active,
                     _fix = $._fix;
@@ -1683,6 +1685,7 @@
                 return "" !== value ? value : null;
             },
             set: function set(value) {
+                selectToNone();
                 var $ = this,
                     _active = $._active;
                 $._fix;

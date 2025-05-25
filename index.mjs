@@ -779,6 +779,7 @@ setObjectAttributes(TagPicker, {
             return this._tags;
         },
         set: function (tags) {
+            selectToNone();
             let $ = this, tagsValues = [];
             createTags($, tags);
             forEachMap($._tags, v => tagsValues.push(getTagValue(v[2], 1)));
@@ -790,6 +791,7 @@ setObjectAttributes(TagPicker, {
             return getText(this._mask.input);
         },
         set: function (value) {
+            selectToNone();
             let $ = this,
                 {_active, _fix} = $;
             if (!_active || _fix) {
@@ -806,6 +808,7 @@ setObjectAttributes(TagPicker, {
             return "" !== value ? value : null;
         },
         set: function (value) {
+            selectToNone();
             let $ = this,
                 {_active, _fix} = $;
             if (!_active) {
