@@ -972,8 +972,9 @@
             data = e.data,
             inputType = e.inputType,
             picker = getReference($),
-            _active = picker._active;
-        if (!_active) {
+            _active = picker._active,
+            _fix = picker._fix;
+        if (!_active || _fix) {
             return offEventDefault(e);
         }
         var _tags = picker._tags,
@@ -1084,8 +1085,9 @@
     function onInputTextInput(e) {
         var $ = this,
             picker = getReference($),
-            _active = picker._active;
-        if (!_active) {
+            _active = picker._active,
+            _fix = picker._fix;
+        if (!_active || _fix) {
             return offEventDefault(e);
         }
         var state = picker.state,
@@ -1116,8 +1118,9 @@
             keyIsCtrl = _keyIsCtrl = e.ctrlKey,
             keyIsShift = _keyIsShift = e.shiftKey,
             picker = getReference($),
-            _active = picker._active;
-        if (!_active) {
+            _active = picker._active,
+            _fix = picker._fix;
+        if (!_active || _fix) {
             return offEventDefault(e);
         }
         var _mask = picker._mask,
@@ -1247,8 +1250,9 @@
             keyIsCtrl = _keyIsCtrl = e.ctrlKey,
             keyIsShift = _keyIsShift = e.shiftKey,
             picker = getReference($),
-            _active = picker._active;
-        if (!_active) {
+            _active = picker._active,
+            _fix = picker._fix;
+        if (!_active || _fix) {
             return;
         }
         var _tags = picker._tags,
@@ -1461,12 +1465,18 @@
     }
 
     function onPointerDownTagX(e) {
+        offEventDefault(e);
         var $ = this,
             tag = getParent($),
             picker = getReference(tag),
-            _tags = picker._tags;
+            _active = picker._active,
+            _fix = picker._fix;
+        if (!_active || _fix) {
+            return focusTo(picker);
+        }
+        var _tags = picker._tags;
         letValueInMap(getTagValue(tag), _tags);
-        focusTo(picker), offEventDefault(e);
+        focusTo(picker);
     }
 
     function onResetForm() {
@@ -1539,7 +1549,7 @@
         },
         'with': []
     };
-    TagPicker.version = '4.2.5';
+    TagPicker.version = '4.2.6';
     setObjectAttributes(TagPicker, {
         name: {
             value: name
@@ -1591,7 +1601,7 @@
                     self = $.self,
                     input = _mask.input,
                     v = !!value;
-                $._active = !($._fix = self[TOKEN_READ_ONLY] = v);
+                self[TOKEN_READ_ONLY] = $._fix = v;
                 if (v) {
                     letAttribute(input, TOKEN_CONTENTEDITABLE);
                     setAria(input, TOKEN_READONLY, true);
@@ -1654,8 +1664,9 @@
             },
             set: function set(value) {
                 var $ = this,
-                    _active = $._active;
-                if (!_active) {
+                    _active = $._active,
+                    _fix = $._fix;
+                if (!_active || _fix) {
                     return $;
                 }
                 var _mask = $._mask,
@@ -1671,22 +1682,20 @@
             },
             set: function set(value) {
                 var $ = this,
-                    _active = $._active,
-                    _fix = $._fix;
-                if (!_active && !_fix) {
+                    _active = $._active;
+                $._fix;
+                if (!_active) {
                     return $;
                 }
                 var _tags = $._tags,
                     state = $.state,
                     join = state.join;
-                $._active = true;
                 $[TOKEN_VALUE] && forEachArray($[TOKEN_VALUE].split(join), function (v) {
                     return letValueInMap(v, _tags);
                 });
                 value && forEachArray(value.split(join), function (v) {
                     return setValueInMap(v, v, _tags);
                 });
-                $._active = _active;
                 return $.fire('change', [$[TOKEN_VALUE]]);
             }
         },
@@ -1702,7 +1711,7 @@
                     self = $.self,
                     input = _mask.input,
                     v = !!value;
-                self[TOKEN_REQUIRED] = v;
+                self[TOKEN_REQUIRED] = $._vital = v;
                 if (v) {
                     if (0 === min) {
                         $.min = 1;
@@ -1742,7 +1751,7 @@
                 theInputName = self.name,
                 theInputPlaceholder = self.placeholder,
                 theInputValue = getValue(self);
-            $._active = !isDisabledSelf && !isReadOnlySelf;
+            $._active = !isDisabledSelf;
             $._fix = isReadOnlySelf;
             $._vital = isRequiredSelf;
             if (isRequiredSelf && min < 1) {
@@ -1926,9 +1935,8 @@
         },
         focus: function focus(mode) {
             var $ = this,
-                _active = $._active,
-                _fix = $._fix;
-            if (!_active && !_fix) {
+                _active = $._active;
+            if (!_active) {
                 return $;
             }
             var _mask = $._mask,
@@ -1937,14 +1945,11 @@
         },
         reset: function reset(focus, mode) {
             var $ = this,
-                _active = $._active,
-                _fix = $._fix;
-            if (!_active && !_fix) {
+                _active = $._active;
+            if (!_active) {
                 return $;
             }
-            $._active = true;
             $[TOKEN_VALUE] = $['_' + TOKEN_VALUE];
-            $._active = _active;
             return focus ? $.focus(mode) : $;
         }
     });

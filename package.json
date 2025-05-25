@@ -50,5 +50,5 @@
   "scripts": {
     "pack": "pack --clean=false --from=.factory --js-format=umd --js-name=TagPicker --js-top='%(js.license)' --mjs=true --scss=true --to=."
   },
-  "version": "4.2.5"
+  "version": "4.2.6"
 }

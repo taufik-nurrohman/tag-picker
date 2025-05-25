@@ -139,8 +139,8 @@ function onBeforeInputTextInput(e) {
     let $ = this,
         {data, inputType} = e,
         picker = getReference($),
-        {_active} = picker;
-    if (!_active) {
+        {_active, fix} = picker;
+    if (!_active || _fix) {
         return offEventDefault(e);
     }
     let {_tags, state} = picker,
@@ -246,8 +246,8 @@ function onFocusTextInput() {
 function onInputTextInput(e) {
     let $ = this,
         picker = getReference($),
-        {_active} = picker;
-    if (!_active) {
+        {_active, _fix} = picker;
+    if (!_active || _fix) {
         return offEventDefault(e);
     }
     let {state} = picker,
@@ -278,8 +278,8 @@ function onKeyDownTag(e) {
         keyIsCtrl = _keyIsCtrl = e.ctrlKey,
         keyIsShift = _keyIsShift = e.shiftKey,
         picker = getReference($),
-        {_active} = picker;
-    if (!_active) {
+        {_active, _fix} = picker;
+    if (!_active || _fix) {
         return offEventDefault(e);
     }
     let {_mask, _tags} = picker,
@@ -402,8 +402,8 @@ function onKeyDownTextInput(e) {
         keyIsCtrl = _keyIsCtrl = e.ctrlKey,
         keyIsShift = _keyIsShift = e.shiftKey,
         picker = getReference($),
-        {_active} = picker;
-    if (!_active) {
+        {_active, _fix} = picker;
+    if (!_active || _fix) {
         return;
     }
     let {_tags, self, state} = picker,
@@ -597,12 +597,17 @@ function onPointerDownTag(e) {
 }
 
 function onPointerDownTagX(e) {
+    offEventDefault(e);
     let $ = this,
         tag = getParent($),
         picker = getReference(tag),
-        {_tags} = picker;
+        {_active, _fix} = picker;
+    if (!_active || _fix) {
+        return focusTo(picker);
+    }
+    let {_tags} = picker;
     letValueInMap(getTagValue(tag), _tags);
-    focusTo(picker), offEventDefault(e);
+    focusTo(picker);
 }
 
 function onResetForm() {
@@ -676,7 +681,7 @@ TagPicker.state = {
     'with': []
 };
 
-TagPicker.version = '4.2.5';
+TagPicker.version = '4.2.6';
 
 setObjectAttributes(TagPicker, {
     name: {
@@ -724,7 +729,7 @@ setObjectAttributes(TagPicker, {
                 {_mask, _tags, mask, self} = $,
                 {input} = _mask,
                 v = !!value;
-            $._active = !($._fix = self[TOKEN_READ_ONLY] = v);
+            self[TOKEN_READ_ONLY] = $._fix = v;
             if (v) {
                 letAttribute(input, TOKEN_CONTENTEDITABLE);
                 setAria(input, TOKEN_READONLY, true);
@@ -784,8 +789,8 @@ setObjectAttributes(TagPicker, {
         },
         set: function (value) {
             let $ = this,
-                {_active} = $;
-            if (!_active) {
+                {_active, _fix} = $;
+            if (!_active || _fix) {
                 return $;
             }
             let {_mask} = $,
@@ -801,15 +806,13 @@ setObjectAttributes(TagPicker, {
         set: function (value) {
             let $ = this,
                 {_active, _fix} = $;
-            if (!_active && !_fix) {
+            if (!_active) {
                 return $;
             }
             let {_tags, state} = $,
                 {join} = state;
-            $._active = true;
             $[TOKEN_VALUE] && forEachArray($[TOKEN_VALUE].split(join), v => letValueInMap(v, _tags));
             value && forEachArray(value.split(join), v => setValueInMap(v, v, _tags));
-            $._active = _active;
             return $.fire('change', [$[TOKEN_VALUE]]);
         }
     },
@@ -822,7 +825,7 @@ setObjectAttributes(TagPicker, {
                 {_mask, mask, min, self} = $,
                 {input} = _mask,
                 v = !!value;
-            self[TOKEN_REQUIRED] = v;
+            self[TOKEN_REQUIRED] = $._vital = v;
             if (v) {
                 if (0 === min) {
                     $.min = 1;
@@ -860,7 +863,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
             theInputName = self.name,
             theInputPlaceholder = self.placeholder,
             theInputValue = getValue(self);
-        $._active = !isDisabledSelf && !isReadOnlySelf;
+        $._active = !isDisabledSelf;
         $._fix = isReadOnlySelf;
         $._vital = isRequiredSelf;
         if (isRequiredSelf && min < 1) {
@@ -1035,8 +1038,8 @@ TagPicker._ = setObjectMethods(TagPicker, {
     },
     focus: function (mode) {
         let $ = this,
-            {_active, _fix} = $;
-        if (!_active && !_fix) {
+            {_active} = $;
+        if (!_active) {
             return $;
         }
         let {_mask} = $,
@@ -1045,13 +1048,11 @@ TagPicker._ = setObjectMethods(TagPicker, {
     },
     reset: function (focus, mode) {
         let $ = this,
-            {_active, _fix} = $;
-        if (!_active && !_fix) {
+            {_active} = $;
+        if (!_active) {
             return $;
         }
-        $._active = true;
         $[TOKEN_VALUE] = $['_' + TOKEN_VALUE];
-        $._active = _active;
         return focus ? $.focus(mode) : $;
     }
 });

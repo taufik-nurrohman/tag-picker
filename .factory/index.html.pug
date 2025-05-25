@@ -419,16 +419,6 @@ block content
       = ' '
       code picker.fix
     p Gets or sets the read-only state of the tag picker. By setting the value to #[code false] or #[code true], the read-only state of the source element will also be set automatically.
-    div(role='note')
-      p #[b Note:] Setting this value to #[code true] will automatically set the #[a(href='#instance-property-active') #[code picker.active]] value to #[code false], and vice versa. However, it will not disable the tag picker as if you set the #[a(href='#instance-property-active') #[code picker.active]] value to #[code false] directly. This means that if the #[a(href='#instance-property-active') #[code picker.active]] value is #[code false], it does not always mean that the #[a(href='#instance-property-fix') #[code picker.fix]] value is #[code true]. However, if the #[a(href='#instance-property-fix') #[code picker.fix]] value is #[code true], it always means that the #[a(href='#instance-property-active') #[code picker.active]] value is #[code false].
-      pre: code
-        | if (!picker.active) {
-        |     // Tag picker is “disabled” or “read-only”
-        | }
-        |
-        | if (picker.fix) {
-        |     // Tag picker is “read-only”
-        | }
     pre: code
       | picker.fix = true; // Make the tag picker “read-only”
     h4#instance-property-hooks

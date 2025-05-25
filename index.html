@@ -5,7 +5,7 @@
     <meta content="#000" name="theme-color">
     <meta content="width=device-width" name="viewport">
     <meta content="Better tags input interaction with JavaScript." name="description">
-    <title>Tag Picker 4.2.5</title>
+    <title>Tag Picker 4.2.6</title>
     <link href="../layout/index.min.css" rel="stylesheet">
     <link href="../layout/anchor/index.min.css" rel="stylesheet">
     <link href="index.min.css" rel="stylesheet">
@@ -67,7 +67,7 @@
     <p role="alert">Do you like this project? Please support my <a href="https://github.com/mecha-cms">Mecha CMS</a> project too. Thank you!</p>
     <header>
       <hgroup>
-        <h1>Tag Picker 4.2.5</h1>
+        <h1>Tag Picker 4.2.6</h1>
         <p>Tag Picker is a JavaScript application designed to simplify the management of comma-separated lists of words, offering a minimalist interface for an enhanced user experience. Users can easily add tags by typing a word and pressing the <kbd>,</kbd> key (by default), or remove tags with a quick click (or by using common keys such as the <kbd>Backspace</kbd> or <kbd>Delete</kbd> keys). Developers can easily integrate and customize this application styles to match the design of their web project.</p>
       </hgroup>
       <p>It supports native keyboard interaction as if it were plain text. You should be able to copy, cut, and paste from/to the mask. Click a tag to select it, press the <kbd>Control</kbd> key while clicking the tag to select multiple tags. You can also select the tags using the combination of <kbd>Shift</kbd> and <kbd>ArrowLeft</kbd> or <kbd>ArrowRight</kbd> keys.</p>
@@ -283,16 +283,6 @@ picker.reset(true); // Reset the tag picker’s value and focus to the tag picke
 picker.active = true; // Make the tag picker “enabled”</code></pre>
       <h4 id="instance-property-fix"><a aria-hidden="true" href="#instance-property-fix">#</a> <code>picker.fix</code></h4>
       <p>Gets or sets the read-only state of the tag picker. By setting the value to <code>false</code> or <code>true</code>, the read-only state of the source element will also be set automatically.</p>
-      <div role="note">
-        <p><b>Note:</b> Setting this value to <code>true</code> will automatically set the <a href="#instance-property-active"><code>picker.active</code></a> value to <code>false</code>, and vice versa. However, it will not disable the tag picker as if you set the <a href="#instance-property-active"><code>picker.active</code></a> value to <code>false</code> directly. This means that if the <a href="#instance-property-active"><code>picker.active</code></a> value is <code>false</code>, it does not always mean that the <a href="#instance-property-fix"><code>picker.fix</code></a> value is <code>true</code>. However, if the <a href="#instance-property-fix"><code>picker.fix</code></a> value is <code>true</code>, it always means that the <a href="#instance-property-active"><code>picker.active</code></a> value is <code>false</code>.</p>
-        <pre><code>if (!picker.active) {
-    // Tag picker is “disabled” or “read-only”
-}
-
-if (picker.fix) {
-    // Tag picker is “read-only”
-}</code></pre>
-      </div>
       <pre><code>picker.fix = true; // Make the tag picker “read-only”</code></pre>
       <h4 id="instance-property-hooks"><a aria-hidden="true" href="#instance-property-hooks">#</a> <code>picker.hooks</code></h4>
       <p>Returns the events data.</p>
