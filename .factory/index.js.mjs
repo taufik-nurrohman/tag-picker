@@ -66,7 +66,12 @@ const [letError, letErrorAbort] = delay(function (picker) {
 });
 
 const setError = function (picker) {
-    setAria(picker.mask, TOKEN_INVALID, true);
+    let {mask, state} = picker,
+        {time} = state,
+        {error} = time;
+    if (isInteger(error) && error > 0) {
+        setAria(mask, TOKEN_INVALID, true);
+    }
 };
 
 const [toggleHint] = delay(function (picker) {
@@ -792,7 +797,6 @@ setObjectAttributes(TagPicker, {
             return getText(this._mask.input);
         },
         set: function (value) {
-            selectToNone();
             let $ = this,
                 {_active, _fix} = $;
             if (!_active || _fix) {
@@ -809,7 +813,6 @@ setObjectAttributes(TagPicker, {
             return "" !== value ? value : null;
         },
         set: function (value) {
-            selectToNone();
             let $ = this,
                 {_active} = $;
             if (!_active) {
