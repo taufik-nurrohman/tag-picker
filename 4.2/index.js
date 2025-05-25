@@ -1490,14 +1490,16 @@
             max = picker.max,
             min = picker.min,
             self = picker.self,
-            count = _tags.count();
+            count = _tags.count(),
+            exit;
         if (count > max) {
-            onInvalidSelf.call(self);
-            focusTo(picker.fire('max.tags', [count, max])), offEventDefault(e);
+            exit = true;
+            focusTo(picker.fire('max.tags', [count, max]));
         } else if (count < min) {
-            onInvalidSelf.call(self);
-            focusTo(picker.fire('min.tags', [count, min])), offEventDefault(e);
+            exit = true;
+            focusTo(picker.fire('min.tags', [count, min]));
         }
+        exit && (onInvalidSelf.call(self), offEventDefault(e));
     }
 
     function TagPicker(self, state) {
