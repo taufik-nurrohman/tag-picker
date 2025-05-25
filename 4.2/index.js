@@ -1561,6 +1561,7 @@
                 return this._active;
             },
             set: function set(value) {
+                selectToNone();
                 var $ = this,
                     _mask = $._mask,
                     _tags = $._tags,
@@ -1594,6 +1595,7 @@
                 return this._fix;
             },
             set: function set(value) {
+                selectToNone();
                 var $ = this,
                     _mask = $._mask,
                     _tags = $._tags,
@@ -1704,6 +1706,7 @@
                 return this._vital;
             },
             set: function set(value) {
+                selectToNone();
                 var $ = this,
                     _mask = $._mask,
                     mask = $.mask,

@@ -139,7 +139,7 @@ function onBeforeInputTextInput(e) {
     let $ = this,
         {data, inputType} = e,
         picker = getReference($),
-        {_active, fix} = picker;
+        {_active, _fix} = picker;
     if (!_active || _fix) {
         return offEventDefault(e);
     }
@@ -695,6 +695,7 @@ setObjectAttributes(TagPicker, {
             return this._active;
         },
         set: function (value) {
+            selectToNone();
             let $ = this,
                 {_mask, _tags, mask, self} = $,
                 {input} = _mask,
@@ -725,6 +726,7 @@ setObjectAttributes(TagPicker, {
             return this._fix;
         },
         set: function (value) {
+            selectToNone();
             let $ = this,
                 {_mask, _tags, mask, self} = $,
                 {input} = _mask,
@@ -821,6 +823,7 @@ setObjectAttributes(TagPicker, {
             return this._vital;
         },
         set: function (value) {
+            selectToNone();
             let $ = this,
                 {_mask, mask, min, self} = $,
                 {input} = _mask,
