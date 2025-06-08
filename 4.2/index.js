@@ -400,6 +400,18 @@
         }
         return index;
     };
+    var getHTML = function getHTML(node, trim) {
+        if (trim === void 0) {
+            trim = true;
+        }
+        var state = 'innerHTML';
+        if (!hasState(node, state)) {
+            return false;
+        }
+        var content = node[state];
+        content = trim ? content.trim() : content;
+        return "" !== content ? content : null;
+    };
     var getID = function getID(node, batch) {
         if (batch === void 0) {
             batch = 'e:';
@@ -636,15 +648,18 @@
         return node.value = _fromValue(value), node;
     };
     var theID = {};
+    var now = Date.now;
+    var history = new WeakMap();
+    var historyIndex = new WeakMap();
     var _getSelection = function _getSelection() {
         return D.getSelection();
     };
     var _setRange = function _setRange() {
         return D.createRange();
     };
-    var getCharBeforeCaret = function getCharBeforeCaret(node, selection) {
+    var getCharBeforeCaret = function getCharBeforeCaret(node, n, selection) {
         selection = selection || _getSelection();
-        if (!selection.rangeCount) {
+        if (!hasSelection(node, selection)) {
             return null;
         }
         var range = selection.getRangeAt(0).cloneRange();
@@ -652,37 +667,45 @@
         range.setStart(node, 0);
         return (range + "").slice(-1);
     };
+    // The `node` parameter is currently not in use
+    var hasSelection = function hasSelection(node, selection) {
+        return (selection || _getSelection()).rangeCount > 0;
+    };
     // <https://stackoverflow.com/a/6691294/1163000>
     // The `node` parameter is currently not in use
     var insertAtSelection = function insertAtSelection(node, content, mode, selection) {
         selection = selection || _getSelection();
         var from, range, to;
-        if (selection.rangeCount) {
-            range = selection.getRangeAt(0);
-            range.deleteContents();
-            to = D.createDocumentFragment();
-            var nodeCurrent, nodeFirst, nodeLast;
-            if (isString(content)) {
-                from = setElement('div');
-                setHTML(from, content);
-                while (nodeCurrent = getChildFirst(from, 1)) {
-                    nodeLast = setChildLast(to, nodeCurrent);
-                }
-            } else if (isArray(content)) {
-                forEachArray(content, function (v) {
-                    return nodeLast = setChildLast(to, v);
-                });
-            } else {
-                nodeLast = setChildLast(to, content);
+        if (!hasSelection(node, selection)) {
+            return false;
+        }
+        range = selection.getRangeAt(0);
+        range.deleteContents();
+        to = D.createDocumentFragment();
+        var nodeCurrent, nodeFirst, nodeLast;
+        if (isString(content)) {
+            from = setElement('div');
+            setHTML(from, content);
+            while (nodeCurrent = getChildFirst(from, 1)) {
+                nodeLast = setChildLast(to, nodeCurrent);
             }
-            nodeFirst = getChildFirst(to, 1);
-            range.insertNode(to);
-            if (nodeLast) {
-                range = range.cloneRange();
-                range.setStartAfter(nodeLast);
-                range.setStartBefore(nodeFirst);
-                setSelection(node, range, selectToNone(selection));
+        } else if (isArray(content)) {
+            forEachArray(content, function (v) {
+                return nodeLast = setChildLast(to, v);
+            });
+        } else {
+            nodeLast = setChildLast(to, content);
+        }
+        nodeFirst = getChildFirst(to, 1);
+        range.insertNode(to);
+        if (nodeLast) {
+            range = range.cloneRange();
+            range.setStartAfter(nodeLast);
+            range.setStartBefore(nodeFirst);
+            {
+                range.collapse();
             }
+            setSelection(node, range, selectToNone(node, selection));
         }
         return selection;
     };
@@ -690,6 +713,18 @@
     var letSelection = function letSelection(node, selection) {
         selection = selection || _getSelection();
         return selection.empty(), selection;
+    };
+    var redo = function redo(node, selection) {
+        var _getValueInMap, _getValueInMap2;
+        var h = (_getValueInMap = getValueInMap(node, history)) != null ? _getValueInMap : [],
+            i = (_getValueInMap2 = getValueInMap(node, historyIndex)) != null ? _getValueInMap2 : toCount(h) - 1,
+            j;
+        if (!(j = h[i + 1])) {
+            return restoreSelection(node, h[i][1], selection);
+        }
+        i++;
+        setValueInMap(node, i, historyIndex);
+        return setHTML(node, j[0]), restoreSelection(node, j[1], selection);
     };
     // <https://stackoverflow.com/a/13950376/1163000>
     var restoreSelection = function restoreSelection(node, store, selection) {
@@ -721,6 +756,34 @@
         }
         return setSelection(node, range, letSelection(node, selection));
     };
+    // <https://stackoverflow.com/a/13950376/1163000>
+    var saveSelection = function saveSelection(node, selection) {
+        var range = (_getSelection()).getRangeAt(0),
+            rangeClone = range.cloneRange();
+        rangeClone.selectNodeContents(node);
+        rangeClone.setEnd(range.startContainer, range.startOffset);
+        var start = toCount(rangeClone + "");
+        return [start, start + toCount(range + "")];
+    };
+    var saveState = function saveState(node, selection) {
+        var _getValueInMap3, _getValueInMap4, _getHTML;
+        var h = (_getValueInMap3 = getValueInMap(node, history)) != null ? _getValueInMap3 : [],
+            i = (_getValueInMap4 = getValueInMap(node, historyIndex)) != null ? _getValueInMap4 : toCount(h) - 1,
+            j,
+            v = (_getHTML = getHTML(node)) != null ? _getHTML : "";
+        j = hasSelection(node, selection) ? saveSelection(node) : [];
+        if (h[i] && v === h[i][0] && j[0] === h[i][1][0] && j[1] === h[i][1][1]) {
+            return node; // No change
+        }
+        // Trim future history if `undo()` was used
+        if (i < toCount(h) - 1) {
+            h.splice(i + 1);
+        }
+        h.push([v, j, now()]);
+        setValueInMap(node, h, history);
+        setValueInMap(node, ++i, historyIndex);
+        return node;
+    };
     var selectTo = function selectTo(node, mode, selection) {
         selection = selection || _getSelection();
         letSelection(node, selection);
@@ -733,7 +796,8 @@
             selection.collapseToStart();
         } else;
     };
-    var selectToNone = function selectToNone(selection) {
+    // The `node` parameter is currently not in use
+    var selectToNone = function selectToNone(node, selection) {
         selection = selection || _getSelection();
         // selection.removeAllRanges();
         if (selection.rangeCount) {
@@ -748,6 +812,18 @@
             return restoreSelection(node, range, selection);
         }
         return selection.addRange(range), selection;
+    };
+    var undo = function undo(node, selection) {
+        var _getValueInMap5, _getValueInMap6;
+        var h = (_getValueInMap5 = getValueInMap(node, history)) != null ? _getValueInMap5 : [],
+            i = (_getValueInMap6 = getValueInMap(node, historyIndex)) != null ? _getValueInMap6 : toCount(h) - 1,
+            j;
+        if (!(j = h[i - 1])) {
+            return restoreSelection(node, h[i][1], selection);
+        }
+        i--;
+        setValueInMap(node, i, historyIndex);
+        return setHTML(node, j[0]), restoreSelection(node, j[1], selection);
     };
 
     function _toArray(iterable) {
@@ -876,6 +952,8 @@
     var KEY_ENTER = 'Enter';
     var KEY_ESCAPE = 'Escape';
     var KEY_TAB = 'Tab';
+    var KEY_Y = 'y';
+    var KEY_Z = 'z';
     var TOKEN_CONTENTEDITABLE = 'contenteditable';
     var TOKEN_DISABLED = 'disabled';
     var TOKEN_FALSE = 'false';
@@ -905,13 +983,18 @@
             setAria(mask, TOKEN_INVALID, true);
         }
     };
-    var _delay3 = delay(function (picker) {
+    var _delay3 = delay(function ($) {
+            saveState($);
+        }, 1),
+        _delay4 = _maybeArrayLike(_slicedToArray, _delay3, 1),
+        saveStateLazy = _delay4[0];
+    var _delay5 = delay(function (picker) {
             var _mask = picker._mask,
                 input = _mask.input;
             toggleHintByValue(picker, getText(input, 0));
         }),
-        _delay4 = _maybeArrayLike(_slicedToArray, _delay3, 1),
-        toggleHint = _delay4[0];
+        _delay6 = _maybeArrayLike(_slicedToArray, _delay5, 1),
+        toggleHint = _delay6[0];
     var toggleHintByValue = function toggleHintByValue(picker, value) {
         var _mask = picker._mask,
             hint = _mask.hint;
@@ -1062,7 +1145,8 @@
     }
 
     function onCutTextInput() {
-        toggleHint(1, getReference(this));
+        var $ = this;
+        saveState($), toggleHint(1, getReference($)), saveStateLazy($);
     }
 
     function onFocusSelf() {
@@ -1101,9 +1185,9 @@
             inputType = e.inputType,
             v = getText($, 0);
         if ('deleteContent' === inputType.slice(0, 13) && !v) {
-            toggleHintByValue(picker, 0);
+            toggleHintByValue(picker, 0), saveStateLazy($);
         } else if ('insertText' === inputType) {
-            toggleHintByValue(picker, 1);
+            toggleHintByValue(picker, 1), saveStateLazy($);
         }
         if (isString(pattern) && !toPattern(pattern).test(v)) {
             letErrorAbort(), setError(picker);
@@ -1279,20 +1363,20 @@
             tagLast,
             textIsVoid = !getText($, 0);
         if (keyIsShift) {
-            if (KEY_ENTER === key) {
-                exit = true;
-            } else if (KEY_TAB === key) {
-                selectToNone();
-            } else if (KEY_ARROW_LEFT === key) {
+            if (KEY_ARROW_LEFT === key) {
                 if (caretIsToTheFirst || textIsVoid) {
                     exit = true;
                     selectToNone();
                     tagLast = toValueLastFromMap(_tags);
                     tagLast && focusTo(tagLast[2]) && setAria(tagLast[2], TOKEN_PRESSED, true);
                 }
+            } else if (KEY_ENTER === key) {
+                exit = true;
+            } else if (KEY_TAB === key) {
+                selectToNone();
             }
         } else if (keyIsCtrl) {
-            if (KEY_A === key && textIsVoid && _tags.count()) {
+            if (KEY_A === toCaseLower(key) && textIsVoid && _tags.count()) {
                 exit = true;
                 forEachMap(_tags, function (v) {
                     return setAria(v[2], TOKEN_PRESSED, true), focusTo(v[2]), selectTo(v[2]);
@@ -1307,6 +1391,12 @@
                 tagFirst && focusTo(tagFirst[2]);
             } else if (KEY_ENTER === key) {
                 exit = true;
+            } else if (!keyIsShift && KEY_Z === toCaseLower(key)) {
+                exit = true;
+                undo($);
+            } else if (keyIsShift && KEY_Z === toCaseLower(key) || KEY_Y === toCaseLower(key)) {
+                exit = true;
+                redo($);
             }
         } else {
             if (KEY_BEGIN === key) {
@@ -1391,7 +1481,7 @@
             state = picker.state,
             join = state.join,
             v;
-        toggleHint(1, picker), insertAtSelection($, v = e.clipboardData.getData('text/plain'));
+        saveState($), toggleHint(1, picker), insertAtSelection($, v = e.clipboardData.getData('text/plain')), saveStateLazy($);
         if (v !== getText($));
         else {
             forEachArray((getText($) + "").split(join), function (v) {
@@ -1557,7 +1647,7 @@
         },
         'with': []
     };
-    TagPicker.version = '4.2.6';
+    TagPicker.version = '4.2.7';
     setObjectAttributes(TagPicker, {
         name: {
             value: name
@@ -1881,7 +1971,7 @@
                     }
                 });
             }
-            return $;
+            return saveState(textInput), $;
         },
         blur: function blur() {
             selectToNone();

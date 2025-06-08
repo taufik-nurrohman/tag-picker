@@ -11,7 +11,7 @@
     "@taufik-nurrohman/hook": "^1.2.2",
     "@taufik-nurrohman/is": "^1.0.5",
     "@taufik-nurrohman/pattern": "^1.0.1",
-    "@taufik-nurrohman/selection": "^1.1.0",
+    "@taufik-nurrohman/selection": "^1.2.3",
     "@taufik-nurrohman/tick": "^2.1.1",
     "@taufik-nurrohman/to": "^1.2.0"
   },
@@ -50,5 +50,5 @@
   "scripts": {
     "pack": "pack --clean=false --from=.factory --js-format=umd --js-name=TagPicker --js-top='%(js.license)' --mjs=true --scss=true --to=."
   },
-  "version": "4.2.6"
+  "version": "4.2.7"
 }

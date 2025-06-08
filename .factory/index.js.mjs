@@ -1,4 +1,4 @@
-import {/* focusTo, */getCharBeforeCaret, insertAtSelection, selectTo, selectToNone} from '@taufik-nurrohman/selection';
+import {/* focusTo, */getCharBeforeCaret, insertAtSelection, redo, saveState, selectTo, selectToNone, undo} from '@taufik-nurrohman/selection';
 import {delay} from '@taufik-nurrohman/tick';
 import {forEachArray, forEachMap, forEachObject, getPrototype, getReference, getValueInMap, hasKeyInMap, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap, toValueFirstFromMap, toValueLastFromMap} from '@taufik-nurrohman/f';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
@@ -7,7 +7,7 @@ import {hasValue} from '@taufik-nurrohman/has';
 import {hook} from '@taufik-nurrohman/hook';
 import {isArray, isFloat, isFunction, isInstance, isInteger, isObject, isSet, isString} from '@taufik-nurrohman/is';
 import {offEvent, offEventDefault, onEvent} from '@taufik-nurrohman/event';
-import {toCount, toMapCount, toValue} from '@taufik-nurrohman/to';
+import {toCaseLower, toCount, toMapCount, toValue} from '@taufik-nurrohman/to';
 import {toPattern} from '@taufik-nurrohman/pattern';
 
 const EVENT_DOWN = 'down';
@@ -45,6 +45,8 @@ const KEY_END = 'End';
 const KEY_ENTER = 'Enter';
 const KEY_ESCAPE = 'Escape';
 const KEY_TAB = 'Tab';
+const KEY_Y = 'y';
+const KEY_Z = 'z';
 
 const TOKEN_CONTENTEDITABLE = 'contenteditable';
 const TOKEN_DISABLED = 'disabled';
@@ -73,6 +75,10 @@ const setError = function (picker) {
         setAria(mask, TOKEN_INVALID, true);
     }
 };
+
+const [saveStateLazy] = delay(function ($) {
+    saveState($);
+}, 1);
 
 const [toggleHint] = delay(function (picker) {
     let {_mask} = picker,
@@ -221,7 +227,8 @@ function onCutTag(e) {
 }
 
 function onCutTextInput() {
-    toggleHint(1, getReference(this));
+    let $ = this;
+    saveState($), toggleHint(1, getReference($)), saveStateLazy($);
 }
 
 function onFocusSelf() {
@@ -260,9 +267,9 @@ function onInputTextInput(e) {
         {inputType} = e,
         v = getText($, 0);
     if ('deleteContent' === inputType.slice(0, 13) && !v) {
-        toggleHintByValue(picker, 0);
+        toggleHintByValue(picker, 0), saveStateLazy($);
     } else if ('insertText' === inputType) {
-        toggleHintByValue(picker, 1);
+        toggleHintByValue(picker, 1), saveStateLazy($);
     }
     if (isString(pattern) && !toPattern(pattern).test(v)) {
         letErrorAbort(), setError(picker);
@@ -426,20 +433,20 @@ function onKeyDownTextInput(e) {
         tagFirst, tagLast,
         textIsVoid = !getText($, 0);
     if (keyIsShift) {
-        if (KEY_ENTER === key) {
-            exit = true;
-        } else if (KEY_TAB === key) {
-            selectToNone();
-        } else if (KEY_ARROW_LEFT === key) {
+        if (KEY_ARROW_LEFT === key) {
             if (caretIsToTheFirst || textIsVoid) {
                 exit = true;
                 selectToNone();
                 tagLast = toValueLastFromMap(_tags);
                 tagLast && focusTo(tagLast[2]) && setAria(tagLast[2], TOKEN_PRESSED, true);
             }
+        } else if (KEY_ENTER === key) {
+            exit = true;
+        } else if (KEY_TAB === key) {
+            selectToNone();
         }
     } else if (keyIsCtrl) {
-        if (KEY_A === key && textIsVoid && _tags.count()) {
+        if (KEY_A === toCaseLower(key) && textIsVoid && _tags.count()) {
             exit = true;
             forEachMap(_tags, v => (setAria(v[2], TOKEN_PRESSED, true), focusTo(v[2]), selectTo(v[2])));
         } else if (KEY_ARROW_LEFT === key) {
@@ -452,6 +459,12 @@ function onKeyDownTextInput(e) {
             tagFirst && focusTo(tagFirst[2]);
         } else if (KEY_ENTER === key) {
             exit = true;
+        } else if (!keyIsShift && KEY_Z === toCaseLower(key)) {
+            exit = true;
+            undo($);
+        } else if (keyIsShift && KEY_Z === toCaseLower(key) || KEY_Y === toCaseLower(key)) {
+            exit = true;
+            redo($);
         }
     } else {
         if (KEY_BEGIN === key) {
@@ -529,7 +542,7 @@ function onPasteTextInput(e) {
         picker = getReference($),
         {_tags, self, state} = picker,
         {join} = state, v;
-    toggleHint(1, picker), insertAtSelection($, v = e.clipboardData.getData('text/plain'));
+    saveState($), toggleHint(1, picker), insertAtSelection($, v = e.clipboardData.getData('text/plain'), -1), saveStateLazy($);
     if (v !== getText($)) {} else {
         forEachArray((getText($) + "").split(join), v => {
             if (!hasKeyInMap(v = toValue(v.trim()), _tags)) {
@@ -990,7 +1003,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
                 }
             });
         }
-        return $;
+        return saveState(textInput), $;
     },
     blur: function () {
         selectToNone();
