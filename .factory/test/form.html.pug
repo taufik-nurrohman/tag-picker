@@ -7,11 +7,12 @@ block state
 
 block script
   script
-    | const picker = new TagPicker(document.forms[0].test);
-    |
-    | picker.self.form.addEventListener('submit', function (e) {
-    |     console.log(picker.value);
-    |     this.prevent.checked && e.preventDefault();
+    | document.querySelectorAll('input[name="test[]"]').forEach(self => {
+    |     const picker = new TagPicker(self);
+    |     picker.self.form.addEventListener('submit', function (e) {
+    |         console.log(this.value);
+    |         this.prevent.checked && e.preventDefault();
+    |     });
     | });
 
 block style
@@ -24,7 +25,8 @@ block content
   main
     p Submitting a form by pressing the #[em Submit] button vs. pressing the #[kbd Enter] key in the tag picker mask.
     form(method='get' target='_blank')
-      p: input(name='test' type='text' value='a, b')
+      p: input(name='test[]' type='text' value='a, b')
+      p: input(name='test[]' type='text' value='a, b')
       p
         label
           input(name='prevent' type='checkbox')

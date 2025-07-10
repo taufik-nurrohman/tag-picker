@@ -1,6 +1,6 @@
-import {/* focusTo, */getCharBeforeCaret, insertAtSelection, redo, saveState, selectTo, selectToNone, undo} from '@taufik-nurrohman/selection';
+import {/* focusTo, */getCharBeforeCaret, insertAtSelection, redoState, resetState, saveState, selectTo, selectToNone, undoState} from '@taufik-nurrohman/selection';
 import {delay} from '@taufik-nurrohman/tick';
-import {forEachArray, forEachMap, forEachObject, getPrototype, getReference, getValueInMap, hasKeyInMap, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap, toValueFirstFromMap, toValueLastFromMap} from '@taufik-nurrohman/f';
+import {forEachArray, forEachMap, forEachObject, forEachSet, getPrototype, getReference, getValueInMap, hasKeyInMap, letValueInMap, setObjectAttributes, setObjectMethods, setReference, setValueInMap, toValueFirstFromMap, toValueLastFromMap} from '@taufik-nurrohman/f';
 import {fromStates, fromValue} from '@taufik-nurrohman/from';
 import {getAria, getElement, getElementIndex, getID, getNext, getParent, getParentForm, getPrev, getRole, getState, getText, getValue, isDisabled, isReadOnly, isRequired, letAria, letAttribute, letClass, letElement, letStyle, setAria, setAttribute, setChildLast, setClass, setDatum, setElement, setID, setNext, setPrev, setStyle, setText, setValue} from '@taufik-nurrohman/document';
 import {hasValue} from '@taufik-nurrohman/has';
@@ -461,10 +461,10 @@ function onKeyDownTextInput(e) {
             exit = true;
         } else if (!keyIsShift && KEY_Z === toCaseLower(key)) {
             exit = true;
-            undo($);
+            undoState($);
         } else if (keyIsShift && KEY_Z === toCaseLower(key) || KEY_Y === toCaseLower(key)) {
             exit = true;
-            redo($);
+            redoState($);
         }
     } else {
         if (KEY_BEGIN === key) {
@@ -629,22 +629,22 @@ function onPointerDownTagX(e) {
 }
 
 function onResetForm() {
-    getReference(this).reset();
+    forEachSet(getReference(this), $ => $.reset());
 }
 
 function onSubmitForm(e) {
-    let $ = this,
-        picker = getReference($),
-        {_tags, max, min, self} = picker,
-        count = _tags.count(), exit;
-    if (count > max) {
-        exit = true;
-        focusTo(picker.fire('max.tags', [count, max]));
-    } else if (count < min) {
-        exit = true;
-        focusTo(picker.fire('min.tags', [count, min]));
-    }
-    exit && (onInvalidSelf.call(self), offEventDefault(e));
+    forEachSet(getReference(this), picker => {
+        let {_tags, max, min, self} = picker,
+            count = _tags.count(), exit;
+        if (count > max) {
+            exit = true;
+            focusTo(picker.fire('max.tags', [count, max]));
+        } else if (count < min) {
+            exit = true;
+            focusTo(picker.fire('min.tags', [count, min]));
+        }
+        exit && (onInvalidSelf.call(self), offEventDefault(e));
+    });
 }
 
 function TagPicker(self, state) {
@@ -817,7 +817,7 @@ setObjectAttributes(TagPicker, {
             }
             let {_mask} = $,
                 {input} = _mask, v;
-            return setText(input, v = fromValue(value)), toggleHintByValue($, v), $;
+            return setText(input, v = fromValue(value)), toggleHintByValue($, v), resetState(input), $;
         }
     },
     value: {
@@ -941,10 +941,12 @@ TagPicker._ = setObjectMethods(TagPicker, {
         setNext(self, mask);
         setChildLast(mask, self);
         if (form) {
+            let set = getReference(form) || new Set;
+            set.add($);
             onEvent(EVENT_RESET, form, onResetForm);
             onEvent(EVENT_SUBMIT, form, onSubmitForm);
             setID(form);
-            setReference(form, $);
+            setReference(form, set);
         }
         onEvent(EVENT_BLUR, textInput, onBlurTextInput);
         onEvent(EVENT_CUT, textInput, onCutTextInput);
@@ -1003,7 +1005,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
                 }
             });
         }
-        return saveState(textInput), $;
+        return resetState(textInput), $;
     },
     blur: function () {
         selectToNone();
@@ -1075,6 +1077,7 @@ TagPicker._ = setObjectMethods(TagPicker, {
         if (!_active) {
             return $;
         }
+        $[TOKEN_VALUE] = ""; // Clear before reset
         $[TOKEN_VALUE] = $['_' + TOKEN_VALUE];
         return focus ? $.focus(mode) : $;
     }

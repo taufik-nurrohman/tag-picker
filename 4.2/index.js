@@ -308,6 +308,22 @@
         }
         return object;
     };
+    var forEachSet = function forEachSet(set, at) {
+        var items = _toIterator(set),
+            item = items.next();
+        while (!item.done) {
+            var k = void 0,
+                v = item.value;
+            v = at.call(set, v, k = v);
+            if (-1 === v) {
+                letValueInMap(k, set);
+            } else if (0 === v) {
+                break;
+            }
+            item = items.next();
+        }
+        return set;
+    };
     var getPrototype = function getPrototype(of) {
         return of.prototype;
     };
@@ -714,7 +730,7 @@
         selection = selection || _getSelection();
         return selection.empty(), selection;
     };
-    var redo = function redo(node, selection) {
+    var redoState = function redoState(node, selection) {
         var _getValueInMap, _getValueInMap2;
         var h = (_getValueInMap = getValueInMap(node, history)) != null ? _getValueInMap : [],
             i = (_getValueInMap2 = getValueInMap(node, historyIndex)) != null ? _getValueInMap2 : toCount(h) - 1,
@@ -725,6 +741,11 @@
         i++;
         setValueInMap(node, i, historyIndex);
         return setHTML(node, j[0]), restoreSelection(node, j[1], selection);
+    };
+    var resetState = function resetState(node, selection) {
+        letValueInMap(node, history);
+        letValueInMap(node, historyIndex);
+        return saveState(node, selection);
     };
     // <https://stackoverflow.com/a/13950376/1163000>
     var restoreSelection = function restoreSelection(node, store, selection) {
@@ -775,7 +796,7 @@
         if (h[i] && v === h[i][0] && j[0] === h[i][1][0] && j[1] === h[i][1][1]) {
             return node; // No change
         }
-        // Trim future history if `undo()` was used
+        // Trim future history if `undoState()` was used
         if (i < toCount(h) - 1) {
             h.splice(i + 1);
         }
@@ -813,7 +834,7 @@
         }
         return selection.addRange(range), selection;
     };
-    var undo = function undo(node, selection) {
+    var undoState = function undoState(node, selection) {
         var _getValueInMap5, _getValueInMap6;
         var h = (_getValueInMap5 = getValueInMap(node, history)) != null ? _getValueInMap5 : [],
             i = (_getValueInMap6 = getValueInMap(node, historyIndex)) != null ? _getValueInMap6 : toCount(h) - 1,
@@ -1393,10 +1414,10 @@
                 exit = true;
             } else if (!keyIsShift && KEY_Z === toCaseLower(key)) {
                 exit = true;
-                undo($);
+                undoState($);
             } else if (keyIsShift && KEY_Z === toCaseLower(key) || KEY_Y === toCaseLower(key)) {
                 exit = true;
-                redo($);
+                redoState($);
             }
         } else {
             if (KEY_BEGIN === key) {
@@ -1576,26 +1597,28 @@
     }
 
     function onResetForm() {
-        getReference(this).reset();
+        forEachSet(getReference(this), function ($) {
+            return $.reset();
+        });
     }
 
     function onSubmitForm(e) {
-        var $ = this,
-            picker = getReference($),
-            _tags = picker._tags,
-            max = picker.max,
-            min = picker.min,
-            self = picker.self,
-            count = _tags.count(),
-            exit;
-        if (count > max) {
-            exit = true;
-            focusTo(picker.fire('max.tags', [count, max]));
-        } else if (count < min) {
-            exit = true;
-            focusTo(picker.fire('min.tags', [count, min]));
-        }
-        exit && (onInvalidSelf.call(self), offEventDefault(e));
+        forEachSet(getReference(this), function (picker) {
+            var _tags = picker._tags,
+                max = picker.max,
+                min = picker.min,
+                self = picker.self,
+                count = _tags.count(),
+                exit;
+            if (count > max) {
+                exit = true;
+                focusTo(picker.fire('max.tags', [count, max]));
+            } else if (count < min) {
+                exit = true;
+                focusTo(picker.fire('min.tags', [count, min]));
+            }
+            exit && (onInvalidSelf.call(self), offEventDefault(e));
+        });
     }
 
     function TagPicker(self, state) {
@@ -1773,7 +1796,7 @@
                 var _mask = $._mask,
                     input = _mask.input,
                     v;
-                return setText(input, v = _fromValue(value)), toggleHintByValue($, v), $;
+                return setText(input, v = _fromValue(value)), toggleHintByValue($, v), resetState(input), $;
             }
         },
         value: {
@@ -1907,10 +1930,12 @@
             setNext(self, mask);
             setChildLast(mask, self);
             if (form) {
+                var set = getReference(form) || new Set();
+                set.add($);
                 onEvent(EVENT_RESET, form, onResetForm);
                 onEvent(EVENT_SUBMIT, form, onSubmitForm);
                 setID(form);
-                setReference(form, $);
+                setReference(form, set);
             }
             onEvent(EVENT_BLUR, textInput, onBlurTextInput);
             onEvent(EVENT_CUT, textInput, onCutTextInput);
@@ -1971,7 +1996,7 @@
                     }
                 });
             }
-            return saveState(textInput), $;
+            return resetState(textInput), $;
         },
         blur: function blur() {
             selectToNone();
@@ -2049,6 +2074,7 @@
             if (!_active) {
                 return $;
             }
+            $[TOKEN_VALUE] = ""; // Clear before reset
             $[TOKEN_VALUE] = $['_' + TOKEN_VALUE];
             return focus ? $.focus(mode) : $;
         }
