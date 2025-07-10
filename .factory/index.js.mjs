@@ -285,10 +285,10 @@ function onInvalidSelf(e) {
 }
 
 function onKeyDownTag(e) {
-    let $ = _keyOverTag = this,
+    let $ = (_keyOverTag = this),
         key = e.key,
-        keyIsCtrl = _keyIsCtrl = e.ctrlKey,
-        keyIsShift = _keyIsShift = e.shiftKey,
+        keyIsCtrl = (_keyIsCtrl = e.ctrlKey),
+        keyIsShift = (_keyIsShift = e.shiftKey),
         picker = getReference($),
         {_active, _fix} = picker;
     if (!_active || _fix) {
@@ -411,8 +411,8 @@ function onKeyDownTextInput(e) {
     let $ = this,
         key = e.key,
         keyCode = e.keyCode,
-        keyIsCtrl = _keyIsCtrl = e.ctrlKey,
-        keyIsShift = _keyIsShift = e.shiftKey,
+        keyIsCtrl = (_keyIsCtrl = e.ctrlKey),
+        keyIsShift = (_keyIsShift = e.shiftKey),
         picker = getReference($),
         {_active, _fix} = picker;
     if (!_active || _fix) {
