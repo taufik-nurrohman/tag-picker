@@ -369,24 +369,32 @@ function onKeyDownTag(e) {
         } else if (KEY_DELETE_LEFT === key) {
             exit = true;
             tagPrev = getPrev($);
-            letValueInMap(getTagValue($), _tags);
+            let hasPressed = 0;
             forEachMap(_tags, v => {
                 if (getAria(v[2], TOKEN_PRESSED)) {
+                    hasPressed = 1;
                     tagPrev = getPrev(v[2]);
                     letValueInMap(getTagValue(v[2]), _tags);
                 }
             });
+            if (!getAria($, TOKEN_PRESSED) && hasPressed) {} else {
+                letValueInMap(getTagValue($), _tags);
+            }
             focusTo(tagPrev || picker), picker.fire('change', [picker[TOKEN_VALUE]]);
         } else if (KEY_DELETE_RIGHT === key) {
             exit = true;
             tagNext = getNext($);
-            letValueInMap(getTagValue($), _tags);
+            let hasPressed = 0;
             forEachMap(_tags, v => {
                 if (getAria(v[2], TOKEN_PRESSED)) {
+                    hasPressed = 1;
                     tagNext = getNext(v[2]);
                     letValueInMap(getTagValue(v[2]), _tags);
                 }
             });
+            if (!getAria($, TOKEN_PRESSED) && hasPressed) {} else {
+                letValueInMap(getTagValue($), _tags);
+            }
             focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker[TOKEN_VALUE]]);
         } else if (KEY_ENTER === key || ' ' === key) {
             exit = true;
@@ -587,7 +595,7 @@ function onPointerDownTag(e) {
         forEachMap(_tags, v => letAria(v[2], TOKEN_PRESSED));
     }
     if (_keyIsCtrl) {
-        setAria($, TOKEN_PRESSED, true);
+        getAria($, TOKEN_PRESSED) ? letAria($, TOKEN_PRESSED) : setAria($, TOKEN_PRESSED, true);
     } else if (_keyIsShift && _keyOverTag) {
         let tagEndIndex = getElementIndex($),
             tagStartIndex = getElementIndex(_keyOverTag),
@@ -700,7 +708,7 @@ TagPicker.state = {
     'with': []
 };
 
-TagPicker.version = '4.2.8';
+TagPicker.version = '4.2.9';
 
 setObjectAttributes(TagPicker, {
     name: {

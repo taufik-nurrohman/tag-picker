@@ -1316,24 +1316,34 @@
             } else if (KEY_DELETE_LEFT === key) {
                 exit = true;
                 tagPrev = getPrev($);
-                letValueInMap(getTagValue($), _tags);
+                var hasPressed = 0;
                 forEachMap(_tags, function (v) {
                     if (getAria(v[2], TOKEN_PRESSED)) {
+                        hasPressed = 1;
                         tagPrev = getPrev(v[2]);
                         letValueInMap(getTagValue(v[2]), _tags);
                     }
                 });
+                if (!getAria($, TOKEN_PRESSED) && hasPressed);
+                else {
+                    letValueInMap(getTagValue($), _tags);
+                }
                 focusTo(tagPrev || picker), picker.fire('change', [picker[TOKEN_VALUE]]);
             } else if (KEY_DELETE_RIGHT === key) {
                 exit = true;
                 tagNext = getNext($);
-                letValueInMap(getTagValue($), _tags);
+                var _hasPressed = 0;
                 forEachMap(_tags, function (v) {
                     if (getAria(v[2], TOKEN_PRESSED)) {
+                        _hasPressed = 1;
                         tagNext = getNext(v[2]);
                         letValueInMap(getTagValue(v[2]), _tags);
                     }
                 });
+                if (!getAria($, TOKEN_PRESSED) && _hasPressed);
+                else {
+                    letValueInMap(getTagValue($), _tags);
+                }
                 focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker[TOKEN_VALUE]]);
             } else if (KEY_ENTER === key || ' ' === key) {
                 exit = true;
@@ -1552,7 +1562,7 @@
             });
         }
         if (_keyIsCtrl) {
-            setAria($, TOKEN_PRESSED, true);
+            getAria($, TOKEN_PRESSED) ? letAria($, TOKEN_PRESSED) : setAria($, TOKEN_PRESSED, true);
         } else if (_keyIsShift && _keyOverTag) {
             var tagEndIndex = getElementIndex($),
                 tagStartIndex = getElementIndex(_keyOverTag),
@@ -1670,7 +1680,7 @@
         },
         'with': []
     };
-    TagPicker.version = '4.2.8';
+    TagPicker.version = '4.2.9';
     setObjectAttributes(TagPicker, {
         name: {
             value: name
