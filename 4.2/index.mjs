@@ -369,7 +369,7 @@ function onKeyDownTag(e) {
         } else if (KEY_DELETE_LEFT === key) {
             exit = true;
             tagPrev = getPrev($);
-            let hasPressed = 0;
+            let hasPressed = 0, v;
             forEachMap(_tags, v => {
                 if (getAria(v[2], TOKEN_PRESSED)) {
                     hasPressed = 1;
@@ -378,13 +378,13 @@ function onKeyDownTag(e) {
                 }
             });
             if (!getAria($, TOKEN_PRESSED) && hasPressed) {} else {
-                letValueInMap(getTagValue($), _tags);
+                getValueInMap(v = getTagValue($), _tags) >= 0 && letValueInMap(v, _tags);
             }
             focusTo(tagPrev || picker), picker.fire('change', [picker[TOKEN_VALUE]]);
         } else if (KEY_DELETE_RIGHT === key) {
             exit = true;
             tagNext = getNext($);
-            let hasPressed = 0;
+            let hasPressed = 0, v;
             forEachMap(_tags, v => {
                 if (getAria(v[2], TOKEN_PRESSED)) {
                     hasPressed = 1;
@@ -393,7 +393,7 @@ function onKeyDownTag(e) {
                 }
             });
             if (!getAria($, TOKEN_PRESSED) && hasPressed) {} else {
-                letValueInMap(getTagValue($), _tags);
+                getValueInMap(v = getTagValue($), _tags) >= 0 && letValueInMap(v, _tags);
             }
             focusTo(tagNext && tagNext !== text ? tagNext : picker), picker.fire('change', [picker[TOKEN_VALUE]]);
         } else if (KEY_ENTER === key || ' ' === key) {
@@ -708,7 +708,7 @@ TagPicker.state = {
     'with': []
 };
 
-TagPicker.version = '4.2.9';
+TagPicker.version = '4.2.10';
 
 setObjectAttributes(TagPicker, {
     name: {
